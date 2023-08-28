@@ -7,6 +7,8 @@
     <button class="botão">Cadastrar usúario</button>
 
     <div class="categoria">Categorias</div>
+
+    <input type="search" placeholder="Buscar" class="buscar material-symbols-outlined">
 @endsection
 
 
