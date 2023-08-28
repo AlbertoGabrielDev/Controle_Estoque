@@ -8,7 +8,10 @@
 
     <div class="categoria">Categorias</div>
 
-    <input type="search" placeholder="Buscar" class="buscar material-symbols-outlined">
-@endsection
+   <input type="search" placeholder="Buscar" class="buscar "> 
+   <span class="material-symbols-outlined">
+    search
+    </span>
 
+@endsection
 
