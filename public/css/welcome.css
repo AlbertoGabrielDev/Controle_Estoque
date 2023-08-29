@@ -169,3 +169,33 @@ img{
     justify-content: space-between; */
 }
 
+
+
+.stepper {
+    display: flex;
+    align-items: center;
+  }
+  
+  .stepper-btn {
+    padding: 5px 10px;
+    background-color: #f2f2f2;
+    border: 1px solid #ccc;
+    cursor: pointer;
+  }
+  
+  .stepper-input {
+    width: 80px;
+    text-align: center;
+    border: 1px solid #ccc;
+    margin: 0 10px;
+  }
+  
+  .stepper-input::-webkit-inner-spin-button,
+  .stepper-input::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  
+  .stepper-input:focus {
+    outline: none;
+  }
