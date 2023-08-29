@@ -6,7 +6,13 @@ use Illuminate\Http\Request;
 
 class CategoriaController extends Controller
 {
-    public function Index(){
-        return view('welcome');
+    public function Inicio(){
+        return view('categorias.categoria');
     }
+
+    public function Index(){
+        return view('categorias.index');
+    }
+
+   
 }

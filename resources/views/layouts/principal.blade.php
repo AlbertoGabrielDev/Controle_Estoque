@@ -11,6 +11,11 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm" crossorigin="anonymous"></script>
 </head>
 <body>
+      <button class="botão">Inicio</button>
+      <button class="botão">Entrar/Cadastrar</button>
+      <button class="botão">Fornecedores</button>
+      <button class="botão">Estoque</button>
+      <button class="botão">Cadastrar usúario</button>
       @yield('conteudo')  
 </body>
 </html>
