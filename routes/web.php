@@ -3,16 +3,9 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\CategoriaController;
 use App\Http\Controllers\ProdutoController;
-/*
-|--------------------------------------------------------------------------
-| Web Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register web routes for your application. These
-| routes are loaded by the RouteServiceProvider and all of them will
-| be assigned to the "web" middleware group. Make something great!
-|
-*/
+use App\Http\Controllers\EstoqueController;
+use App\Http\Controllers\FornecedorController;
+
 Route::prefix('/verdurao')->group(function(){
     // return view('welcome');
     Route::prefix('/categoria')->group(function(){
@@ -20,7 +13,18 @@ Route::prefix('/verdurao')->group(function(){
         Route::get('/index',[CategoriaController::class, 'Index'])->name('categoria.index');
     });
      
-     Route::get('/produtos',[ProdutoController::class, 'produtos'])->name('produtos.index');
+    Route::prefix('/produtos')->group(function(){
+        Route::get('/',[ProdutoController::class, 'produtos'])->name('produtos.inicio');
+        Route::get('/index',[ProdutoController::class, 'Index'])->name('produtos.index');
+        Route::get('/cadastro',[ProdutoController::class, 'cadastro'])->name('produtos.cadastro');
+    });
      
+    Route::prefix('/estoque')->group(function(){
+        Route::get('/',[EstoqueController::class, 'Index'])->name('estoque.index');
+    });
+
+    Route::prefix('/fornecedor')->group(function(){
+        Route::get('/',[FornecedorController::class, 'index'])->name('fornecedor.index');
+    });
 
 });

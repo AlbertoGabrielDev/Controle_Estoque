@@ -3,8 +3,8 @@
 @section('conteudo')
     <div class="categoria">Index</div> 
 
-    <div class="criar_categoria">
-        <button class="button_criar_categoria" type="submit">Criar Categoria</button>     
+    <div class="">
+        <button class="button_criar_categoria" type="submit"></button>     
     </div>
 
     <table class="table mt-5">
@@ -38,5 +38,18 @@
             <td>Inativar</td>
           </tr>
         </tbody>
-      </table>
+    </table>
+      <br>
+
+      <div class="categoria">Cadastro de Categoria</div> 
+
+    <form>
+        <div class="mb-3">
+          <label for="exampleInputPassword1" class="form-label mb-4">Categoria</label>
+          <input type="password" class="form-control form-control-lg w-25" id="exampleInputPassword1">
+        </div>
+        <div class="div_criar_categoria2">
+            <button class="button_criar_categoria2" type="submit">Criar Categoria</button>     
+        </div>
+    </form>
 @endsection

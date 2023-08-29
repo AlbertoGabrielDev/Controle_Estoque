@@ -10,8 +10,8 @@
         </button>
     </div>
     
-    <div class="criar_categoria">
-        <button class="button_criar_categoria" type="submit">Criar Categoria</button>     
+    <div class="div_criar_categoria">
+        <a class="button_criar_categoria" href="{{route('categoria.index')}}">Criar Categoria</a>
     </div>
 
    <div class="div_pai">
@@ -22,7 +22,7 @@
                 <p class="descricao">Todas os tipos de frutas frescas aqui. Tem banana, maça, perâ...</p>
                 
                 <div class="ver_produto">
-                    <button class="button_criar_categoria" type="submit" class="">Ver produtos</button>
+                    <a class="button_criar_categoria" href="{{route('produtos.inicio')}}">Ver produtos</a>
                 </div>
 
             </div>
