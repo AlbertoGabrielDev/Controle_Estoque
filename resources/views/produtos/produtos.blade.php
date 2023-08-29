@@ -25,8 +25,8 @@
                     <div class="valor">
                         Preço: 10,00
                     </div>
-                    <div class="inf_nutri">Quantidade</div>  
-                    <div class="stepper">
+                    {{-- <div class="inf_nutri">Quantidade</div>   --}}
+                    <div class="stepper inf_nutri">
                         <button class="stepper-btn decrement">-</button>
                         <input class="stepper-input" type="number" value="1" min="1" max="10">
                         <button class="stepper-btn increment">+</button>
@@ -48,7 +48,7 @@
         });
       
         incrementBtn.addEventListener('click', () => {
-          if (stepperInput.value <= 30) {
+          if (stepperInput.value < 30) {
             stepperInput.value = parseInt(stepperInput.value) + 1;
           }
         });

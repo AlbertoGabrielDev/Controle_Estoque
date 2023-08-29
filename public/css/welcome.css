@@ -184,6 +184,8 @@ img{
   }
   
   .stepper-input {
+    position: relative;
+    top: 0px;
     width: 80px;
     text-align: center;
     border: 1px solid #ccc;
