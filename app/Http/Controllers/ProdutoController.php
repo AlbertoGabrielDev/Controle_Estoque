@@ -17,24 +17,26 @@ class ProdutoController extends Controller
     }
 
     public function Cadastro(Request $request) {
-        $evento = [
-            10,
-            "Tuts"
-        ];
-        $cidade = "Sao Paulo";
-        $estado = "SP";
-        $vars_localidade = array("estado","cidade","evento");
-       //$resultado =compact($vars_localidade);
-        //dd($resultado);
+    //     $evento = [
+    //         10,
+    //         "Tuts"
+    //     ];
+    //     $cidade = "Sao Paulo";
+    //     $estado = "SP";
+    //     $vars_localidade = array("estado","cidade","evento");
+    //    //$resultado =compact($vars_localidade);
+    //     //dd($resultado);
+         $dados= $this->inserirCadastro($request);
+
 //comapct so retorna array
-        return view('produtos.cadastro',compact('vars_localidade'));
+        return view('produtos.cadastro',compact('dados'));
        
     }
 
     public function inserirCadastro(Request $request){
        
 
-        $produtos = Produtos::create([
+        $produtos = Produto::create([
         'nome_produto'      =>$request->nome_produto,
         'descricao'         =>$request->descricao,
         'validade'          =>$request->validade,
@@ -43,7 +45,7 @@ class ProdutoController extends Controller
         'preco_produto'     =>$request->preco_produto
         ]) ;
 
-            dd($produtos);
-
+            // dd($produtos);
+return $produtos;
     }
 }
