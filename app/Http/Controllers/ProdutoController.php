@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Produto;
+
 use Illuminate\Http\Request;
 
 class ProdutoController extends Controller
@@ -14,7 +16,34 @@ class ProdutoController extends Controller
         return view('produtos.index');
     }
 
-    public function Cadastro(){
-        return view('produtos.cadastro');
+    public function Cadastro(Request $request) {
+        $evento = [
+            10,
+            "Tuts"
+        ];
+        $cidade = "Sao Paulo";
+        $estado = "SP";
+        $vars_localidade = array("estado","cidade","evento");
+       //$resultado =compact($vars_localidade);
+        //dd($resultado);
+//comapct so retorna array
+        return view('produtos.cadastro',compact('vars_localidade'));
+       
+    }
+
+    public function inserirCadastro(Request $request){
+       
+
+        $produtos = Produtos::create([
+        'nome_produto'      =>$request->nome_produto,
+        'descricao'         =>$request->descricao,
+        'validade'          =>$request->validade,
+        'lote'              =>$request->lote,
+        'unidade_medida'    =>$request->unidade_medida,
+        'preco_produto'     =>$request->preco_produto
+        ]) ;
+
+            dd($produtos);
+
     }
 }

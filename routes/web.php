@@ -17,6 +17,7 @@ Route::prefix('/verdurao')->group(function(){
         Route::get('/',[ProdutoController::class, 'produtos'])->name('produtos.inicio');
         Route::get('/index',[ProdutoController::class, 'Index'])->name('produtos.index');
         Route::get('/cadastro',[ProdutoController::class, 'cadastro'])->name('produtos.cadastro');
+        Route::post('/cadastro',[ProdutoController::class, 'inserirCadastro'])->name('produtos.inserirCadastro');
     });
      
     Route::prefix('/estoque')->group(function(){

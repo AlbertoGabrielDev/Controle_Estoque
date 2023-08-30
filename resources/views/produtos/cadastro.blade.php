@@ -5,7 +5,10 @@
         Cadastro de Produtos
     </div>
 
-    <form action="">
+    {{dd($vars_localidade)}}
+
+    <form action="{{route('produtos.inserirCadastro')}}" method="POST">
+        @csrf
      <div class="estoque_espacamento"></div>
         <div class="row">
             <div class="col-md-4">
@@ -74,10 +77,7 @@
         <div class="div_criar_categoria2">
             <button class="button_criar_categoria2" type="submit">Criar Produto</button>     
         </div>
-      
               
-       
-        
     </form>    
 
 @endsection
