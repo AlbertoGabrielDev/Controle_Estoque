@@ -26,26 +26,27 @@ class ProdutoController extends Controller
     //     $vars_localidade = array("estado","cidade","evento");
     //    //$resultado =compact($vars_localidade);
     //     //dd($resultado);
-         $dados= $this->inserirCadastro($request);
+    //$dados= $this->inserirCadastro($request);
 
 //comapct so retorna array
-        return view('produtos.cadastro',compact('dados'));
+        return view('produtos.cadastro');
        
     }
 
     public function inserirCadastro(Request $request){
        
 
-        $produtos = Produto::create([
+        $produto = Produto::create([
         'nome_produto'      =>$request->nome_produto,
         'descricao'         =>$request->descricao,
         'validade'          =>$request->validade,
         'lote'              =>$request->lote,
         'unidade_medida'    =>$request->unidade_medida,
         'preco_produto'     =>$request->preco_produto
-        ]) ;
+        ]);
 
             // dd($produtos);
-return $produtos;
+        return redirect()->route('produtos.index')->with('success', 'Inserido com sucesso');
+        // return $produtos;
     }
 }
