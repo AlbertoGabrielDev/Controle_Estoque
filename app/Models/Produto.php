@@ -8,6 +8,9 @@ use Illuminate\Database\Eloquent\Model;
 class Produto extends Model
 {
 
+    protected $table= 'produto';
+    protected $primaryKey = 'cod_produto';
+
     protected $fillable=[
         'cod_produto',
         'nome_produto',
