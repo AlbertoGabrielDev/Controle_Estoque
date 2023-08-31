@@ -6,7 +6,7 @@ use App\Http\Controllers\ProdutoController;
 use App\Http\Controllers\EstoqueController;
 use App\Http\Controllers\FornecedorController;
 use App\Http\Controllers\UsuarioController;
-
+use App\Http\Controllers\MarcaController;
 
 Route::prefix('/verdurao')->group(function(){
     // return view('welcome');
@@ -37,6 +37,10 @@ Route::prefix('/verdurao')->group(function(){
 
     Route::prefix('/fornecedor')->group(function(){
         Route::get('/',[FornecedorController::class, 'index'])->name('fornecedor.index');
+    });
+
+    Route::prefix('/marca')->group(function(){
+        Route::get('/index',[MarcaController::class, 'index'])->name('marca.index');
     });
 
 });
