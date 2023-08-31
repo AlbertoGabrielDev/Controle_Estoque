@@ -44,7 +44,7 @@
                 <select class="form-control form-control-lg w-75" name="categoria" required>
                     <option value="">Selecione uma Categoria</option>
                     @foreach ($dados as $categorias)
-                        <option value="{{ $categorias->id }}">{{ $categorias->categoria }}</option>
+                        <option value="{{ $categorias->id_categoria }}">{{ $categorias->categoria }}</option>
                     @endforeach
                 </select>
            </div>

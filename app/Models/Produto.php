@@ -19,8 +19,13 @@ class Produto extends Model
         'lote',
         'unidade_medida',
         'preco_produto',
-        'id_usuario_fk'
+        'id_categoria_fk'
     ];
+
+    public function categoria()
+    {
+        return $this->belongsTo(Categoria::class, 'id_categoria_fk', 'id_categoria');
+    }
 
     use HasFactory;
 }

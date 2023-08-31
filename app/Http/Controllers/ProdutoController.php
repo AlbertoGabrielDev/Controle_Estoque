@@ -64,10 +64,13 @@ class ProdutoController extends Controller
             'sodio'             =>$request->sodio
         ]);
 
-        $categoria =  Categoria::create([
-            'categoria'     =>$request->categoria
-        ]);
-        // dd($request);
+        $categoria = Categoria::all();
+
+        $categoriaId = $request->input('categoria');
+        $produto->id_categoria_fk = $categoriaId;
+
+        $produto->save();
+
         return redirect()->route('produtos.index')->with('success', 'Inserido com sucesso');
 
         //  return view('produtos.index',compact('categoria'));
