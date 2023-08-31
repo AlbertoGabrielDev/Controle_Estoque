@@ -23,36 +23,36 @@
     <tbody>
       <tr>
        
-        <td>Banana</td>
-        <td>4kg</td>
-        <td>20/12/2023</td>
-        <td>Fruta</td>
-        <td>Fazendinha</td>
-        <td>10,00KG</td>
-        <td>Editar</td> 
-        <td>Deletar</td>
+      <td>Banana</td>
+      <td>4kg</td>
+      <td>20/12/2023</td>
+      <td>Fruta</td>
+      <td>Fazendinha</td>
+      <td>10,00KG</td>
+      <td>Editar</td> 
+      <td>Deletar</td>
       </tr>
       <tr>
      
-        <td>Alcatra</td>
-        <td>50KG</td>
-        <td>31/12/2023</td>
-        <td>Carne</td>
-        <td>Friboi</td>
-        <td>31,00KG</td>
-        <td>Editar</td> 
-        <td>Deletar</td>
+      <td>Alcatra</td>
+      <td>50KG</td>
+      <td>31/12/2023</td>
+      <td>Carne</td>
+      <td>Friboi</td>
+      <td>31,00KG</td>
+      <td>Editar</td> 
+      <td>Deletar</td>
       </tr>
       <tr>
         
-        <td>Cerveja</td>
-        <td>300LT</td>
-        <td>05/03/2024</td>
-        <td>Bebida</td>
-        <td>Skol</td>
-        <td>21,00LT</td>
-        <td>Editar</td> 
-        <td>Deletar</td>
+      <td>Cerveja</td>
+      <td>300LT</td>
+      <td>05/03/2024</td>
+      <td>Bebida</td>
+      <td>Skol</td>
+      <td>21,00LT</td>
+      <td>Editar</td> 
+      <td>Deletar</td>
       </tr>
     </tbody>
 </table>

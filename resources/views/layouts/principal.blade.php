@@ -15,7 +15,7 @@
       <a href="{{route('produtos.index')}}" class="a">Produtos</a>
       <a href="{{route('fornecedor.index')}}" class="a">Fornecedores</a>
       <a href="{{route('estoque.index')}}" class="a">Estoque</a>
-      <button class="botão">Cadastrar usúario</button>
+      <a href="{{route('usuario.index')}}" class="a">Cadastrar/Permitir usuário</a>
       @yield('conteudo')  
 </body>
 </html>

@@ -7,7 +7,7 @@
 
     {{-- {{dd($vars_localidade)}} --}}
 
-    <form action="{{route('produtos.inserirCadastro')}}" method="POST">
+    <form action="{{route('produtos.salvarCadastro')}}" method="POST">
         @csrf
      <div class="estoque_espacamento"></div>
         <div class="row">
@@ -37,9 +37,15 @@
             <div class="col-md-4">
                 <input type="text" class="form-control form-control-lg w-75" name="marca"  placeholder="Marca">
             </div>
-            <div class="col-md-4">
-                <input type="number" class="form-control form-control-lg w-75" name="quantidade"  placeholder="Quantidade">
-            </div>
+            {{-- <div class="col-md-4">
+                <input type="text" class="form-control form-control-lg w-75" name="categoria" placeholder="Categoria">
+            </div> --}}
+            <select class="form-control form-control-lg w-75" name="categoria" required>
+                <option value="">Selecione uma Categoria</option>
+                @foreach ($dados as $categorias)
+                    <option value="{{ $categorias->id }}">{{ $categorias->categoria }}</option>
+                @endforeach
+            </select>
             <div class="col-md-4">
                 <input type="text" class="form-control form-control-lg w-75" name="localizacao"  placeholder="Localização no Estoque">
             </div>
@@ -60,7 +66,7 @@
                 <input type="number" class="form-control form-control-lg w-75" name="preco_fornecedor"  placeholder="Preço Fornecedor">
             </div>
             <div class="col-md-4">
-                <input type="number" class="form-control form-control-lg w-75" name="valor_energetico"  placeholder="Valor Energético">
+                <input type="number" class="form-control form-control-lg w-75" name="quantidade"  placeholder="Quantidade">
             </div>
             <div class="col-md-4">
                 <input type="number" class="form-control form-control-lg w-75" name="carboidrato"  placeholder="Carboidrato">
@@ -72,6 +78,9 @@
             </div>
             <div class="col-md-4">
                 <input type="number" class="form-control form-control-lg w-75" name="sodio" placeholder="Sódio">
+            </div>
+            <div class="col-md-4">
+                <input type="number" class="form-control form-control-lg w-75" name="valor_energetico"  placeholder="Valor Energético">
             </div>
         </div>
         <div class="div_criar_categoria2">
