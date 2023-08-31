@@ -26,9 +26,9 @@
                         Preço: 10,00
                     </div>
                     {{-- <div class="inf_nutri">Quantidade</div>   --}}
-                    <div class="stepper inf_nutri">
+                    <div class="stepper display_soma_diminuir">
                         <button class="stepper-btn decrement">-</button>
-                        <input class="stepper-input" type="number" value="1" min="1" max="10">
+                        <input class="stepper-input display" type="number" value="1" min="1" max="10">
                         <button class="stepper-btn increment">+</button>
                       </div>
                 </div>

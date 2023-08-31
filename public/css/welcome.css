@@ -127,7 +127,7 @@ img{
     height: 50px;
 }
 
-.valor ,.inf_nutri{
+.valor ,.inf_nutri,.display_soma_diminuir{
     position: relative;
     top: 20px;
     border: 1px solid;
@@ -169,7 +169,10 @@ img{
     justify-content: space-between; */
 }
 
-
+/* .menos,.mais{
+    border: none;
+    background-color: black;
+} */
 
 .stepper {
     display: flex;
@@ -178,8 +181,8 @@ img{
   
   .stepper-btn {
     padding: 5px 10px;
-    background-color: #f2f2f2;
-    border: 1px solid #ccc;
+    background-color: transparent;
+    border: none;
     cursor: pointer;
   }
   
@@ -188,7 +191,7 @@ img{
     top: 0px;
     width: 80px;
     text-align: center;
-    border: 1px solid #ccc;
+   
     margin: 0 10px;
   }
   
