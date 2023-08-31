@@ -40,12 +40,14 @@
             {{-- <div class="col-md-4">
                 <input type="text" class="form-control form-control-lg w-75" name="categoria" placeholder="Categoria">
             </div> --}}
-            <select class="form-control form-control-lg w-75" name="categoria" required>
-                <option value="">Selecione uma Categoria</option>
-                @foreach ($dados as $categorias)
-                    <option value="{{ $categorias->id }}">{{ $categorias->categoria }}</option>
-                @endforeach
-            </select>
+           <div class="col-md-4">
+                <select class="form-control form-control-lg w-75" name="categoria" required>
+                    <option value="">Selecione uma Categoria</option>
+                    @foreach ($dados as $categorias)
+                        <option value="{{ $categorias->id }}">{{ $categorias->categoria }}</option>
+                    @endforeach
+                </select>
+           </div>
             <div class="col-md-4">
                 <input type="text" class="form-control form-control-lg w-75" name="localizacao"  placeholder="Localização no Estoque">
             </div>
