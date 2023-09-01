@@ -25,9 +25,10 @@ class ProdutoController extends Controller
     public function Cadastro(Request $request) {
 
         //$dados= $this->inserirCadastro($request);
-        $dados= Categoria::all();
+        $categoria= Categoria::all();
+        $marca= Marca::all();
 
-        return view('produtos.cadastro',compact('dados'));
+        return view('produtos.cadastro',compact('categoria','marca'));
     }
 
     public function inserirCadastro(Request $request){
@@ -70,6 +71,8 @@ class ProdutoController extends Controller
         $produto->id_categoria_fk = $categoriaId;
 
         $produto->save();
+        
+
 
         return redirect()->route('produtos.index')->with('success', 'Inserido com sucesso');
 

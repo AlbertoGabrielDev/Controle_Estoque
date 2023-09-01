@@ -41,6 +41,8 @@ Route::prefix('/verdurao')->group(function(){
 
     Route::prefix('/marca')->group(function(){
         Route::get('/index',[MarcaController::class, 'index'])->name('marca.index');
+        Route::get('/cadastro',[MarcaController::class, 'cadastro'])->name('marca.cadastro');
+        Route::post('/cadastro',[MarcaController::class, 'inserirMarca'])->name('marca.inserirMarca');
     });
 
 });

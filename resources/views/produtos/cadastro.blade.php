@@ -35,15 +35,17 @@
         </div>
         <div class="row">
             <div class="col-md-4">
-                <input type="text" class="form-control form-control-lg w-75" name="marca"  placeholder="Marca">
-            </div>
-            {{-- <div class="col-md-4">
-                <input type="text" class="form-control form-control-lg w-75" name="categoria" placeholder="Categoria">
-            </div> --}}
+                <select class="form-control form-control-lg w-75" name="categoria" required>
+                    <option value="">Selecione uma Marca</option>
+                    @foreach ($marca as $marcas)
+                        <option value="{{ $marcas->id_marca }}">{{ $marcas->marca }}</option>
+                    @endforeach
+                </select>
+           </div>
            <div class="col-md-4">
                 <select class="form-control form-control-lg w-75" name="categoria" required>
                     <option value="">Selecione uma Categoria</option>
-                    @foreach ($dados as $categorias)
+                    @foreach ($categoria as $categorias)
                         <option value="{{ $categorias->id_categoria }}">{{ $categorias->categoria }}</option>
                     @endforeach
                 </select>

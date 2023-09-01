@@ -15,5 +15,9 @@ class Marca extends Model
         'marca'
     ];
 
+    public function produto(){
+        return $this->hasMany(Produto::class, 'id_marca_fk', 'id_marca');
+    }
+
     use HasFactory;
 }

@@ -27,5 +27,9 @@ class Produto extends Model
         return $this->belongsTo(Categoria::class, 'id_categoria_fk', 'id_categoria');
     }
 
+    public function marca(){
+        return $this->belongsTo(Marca::class, 'id_marca_fk', 'id_marca');
+    }
+
     use HasFactory;
 }
