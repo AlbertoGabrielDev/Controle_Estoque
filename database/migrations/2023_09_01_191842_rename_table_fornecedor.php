@@ -11,9 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('produto', function (Blueprint $table) {
-            $table->dropForeign(['id_usuario_fk']);
-        });
+        Schema::rename('table_fornecedor', 'fornecedor');
     }
 
     /**
@@ -21,8 +19,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('produto', function (Blueprint $table) {
-            //
-        });
+        Schema::dropIfExists('table_fornecedor');
     }
 };

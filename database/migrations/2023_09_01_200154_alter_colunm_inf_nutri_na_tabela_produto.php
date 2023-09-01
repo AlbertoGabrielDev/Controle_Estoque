@@ -11,11 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('marca', function (Blueprint $table) {
-         
-            $table->foreign('id_cod_produto_fk')->references('cod_produto')->on('produto');
-            $table->foreign('id_usuario_fk')->references('id_usuario')->on('usuario');
-            });
+        Schema::table('produto', function (Blueprint $table) {
+            $table->string('inf_nutrientes')->nullable()->change();
+        });
     }
 
     /**
@@ -23,6 +21,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        //
+        Schema::dropIfExists('produto');
     }
 };

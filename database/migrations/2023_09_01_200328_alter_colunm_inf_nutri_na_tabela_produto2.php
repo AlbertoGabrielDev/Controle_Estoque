@@ -11,9 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('produto', function(Blueprint $table){
-            $table->foreign('id_marca_fk')->references('id_marca')->on('marca');
-
+        Schema::table('produto', function (Blueprint $table) {
+            $table->json('inf_nutrientes')->nullable()->change();
         });
     }
 
@@ -22,9 +21,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('produto', function(Blueprint $table){
-            $table->dropColumn('id_marca_fk');
-
-        });
+        Schema::dropIfExists('produto');
     }
 };

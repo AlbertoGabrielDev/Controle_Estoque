@@ -11,15 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('inf_nutri', function (Blueprint $table) {
-         
+        Schema::table('produto', function (Blueprint $table) {
+            $table->json('inf_nutrientes');
             
-
-            $table->foreign('id_cod_produto_fk')->references('cod_produto')->on('produto');
-            $table->foreign('id_usuario_fk')->references('id_usuario')->on('usuario');
-            
-                
-            });
+        });
     }
 
     /**
@@ -27,6 +22,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('inf_nutri');
+        Schema::dropIfExists('produto');
     }
 };

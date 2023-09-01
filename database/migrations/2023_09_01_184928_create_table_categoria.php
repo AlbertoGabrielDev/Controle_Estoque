@@ -11,8 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('produto', function (Blueprint $table) {
-            $table->unsignedBigInteger('id_categoria_fk');
+        Schema::create('categoria', function (Blueprint $table) {
+            $table->smallIncrements('id_categoria');
+            $table->string('nome_categoria',20)->unique();
+            $table->string('imagem');
+            $table->timestamps();
         });
     }
 
@@ -21,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        //
+        Schema::dropIfExists('categoria');
     }
 };

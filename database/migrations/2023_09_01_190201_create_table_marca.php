@@ -11,11 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('fornecedor', function (Blueprint $table) {
-         
-            $table->foreign('id_cod_produto_fk')->references('cod_produto')->on('produto');
-            $table->foreign('id_usuario_fk')->references('id_usuario')->on('usuario');
-            });
+        Schema::create('marca', function (Blueprint $table) {
+            $table->smallIncrements('id_marca');
+            $table->string('nome_marca',20)->unique();
+            $table->timestamps();
+        });
     }
 
     /**
@@ -23,6 +23,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        //
+        Schema::dropIfExists('marca');
     }
 };
