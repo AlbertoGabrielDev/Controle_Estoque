@@ -4,6 +4,10 @@
 
 <div class="fornecedor">Index Fornecedores</div> 
 
+<div class="div_criar_produto">
+  <a class="button_criar_produto" href="{{route('fornecedor.cadastro')}}">Cadastrar Fornecedor</a>     
+</div>
+
 <table class="table mt-5">
     <thead>
       <tr>

@@ -37,6 +37,7 @@ Route::prefix('/verdurao')->group(function(){
 
     Route::prefix('/fornecedor')->group(function(){
         Route::get('/',[FornecedorController::class, 'index'])->name('fornecedor.index');
+        Route::get('/cadastro',[FornecedorController::class, 'Cadastro'])->name('fornecedor.cadastro');
     });
 
     Route::prefix('/marca')->group(function(){

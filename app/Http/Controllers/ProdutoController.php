@@ -42,28 +42,28 @@ class ProdutoController extends Controller
             'preco_produto'     =>$request->preco_produto
         ]);
 
-        $estoque = Estoque::create([
-            'quantidade'      =>$request->quantidade,
-            'localizacao'     =>$request->localizacao,
-            'data_entrega'    =>$request->data_entrega,
-            'data_cadastro'   =>$request->data_cadastro,
-        ]);
+        // $estoque = Estoque::create([
+        //     'quantidade'      =>$request->quantidade,
+        //     'localizacao'     =>$request->localizacao,
+        //     'data_entrega'    =>$request->data_entrega,
+        //     'data_cadastro'   =>$request->data_cadastro,
+        // ]);
 
-        $fornecedor = Fornecedor::create([
-            'nome_fornecedor'   =>$request->nome_fornecedor,
-            'preco_fornecedor'  =>$request->preco_fornecedor
-        ]);
+        // $fornecedor = Fornecedor::create([
+        //     'nome_fornecedor'   =>$request->nome_fornecedor,
+        //     'preco_fornecedor'  =>$request->preco_fornecedor
+        // ]);
 
-        $marca = Marca::create([
-            'marca' =>$request->marca
-        ]);
+        // $marca = Marca::create([
+        //     'marca' =>$request->marca
+        // ]);
 
-        $inf_nutri = Inf_nutri::create([
-            'valor_energetico'  =>$request->valor_energetico,
-            'carboidrato'       =>$request->carboidrato,
-            'proteina'          =>$request->proteina,
-            'sodio'             =>$request->sodio
-        ]);
+        // $inf_nutri = Inf_nutri::create([
+        //     'valor_energetico'  =>$request->valor_energetico,
+        //     'carboidrato'       =>$request->carboidrato,
+        //     'proteina'          =>$request->proteina,
+        //     'sodio'             =>$request->sodio
+        // ]);
 
         $categoria = Categoria::all();
 

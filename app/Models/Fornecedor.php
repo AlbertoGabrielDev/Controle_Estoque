@@ -13,7 +13,13 @@ class Fornecedor extends Model
     protected $fillable = [
         'id_fornecedor',
         'nome_fornecedor',
-        'preco_fornecedor'
+        'cnpj',
+        'cep',
+        'logradouro',
+        'bairro',
+        'numero_casa',
+        'telefone',
+        'email'
     ];
     use HasFactory;
 }
