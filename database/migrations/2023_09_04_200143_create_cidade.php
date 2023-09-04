@@ -6,18 +6,21 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-
+    /**
+     * Run the migrations.
+     */
     public function up(): void
     {
-        $statements = <<<S
-        BEGIN;
+        $statements= <<<S
+BEGIN;
 DROP TABLE IF EXISTS `cidade`;
 CREATE TABLE `cidade` (
   `id` int(11) NOT NULL,
   `nome` varchar(120) DEFAULT NULL,
   `uf` int(2) DEFAULT NULL,
   `ibge` int(7) DEFAULT NULL
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='Municipios das Unidades Federativas';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Municipios das Unidades Federativas';
+
 INSERT INTO `cidade` (`id`, `nome`, `uf`, `ibge`) VALUES
 (1, 'Afonso Cláudio', 8, 3200102),
 (2, 'Água Doce do Norte', 8, 3200169),
@@ -5617,14 +5620,18 @@ INSERT INTO `cidade` (`id`, `nome`, `uf`, `ibge`) VALUES
 (5608, 'Balneário Rincão', 24, 4220000),
 (5609, 'Pescaria Brava', 24, 4212650),
 (5610, 'Exterior', 99, 9999999);
-ALTER TABLE `cidade` ADD PRIMARY KEY (`id`);
+
+ALTER TABLE `cidade`
+  ADD PRIMARY KEY (`id`);
 COMMIT
 S;
-    foreach (explode(';',$statements) as $statement) {
-        DB::statement($statement);   
-    }
+foreach (explode(';', $statements) as $statement) 
+        {
+            DB::statement($statement);   
+        }
     }
 
+  
     public function down(): void
     {
         Schema::dropIfExists('cidade');
