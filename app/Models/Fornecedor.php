@@ -19,7 +19,9 @@ class Fornecedor extends Model
         'bairro',
         'numero_casa',
         'telefone',
-        'email'
+        'email',
+        'id_users_fk',
+        'id_cidade_fk'
     ];
     use HasFactory;
 }

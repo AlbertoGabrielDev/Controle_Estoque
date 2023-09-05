@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use App\Models\Fornecedor;
 use App\Models\Estado;
 use App\Models\Cidade;
+use App\Models\User;
+use Illuminate\Support\Facades\Auth;
 
 class FornecedorController extends Controller
 {
@@ -29,6 +31,9 @@ class FornecedorController extends Controller
     }
 
     public function inserirCadastro(Request $request){
+        // $usuario['id_users_fk'] = Auth::id();
+        $cidadeUf = $request->input('cidade');
+        $cidade = Cidade::where('id', $cidadeUf)->first();
        $fornecedor = Fornecedor::create([
             'nome_fornecedor'   =>$request->nome_fornecedor,
             'cnpj'              =>$request->cnpj,
@@ -37,13 +42,17 @@ class FornecedorController extends Controller
             'bairro'            =>$request->bairro,
             'numero_casa'       =>$request->numero_casa,
             'telefone'          =>$request->telefone,
-            'email'             =>$request->email
+            'email'             =>$request->email,
+            'id_cidade_fk'      =>$request->$cidade->id,
+            'id_users_fk'       =>Auth::id()                                
        ]);
 
-      $cidade = Cidade::all();
-      $cidadeId = $request->input('cidade');
-      $fornecedor->id_cidade_fk = $cidadeId;
+        // $cidade = Cidade::all();
+        // $cidadeId = $request->input('cidade');
+        // $fornecedor->id_cidade_fk = $cidadeId;
 
-      $fornecedor->save();
+        // $fornecedor->save();
+
+     return redirect()->route('fornecedor.index')->with('success','Inserido com sucesso');
     }
 }

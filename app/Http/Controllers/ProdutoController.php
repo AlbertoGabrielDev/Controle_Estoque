@@ -71,8 +71,6 @@ class ProdutoController extends Controller
         $produto->id_categoria_fk = $categoriaId;
 
         $produto->save();
-        
-
 
         return redirect()->route('produtos.index')->with('success', 'Inserido com sucesso');
 
