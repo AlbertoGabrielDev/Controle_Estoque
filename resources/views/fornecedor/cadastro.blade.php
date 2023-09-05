@@ -69,7 +69,7 @@
                         $('#cidade').empty().append('<option value="">Selecione uma cidade</option>');
 
                         $.each(data, function (index, cidade) {
-                            $('#cidade').append('<option value="' + cidade.uf + '">' + cidade.nome + '</option>');
+                            $('#cidade').append('<option value="' + cidade.id + '">' + cidade.nome + '</option>');
                         });
                         
                         $('#cidade').prop('disabled', false);

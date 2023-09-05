@@ -33,6 +33,7 @@ class FornecedorController extends Controller
     public function inserirCadastro(Request $request){
         // $usuario['id_users_fk'] = Auth::id();
         $cidadeUf = $request->input('cidade');
+        dd($cidadeUf);
         $cidade = Cidade::where('id', $cidadeUf)->first();
        $fornecedor = Fornecedor::create([
             'nome_fornecedor'   =>$request->nome_fornecedor,
