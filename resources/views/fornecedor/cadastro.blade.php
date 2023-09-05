@@ -36,17 +36,51 @@
             <input type="text" class="form-control form-control-lg w-75" name="email" placeholder="Email">
           </div>
           <div class="col-md-4">
-            <select class="form-control form-control-lg w-75" name="cidade" required>
-                <option value="">Selecione uma Categoria</option>
-                @foreach ($estado as $estados)
-                    <option value="{{ $estados->id }}">{{ $estados->nome }}</option>
-                @endforeach
+            {{-- {{dd($cidade)}} --}}
+              <select class="form-control form-control-lg w-75" name="cidade" id="estado" required>
+                  <option value="">Selecione um Estado</option>
+                  @foreach ($estado as $estados)
+                      <option value="{{ $estados->id }}">{{ $estados->nome }}</option>
+                  @endforeach
+              </select>
+              <select id="cidade" disabled>
+                <option value="">Selecione um estado primeiro</option>
             </select>
-       </div>
+          </div>
         <div class="div_criar_marca">
             <button class="button_criar_marca" type="submit">Cadastrar Fornecedor</button>     
         </div>
     </div>
       
-</form>    
+</form>
+
+<script>
+   $(function () {
+        $('#estado').change(function () {
+            var estadoId = $(this).val();
+            
+            if (estadoId) {
+                $.ajax({
+                    url: '/verdurao/fornecedor/cidade/' + estadoId,
+                    type: 'GET',
+                    dataType: 'json',
+                    success: function (data) {
+                        $('#cidade').empty().append('<option value="">Selecione uma cidade</option>');
+
+                        $.each(data, function (index, cidade) {
+                            $('#cidade').append('<option value="' + cidade.uf + '">' + cidade.nome + '</option>');
+                        });
+                        
+                        $('#cidade').prop('disabled', false);
+                         
+                    }
+                });
+            } else {
+                $('#cidade').empty().append('<option value="">Selecione um estado primeiro</option>');
+                $('#cidade').prop('disabled', true);
+            }
+        });
+    });
+</script>
 @endsection
+

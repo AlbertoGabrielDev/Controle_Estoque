@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Fornecedor;
 use App\Models\Estado;
+use App\Models\Cidade;
 
 class FornecedorController extends Controller
 {
@@ -16,7 +17,15 @@ class FornecedorController extends Controller
 
     public function Cadastro(){
         $estado = Estado::all();
-        return view('fornecedor.cadastro', compact('estado'));
+        $cidade = Cidade::all();
+        return view('fornecedor.cadastro', compact('estado','cidade'));
+    }
+
+    public function getCidade($estado){
+        //$estado = Estado::all();
+        $cidade = Cidade::where('uf', $estado)->get();
+        return response()->json($cidade);
+        
     }
 
     public function inserirCadastro(Request $request){
@@ -30,7 +39,7 @@ class FornecedorController extends Controller
             'email'             =>$request->email
        ]);
 
-       $estado = Estado::all();
+       //$estado = Estado::all();
 
     }
 }
