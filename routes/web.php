@@ -8,19 +8,17 @@ use App\Http\Controllers\FornecedorController;
 use App\Http\Controllers\UsuarioController;
 use App\Http\Controllers\MarcaController;
 
-Route::prefix('/verdurao')->group(function(){
+Route::middleware([
+    'auth:sanctum',
+    config('jetstream.auth_session'),
+    'verified',
+])->prefix('/verdurao')->group(function(){
     // return view('welcome');
     Route::prefix('/categoria')->group(function(){
         Route::get('/',[CategoriaController::class, 'Inicio'])->name('categoria.inicio');
         Route::get('/index',[CategoriaController::class, 'Index'])->name('categoria.index');
         Route::get('/cadastro',[CategoriaController::class, 'cadastro'])->name('categoria.cadastro');
         Route::post('/cadastro',[CategoriaController::class, 'inserirCategoria'])->name('categoria.inserirCategoria');
-    });
-     
-    Route::prefix('/usuario')->group(function(){
-        Route::get('/index',[UsuarioController::class, 'index'])->name('usuario.index');
-        Route::get('/cadastro',[UsuarioController::class, 'cadastro'])->name('usuario.cadastro');
-        Route::post('/cadastro',[UsuarioController::class, 'inserirUsuario'])->name('usuario.inserirUsuario');
     });
 
     Route::prefix('/produtos')->group(function(){
@@ -49,12 +47,12 @@ Route::prefix('/verdurao')->group(function(){
     });
 
 });
-Route::middleware([
-    'auth:sanctum',
-    config('jetstream.auth_session'),
-    'verified',
-])->group(function () {
-    Route::get('/dashboard', function () {
-        return view('dashboard');
-    })->name('dashboard');
-});
+// Route::middleware([
+//     'auth:sanctum',
+//     config('jetstream.auth_session'),
+//     'verified',
+// ])->group(function () {
+//     Route::get('/dashboard', function () {
+//         return view('dashboard');
+//     })->name('dashboard');
+// });
