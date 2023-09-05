@@ -89,6 +89,32 @@ button[type="submit"]{
     text-decoration: none;
     color: black;
 }
+
+.button_criar_categoria2,.button_criar_fornecedor{
+    position: relative;
+    height: 50px;
+    bottom: 30px;
+    left: 10px;
+}
+
+.div_criar_categoria2,.div_criar_fornecedor{
+    position: relative;
+    left: 20px;
+    bottom: 30px;
+    border: 1px solid;
+    border-radius: 20px;
+    width: 250px;
+    height: 50px;
+}
+.div_criar_marca{
+    position: relative;
+    left: 20px;
+    bottom: 30px;
+    border: 1px solid;
+    border-radius: 20px;
+    width: 250px;
+    height: 50px; 
+}
 .cards{
     position: relative;
     width: 300px; 
@@ -144,32 +170,6 @@ img{
     right: 20px;
 }
 
-.button_criar_categoria2{
-    position: relative;
-    height: 50px;
-    bottom: 30px;
-    left: 30px;
-    
-}
-
-.div_criar_categoria2{
-    position: relative;
-    left: 20px;
-    bottom: 30px;
-    border: 1px solid;
-    border-radius: 20px;
-    width: 250px;
-    height: 50px;
-}
-.div_criar_marca{
-    position: relative;
-    left: 20px;
-    bottom: 30px;
-    border: 1px solid;
-    border-radius: 20px;
-    width: 250px;
-    height: 50px; 
-}
 
 .estoque_espacamento{
     margin-top: 90px;
@@ -205,4 +205,18 @@ img{
   
   .stepper-input:focus {
     outline: none;
+  }
+
+  .select{
+    width: 550px;
+    display: flex;
+    justify-content: space-between;
+    position: relative;
+    left: 1140px;
+    bottom: 150px;
+  }
+
+  .select select{
+    border-radius: 10px;
+    background-color: transparent;
   }

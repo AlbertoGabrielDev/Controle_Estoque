@@ -12,6 +12,12 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 <body>
+        <form action="/logout" method="POST">
+            @csrf
+            <a href="/logout" class="a" onclick="event.preventDefault();
+                this.closest('form').submit();">Sair</a>
+        </form>  
+
       <a href="{{route('categoria.inicio')}}" class="a">Inicio</a>
       <a href="{{route('produtos.index')}}" class="a">Produtos</a>
       <a href="{{route('fornecedor.index')}}" class="a">Fornecedores</a>

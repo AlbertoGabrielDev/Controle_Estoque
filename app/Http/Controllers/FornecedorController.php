@@ -32,6 +32,7 @@ class FornecedorController extends Controller
        $fornecedor = Fornecedor::create([
             'nome_fornecedor'   =>$request->nome_fornecedor,
             'cnpj'              =>$request->cnpj,
+            'cep'               =>$request->cep,
             'logradouro'        =>$request->logradouro,
             'bairro'            =>$request->bairro,
             'numero_casa'       =>$request->numero_casa,
@@ -39,7 +40,10 @@ class FornecedorController extends Controller
             'email'             =>$request->email
        ]);
 
-       //$estado = Estado::all();
+      $cidade = Cidade::all();
+      $cidadeId = $request->input('cidade');
+      $fornecedor->id_cidade_fk = $cidadeId;
 
+      $fornecedor->save();
     }
 }
