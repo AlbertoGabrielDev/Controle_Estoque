@@ -39,16 +39,24 @@
   </div>
 
   <div class="select">
-    <select class="" name="cidade" id="estado" required>
+    <select class="" name="estado" id="estado" required>
         <option value="">Selecione um Estado</option>
         @foreach ($estado as $estados)
             <option value="{{ $estados->id }}">{{ $estados->nome }}</option>
         @endforeach
     </select>
-    <select id="cidade" class="" disabled>
+    <select id="cidades" name="cidades" class="" disabled>
       <option value="">Selecione um estado primeiro</option>
     </select>
   </div>
+
+  <div class="select">
+    <label for="status">Status:</label>
+    <select name="status" id="status" class="form-control">
+        <option value="1">Ativo</option>
+        <option value="0">Inativo</option>
+    </select>
+    </div>
 
   <div class="div_criar_fornecedor">
     <button class="button_criar_fornecedor" type="submit">Cadastrar Fornecedor</button>     
@@ -66,19 +74,19 @@
                     type: 'GET',
                     dataType: 'json',
                     success: function (data) {
-                        $('#cidade').empty().append('<option value="">Selecione uma cidade</option>');
-
+                        $('#cidades').empty().append('<option value="">Selecione uma cidade</option>');
+                        var cidadeId = $('#cidades').val();
                         $.each(data, function (index, cidade) {
-                            $('#cidade').append('<option value="' + cidade.id + '">' + cidade.nome + '</option>');
+                            $('#cidades').append('<option value="' + cidade.id + '">' + cidade.nome + '</option>');
                         });
                         
-                        $('#cidade').prop('disabled', false);
+                        $('#cidades').prop('disabled', false);
                          
                     }
                 });
             } else {
-                $('#cidade').empty().append('<option value="">Selecione um estado primeiro</option>');
-                $('#cidade').prop('disabled', true);
+                $('#cidades').empty().append('<option value="">Selecione um estado primeiro</option>');
+                $('#cidades').prop('disabled', true);
             }
         });
     });

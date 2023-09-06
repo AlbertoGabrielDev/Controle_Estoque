@@ -21,7 +21,8 @@ class Fornecedor extends Model
         'telefone',
         'email',
         'id_users_fk',
-        'id_cidade_fk'
+        'id_cidade_fk',
+        'status'
     ];
     use HasFactory;
 }

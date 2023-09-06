@@ -20,21 +20,27 @@ class FornecedorController extends Controller
     public function Cadastro(){
         $estado = Estado::all();
         $cidade = Cidade::all();
-        return view('fornecedor.cadastro', compact('estado','cidade'));
+        $status = Fornecedor::all();
+        return view('fornecedor.cadastro', compact('estado','cidade','status'));
     }
 
     public function getCidade($estado){
         //$estado = Estado::all();
-        $cidade = Cidade::where('uf', $estado)->get();
+        $cidade = Cidade::where('id_estado_fk', $estado)->get();
         return response()->json($cidade);
         
     }
 
     public function inserirCadastro(Request $request){
         // $usuario['id_users_fk'] = Auth::id();
-        $cidadeUf = $request->input('cidade');
-        dd($cidadeUf);
+        $fornecedor = $request->validate([
+            'status' => 'required|boolean'
+        ]);
+
+        $cidadeUf = $request->input('cidades');
+
         $cidade = Cidade::where('id', $cidadeUf)->first();
+        //dd($request->$cidade->id);
        $fornecedor = Fornecedor::create([
             'nome_fornecedor'   =>$request->nome_fornecedor,
             'cnpj'              =>$request->cnpj,
@@ -44,11 +50,12 @@ class FornecedorController extends Controller
             'numero_casa'       =>$request->numero_casa,
             'telefone'          =>$request->telefone,
             'email'             =>$request->email,
-            'id_cidade_fk'      =>$request->$cidade->id,
-            'id_users_fk'       =>Auth::id()                                
+            'id_cidade_fk'      =>$cidade->id,
+            'id_users_fk'       =>Auth::id(),
+            'status'            =>$request->status                                
        ]);
 
-        // $cidade = Cidade::all();
+        
         // $cidadeId = $request->input('cidade');
         // $fornecedor->id_cidade_fk = $cidadeId;
 

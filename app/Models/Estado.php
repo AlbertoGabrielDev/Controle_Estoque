@@ -11,7 +11,6 @@ class Estado extends Model
     protected $primaryKey = 'id';
 
     protected $fillable = [
-        'id_fornecedor',
         'nome',
         'uf',
         'ibge',
