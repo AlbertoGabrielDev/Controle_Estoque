@@ -12,13 +12,14 @@ class Categoria extends Model
     protected $primaryKey = 'id_categoria';
 
     protected $fillable = [
-        'categoria'
+        'nome_categoria',
+        'id_users_fk'
     ];
 
-    public function produtos()
-    {
-        return $this->hasMany(Produto::class, 'id_categoria_fk', 'id_categoria');
-    }
+    // public function produtos()
+    // {
+    //     return $this->hasMany(Produto::class, 'id_categoria_fk', 'id_categoria');
+    // }
     
     use HasFactory;
 }

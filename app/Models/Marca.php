@@ -11,8 +11,8 @@ class Marca extends Model
     protected $primaryKey = 'id_marca';
 
     protected $fillable = [
-        'id_marca',
-        'marca'
+        'nome_marca',
+        'id_users_fk'
     ];
 
     public function produto(){

@@ -12,8 +12,6 @@ use Illuminate\Support\Facades\Auth;
 class FornecedorController extends Controller
 {
     public function Index(){
-
-        
         return view('fornecedor.index');
     }
 
@@ -25,22 +23,21 @@ class FornecedorController extends Controller
     }
 
     public function getCidade($estado){
-        //$estado = Estado::all();
         $cidade = Cidade::where('id_estado_fk', $estado)->get();
         return response()->json($cidade);
         
     }
 
     public function inserirCadastro(Request $request){
-        // $usuario['id_users_fk'] = Auth::id();
+
+       
         $fornecedor = $request->validate([
             'status' => 'required|boolean'
         ]);
 
         $cidadeUf = $request->input('cidades');
-
         $cidade = Cidade::where('id', $cidadeUf)->first();
-        //dd($request->$cidade->id);
+       
        $fornecedor = Fornecedor::create([
             'nome_fornecedor'   =>$request->nome_fornecedor,
             'cnpj'              =>$request->cnpj,
@@ -54,12 +51,6 @@ class FornecedorController extends Controller
             'id_users_fk'       =>Auth::id(),
             'status'            =>$request->status                                
        ]);
-
-        
-        // $cidadeId = $request->input('cidade');
-        // $fornecedor->id_cidade_fk = $cidadeId;
-
-        // $fornecedor->save();
 
      return redirect()->route('fornecedor.index')->with('success','Inserido com sucesso');
     }

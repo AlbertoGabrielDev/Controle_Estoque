@@ -16,8 +16,16 @@ class Estoque extends Model
         'quantidade',
         'localizacao',
         'data_entrega',
-        'data_cadastro'
-
+        'data_cadastro',
+        'preco_custo',
+        'preco_venda',
+        'lote',
+        'data_chegada',
+        'id_produto_fk',
+        'id_fornecedor_fk',
+        'lote',
+        'id_marca_fk',
+        'localizacao'
     ];
 
     use HasFactory;

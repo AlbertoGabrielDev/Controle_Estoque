@@ -15,11 +15,10 @@ class Produto extends Model
         'cod_produto',
         'nome_produto',
         'descricao',
-        'validade',
-        'lote',
         'unidade_medida',
-        'preco_produto',
-        'id_categoria_fk'
+        'validade',
+        'id_categoria_fk',
+        'id_users_fk'
     ];
 
     public function categoria()
