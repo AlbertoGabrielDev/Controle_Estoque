@@ -7,6 +7,11 @@
   <a class="button_criar_produto" href="{{route('marca.cadastro')}}">Cadastrar Marca</a>     
 </div>
 
+<form action="{{ route('marca.buscar') }}" method="GET">
+  <input type="text" name="nome_marca" placeholder="Digite o nome do produto">
+  <button type="submit">Pesquisar</button>
+</form>
+
 <table class="table mt-5">
     <thead>
       <tr>
@@ -19,7 +24,7 @@
       @foreach ($marca as $marcas)
       <tr>
           <td>{{$marcas->nome_marca}}</td>
-          <td>Editar</td> 
+          {{-- <td><a href="{{route('marca.editar', ['id'=> $editar->id_marca])}}"></a>Editar</td>  --}}
           <td>Inativar</td>
       </tr>
       @endforeach

@@ -18,6 +18,27 @@ class MarcaController extends Controller
         return view('marca.cadastro');
     }
 
+    public function Buscar(Request $request)
+{
+    $termo = $request->input('nome_marca');
+
+    $marca = Marca::where('nome_marca', 'like', '%' . $termo . '%')->get();
+
+    return view('marca.index', compact('marca'));
+}
+
+    public function Editar(Request $request, $id){
+        $editar = Marca::find($id);
+
+        if (!$editar) {
+            echo('Não encontrado');
+        }
+
+        $editar->nome_marca = $request->input('nome_marca');
+
+        return view('marca.editar',compact('editar'));
+    }
+
     public function inserirMarca(Request $request){
         $marca = Marca::create([
             'nome_marca'     =>$request->nome_marca,
