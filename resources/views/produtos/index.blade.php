@@ -10,54 +10,33 @@
 <table class="table mt-5">
     <thead>
       <tr>
-        <th scope="col">Produto</th>
-        <th scope="col">Quantidade no Estoque(Uni.Med)</th>
+        <th scope="col">Cod. Produto</th>
+        <th scope="col">Nome Produto</th>
+        <th scope="col">Descrição</th>
+        <th scope="col">Unidade de Medida</th>
+        <th scope="col">Infor. Nutricional</th>
         <th scope="col">Validade</th>
-        <th scope="col">Categoria</th>
-        <th scope="col">Marca</th>
-        <th scope="col">Valor</th>
-        <th>X</th>
-        <th>Y</th>
+        <th>Editar</th>
+        <th>Inativar</th>
       </tr>
     </thead>
+
     <tbody>
-      <tr>
-       
-      <td>Banana</td>
-      <td>4kg</td>
-      <td>20/12/2023</td>
-      <td>Fruta</td>
-      <td>Fazendinha</td>
-      <td>10,00KG</td>
-      <td>Editar</td> 
-      <td>Deletar</td>
-      </tr>
-      <tr>
-     
-      <td>Alcatra</td>
-      <td>50KG</td>
-      <td>31/12/2023</td>
-      <td>Carne</td>
-      <td>Friboi</td>
-      <td>31,00KG</td>
-      <td>Editar</td> 
-      <td>Deletar</td>
-      </tr>
-      <tr>
-        
-      <td>Cerveja</td>
-      <td>300LT</td>
-      <td>05/03/2024</td>
-      <td>Bebida</td>
-      <td>Skol</td>
-      <td>21,00LT</td>
-      <td>Editar</td> 
-      <td>Deletar</td>
+      <tr> 
+        @foreach ($produto as $produtos)
+            <tr>
+              <td>{{$produtos->cod_produto}}</td>
+              <td>{{$produtos->nome_produto}}</td>
+              <td>{{$produtos->descricao}}</td>
+              <td>{{$produtos->unidade_medida}}</td>
+              <td>{{$produtos->inf_nutrientes}}</td>
+              <td>{{$produtos->validade}}</td>
+            </tr>
+            @endforeach
       </tr>
     </tbody>
 </table>
-        <div>OBS: editar e deletar tem que alterar a tabela estoque/ O estoque so vai servir para vizualizar. 
-            Inserir produtos vai ser dentro dessa página/ Todos os dados tem que ser inseridos juntos, assim as chaves primarias serão inseridas juntas e serão iguais </div>
+  
   <br>
 
  {{--  <div class="categoria">Cadastro de Produtos</div> 

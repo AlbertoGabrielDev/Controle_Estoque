@@ -22,7 +22,9 @@ class ProdutoController extends Controller
     }
 
     public function Index(){
-        return view('produtos.index');
+        $produto = Produto::all();
+
+        return view('produtos.index',compact('produto'));
     }
 
     public function Cadastro(Request $request) {
@@ -41,30 +43,10 @@ class ProdutoController extends Controller
             'id_users_fk'       =>Auth::id()
         ]);
         
-        // $fornecedor = Fornecedor::latest('id_fornecedor')->first();
         $marca= Marca::latest('id_marca')->first();
         $produtoId = Produto::latest('id_produto')->first();
         $categoria = Categoria::latest('id_categoria')->first();
 
-        // $estoque = Estoque::create([
-        //     'quantidade'        =>$request->quantidade,
-        //     'localizacao'       =>$request->localizacao,
-        //     'preco_custo'       =>$request->preco_custo,
-        //     'preco_venda'       =>$request->preco_venda,
-        //     'data_validade'     =>$request->data_validade,
-        //     'data_chegada'      =>$request->data_chegada,
-        //     'id_produto_fk'     =>$request->id_produto_fk,
-        //     'id_fornecedor_fk'  =>$request->id_fornecedor_fk,
-        //     'lote'              =>$request->lote,
-        //     'id_marca_fk'       =>$request->id_marca_fk,
-        //     'localizacao'       =>$request->localizacao,
-        //     'id_produto_fk'     =>$produtoId->id_produto,
-        //     'id_fornecedor_fk'  =>$fornecedor->id_fornecedor,
-        //     'id_marca_fk'       =>$marca->id_marca
-        // ]);
-
-        
-        
         CategoriaProduto::create([
             'id_categoria_fk'      =>$categoria->id_categoria,
             'id_produto_fk'        =>$produtoId->id_produto        
@@ -75,15 +57,7 @@ class ProdutoController extends Controller
             'id_marca_fk'       =>$marca->id_marca
         ]);
 
-
-
-        // $categoriaId = $request->input('categoria');
-        // $produto->id_categoria_fk = $categoriaId;
-
-        // $produto->save();
-
         return redirect()->route('produtos.index')->with('success', 'Inserido com sucesso');
 
-        //  return view('produtos.index',compact('categoria'));
     }
 }

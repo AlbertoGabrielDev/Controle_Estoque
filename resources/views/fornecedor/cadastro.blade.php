@@ -75,7 +75,7 @@
                     dataType: 'json',
                     success: function (data) {
                         $('#cidades').empty().append('<option value="">Selecione uma cidade</option>');
-                        var cidadeId = $('#cidades').val();
+                        //var cidadeId = $('#cidades').val();
                         $.each(data, function (index, cidade) {
                             $('#cidades').append('<option value="' + cidade.id + '">' + cidade.nome + '</option>');
                         });

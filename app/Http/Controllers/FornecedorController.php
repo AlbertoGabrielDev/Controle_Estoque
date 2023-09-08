@@ -12,7 +12,8 @@ use Illuminate\Support\Facades\Auth;
 class FornecedorController extends Controller
 {
     public function Index(){
-        return view('fornecedor.index');
+        $fornecedor = Fornecedor::all();
+        return view('fornecedor.index', compact('fornecedor'));
     }
 
     public function Cadastro(){

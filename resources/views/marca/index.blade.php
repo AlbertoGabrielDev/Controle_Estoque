@@ -11,32 +11,20 @@
     <thead>
       <tr>
         <th scope="col">Marca</th>
-        <th scope="col">Id Produto</th>
         <th>X</th>
         <th>Y</th>
       </tr>
     </thead>
     <tbody>
       <tr>
-       
-        <td>Mark</td>
-        <td>Otto</td>
+        @foreach ($marca as $marcas)
+            <td>{{$marcas->nome_marca}}</td>
+        @endforeach
         <td>Editar</td> 
         <td>Inativar</td>
       </tr>
       <tr>
-     
-        <td>Jacob</td>
-        <td>Thornton</td>
-        <td>Editar</td> 
-        <td>Inativar</td>
-      </tr>
-      <tr>
-        
-        <td colspan="2">Larry the Bird</td>
-        <td>Editar</td> 
-        <td>Inativar</td>
-      </tr>
+    
     </tbody>
 </table>
   <br>

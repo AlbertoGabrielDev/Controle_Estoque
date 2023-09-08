@@ -10,10 +10,11 @@ use Illuminate\Support\Facades\Auth;
 class MarcaController extends Controller
 {
     public function Index(){
-        return view('marca.index');
+        $marca= Marca::all();
+        return view('marca.index',compact('marca'));
     }
 
-    public function cadastro(){
+    public function cadastro(){   
         return view('marca.cadastro');
     }
 

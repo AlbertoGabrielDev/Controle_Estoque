@@ -10,50 +10,32 @@
 <table class="table mt-5">
     <thead>
       <tr>
-        <th scope="col">Produto</th>
-        <th scope="col">Quantidade no Estoque(Uni.Med)</th>
-        <th scope="col">Validade</th>
-        <th scope="col">Categoria</th>
-        <th scope="col">Marca</th>
-        <th scope="col">Valor</th>
+        <th scope="col">Preço Custo</th>
+        <th scope="col">Preço Venda</th>
+        <th scope="col">Quantidade</th>
+        <th scope="col">Data de Chegada</th>
+        <th scope="col">Data de Cadastro</th>
+        <th scope="col">Lote</th>
+        <th scope="col">localização</th>
         <th>X</th>
         <th>Y</th>
       </tr>
     </thead>
     <tbody>
       <tr>
-       
-        <td>Banana</td>
-        <td>4kg</td>
-        <td>20/12/2023</td>
-        <td>Fruta</td>
-        <td>Fazendinha</td>
-        <td>10,00KG</td>
+        @foreach ($estoque as $estoques)
+            <td>{{$estoques->preco_custo}}</td>
+            <td>{{$estoques->preco_venda}}</td>
+            <td>{{$estoques->quantidade}}</td>
+            <td>{{$estoques->data_chegada}}</td> 
+            <td>{{$estoques->created_at}}</td>
+            <td>{{$estoques->lote}}</td>
+            <td>{{$estoques->localizacao}}</td>
+        @endforeach
         <td>Editar</td> 
         <td>Deletar</td>
       </tr>
-      <tr>
-     
-        <td>Alcatra</td>
-        <td>50KG</td>
-        <td>31/12/2023</td>
-        <td>Carne</td>
-        <td>Friboi</td>
-        <td>31,00KG</td>
-        <td>Editar</td> 
-        <td>Deletar</td>
-      </tr>
-      <tr>
-        
-        <td>Cerveja</td>
-        <td>300LT</td>
-        <td>05/03/2024</td>
-        <td>Bebida</td>
-        <td>Skol</td>
-        <td>21,00LT</td>
-        <td>Editar</td> 
-        <td>Deletar</td>
-      </tr>
+      
     </tbody>
 </table>
 @endsection

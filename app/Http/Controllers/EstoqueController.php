@@ -11,7 +11,8 @@ use Illuminate\Http\Request;
 class EstoqueController extends Controller
 {
     public function Index(){
-        return view('estoque.index');
+        $estoque = Estoque::all();
+        return view('estoque.index',compact('estoque'));
     }
 
     public function Cadastro(){
