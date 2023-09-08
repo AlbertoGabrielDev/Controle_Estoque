@@ -11,32 +11,18 @@
         <thead>
           <tr>
             <th scope="col">Categoria</th>
-            <th scope="col">Quantidade</th>
             <th>X</th>
             <th>Y</th>
           </tr>
         </thead>
         <tbody>
+          @foreach ($categoria as $categorias)
           <tr>
-           
-            <td>Mark</td>
-            <td>Otto</td>
+            <td>{{$categorias->nome_categoria}}</td>
             <td>Editar</td> 
             <td>Inativar</td>
           </tr>
-          <tr>
-         
-            <td>Jacob</td>
-            <td>Thornton</td>
-            <td>Editar</td> 
-            <td>Inativar</td>
-          </tr>
-          <tr>
-            
-            <td colspan="2">Larry the Bird</td>
-            <td>Editar</td> 
-            <td>Inativar</td>
-          </tr>
+          @endforeach
         </tbody>
     </table>
       <br>

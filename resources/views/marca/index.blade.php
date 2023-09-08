@@ -16,15 +16,13 @@
       </tr>
     </thead>
     <tbody>
+      @foreach ($marca as $marcas)
       <tr>
-        @foreach ($marca as $marcas)
-            <td>{{$marcas->nome_marca}}</td>
-        @endforeach
-        <td>Editar</td> 
-        <td>Inativar</td>
+          <td>{{$marcas->nome_marca}}</td>
+          <td>Editar</td> 
+          <td>Inativar</td>
       </tr>
-      <tr>
-    
+      @endforeach
     </tbody>
 </table>
   <br>

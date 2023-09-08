@@ -22,7 +22,7 @@
     </thead>
 
     <tbody>
-      <tr> 
+      
         @foreach ($produto as $produtos)
             <tr>
               <td>{{$produtos->cod_produto}}</td>
@@ -33,7 +33,7 @@
               <td>{{$produtos->validade}}</td>
             </tr>
             @endforeach
-      </tr>
+     
     </tbody>
 </table>
   

@@ -17,14 +17,13 @@
       </tr>
     </thead>
     <tbody>
-      <tr>
-       @foreach ($fornecedor as $fornecedores)
-        <td>  {{$fornecedores->nome_fornecedor}}</td>
-       @endforeach
-        <td>Editar</td> 
-        <td>Deletar</td>
-      </tr>
-     
+      @foreach ($fornecedor as $fornecedores)
+        <tr>
+          <td>{{$fornecedores->nome_fornecedor}}</td>
+          <td>Editar</td> 
+          <td>Deletar</td>
+        </tr>
+      @endforeach
     </tbody>
 </table>
 @endsection

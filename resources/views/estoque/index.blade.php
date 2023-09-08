@@ -22,8 +22,8 @@
       </tr>
     </thead>
     <tbody>
+      @foreach ($estoque as $estoques)
       <tr>
-        @foreach ($estoque as $estoques)
             <td>{{$estoques->preco_custo}}</td>
             <td>{{$estoques->preco_venda}}</td>
             <td>{{$estoques->quantidade}}</td>
@@ -31,11 +31,10 @@
             <td>{{$estoques->created_at}}</td>
             <td>{{$estoques->lote}}</td>
             <td>{{$estoques->localizacao}}</td>
-        @endforeach
         <td>Editar</td> 
         <td>Deletar</td>
       </tr>
-      
+      @endforeach
     </tbody>
 </table>
 @endsection

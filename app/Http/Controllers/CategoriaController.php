@@ -15,7 +15,8 @@ class CategoriaController extends Controller
     }
 
     public function Index(){
-        return view('categorias.index');
+        $categoria = Categoria::all();
+        return view('categorias.index',compact('categoria'));
     }
 
     public function Cadastro(){
@@ -29,13 +30,6 @@ class CategoriaController extends Controller
             'id_users_fk'       =>Auth::id()
         ]);
 
-        // $categoria = Categoria::all();
-        
-        //$categoriaProduto = $categoria->id_categoria;
-        //dd($categoriaProduto);
-        //     CategoriaProduto::create([
-        //     'id_categoria_fk'      =>$categoria->id_categoria
-        // ]);
        
 
     return redirect()->route('categoria.index')->with('success', 'Inserido com sucesso');
