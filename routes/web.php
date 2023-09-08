@@ -30,6 +30,8 @@ Route::middleware([
      
     Route::prefix('/estoque')->group(function(){
         Route::get('/',[EstoqueController::class, 'Index'])->name('estoque.index');
+        Route::get('/cadastro',[EstoqueController::class, 'Cadastro'])->name('estoque.cadastro');
+        Route::post('/cadastro',[EstoqueController::class, 'inserirEstoque'])->name('estoque.inserirEstoque');
     });
 
     Route::prefix('/fornecedor')->group(function(){

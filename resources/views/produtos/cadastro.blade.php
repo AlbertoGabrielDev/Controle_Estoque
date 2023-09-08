@@ -23,9 +23,9 @@
         </div>
           
         <div class="row">
-            <div class="col-md-4">
+            {{-- <div class="col-md-4">
                 <input type="number" class="form-control form-control-lg w-75" required name="lote"  placeholder="Lote">
-            </div>
+            </div> --}}
             <div class="col-md-4">
                 <input type="text" class="form-control form-control-lg w-75" required name="unidade_medida"  placeholder="Unidade de Medida">
             </div>
@@ -33,43 +33,8 @@
                 <input type="Number" class="form-control form-control-lg w-75" required name="preco_venda" placeholder="Preço">
             </div>
         </div>
-        <div class="row">
-            <div class="col-md-4">
-                <select class="form-control form-control-lg w-75" name="categoria" required>
-                    <option value="">Selecione uma Marca</option>
-                    @foreach ($marca as $marcas)
-                        <option value="{{ $marcas->id_marca }}">{{ $marcas->nome_marca }}</option>
-                    @endforeach
-                </select>
-           </div>
-           <div class="col-md-4">
-                <select class="form-control form-control-lg w-75" name="categoria" required>
-                    <option value="">Selecione uma Categoria</option>
-                    @foreach ($categoria as $categorias)
-                        <option value="{{ $categorias->id_categoria }}">{{ $categorias->nome_categoria }}</option>
-                    @endforeach
-                </select>
-           </div>
-            <div class="col-md-4">
-                <input type="text" class="form-control form-control-lg w-75" required name="localizacao"  placeholder="Localização no Estoque">
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-md-4">
-                <input type="Date" class="form-control form-control-lg w-75" required name="data_chegada"  placeholder="Data de Entrega">
-            </div>
-            {{-- <div class="col-md-4">
-                <input type="Date" class="form-control form-control-lg w-75" required name="data_cadastro"  placeholder="Data de Cadastro">
-            </div> --}}
-            <div class="col-md-4">
-                <select class="form-control form-control-lg w-75" name="categoria" required>
-                    <option value="">Selecione um Fornecedor</option>
-                    @foreach ($fornecedor as $fornecedores)
-                        <option value="{{ $fornecedores->id_fornecedor }}">{{ $fornecedores->nome_fornecedor }}</option>
-                    @endforeach
-                </select>
-           </div>
-        </div>
+       
+       
         <div class="row">
             <div class="col-md-4">
                 <input type="number" required class="form-control form-control-lg w-75" name="preco_custo"  placeholder="Preço Fornecedor">
@@ -81,6 +46,14 @@
                 <input type="number" class="form-control form-control-lg w-75" required name="cod_produto"  placeholder="Cod. Produto">
             </div>
         </div>
+        <div class="col-md-4">
+            <select class="form-control form-control-lg w-75" name="nome_categoria" required>
+                <option value="">Selecione uma Categoria</option>
+                @foreach ($categoria as $categorias)
+                    <option value="{{ $categorias->id_categoria }}">{{ $categorias->nome_categoria}}</option>
+                @endforeach
+            </select>
+       </div>
     
         <div class="div_criar_categoria2">
             <button class="button_criar_categoria2" type="submit">Criar Produto</button>     

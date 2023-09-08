@@ -3,6 +3,10 @@
 
 <div class="estoque">Index Estoque</div> 
 
+<div class="div_criar_produto">
+  <a class="button_criar_produto" href="{{route('estoque.cadastro')}}">Cadastrar Estoque</a>     
+</div>
+
 <table class="table mt-5">
     <thead>
       <tr>
