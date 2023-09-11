@@ -1,7 +1,5 @@
 <?php
-
 namespace App\Http\Controllers;
-
 use App\Models\Estoque;
 use App\Models\Marca;
 use App\Models\Produto;
@@ -21,8 +19,8 @@ class EstoqueController extends Controller
 
     public function cadastro()
     {
-        $produto= Produto::all();
-        $marca= Marca::all();
+        $produto = Produto::all();
+        $marca = Marca::all();
         $fornecedor = Fornecedor::all();
         return view('estoque.cadastro',compact('fornecedor','marca','produto'));
     }
@@ -37,32 +35,31 @@ class EstoqueController extends Controller
         ->join('marca_produto as mp2' , 'mp2.id_marca_fk' , '=' , 'm.id_marca')
         ->where('p.nome_produto', 'like', '%' . $input . '%')
         ->orWhere('m.nome_marca', 'like', '%' . $input . '%')->get();
-
         return view('estoque.index', compact('estoque'));
     }
 
     public function inserirEstoque(Request $request){
+        $fornecedorInput = $request->input('fornecedor');
+        $fornecedor = Fornecedor::where('id_fornecedor', $fornecedorInput)->first();
+        $marcaInput = $request->input('marca');
+        $marca = Marca::where('id_marca', $marcaInput)->first();
+        $produtoInput = $request->input('nome_produto');
+        $produtoId = Produto::where('id_produto', $produtoInput)->first();
 
-        $fornecedor = Fornecedor::latest('id_fornecedor')->first();
-        $marca= Marca::latest('id_marca')->first();
-        $produtoId = Produto::latest('id_produto')->first();
-        //dd($request);
+        // $cidadeUf = $request->input('cidades');
+        // $cidade = Cidade::where('id', $cidadeUf)->first();
+
         $estoque = Estoque::create([
             'quantidade'        =>$request->quantidade,
             'localizacao'       =>$request->localizacao,
             'preco_custo'       =>$request->preco_custo,
             'preco_venda'       =>$request->preco_venda,
-            'data_validade'     =>$request->data_validade,
             'data_chegada'      =>$request->data_chegada,
             'lote'              =>$request->lote,
-            'localizacao'       =>$request->localizacao,
             'id_produto_fk'     =>$produtoId->id_produto,
             'id_fornecedor_fk'  =>$fornecedor->id_fornecedor,
             'id_marca_fk'       =>$marca->id_marca
         ]);
-
         return redirect()->route('estoque.index')->with('success', 'Inserido com sucesso');
-
     }
-
 }

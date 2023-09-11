@@ -31,7 +31,7 @@
 
     <div class="row">
         <div class="col-md-4">
-            <select class="form-control form-control-lg w-75" name="categoria" required>
+            <select class="form-control form-control-lg w-75" name="marca" required>
                 <option value="">Selecione uma Marca</option>
                 @foreach ($marca as $marcas)
                     <option value="{{ $marcas->id_marca }}">{{ $marcas->nome_marca }}</option>
@@ -48,7 +48,7 @@
        </div>
        
        <div class="col-md-4">
-        <select class="form-control form-control-lg w-75" name="categoria" required>
+        <select class="form-control form-control-lg w-75" name="fornecedor" required>
             <option value="">Selecione um Fornecedor</option>
             @foreach ($fornecedor as $fornecedores)
                 <option value="{{ $fornecedores->id_fornecedor }}">{{ $fornecedores->nome_fornecedor }}</option>
