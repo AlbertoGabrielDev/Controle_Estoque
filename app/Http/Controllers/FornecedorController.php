@@ -11,35 +11,41 @@ use Illuminate\Support\Facades\Auth;
 
 class FornecedorController extends Controller
 {
-    public function Index(){
+    public function index()
+    {
         $fornecedor = Fornecedor::all();
         return view('fornecedor.index', compact('fornecedor'));
     }
 
-    public function Cadastro(){
+    public function cadastro()
+    {
         $estado = Estado::all();
         $cidade = Cidade::all();
         $status = Fornecedor::all();
         return view('fornecedor.cadastro', compact('estado','cidade','status'));
     }
 
-    public function getCidade($estado){
+    public function getCidade($estado)
+    {
         $cidade = Cidade::where('id_estado_fk', $estado)->get();
-        return response()->json($cidade);
-        
+        return response()->json($cidade);  
     }
 
-    public function inserirCadastro(Request $request){
+    public function buscar(Request $request)
+    {   
+        $buscarFornecedor = $request->input('nome_fornecedor');
+        $fornecedor = Fornecedor::where('nome_fornecedor', 'like' , '%' . $buscarFornecedor. '%')->get();
+        return view('fornecedor.index', compact('fornecedor'));
+    }
 
-       
+    public function inserirCadastro(Request $request)
+    {
         $fornecedor = $request->validate([
             'status' => 'required|boolean'
         ]);
-
         $cidadeUf = $request->input('cidades');
         $cidade = Cidade::where('id', $cidadeUf)->first();
-       
-       $fornecedor = Fornecedor::create([
+        $fornecedor = Fornecedor::create([
             'nome_fornecedor'   =>$request->nome_fornecedor,
             'cnpj'              =>$request->cnpj,
             'cep'               =>$request->cep,
@@ -52,7 +58,6 @@ class FornecedorController extends Controller
             'id_users_fk'       =>Auth::id(),
             'status'            =>$request->status                                
        ]);
-
      return redirect()->route('fornecedor.index')->with('success','Inserido com sucesso');
     }
 }

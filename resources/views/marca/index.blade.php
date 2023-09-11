@@ -8,7 +8,7 @@
 </div>
 
 <form action="{{ route('marca.buscar') }}" method="GET">
-  <input type="text" name="nome_marca" placeholder="Digite o nome do produto">
+  <input type="text" name="nome_marca" placeholder="Digite o nome da Marca">
   <button type="submit">Pesquisar</button>
 </form>
 
@@ -21,9 +21,9 @@
       </tr>
     </thead>
     <tbody>
-      @foreach ($marca as $marcas)
+      @foreach ($marcas as $marca)
       <tr>
-          <td>{{$marcas->nome_marca}}</td>
+          <td>{{$marca->nome_marca}}</td>
           {{-- <td><a href="{{route('marca.editar', ['id'=> $editar->id_marca])}}"></a>Editar</td>  --}}
           <td>Inativar</td>
       </tr>

@@ -33,9 +33,7 @@
        
        
         <div class="row">
-            <div class="col-md-4">
-                <input type="number" class="form-control form-control-lg w-75" required name="quantidade"  placeholder="Quantidade">
-            </div>
+            
             <div class="col-md-4">
                 <input type="number" class="form-control form-control-lg w-75" required name="cod_produto"  placeholder="Cod. Produto">
             </div>

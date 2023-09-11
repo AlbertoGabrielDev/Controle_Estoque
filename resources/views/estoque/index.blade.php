@@ -7,9 +7,17 @@
   <a class="button_criar_produto" href="{{route('estoque.cadastro')}}">Cadastrar Estoque</a>     
 </div>
 
+<form action="{{ route('estoque.buscar') }}" method="GET">
+  <input type="text" name="inputBusca" placeholder="Digite nome do produto ou da marca">
+  <button type="submit">Pesquisar</button>
+</form>
+
 <table class="table mt-5">
     <thead>
       <tr>
+        <th scope="col">Nome Produto</th>
+        <th scope="col">Nome Marca</th>
+        <th scope="col">Nome Fornecedor</th>
         <th scope="col">Preço Custo</th>
         <th scope="col">Preço Venda</th>
         <th scope="col">Quantidade</th>
@@ -24,13 +32,16 @@
     <tbody>
       @foreach ($estoque as $estoques)
       <tr>
-            <td>{{$estoques->preco_custo}}</td>
-            <td>{{$estoques->preco_venda}}</td>
-            <td>{{$estoques->quantidade}}</td>
-            <td>{{$estoques->data_chegada}}</td> 
-            <td>{{$estoques->created_at}}</td>
-            <td>{{$estoques->lote}}</td>
-            <td>{{$estoques->localizacao}}</td>
+          <td>{{$estoques->nome_produto}}</td>
+          <td>{{$estoques->nome_marca}}</td>
+          <td>{{$estoques->nome_fornecedor}}</td>
+          <td>{{$estoques->preco_custo}}</td>
+          <td>{{$estoques->preco_venda}}</td>
+          <td>{{$estoques->quantidade}}</td>
+          <td>{{$estoques->data_chegada}}</td> 
+          <td>{{$estoques->created_at}}</td>
+          <td>{{$estoques->lote}}</td>
+          <td>{{$estoques->localizacao}}</td>
         <td>Editar</td> 
         <td>Deletar</td>
       </tr>

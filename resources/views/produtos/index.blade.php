@@ -7,6 +7,11 @@
     <a class="button_criar_produto" href="{{route('produtos.cadastro')}}">Cadastrar Produto</a>     
 </div>
 
+<form action="{{ route('produtos.buscar') }}" method="GET">
+    <input type="text" name="nome_produto" placeholder="Digite nome do produto">
+    <button type="submit">Pesquisar</button>
+</form>
+
 <table class="table mt-5">
     <thead>
       <tr>

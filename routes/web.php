@@ -25,6 +25,7 @@ Route::middleware([
         Route::get('/index',[ProdutoController::class, 'Index'])->name('produtos.index');
         Route::get('/cadastro',[ProdutoController::class, 'cadastro'])->name('produtos.cadastro');
         Route::post('/salvar-cadastro',[ProdutoController::class, 'inserirCadastro'])->name('produtos.salvarCadastro');
+        Route::get('/buscar-produto',[ProdutoController::class, 'buscarProduto'])->name('produtos.buscar');
        // Route::get('/ver-categoria/{id}',[ProdutoController::class, 'Cadastro'])->name('produtos.verCategoria');
     });
      
@@ -32,6 +33,7 @@ Route::middleware([
         Route::get('/',[EstoqueController::class, 'Index'])->name('estoque.index');
         Route::get('/cadastro',[EstoqueController::class, 'Cadastro'])->name('estoque.cadastro');
         Route::post('/cadastro',[EstoqueController::class, 'inserirEstoque'])->name('estoque.inserirEstoque');
+        Route::get('/buscar-estoque',[EstoqueController::class, 'buscar'])->name('estoque.buscar');
     });
 
     Route::prefix('/fornecedor')->group(function(){
@@ -39,12 +41,13 @@ Route::middleware([
         Route::get('/cadastro',[FornecedorController::class, 'Cadastro'])->name('fornecedor.cadastro');
         Route::post('/cadastro',[FornecedorController::class, 'inserirCadastro'])->name('fornecedor.inserirCadastro');
         Route::get('/cidade/{estado}',[FornecedorController::class, 'getCidade'])->name('fornecedor.cidade');
+        Route::get('/buscar-fornecedor',[FornecedorController::class, 'Buscar'])->name('fornecedor.buscar');
     });
 
     Route::prefix('/marca')->group(function(){
         Route::get('/index',[MarcaController::class, 'index'])->name('marca.index');
         Route::get('/cadastro',[MarcaController::class, 'cadastro'])->name('marca.cadastro');
-        Route::get('/buscar',[MarcaController::class, 'Buscar'])->name('marca.buscar');
+        Route::get('/buscar-marca',[MarcaController::class, 'Buscar'])->name('marca.buscar');
         Route::get('/editar/{id}',[MarcaController::class, 'Editar'])->name('marca.editar');
         Route::post('/cadastro',[MarcaController::class, 'inserirMarca'])->name('marca.inserirMarca');
     });
