@@ -4,17 +4,21 @@ use App\Models\Estoque;
 use App\Models\Marca;
 use App\Models\Produto;
 use App\Models\Fornecedor;
+use App\Models\Categoria;
 use Illuminate\Http\Request;
 
 class EstoqueController extends Controller
 {
     public function index()
     {
+        $fornecedores = Fornecedor::all();
+        $marcas = Marca::all();
+        $categorias = Categoria::all();
         $estoque = Estoque::join('produto', 'produto.id_produto', '=' , 'estoque.id_produto_fk')
         ->join('marca', 'id_marca', '=' , 'estoque.id_marca_fk')
         ->join('fornecedor', 'fornecedor.id_fornecedor' , '=' , 'estoque.id_fornecedor_fk')
         ->get();
-        return view('estoque.index',compact('estoque'));
+        return view('estoque.index',compact('estoque', 'fornecedores', 'marcas', 'categorias'));
     }
 
     public function cadastro()
@@ -27,15 +31,31 @@ class EstoqueController extends Controller
 
     public function buscar(Request $request)
     {
-        $input = $request->input('inputBusca');
-       // dd($input);
+        $fornecedores = Fornecedor::all();
+        $marcas = Marca::all();
+        $categorias = Categoria::all();
+
+        $nomeProduto = $request->input('nome_produto');
+        $nomeFornecedor = $request->input('nome_fornecedor');
+        $nomeMarca = $request->input('nome_marca');
+        $nomeCategoria = $request->input('nome_categoria');
+        $numeroLote = $request->input('lote');
+        $precoCusto = $request->input('preco_custo');
+        $precoVenda = $request->input('preco_venda');
+        $localizacao = $request->input('localizacao');
+        dd($nomeFornecedor);
         $estoque = Estoque::join('produto as p' , 'p.id_produto' , '=' , 'estoque.id_produto_fk')
         ->join('marca as m', 'm.id_marca', '=', 'estoque.id_marca_fk')
         ->join('marca_produto as mp' , 'mp.id_produto_fk', '=' , 'p.id_produto')
         ->join('marca_produto as mp2' , 'mp2.id_marca_fk' , '=' , 'm.id_marca')
-        ->where('p.nome_produto', 'like', '%' . $input . '%')
-        ->orWhere('m.nome_marca', 'like', '%' . $input . '%')->get();
-        return view('estoque.index', compact('estoque'));
+        ->join('fornecedor as f', 'f.id_fornecedor', '=' , 'estoque.id_fornecedor_fk')
+        //->where('p.nome_produto', 'like', '%' . $nomeProduto . '%')
+        ->where('m.nome_marca', 'like', '%' . $nomeMarca . '%')
+        ->orwhere('f.nome_fornecedor' ,'like' , '%'. $nomeFornecedor.'%' )
+        // ->orWhere('estoque.lote','>=', $numeroLote)
+        ->get();
+        
+        return view('estoque.index', compact('estoque', 'fornecedores', 'marcas', 'categorias'));
     }
 
     public function inserirEstoque(Request $request){
@@ -45,9 +65,6 @@ class EstoqueController extends Controller
         $marca = Marca::where('id_marca', $marcaInput)->first();
         $produtoInput = $request->input('nome_produto');
         $produtoId = Produto::where('id_produto', $produtoInput)->first();
-
-        // $cidadeUf = $request->input('cidades');
-        // $cidade = Cidade::where('id', $cidadeUf)->first();
 
         $estoque = Estoque::create([
             'quantidade'        =>$request->quantidade,

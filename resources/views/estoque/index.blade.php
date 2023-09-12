@@ -17,13 +17,35 @@
       </h2>
       <div id="flush-collapseOne" class="accordion-collapse collapse" aria-labelledby="flush-headingOne" data-bs-parent="#accordionFlushExample">
         <div class="accordion-body">
-          <select name="" id="">
-            
-          </select>
-        </div>
-        <button type="submit">Pesquisar</button>
+            <input type="text" class="w-50" name="nome_produto" placeholder="Nome do Produto">
+            <div class="col-md-4">
+              <select class="form-control form-control-lg w-50" name="nome_fornecedor" >
+                <option value="">Selecione um Fornecedor</option>
+                @foreach ($fornecedores as $fornecedor)
+                    <option value="{{ $fornecedor->id_fornecedor }}">{{ $fornecedor->nome_fornecedor}}</option>
+                @endforeach
+              </select>
+              <select class="form-control form-control-lg w-50" name="nome_marca" >
+                <option value="">Selecione uma Marca</option>
+                @foreach ($marcas as $marca)
+                    <option value="{{ $marca->id_marca}}">{{ $marca->nome_marca}}</option>
+                @endforeach
+              </select>
+              {{-- <select class="form-control form-control-lg w-50" name="nome_categoria" >
+                <option value="">Selecione uma Categoria</option>
+                @foreach ($categorias as $categoria)
+                    <option value="{{ $categoria->id_categoria}}">{{ $categoria->nome_categoria}}</option>
+                @endforeach
+              </select> --}}
+            </div>
+            {{-- <input type="text" class="w-50" name="lote" placeholder="Lote"> --}}
+            {{-- <input type="number" class="w-50" name="preco_custo" placeholder="Preço Custo">     
+            <input type="number" class="w-50" name="preco_venda" placeholder="Preço Venda"> 
+            <input type="text" class="w-50" name="localizacao" placeholder="Localização">  --}}
+            {{-- <input type="date" class="w-25" name="vencimento" placeholder="Vencimento">  --}}
+          </div>
+          <button type="submit">Pesquisar</button>
       </div>
-      
     </div>
   </div>
 
@@ -59,8 +81,8 @@
           <td>{{$estoques->created_at}}</td>
           <td>{{$estoques->lote}}</td>
           <td>{{$estoques->localizacao}}</td>
-        <td>Editar</td> 
-        <td>Deletar</td>
+          <td>Editar</td> 
+          <td>Deletar</td>
       </tr>
       @endforeach
     </tbody>
