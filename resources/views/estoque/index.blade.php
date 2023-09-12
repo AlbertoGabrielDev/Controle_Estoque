@@ -22,13 +22,13 @@
               <select class="form-control form-control-lg w-50" name="nome_fornecedor" >
                 <option value="">Selecione um Fornecedor</option>
                 @foreach ($fornecedores as $fornecedor)
-                    <option value="{{ $fornecedor->id_fornecedor }}">{{ $fornecedor->nome_fornecedor}}</option>
+                    <option value="{{ $fornecedor->nome_fornecedor }}">{{ $fornecedor->nome_fornecedor}}</option>
                 @endforeach
               </select>
               <select class="form-control form-control-lg w-50" name="nome_marca" >
                 <option value="">Selecione uma Marca</option>
                 @foreach ($marcas as $marca)
-                    <option value="{{ $marca->id_marca}}">{{ $marca->nome_marca}}</option>
+                    <option value="{{ $marca->nome_marca}}">{{ $marca->nome_marca}}</option>
                 @endforeach
               </select>
               {{-- <select class="form-control form-control-lg w-50" name="nome_categoria" >

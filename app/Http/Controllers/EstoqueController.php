@@ -43,13 +43,13 @@ class EstoqueController extends Controller
         $precoCusto = $request->input('preco_custo');
         $precoVenda = $request->input('preco_venda');
         $localizacao = $request->input('localizacao');
-        dd($nomeFornecedor);
+        //dd($nomeProduto);
         $estoque = Estoque::join('produto as p' , 'p.id_produto' , '=' , 'estoque.id_produto_fk')
         ->join('marca as m', 'm.id_marca', '=', 'estoque.id_marca_fk')
         ->join('marca_produto as mp' , 'mp.id_produto_fk', '=' , 'p.id_produto')
         ->join('marca_produto as mp2' , 'mp2.id_marca_fk' , '=' , 'm.id_marca')
         ->join('fornecedor as f', 'f.id_fornecedor', '=' , 'estoque.id_fornecedor_fk')
-        //->where('p.nome_produto', 'like', '%' . $nomeProduto . '%')
+        ->where('p.nome_produto', 'like', '%' . $nomeProduto . '%')
         ->where('m.nome_marca', 'like', '%' . $nomeMarca . '%')
         ->orwhere('f.nome_fornecedor' ,'like' , '%'. $nomeFornecedor.'%' )
         // ->orWhere('estoque.lote','>=', $numeroLote)
