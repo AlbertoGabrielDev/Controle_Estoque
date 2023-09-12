@@ -5,6 +5,7 @@ use App\Models\Marca;
 use App\Models\Produto;
 use App\Models\Fornecedor;
 use App\Models\Categoria;
+use App\Models\MarcaProduto;
 use Illuminate\Http\Request;
 
 class EstoqueController extends Controller
@@ -43,16 +44,24 @@ class EstoqueController extends Controller
         $precoCusto = $request->input('preco_custo');
         $precoVenda = $request->input('preco_venda');
         $localizacao = $request->input('localizacao');
-        //dd($nomeProduto);
-        $estoque = Estoque::join('produto as p' , 'p.id_produto' , '=' , 'estoque.id_produto_fk')
-        ->join('marca as m', 'm.id_marca', '=', 'estoque.id_marca_fk')
-        ->join('marca_produto as mp' , 'mp.id_produto_fk', '=' , 'p.id_produto')
-        ->join('marca_produto as mp2' , 'mp2.id_marca_fk' , '=' , 'm.id_marca')
-        ->join('fornecedor as f', 'f.id_fornecedor', '=' , 'estoque.id_fornecedor_fk')
-        ->where('p.nome_produto', 'like', '%' . $nomeProduto . '%')
-        ->where('m.nome_marca', 'like', '%' . $nomeMarca . '%')
-        ->orwhere('f.nome_fornecedor' ,'like' , '%'. $nomeFornecedor.'%' )
-        // ->orWhere('estoque.lote','>=', $numeroLote)
+
+        $estoque = Estoque::join('produto as p', 'estoque.id_produto_fk', '=', 'p.id_produto')
+        ->join('fornecedor as f', 'estoque.id_fornecedor_fk', '=', 'f.id_fornecedor')
+        ->join('marca as m', 'estoque.id_marca_fk', '=', 'm.id_marca')
+        ->join('marca_produto as mp', 'p.id_produto', '=', 'mp.id_produto_fk')
+        ->join('marca_produto as mp2', 'm.id_marca', '=', 'mp2.id_marca_fk')
+        ->where(function ($query) use ($nomeProduto) {
+            $query->where('p.nome_produto', 'like', '%' . $nomeProduto . '%')
+                  ->orWhereNull('p.nome_produto');
+        })
+        ->where(function ($query) use ($nomeMarca) {
+            $query->where('m.nome_marca', 'like', '%' . $nomeMarca . '%')
+                  ->orWhereNull('m.nome_marca');
+        })
+        ->where(function ($query) use ($nomeFornecedor) {
+            $query->where('f.nome_fornecedor', 'like', '%' . $nomeFornecedor . '%')
+                  ->orWhereNull('f.nome_fornecedor');
+        })
         ->get();
         
         return view('estoque.index', compact('estoque', 'fornecedores', 'marcas', 'categorias'));
@@ -77,6 +86,12 @@ class EstoqueController extends Controller
             'id_fornecedor_fk'  =>$fornecedor->id_fornecedor,
             'id_marca_fk'       =>$marca->id_marca
         ]);
+
+        MarcaProduto::create([
+            'id_produto_fk'     =>$produtoId->id_produto,
+            'id_marca_fk'       =>$marca->id_marca
+        ]);
+
         return redirect()->route('estoque.index')->with('success', 'Inserido com sucesso');
     }
 }
