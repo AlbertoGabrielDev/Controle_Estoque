@@ -8,6 +8,7 @@ use App\Models\Categoria;
 use App\Models\MarcaProduto;
 use App\Models\CategoriaProduto;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 
 class EstoqueController extends Controller
@@ -45,11 +46,12 @@ class EstoqueController extends Controller
         $nomeCategoria = $request->input('nome_categoria');
         //dd($nomeCategoria);
         $numeroLote = $request->input('lote');
-        $precoCusto = $request->input('preco_custo');
-        $precoVenda = $request->input('preco_venda');
+        $precoCusto = (int)$request->input('preco_custo');
+        $precoVenda = (int)$request->input('preco_venda');
         $localizacao = $request->input('localizacao');
-        $quantidade = $request->input('quantidade');
-
+        $quantidade = (int)$request->input('quantidade');
+        $dataChegada = $request->input('data_chegada');
+        //dd($dataValidade);
         $estoque = Estoque::join('produto as p', 'estoque.id_produto_fk', '=', 'p.id_produto')
         ->join('fornecedor as f', 'estoque.id_fornecedor_fk', '=', 'f.id_fornecedor')
         ->join('marca as m', 'estoque.id_marca_fk', '=', 'm.id_marca')
@@ -79,17 +81,23 @@ class EstoqueController extends Controller
             $query->where('estoque.localizacao', 'like', '%' . $localizacao . '%')
                   ->orWhereNull('estoque.localizacao');
         })
-        // ->where(function ($query) use ($quantidade) {
-        //     $query->where('estoque.quantidade' ,'>=', $quantidade)
-        //           ->orWhereNull('estoque.quantidade');
-        // })
-        // ->where(function ($query) use ($precoVenda) {
-        //     $query->where('estoque.preco_venda', '>=' ,$precoVenda)
-        //           ->orWhereNull('estoque.preco_venda');
-        // })
+        ->where(function ($query) use ($quantidade) {
+            $query->where('estoque.quantidade' ,'>=', $quantidade)
+                   ->orWhereNull('estoque.quantidade');
+        })
+        ->where(function ($query) use ($precoVenda) {
+            $query->where('estoque.preco_venda', '>=' ,$precoVenda)
+                   ->orWhereNull('estoque.preco_venda');
+        })
+        ->where(function ($query) use ($precoCusto) {
+            $query->where('estoque.preco_custo', '>=' ,$precoCusto)
+                   ->orWhereNull('estoque.preco_custo');
+        })
+        ->where(function ($query) use ($dataChegada) {
+            $query->where('estoque.data_chegada' ,'=', $dataChegada)
+                   ->orWhereNull('estoque.data_chegada');
+        })
         ->get();
-      
-        
         return view('estoque.index', compact('estoque', 'fornecedores', 'marcas', 'categorias'));
     }
 
