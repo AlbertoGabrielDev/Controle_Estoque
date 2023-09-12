@@ -46,11 +46,8 @@
                 @endforeach
             </select>
        </div>
-    
         <div class="div_criar_categoria2">
             <button class="button_criar_categoria2" type="submit">Criar Produto</button>     
-        </div>
-              
+        </div>        
     </form>    
-
 @endsection

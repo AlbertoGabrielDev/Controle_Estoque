@@ -35,7 +35,7 @@
               <td>{{$produtos->descricao}}</td>
               <td>{{$produtos->unidade_medida}}</td>
               <td>{{$produtos->inf_nutrientes}}</td>
-              <td>{{$produtos->validade}}</td>
+              <td>{{ \Carbon\Carbon::parse($produtos->validade)->format('d/m/Y') }}</td> 
             </tr>
             @endforeach
      

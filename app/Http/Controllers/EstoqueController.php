@@ -6,6 +6,8 @@ use App\Models\Produto;
 use App\Models\Fornecedor;
 use App\Models\Categoria;
 use App\Models\MarcaProduto;
+use App\Models\CategoriaProduto;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 
 class EstoqueController extends Controller
@@ -35,21 +37,24 @@ class EstoqueController extends Controller
         $fornecedores = Fornecedor::all();
         $marcas = Marca::all();
         $categorias = Categoria::all();
+        $categoriaProduto = CategoriaProduto::all();
 
         $nomeProduto = $request->input('nome_produto');
         $nomeFornecedor = $request->input('nome_fornecedor');
         $nomeMarca = $request->input('nome_marca');
         $nomeCategoria = $request->input('nome_categoria');
+        //dd($nomeCategoria);
         $numeroLote = $request->input('lote');
         $precoCusto = $request->input('preco_custo');
         $precoVenda = $request->input('preco_venda');
         $localizacao = $request->input('localizacao');
+        $quantidade = $request->input('quantidade');
 
         $estoque = Estoque::join('produto as p', 'estoque.id_produto_fk', '=', 'p.id_produto')
         ->join('fornecedor as f', 'estoque.id_fornecedor_fk', '=', 'f.id_fornecedor')
         ->join('marca as m', 'estoque.id_marca_fk', '=', 'm.id_marca')
-        ->join('marca_produto as mp', 'p.id_produto', '=', 'mp.id_produto_fk')
-        ->join('marca_produto as mp2', 'm.id_marca', '=', 'mp2.id_marca_fk')
+        ->join('categoria_produto as cp', 'cp.id_produto_fk', '=' , 'p.id_produto')
+        ->join('categoria as c', 'c.id_categoria' , '=' , 'cp.id_categoria_fk')
         ->where(function ($query) use ($nomeProduto) {
             $query->where('p.nome_produto', 'like', '%' . $nomeProduto . '%')
                   ->orWhereNull('p.nome_produto');
@@ -61,8 +66,29 @@ class EstoqueController extends Controller
         ->where(function ($query) use ($nomeFornecedor) {
             $query->where('f.nome_fornecedor', 'like', '%' . $nomeFornecedor . '%')
                   ->orWhereNull('f.nome_fornecedor');
+        })  
+        ->where(function ($query) use ($nomeCategoria) {
+            $query->where('c.nome_categoria', 'like', '%' . $nomeCategoria . '%')
+                  ->orWhereNull('c.nome_categoria');
         })
+        ->where(function ($query) use ($numeroLote) {
+            $query->where('estoque.lote', 'like', '%' . $numeroLote . '%')
+                  ->orWhereNull('estoque.lote');
+        })
+        ->where(function ($query) use ($localizacao) {
+            $query->where('estoque.localizacao', 'like', '%' . $localizacao . '%')
+                  ->orWhereNull('estoque.localizacao');
+        })
+        // ->where(function ($query) use ($quantidade) {
+        //     $query->where('estoque.quantidade' ,'>=', $quantidade)
+        //           ->orWhereNull('estoque.quantidade');
+        // })
+        // ->where(function ($query) use ($precoVenda) {
+        //     $query->where('estoque.preco_venda', '>=' ,$precoVenda)
+        //           ->orWhereNull('estoque.preco_venda');
+        // })
         ->get();
+      
         
         return view('estoque.index', compact('estoque', 'fornecedores', 'marcas', 'categorias'));
     }
@@ -74,7 +100,7 @@ class EstoqueController extends Controller
         $marca = Marca::where('id_marca', $marcaInput)->first();
         $produtoInput = $request->input('nome_produto');
         $produtoId = Produto::where('id_produto', $produtoInput)->first();
-
+        //dd($request);
         $estoque = Estoque::create([
             'quantidade'        =>$request->quantidade,
             'localizacao'       =>$request->localizacao,

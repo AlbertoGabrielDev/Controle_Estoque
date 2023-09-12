@@ -31,14 +31,18 @@
                     <option value="{{ $marca->nome_marca}}">{{ $marca->nome_marca}}</option>
                 @endforeach
               </select>
-              {{-- <select class="form-control form-control-lg w-50" name="nome_categoria" >
+              <select class="form-control form-control-lg w-50" name="nome_categoria" >
                 <option value="">Selecione uma Categoria</option>
                 @foreach ($categorias as $categoria)
-                    <option value="{{ $categoria->id_categoria}}">{{ $categoria->nome_categoria}}</option>
+                    <option value="{{ $categoria->nome_categoria}}">{{ $categoria->nome_categoria}}</option>
                 @endforeach
-              </select> --}}
+              </select>
             </div>
-            {{-- <input type="text" class="w-50" name="lote" placeholder="Lote"> --}}
+            <input type="text" class="w-50" name="lote" placeholder="Lote">
+            <input type="text" class="w-50" name="localizacao" placeholder="Localização">
+            <input type="text" class="w-50" name="preco_custo" placeholder="Preço Custo">
+            <input type="text" class="w-50" name="preco_venda" placeholder="Preço Venda">
+            <input type="text" class="w-50" name="quantidade" placeholder="Quantidade">
             {{-- <input type="number" class="w-50" name="preco_custo" placeholder="Preço Custo">     
             <input type="number" class="w-50" name="preco_venda" placeholder="Preço Venda"> 
             <input type="text" class="w-50" name="localizacao" placeholder="Localização">  --}}
@@ -77,7 +81,7 @@
           <td>{{$estoques->preco_custo}}</td>
           <td>{{$estoques->preco_venda}}</td>
           <td>{{$estoques->quantidade}}</td>
-          <td>{{$estoques->data_chegada}}</td> 
+          <td>{{ \Carbon\Carbon::parse($estoques->data_chegada)->format('d/m/Y') }}</td> 
           <td>{{$estoques->created_at}}</td>
           <td>{{$estoques->lote}}</td>
           <td>{{$estoques->localizacao}}</td>
@@ -87,4 +91,5 @@
       @endforeach
     </tbody>
 </table>
+
 @endsection
