@@ -122,12 +122,12 @@ button[type="submit"]{
    
 }
 
-img{
+/* img{
     position: relative;
     right: 60px;
     width: 440px;
     bottom: 60px;
-}
+} */
 
 .div_pai{
     width: 400px;
@@ -212,7 +212,7 @@ img{
     display: flex;
     justify-content: space-between;
     position: relative;
-    left: 1140px;
+    right: 1150px;
     bottom: 150px;
   }
 

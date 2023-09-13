@@ -22,8 +22,7 @@ class FornecedorController extends Controller
     {
         $estado = Estado::all();
         $cidade = Cidade::all();
-        $status = Fornecedor::all();
-        return view('fornecedor.cadastro', compact('estado','cidade','status'));
+        return view('fornecedor.cadastro', compact('estado','cidade'));
     }
     public function getCidade($estado)
     {
@@ -42,8 +41,7 @@ class FornecedorController extends Controller
         $principal = $request->input('principal') ? $request->principal : 0;
         $whatsapp = $request->input('whatsapp') ? $request->whatsapp : 0;
         $telegram = $request->input('telegram') ? $request->telegram : 0;
-          //dd($request);
-
+        
         $telefones = Telefone::create([
             'ddd' => $request->ddd,
             'telefone' => $request->telefone,

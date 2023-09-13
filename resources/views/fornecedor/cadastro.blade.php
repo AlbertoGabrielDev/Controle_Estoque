@@ -30,9 +30,6 @@
       <div class="col-md-4">
           <input type="text" class="form-control form-control-lg w-75" required name="numero_casa" placeholder="Número">
       </div>
-      {{-- <div class="col-md-4">
-          <input type="text" class="form-control form-control-lg w-75" required name="telefone" placeholder="Telefone">
-      </div> --}}
       <div class="col-md-4">
           <input type="text" class="form-control form-control-lg w-75" required name="email" placeholder="Email">
       </div>

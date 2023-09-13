@@ -14,19 +14,20 @@
         <a class="button_criar_categoria" href="{{route('categoria.index')}}">Criar Categoria</a>
     </div>
 
-   <div class="div_pai">
-        <div class="cards">
-            <img src="{{asset('img/Frutas.jpg')}}" class="" alt="...">
-            <div class="div_filho">
-                <h5 class="titulo">Frutas</h5>
-                <p class="descricao">Todas os tipos de frutas frescas aqui. Tem banana, maça, perâ...</p>
-                
-                <div class="ver_produto">
-                    <a class="button_criar_categoria" href="{{route('produtos.inicio')}}">Ver produtos</a>
+    <div class="row">
+        @foreach ($categorias as $categoria)
+            <div class="col-md-3 mb-3">
+                <div class="card">
+                    <img src="{{ asset('img/Frutas.jpg') }}" class="card-img-top" alt="...">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ $categoria->nome_categoria }}</h5>
+                    </div>
                 </div>
-
             </div>
-        </div>
+            @if ($loop->iteration % 4 == 0)
+                </div><div class="row">
+            @endif
+        @endforeach
     </div>
 @endsection
 
