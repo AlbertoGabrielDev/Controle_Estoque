@@ -22,9 +22,9 @@
       </tr>
     </thead>
     <tbody>
-      @foreach ($fornecedor as $fornecedores)
+      @foreach ($fornecedores as $fornecedor)
         <tr>
-          <td>{{$fornecedores->nome_fornecedor}}</td>
+          <td>{{$fornecedor->nome_fornecedor}}</td>
           <td>Editar</td> 
           <td>Deletar</td>
         </tr>

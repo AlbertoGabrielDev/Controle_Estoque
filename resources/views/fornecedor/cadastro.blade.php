@@ -7,7 +7,7 @@
 </div>
 
 
-<form action="{{route('fornecedor.inserirCadastro')}}" method="POST">
+<form action="{{route('fornecedor.inserirCadastro')}}" method="POST" id="cadastro_fornecedor">
     @csrf
  <div class="estoque_espacamento"></div>
 
@@ -30,12 +30,30 @@
       <div class="col-md-4">
           <input type="text" class="form-control form-control-lg w-75" required name="numero_casa" placeholder="Número">
       </div>
-      <div class="col-md-4">
+      {{-- <div class="col-md-4">
           <input type="text" class="form-control form-control-lg w-75" required name="telefone" placeholder="Telefone">
-      </div>
+      </div> --}}
       <div class="col-md-4">
           <input type="text" class="form-control form-control-lg w-75" required name="email" placeholder="Email">
       </div>
+      <div class="col-md-4">
+            <input type="text" class="form-control form-control-lg w-75" required name="ddd" placeholder="DDD">
+            </div>
+        <div class="col-md-4">
+            <input type="text" class="form-control form-control-lg w-75" required name="telefone" placeholder="Telefone">
+            <div class="btn-group" role="group" aria-label="Basic checkbox toggle button group">
+                <input type="checkbox" class="btn-check" id="btncheck1" name="principal" value="1" autocomplete="off">
+                <label class="btn btn-outline-primary" for="btncheck1">Principal</label>
+            </div>
+            <div class="btn-group" role="group" aria-label="Basic checkbox toggle button group">
+                <input type="checkbox" class="btn-check" id="btncheck2" name="whatsapp" value="1" autocomplete="off">
+                <label class="btn btn-outline-primary" for="btncheck2">Whatsapp</label>
+            </div>
+            <div class="btn-group" role="group" aria-label="Basic checkbox toggle button group">
+                <input type="checkbox" class="btn-check" id="btncheck3" name="telegram" value="1" autocomplete="off">
+                <label class="btn btn-outline-primary" for="btncheck3">Telegram</label>
+            </div>
+        <div>
   </div>
 
   <div class="select">

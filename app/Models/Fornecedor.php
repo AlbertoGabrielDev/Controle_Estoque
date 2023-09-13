@@ -18,11 +18,11 @@ class Fornecedor extends Model
         'logradouro',
         'bairro',
         'numero_casa',
-        'telefone',
         'email',
         'id_users_fk',
         'id_cidade_fk',
-        'status'
+        'status',
+        'id_telefone_fk'
     ];
     use HasFactory;
 }

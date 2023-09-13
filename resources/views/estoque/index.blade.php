@@ -44,10 +44,6 @@
             <input type="text" class="w-50" name="preco_venda" placeholder="Preço Venda">
             <input type="text" class="w-50" name="quantidade" placeholder="Quantidade">
             <input type="date" class="w-50" name="data_chegada" placeholder="Quantidade">
-            {{-- <input type="number" class="w-50" name="preco_custo" placeholder="Preço Custo">     
-            <input type="number" class="w-50" name="preco_venda" placeholder="Preço Venda"> 
-            <input type="text" class="w-50" name="localizacao" placeholder="Localização">  --}}
-            {{-- <input type="date" class="w-25" name="vencimento" placeholder="Vencimento">  --}}
           </div>
           <button type="submit">Pesquisar</button>
       </div>

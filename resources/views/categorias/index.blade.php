@@ -2,11 +2,9 @@
 
 @section('conteudo')
     <div class="categoria">Index</div> 
-
     <div class="div_criar_produto">
       <a class="button_criar_produto" href="{{route('categoria.cadastro')}}">Cadastrar Categoria</a>     
-  </div>
-
+    </div>
     <table class="table mt-5">
         <thead>
           <tr>
@@ -16,9 +14,9 @@
           </tr>
         </thead>
         <tbody>
-          @foreach ($categoria as $categorias)
+          @foreach ($categorias as $categoria)
           <tr>
-            <td>{{$categorias->nome_categoria}}</td>
+            <td>{{$categoria->nome_categoria}}</td>
             <td>Editar</td> 
             <td>Inativar</td>
           </tr>
@@ -26,6 +24,4 @@
         </tbody>
     </table>
       <br>
-
-     
 @endsection
