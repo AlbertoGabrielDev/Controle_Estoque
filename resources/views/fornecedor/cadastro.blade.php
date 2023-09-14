@@ -21,7 +21,7 @@
             <input type="text" class="form-control form-control-lg w-75" required name="nome_fornecedor" placeholder="Nome da Fornecedor">
         </div>
         <div class="col-md-4">
-            <input type="text" class="form-control form-control-lg w-75" required name="cnpj" placeholder="CNPJ">
+            <input type="text" class="form-control form-control-lg w-75 campo-invalido " required name="cnpj" id="cnpj" placeholder="CNPJ">
         </div>
         <div class="col-md-4">
             <input type="text" class="form-control form-control-lg w-75" required name="cep" id="cep" placeholder="CEP">
@@ -116,24 +116,37 @@
 //             }
 //         });
 //     });
-$("#cep").blur(function(){
-				var cep = this.value.replace(/[^0-9]/, "");
-				if(cep.length != 8){
-					return false;
-				}
-				var url = "https://viacep.com.br/ws/"+cep+"/json/";
-				$.getJSON(url, function(dadosRetorno){
-					try{
-						// Preenche os campos de acordo com o retorno da pesquisa
-						$("#endereco").val(dadosRetorno.logradouro);
-						$("#bairro").val(dadosRetorno.bairro);
-						$("#cidade").val(dadosRetorno.localidade);
-						$("#uf").val(dadosRetorno.uf);
-					}catch(ex){
-                        console.log(ex);
-                    }
-				});
-			});
+$("#cep").blur(function()
+{
+    var cep = this.value.replace(/[^0-9]/, "");
+    if (cep.length !== 8) {
+        this.style.backgroundColor = "red"; 
+    } else {
+        this.style.backgroundColor = ""; 
+    }
+    var url = "https://viacep.com.br/ws/"+cep+"/json/";
+    $.getJSON(url, function(dadosRetorno){
+        try{
+            // Preenche os campos de acordo com o retorno da pesquisa
+            $("#endereco").val(dadosRetorno.logradouro);
+            $("#bairro").val(dadosRetorno.bairro);
+            $("#cidade").val(dadosRetorno.localidade);
+            $("#uf").val(dadosRetorno.uf);
+        }catch(ex){
+            console.log(ex);
+        }
+    });
+});
+
+$("#cnpj", "#cep").blur(function() {
+    var cnpj = this.value.replace(/[^0-9]/g, "");
+    if (cnpj.length !== 14) {
+        this.style.backgroundColor = "red"; 
+       // alert('Insira um CNPJ válido!');
+    } else {
+        this.style.backgroundColor = ""; 
+    }
+});
 </script>
 @endsection
 
