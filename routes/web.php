@@ -18,6 +18,7 @@ Route::middleware([
         Route::get('/index',[CategoriaController::class, 'Index'])->name('categoria.index');
         Route::get('/cadastro',[CategoriaController::class, 'cadastro'])->name('categoria.cadastro');
         Route::post('/cadastro',[CategoriaController::class, 'inserirCategoria'])->name('categoria.inserirCategoria');
+        Route::get('/produto/{categoria}',[CategoriaController::class, 'produto'])->name('categorias.produto');
     });
 
     Route::prefix('/produtos')->group(function(){
@@ -26,7 +27,6 @@ Route::middleware([
         Route::get('/cadastro',[ProdutoController::class, 'cadastro'])->name('produtos.cadastro');
         Route::post('/salvar-cadastro',[ProdutoController::class, 'inserirCadastro'])->name('produtos.salvarCadastro');
         Route::get('/buscar-produto',[ProdutoController::class, 'buscarProduto'])->name('produtos.buscar');
-       // Route::get('/ver-categoria/{id}',[ProdutoController::class, 'Cadastro'])->name('produtos.verCategoria');
     });
      
     Route::prefix('/estoque')->group(function(){

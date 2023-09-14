@@ -13,7 +13,8 @@ class Categoria extends Model
 
     protected $fillable = [
         'nome_categoria',
-        'id_users_fk'
+        'id_users_fk',
+        'imagem'
     ];
 
     // public function produtos()

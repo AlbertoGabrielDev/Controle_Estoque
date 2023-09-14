@@ -95,17 +95,17 @@ class EstoqueController extends Controller
             $query->where('estoque.preco_venda', '>=' ,$precoVenda)
                    ->orWhereNull('estoque.preco_venda');
         })
-        ->where(function ($query) use ($dataChegada) {
+        // ->where(function ($query) use ($dataChegada) {
             
-            $query->where('estoque.data_chegada' ,'=', $dataChegada)
-                   ->orWhereNull('estoque.data_chegada');
-        })
+        //     $query->where('estoque.data_chegada' ,'=', $dataChegada)
+        //            ->orWhereNull('estoque.data_chegada');
+        // })
         ->where(function ($query) use ($precoCusto) {
             $query->where('estoque.preco_custo', '>=' ,$precoCusto)
                    ->orWhereNull('estoque.preco_custo');
         })
         ->get();
-
+        dd($estoque);
         return view('estoque.index', compact('estoque', 'fornecedores', 'marcas', 'categorias'));
     }
 
