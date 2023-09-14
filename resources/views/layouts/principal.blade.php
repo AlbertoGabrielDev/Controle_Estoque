@@ -12,18 +12,22 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 <body>
+    <div class="container d-flex flex-row justify-content-between align-items-center">
+        <div class="mx-auto">
+          <ul class="list-group list-group-horizontal">
+            <a class="list-group-item fs-5" href="{{route('categoria.inicio')}}">Inicio</a>
+            <a class="list-group-item fs-5" href="{{route('produtos.index')}}">Produtos</a>
+            <a class="list-group-item fs-5" href="{{route('fornecedor.index')}}">Fornecedores</a>
+            <a class="list-group-item fs-5" href="{{route('estoque.index')}}">Estoque</a>
+            <a class="list-group-item fs-5" href="{{route('marca.index')}}">Marca</a>
+          </ul>
+        </div>
         <form action="/logout" method="POST">
-            @csrf
-            <a href="/logout" class="a" onclick="event.preventDefault();
-                this.closest('form').submit();">Sair</a>
-        </form>  
-
-      <a href="{{route('categoria.inicio')}}" class="a">Inicio</a>
-      <a href="{{route('produtos.index')}}" class="a">Produtos</a>
-      <a href="{{route('fornecedor.index')}}" class="a">Fornecedores</a>
-      <a href="{{route('estoque.index')}}" class="a">Estoque</a>
-      {{-- <a href="{{route('usuario.index')}}" class="a">Cadastrar/Permitir usuário</a> --}}
-      <a href="{{route('marca.index')}}" class="a">Marca</a>
+          @csrf
+          <a href="/logout" class="list-group-item" onclick="event.preventDefault();
+            this.closest('form').submit();">Sair</a>
+        </form>
+      </div>
       @yield('conteudo')  
 </body>
 </html>

@@ -2,7 +2,7 @@
 
 @section('conteudo')
 
-<div class="container">
+<div class="container d-flex flex-row justify-content-between align-items-center">
     <div class="mx-auto">
         <h1 class="card-title">{{ $variaveis->first()->nome_categoria }}</h1>
     </div>

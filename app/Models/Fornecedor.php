@@ -19,6 +19,8 @@ class Fornecedor extends Model
         'bairro',
         'numero_casa',
         'email',
+        'cidade',
+        'uf',
         'id_users_fk',
         'id_cidade_fk',
         'status',

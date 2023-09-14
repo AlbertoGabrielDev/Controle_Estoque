@@ -64,8 +64,9 @@ class FornecedorController extends Controller
             'bairro'            =>$request->bairro,
             'numero_casa'       =>$request->numero_casa,
             'email'             =>$request->email,
-            'id_cidade_fk'      =>$cidade->id,
             'id_users_fk'       =>Auth::id(),
+            'cidade'            =>$request->cidade,
+            'uf'                =>$request->uf,
             'status'            =>$request->status,    
             'id_telefone_fk'    => $telefonesId->id_telefone                           
        ]);
