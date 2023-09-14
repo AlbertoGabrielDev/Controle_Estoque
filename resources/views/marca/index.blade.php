@@ -1,8 +1,14 @@
 @extends('layouts.principal')
 
 @section('conteudo')
-<div class="categoria">Index</div> 
-
+<div class="container d-flex justify-content-between align-items-center">
+  <div class="mx-auto">
+    <h1 class="card-title">Index Marca</h1>
+  </div>
+  <div>
+    <a class="btn btn-primary" href="{{route('categoria.inicio')}}">Voltar</a>
+  </div>
+</div>
 <div class="div_criar_produto">
   <a class="button_criar_produto" href="{{route('marca.cadastro')}}">Cadastrar Marca</a>     
 </div>
@@ -11,7 +17,6 @@
   <input type="text" name="nome_marca" placeholder="Digite o nome da Marca">
   <button type="submit">Pesquisar</button>
 </form>
-
 <table class="table mt-5">
     <thead>
       <tr>

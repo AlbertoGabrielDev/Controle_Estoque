@@ -2,11 +2,15 @@
 
 @section('conteudo')
 
-<div class="container d-flex flex-row justify-content-between align-items-center">
+<div class="container d-flex justify-content-between align-items-center">
     <div class="mx-auto">
-        <h1 class="card-title">{{ $variaveis->first()->nome_categoria }}</h1>
+      <h1 class="card-title">{{ $variaveis->first()->nome_categoria }}</h1>
+    </div>
+    <div>
+      <a class="btn btn-primary" href="{{route('categoria.inicio')}}">Voltar</a>
     </div>
   </div>
+</div>
     <table class="table">
         <thead>
             <tr>

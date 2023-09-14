@@ -32,8 +32,8 @@ class FornecedorController extends Controller
     public function buscar(Request $request)
     {   
         $buscarFornecedor = $request->input('nome_fornecedor');
-        $fornecedor = Fornecedor::where('nome_fornecedor', 'like' , '%' . $buscarFornecedor. '%')->get();
-        return view('fornecedor.index', compact('fornecedor'));
+        $fornecedores = Fornecedor::where('nome_fornecedor', 'like' , '%' . $buscarFornecedor. '%')->get();
+        return view('fornecedor.index', compact('fornecedores'));
     }
 
     public function inserirCadastro(Request $request)

@@ -1,7 +1,14 @@
 @extends('layouts.principal')
 
 @section('conteudo')
-<div class="estoque_espacamento"></div>
+<div class="container d-flex justify-content-between align-items-center">
+  <div class="mx-auto">
+    <h1 class="card-title">Cadastro de Estoque</h1>
+  </div>
+  <div>
+    <a class="btn btn-primary" href="{{route('estoque.index')}}">Voltar</a>
+  </div>
+</div>
 
 <form action="{{route('estoque.inserirEstoque')}}" method="POST">
     @csrf

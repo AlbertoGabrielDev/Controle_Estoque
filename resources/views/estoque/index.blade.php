@@ -1,12 +1,17 @@
 @extends('layouts.principal')
 @section('conteudo')
 
-<div class="estoque">Index Estoque</div> 
-
+<div class="container d-flex justify-content-between align-items-center">
+  <div class="mx-auto">
+    <h1 class="card-title">Index Estoque</h1>
+  </div>
+  <div>
+    <a class="btn btn-primary" href="{{route('categoria.inicio')}}">Voltar</a>
+  </div>
+</div>
 <div class="div_criar_produto">
   <a class="button_criar_produto" href="{{route('estoque.cadastro')}}">Cadastrar Estoque</a>     
 </div>
-
 <form action="{{ route('estoque.buscar') }}" method="GET">
   <div class="accordion accordion-flush" id="accordionFlushExample">
     <div class="accordion-item">

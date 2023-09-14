@@ -1,11 +1,14 @@
 @extends('layouts.principal')
 
 @section('conteudo')
-    <div class="produto">
-        Cadastro de Marcas
+<div class="container d-flex justify-content-between align-items-center">
+    <div class="mx-auto">
+      <h1 class="card-title">Cadastro de Marcas</h1>
     </div>
-
-    {{-- {{dd($vars_localidade)}} --}}
+    <div>
+      <a class="btn btn-primary" href="{{route('marca.index')}}">Voltar</a>
+    </div>
+</div>
 
     <form action="{{route('marca.inserirMarca')}}" method="POST">
         @csrf
