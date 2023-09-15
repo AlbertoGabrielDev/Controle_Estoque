@@ -12,6 +12,9 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 <body>
+  {{-- 
+    Cabeçalho
+  --}}
     <div class="container d-flex flex-row justify-content-between align-items-center">
         <div class="mx-auto">
           <ul class="list-group list-group-horizontal">
@@ -28,6 +31,16 @@
             this.closest('form').submit();">Sair</a>
         </form>
       </div>
+{{-- 
+    Cabeçalho
+  --}}      
+  {{-- 
+    -------------------------------------------------------------
+    Corpo
+  --}}
       @yield('conteudo')  
+{{-- 
+    Corpo
+  --}}      
 </body>
 </html>

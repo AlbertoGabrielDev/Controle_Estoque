@@ -27,6 +27,8 @@ Route::middleware([
         Route::get('/cadastro',[ProdutoController::class, 'cadastro'])->name('produtos.cadastro');
         Route::post('/salvar-cadastro',[ProdutoController::class, 'inserirCadastro'])->name('produtos.salvarCadastro');
         Route::get('/buscar-produto',[ProdutoController::class, 'buscarProduto'])->name('produtos.buscar');
+        Route::get('/editar/{produtoId}',[ProdutoController::class, 'editar'])->name('produtos.editar');
+        Route::post('/editar/{produtoId}',[ProdutoController::class, 'salvarEditar'])->name('produtos.salvarEditar');
     });
      
     Route::prefix('/estoque')->group(function(){

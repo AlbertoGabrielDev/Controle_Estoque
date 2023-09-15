@@ -46,11 +46,11 @@ class CategoriaController extends Controller
 
     public function produto(Request $request , $categoria)
     {
-        //$categorias = Categoria::all();
         $rota = $categoria;    
-        $variaveis=  CategoriaProduto::join('produto as p', 'categoria_produto.id_produto_fk', '=' , 'p.id_produto')
+        $variaveis =  CategoriaProduto::join('produto as p', 'categoria_produto.id_produto_fk', '=' , 'p.id_produto')
         ->join('categoria as c', 'categoria_produto.id_categoria_fk' , '=' , 'c.id_categoria')
-        ->where('categoria_produto.id_categoria_fk' ,'=' , $rota)->get();   
+        ->where('categoria_produto.id_categoria_fk' ,'=' , $rota)->get();  
+        //dd($variaveis); 
         return view('categorias.produto',compact('variaveis'));
     }
 

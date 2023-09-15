@@ -23,19 +23,12 @@
               <input type="Date" class="form-control form-control-lg w-75" required name="validade"  placeholder="Validade do produto">
             </div>
         </div>
-          
         <div class="row">
-            {{-- <div class="col-md-4">
-                <input type="number" class="form-control form-control-lg w-75" required name="lote"  placeholder="Lote">
-            </div> --}}
             <div class="col-md-4">
                 <input type="text" class="form-control form-control-lg w-75" required name="unidade_medida"  placeholder="Unidade de Medida">
             </div>
         </div>
-       
-       
         <div class="row">
-            
             <div class="col-md-4">
                 <input type="number" class="form-control form-control-lg w-75" required name="cod_produto"  placeholder="Cod. Produto">
             </div>

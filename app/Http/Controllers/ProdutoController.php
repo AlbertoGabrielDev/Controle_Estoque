@@ -24,8 +24,8 @@ class ProdutoController extends Controller
 
     public function Index()
     {
-        $produto = Produto::all();
-        return view('produtos.index',compact('produto'));
+        $produtos = Produto::all();
+        return view('produtos.index',compact('produtos'));
     }
 
     public function Cadastro(Request $request) 
@@ -61,8 +61,29 @@ class ProdutoController extends Controller
     public function buscarProduto(Request $request)
     {
         $buscarProduto= $request->input('nome_produto');
-        $produto = Produto::where('nome_produto', 'like', '%' .$buscarProduto. '%')->get();
-        return view('produtos.index', compact('produto'));
+        $produtos = Produto::where('nome_produto', 'like', '%' .$buscarProduto. '%')->get();
+        return view('produtos.index', compact('produtos'));
+    }
+
+    public function editar(Request $request, $produtoId) 
+    {
+        $categorias = Categoria::all();
+        $produtos = Produto::where('produto.id_produto' , $produtoId)->get();
+        return view('produtos.editar',compact('produtos', 'categorias'));    
+    }
+
+    public function salvarEditar(Request $request, $produtoId)
+    {       
+      
+        $produtos = Produto::where('id_produto',$produtoId)
+        ->update([
+            'nome_produto'      =>$request->nome_produto,
+            'cod_produto'       =>$request->cod_produto,
+            'descricao'         =>$request->descricao,
+            'validade'          =>$request->validade,
+            'unidade_medida'    =>$request->unidade_medida,
+        ]);
+        return redirect()->route('produtos.index')->with('success', 'Editadocom sucesso');
     }
 
 }

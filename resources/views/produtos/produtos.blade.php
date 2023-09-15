@@ -9,11 +9,9 @@
         search
         </button>
     </div>
-
     <div class="div_criar_produto">
         <a class="button_criar_produto" href="{{route('produtos.cadastro')}}">Cadastrar Produto</a>     
     </div>
-
     <div class="div_pai">
         <div class="cards">
             <img src="{{asset('img/banana.png')}}" class="" alt="...">
@@ -40,7 +38,6 @@
         const decrementBtn = document.querySelector('.decrement');
         const incrementBtn = document.querySelector('.increment');
         const stepperInput = document.querySelector('.stepper-input');
-      
         decrementBtn.addEventListener('click', () => {
           if (stepperInput.value > 1) {
             stepperInput.value = parseInt(stepperInput.value) - 1;

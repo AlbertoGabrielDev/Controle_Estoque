@@ -138,11 +138,10 @@ $("#cep").blur(function()
     });
 });
 
-$("#cnpj", "#cep").blur(function() {
+$("#cnpj").blur(function() {
     var cnpj = this.value.replace(/[^0-9]/g, "");
     if (cnpj.length !== 14) {
         this.style.backgroundColor = "red"; 
-       // alert('Insira um CNPJ válido!');
     } else {
         this.style.backgroundColor = ""; 
     }

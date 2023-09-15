@@ -15,9 +15,9 @@
 </div>
 
 
-<form action="{{ route('produtos.buscar') }}" method="GET">
-    <input type="text" name="nome_produto" placeholder="Digite nome do produto">
-    <button type="submit">Pesquisar</button>
+<form action="{{ route('produtos.buscar') }}" method="GET" class="d-flex">
+  <input type="text" name="nome_produto" class="form-control w-25" placeholder="Procurar">
+  <button class="btn btn-outline-success" type="submit">Pesquisar</button>
 </form>
 <table class="table mt-5">
     <thead>
@@ -33,14 +33,15 @@
       </tr>
     </thead>
     <tbody>
-        @foreach ($produto as $produtos)
+        @foreach ($produtos as $produto)
           <tr>
-            <td>{{$produtos->cod_produto}}</td>
-            <td>{{$produtos->nome_produto}}</td>
-            <td>{{$produtos->descricao}}</td>
-            <td>{{$produtos->unidade_medida}}</td>
-            <td>{{$produtos->inf_nutrientes}}</td>
-            <td>{{ \Carbon\Carbon::parse($produtos->validade)->format('d/m/Y') }}</td> 
+            <td>{{$produto->cod_produto}}</td>
+            <td>{{$produto->nome_produto}}</td>
+            <td>{{$produto->descricao}}</td>
+            <td>{{$produto->unidade_medida}}</td>
+            <td>{{$produto->inf_nutrientes}}</td>
+            <td>{{ \Carbon\Carbon::parse($produto->validade)->format('d/m/Y') }}</td> 
+            <td> <a href="{{route('produtos.editar', $produto->id_produto)}}" class="btn btn-primary">Editar</a></td>
           </tr>
           @endforeach
     </tbody>

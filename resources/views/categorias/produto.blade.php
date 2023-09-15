@@ -14,15 +14,15 @@
     <table class="table">
         <thead>
             <tr>
-                <th scope="col">Cod. Produto</th>
-                <th scope="col">Nome Produto</th>
-                <th scope="col">Descrição</th>
-                <th scope="col">Unidade de Medida</th>
-                <th scope="col">Infor. Nutricional</th>
-                <th scope="col">Validade</th>
-                <th>Editar</th>
-                <th>Inativar</th>
-              </tr>
+              <th scope="col">Cod. Produto</th>
+              <th scope="col">Nome Produto</th>
+              <th scope="col">Descrição</th>
+              <th scope="col">Unidade de Medida</th>
+              <th scope="col">Infor. Nutricional</th>
+              <th scope="col">Validade</th>
+              <th>Editar</th>
+              <th>Inativar</th>
+            </tr>
         </thead>
         <tbody>
             @foreach ($variaveis as $variavel)
@@ -37,7 +37,4 @@
             @endforeach
         </tbody>
     </table>
-
-
-
 @endsection
