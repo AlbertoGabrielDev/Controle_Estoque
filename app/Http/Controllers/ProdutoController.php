@@ -24,8 +24,9 @@ class ProdutoController extends Controller
 
     public function Index()
     {
+        $categorias = Categoria::all();
         $produtos = Produto::all();
-        return view('produtos.index',compact('produtos'));
+        return view('produtos.index',compact('produtos','categorias'));
     }
 
     public function Cadastro(Request $request) 
@@ -66,15 +67,19 @@ class ProdutoController extends Controller
 
     public function editar(Request $request, $produtoId) 
     {
+
+        // $selecionado = CategoriaProduto::join('produto as p', 'p.id_produto', '=', 'categoria_produto.id_produto_fk')
+        // ->join('categoria as c', 'c.id_categoria' , '=' , 'categoria_produto.id_categoria_fk')
+        // ->where('p.id_produto' , '=' .$produtoId)->get();
+        // dd($selecionado);
         $categorias = Categoria::all();
         $produtos = Produto::where('produto.id_produto' , $produtoId)->get();
         return view('produtos.editar',compact('produtos', 'categorias'));    
     }
 
     public function salvarEditar(Request $request, $produtoId)
-    {       
+    {   
         $categoriaId = $request->input('nome_categoria');
-
         $produtos = Produto::where('id_produto',$produtoId)
         ->update([
             'nome_produto'      =>$request->nome_produto,
@@ -83,9 +88,8 @@ class ProdutoController extends Controller
             'validade'          =>$request->validade,
             'unidade_medida'    =>$request->unidade_medida,
         ]);
-        $categoria = CategoriaProduto::where('id_produto_fk' , $produtoId)->update([
-            'id_categoria_fk' =>$categoriaId
-        ]);
+        $categoria = CategoriaProduto::where('id_produto_fk' , $produtoId)
+        ->update(['id_categoria_fk' =>$categoriaId]);
         
         return redirect()->route('produtos.index')->with('success', 'Editadocom sucesso');
     }

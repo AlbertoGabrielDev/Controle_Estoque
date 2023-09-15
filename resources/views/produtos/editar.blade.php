@@ -28,14 +28,6 @@
       <span class="input-group-text" id="inputGroup-sizing-lg">Validade</span>
       <input type="date" name="validade" class="form-control" aria-label="Sizing example input" value="{{$produto->validade}}">
     </div>
-    <div class="input-group input-group-lg">
-      <span class="input-group-text" id="inputGroup-sizing-lg">Uni. Medida</span>
-      <input type="text" name="unidade_medida" class="form-control" aria-label="Sizing example input" value="{{$produto->unidade_medida}}">
-      <span class="input-group-text" id="inputGroup-sizing-lg">Inf. Nutricionais</span>
-      <input type="text" name="inf_nutrientes" class="form-control" aria-label="Sizing example input" value="{{$produto->inf_nutrientes}}">
-      <span class="input-group-text" id="inputGroup-sizing-lg">Validade</span>
-      <input type="date" name="validade" class="form-control" aria-label="Sizing example input" value="{{$produto->validade}}">
-    </div>
  @endforeach
     <div class="input-group input-group-lg w-25">
       <select class="form-select" aria-label="Default select example" name="nome_categoria">

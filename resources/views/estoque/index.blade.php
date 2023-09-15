@@ -87,7 +87,7 @@
           <td>{{$estoques->created_at}}</td>
           <td>{{$estoques->lote}}</td>
           <td>{{$estoques->localizacao}}</td>
-          <td>Editar</td> 
+          <td><a href="{{route('estoque.editar', $estoques->id_estoque)}}" class="btn btn-primary">Editar</a></td> 
           <td>Deletar</td>
       </tr>
       @endforeach

@@ -36,6 +36,8 @@ Route::middleware([
         Route::get('/cadastro',[EstoqueController::class, 'Cadastro'])->name('estoque.cadastro');
         Route::post('/cadastro',[EstoqueController::class, 'inserirEstoque'])->name('estoque.inserirEstoque');
         Route::get('/buscar-estoque',[EstoqueController::class, 'buscar'])->name('estoque.buscar');
+        Route::get('/editar/{estoqueId}',[EstoqueController::class, 'editar'])->name('estoque.editar');
+        Route::post('/editar/{estoqueId}',[EstoqueController::class, 'salvarEditar'])->name('estoque.salvarEditar');
     });
 
     Route::prefix('/fornecedor')->group(function(){

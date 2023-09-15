@@ -22,6 +22,7 @@
 <table class="table mt-5">
     <thead>
       <tr>
+        {{-- <th>Categoria</th> --}}
         <th scope="col">Cod. Produto</th>
         <th scope="col">Nome Produto</th>
         <th scope="col">Descrição</th>
@@ -30,11 +31,22 @@
         <th scope="col">Validade</th>
         <th>Editar</th>
         <th>Inativar</th>
+       
       </tr>
     </thead>
     <tbody>
-        @foreach ($produtos as $produto)
+      {{-- @foreach ($categorias as $categoria)
+      <th>
+        <td>{{$categoria->nome_categoria}}</td>
+      </th>
+      @endforeach --}}
+      @foreach ($produtos as $produto)
           <tr>
+            {{-- <td>
+              @foreach ($categorias as $categoria)
+                      {{ $categoria->nome_categoria }}
+              @endforeach
+          </td> --}}
             <td>{{$produto->cod_produto}}</td>
             <td>{{$produto->nome_produto}}</td>
             <td>{{$produto->descricao}}</td>
@@ -43,7 +55,7 @@
             <td>{{ \Carbon\Carbon::parse($produto->validade)->format('d/m/Y') }}</td> 
             <td> <a href="{{route('produtos.editar', $produto->id_produto)}}" class="btn btn-primary">Editar</a></td>
           </tr>
-          @endforeach
+        @endforeach
     </tbody>
 </table>
 @endsection

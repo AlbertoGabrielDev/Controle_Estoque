@@ -14,7 +14,6 @@
   <a class="button_criar_produto" href="{{route('fornecedor.cadastro')}}">Cadastrar Fornecedor</a>     
 </div>
 
-
 <form action="{{ route('fornecedor.buscar') }}" method="GET">
   <input type="text" name="nome_fornecedor" placeholder="Digite nome do fornecedor">
   <button type="submit">Pesquisar</button>
@@ -24,6 +23,15 @@
     <thead>
       <tr>
         <th scope="col">Nome</th>
+        <th scope="col">CNPJ</th>
+        <th scope="col">CEP</th>
+        <th scope="col">Logradouro</th>
+        <th scope="col">Bairro</th>
+        <th scope="col">N. Casa</th>
+        <th scope="col">Email</th>
+        <th scope="col">Status</th>
+        <th scope="col">Cidade</th>
+        <th scope="col">UF</th>
         <th>Editar</th>
         <th>Inativar</th>
       </tr>
@@ -32,6 +40,15 @@
       @foreach ($fornecedores as $fornecedor)
         <tr>
           <td>{{$fornecedor->nome_fornecedor}}</td>
+          <td>{{$fornecedor->cnpj}}</td>
+          <td>{{$fornecedor->cep}}</td>
+          <td>{{$fornecedor->logradouro}}</td>
+          <td>{{$fornecedor->bairro}}</td>
+          <td>{{$fornecedor->numero_casa}}</td>
+          <td>{{$fornecedor->email}}</td>
+          <td>{{$fornecedor->status}}</td>
+          <td>{{$fornecedor->cidade}}</td>
+          <td>{{$fornecedor->uf}}</td>
           <td><a href="{{route('fornecedor.editar', $fornecedor->id_fornecedor)}}" class="btn btn-primary">Editar</a></td> 
           <td>Inativar</td>
         </tr>

@@ -109,14 +109,15 @@ class EstoqueController extends Controller
         return view('estoque.index', compact('estoque', 'fornecedores', 'marcas', 'categorias'));
     }
 
-    public function inserirEstoque(Request $request){
+    public function inserirEstoque(Request $request)
+    {
         $fornecedorInput = $request->input('fornecedor');
         $fornecedor = Fornecedor::where('id_fornecedor', $fornecedorInput)->first();
         $marcaInput = $request->input('marca');
         $marca = Marca::where('id_marca', $marcaInput)->first();
         $produtoInput = $request->input('nome_produto');
         $produtoId = Produto::where('id_produto', $produtoInput)->first();
-        //dd($request);
+
         $estoque = Estoque::create([
             'quantidade'        =>$request->quantidade,
             'localizacao'       =>$request->localizacao,
@@ -135,5 +136,43 @@ class EstoqueController extends Controller
         ]);
 
         return redirect()->route('estoque.index')->with('success', 'Inserido com sucesso');
+    }
+
+    public function editar(Request $request, $estoqueId)
+    {
+        $produtos = Produto::all();
+        $fornecedores = Fornecedor::all();
+        $marcas = Marca::all();
+        $estoques = Estoque::where('id_estoque', $estoqueId)->get();
+        return view('estoque.editar', compact('estoques','produtos','fornecedores','marcas'));
+    }
+
+    public function salvarEditar(Request $request, $estoqueId)
+    {
+        $fornecedorInput = $request->input('fornecedor');
+        $fornecedor = Fornecedor::where('id_fornecedor', $fornecedorInput)->first();
+        $marcaInput = $request->input('marca');
+        $marca = Marca::where('id_marca', $marcaInput)->first();
+        $produtoInput = $request->input('nome_produto');
+        $produtoId = Produto::where('id_produto', $produtoInput)->first();
+        dd($produtoInput);
+        $estoques = Estoque::where('id_estoque' , $estoqueId)
+        ->update([
+            'quantidade'        =>$request->quantidade,
+            'localizacao'       =>$request->localizacao,
+            'preco_custo'       =>$request->preco_custo,
+            'preco_venda'       =>$request->preco_venda,
+            'data_chegada'      =>$request->data_chegada,
+            'lote'              =>$request->lote,
+            'id_produto_fk'     =>$produtoId->id_produto,
+            'id_fornecedor_fk'  =>$fornecedor->id_fornecedor,
+            'id_marca_fk'       =>$marca->id_marca
+        ]);
+
+         MarcaProduto::where('id_estoque_fk', $estoqueId)
+         ->update([
+            'id_produto_fk'     =>$produtoId->id_produto,
+            'id_marca_fk'       =>$marca->id_marca
+        ]);
     }
 }
