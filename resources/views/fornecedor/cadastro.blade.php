@@ -73,11 +73,8 @@
     </select>
     <select id="cidades" name="cidades" class="" disabled>
       <option value="">Selecione um estado primeiro</option>
-    </select>
   </div>
 --}}
-  <div class="">
-    <label for="status">Status:</label>
     <select name="status" id="status" class="form-control">
         <option value="1">Ativo</option>
         <option value="0">Inativo</option>

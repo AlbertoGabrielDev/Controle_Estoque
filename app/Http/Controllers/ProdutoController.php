@@ -30,8 +30,8 @@ class ProdutoController extends Controller
 
     public function Cadastro(Request $request) 
     {
-        $categoria= Categoria::all();
-        return view('produtos.cadastro',compact('categoria'));
+        $categorias= Categoria::all();
+        return view('produtos.cadastro',compact('categorias'));
     }
 
     public function inserirCadastro(Request $request)
@@ -48,10 +48,9 @@ class ProdutoController extends Controller
 
         $produtoId = Produto::latest('id_produto')->first();
         $categoriaId = $request->input('nome_categoria');
-        $categoria = Categoria::where('id_categoria', $categoriaId)->first();
-       
+        
         CategoriaProduto::create([
-            'id_categoria_fk'      =>$categoria->id_categoria,
+            'id_categoria_fk'      =>$categoriaId,
             'id_produto_fk'        =>$produtoId->id_produto        
         ]);
         
@@ -74,7 +73,8 @@ class ProdutoController extends Controller
 
     public function salvarEditar(Request $request, $produtoId)
     {       
-      
+        $categoriaId = $request->input('nome_categoria');
+
         $produtos = Produto::where('id_produto',$produtoId)
         ->update([
             'nome_produto'      =>$request->nome_produto,
@@ -83,6 +83,10 @@ class ProdutoController extends Controller
             'validade'          =>$request->validade,
             'unidade_medida'    =>$request->unidade_medida,
         ]);
+        $categoria = CategoriaProduto::where('id_produto_fk' , $produtoId)->update([
+            'id_categoria_fk' =>$categoriaId
+        ]);
+        
         return redirect()->route('produtos.index')->with('success', 'Editadocom sucesso');
     }
 

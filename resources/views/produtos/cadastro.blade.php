@@ -36,8 +36,8 @@
         <div class="col-md-4">
             <select class="form-control form-control-lg w-75" name="nome_categoria" required>
                 <option value="">Selecione uma Categoria</option>
-                @foreach ($categoria as $categorias)
-                    <option value="{{ $categorias->id_categoria }}">{{ $categorias->nome_categoria}}</option>
+                @foreach ($categorias as $categoria)
+                    <option value="{{ $categoria->id_categoria }}">{{ $categoria->nome_categoria}}</option>
                 @endforeach
             </select>
        </div>

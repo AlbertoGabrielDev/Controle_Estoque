@@ -24,16 +24,16 @@
     <thead>
       <tr>
         <th scope="col">Nome</th>
-        <th>X</th>
-        <th>Y</th>
+        <th>Editar</th>
+        <th>Inativar</th>
       </tr>
     </thead>
     <tbody>
       @foreach ($fornecedores as $fornecedor)
         <tr>
           <td>{{$fornecedor->nome_fornecedor}}</td>
-          <td>Editar</td> 
-          <td>Deletar</td>
+          <td><a href="{{route('fornecedor.editar', $fornecedor->id_fornecedor)}}" class="btn btn-primary">Editar</a></td> 
+          <td>Inativar</td>
         </tr>
       @endforeach
     </tbody>

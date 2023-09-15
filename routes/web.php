@@ -44,6 +44,8 @@ Route::middleware([
         Route::post('/cadastro',[FornecedorController::class, 'inserirCadastro'])->name('fornecedor.inserirCadastro');
         Route::get('/cidade/{estado}',[FornecedorController::class, 'getCidade'])->name('fornecedor.cidade');
         Route::get('/buscar-fornecedor',[FornecedorController::class, 'Buscar'])->name('fornecedor.buscar');
+        Route::get('/editar/{fornecedorId}',[FornecedorController::class, 'editar'])->name('fornecedor.editar');
+        Route::post('/editar/{fornecedorId}',[FornecedorController::class, 'salvarEditar'])->name('fornecedor.salvarEditar');
     });
 
     Route::prefix('/marca')->group(function(){

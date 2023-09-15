@@ -72,4 +72,44 @@ class FornecedorController extends Controller
        ]);
      return redirect()->route('fornecedor.index')->with('success','Inserido com sucesso');
     }
+
+    public function editar(Request $request, $fornecedorId){
+      //  dd($fornecedorId);
+        $fornecedores = Fornecedor::where('fornecedor.id_fornecedor' , $fornecedorId)->get();
+        $telefones = Telefone::join('fornecedor as f' , 'f.id_telefone_fk' , '=' , 'telefones.id_telefone')
+        ->where('f.id_fornecedor', $fornecedorId)->get();
+        return view('fornecedor.editar', compact('fornecedores','telefones'));
+    }
+
+    public function salvarEditar(Request $request, $fornecedorId) {
+        $fornecedores = Fornecedor::where('id_fornecedor' , $fornecedorId)
+        ->update([
+            'nome_fornecedor'   =>$request->nome_fornecedor,
+            'cnpj'              =>$request->cnpj,
+            'cep'               =>$request->cep,
+            'logradouro'        =>$request->logradouro,
+            'bairro'            =>$request->bairro,
+            'numero_casa'       =>$request->numero_casa,
+            'email'             =>$request->email,
+            'cidade'            =>$request->cidade,
+            'uf'                =>$request->uf,
+            'status'            =>$request->status                     
+        ]);
+
+        $principal = $request->input('principal') ? $request->principal : 0;
+        $whatsapp = $request->input('whatsapp') ? $request->whatsapp : 0;
+        $telegram = $request->input('telegram') ? $request->telegram : 0;
+          
+        $telefones = Telefone::join('fornecedor as f' , 'f.id_telefone_fk' , '=' , 'telefones.id_telefone')
+        ->where('f.id_fornecedor', $fornecedorId)
+        ->update([
+            'ddd' => $request->ddd,
+            'telefone' => $request->telefone,
+            'principal' => $principal,
+            'whatsapp' => $whatsapp,
+            'telegram' => $telegram
+        ]);
+
+        return redirect()->route('fornecedor.index')->with('success', 'Editado com sucesso');
+    }
 }
