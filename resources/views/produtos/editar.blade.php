@@ -31,10 +31,10 @@
  @endforeach
     <div class="input-group input-group-lg w-25">
       <select class="form-select" aria-label="Default select example" name="nome_categoria">
-        <option selected>Categoria</option>
+        {{-- <option selected>Categoria</option> --}}
         @foreach ($categorias as $categoria)
-        <option value="{{$categoria->id_categoria}}">{{$categoria->nome_categoria}}</option>
-        @endforeach
+        <option value="{{$categoria->id_categoria}}" >{{$categoria->nome_categoria}}</option>
+    @endforeach
       </select>
     </div>
     <button class="" type="submit">Editar</button>

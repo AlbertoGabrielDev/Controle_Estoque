@@ -67,11 +67,10 @@ class ProdutoController extends Controller
 
     public function editar(Request $request, $produtoId) 
     {
-
-        // $selecionado = CategoriaProduto::join('produto as p', 'p.id_produto', '=', 'categoria_produto.id_produto_fk')
-        // ->join('categoria as c', 'c.id_categoria' , '=' , 'categoria_produto.id_categoria_fk')
-        // ->where('p.id_produto' , '=' .$produtoId)->get();
-        // dd($selecionado);
+        // $categorias = Categoria::join('categoria_produto', 'categoria.id_categoria', '=', 'categoria_produto.id_categoria_fk')
+        // ->join('produto', 'produto.id_produto', '=', 'categoria_produto.id_produto_fk')
+        // ->get();
+       // $produto = Produto::find($produtoId);
         $categorias = Categoria::all();
         $produtos = Produto::where('produto.id_produto' , $produtoId)->get();
         return view('produtos.editar',compact('produtos', 'categorias'));    

@@ -4,12 +4,13 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Produto extends Model
 {
 
     protected $table= 'produto';
-    protected $primaryKey = 'cod_produto';
+    protected $primaryKey = 'id_produto';
 
     protected $fillable=[
         'cod_produto',
@@ -21,14 +22,9 @@ class Produto extends Model
         'id_users_fk'
     ];
 
-    public function categoria()
+    public function categoria() : BelongsToMany
     {
-        return $this->belongsTo(Categoria::class, 'id_categoria_fk', 'id_categoria');
+        return $this->belongsToMany(Categoria::class, 'categoria_produto','id_categoria_fk', 'id_produto_fk');
     }
-
-    public function marca(){
-        return $this->belongsTo(Marca::class, 'id_marca_fk', 'id_marca');
-    }
-
     use HasFactory;
 }

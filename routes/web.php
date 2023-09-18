@@ -53,9 +53,10 @@ Route::middleware([
     Route::prefix('/marca')->group(function(){
         Route::get('/index',[MarcaController::class, 'index'])->name('marca.index');
         Route::get('/cadastro',[MarcaController::class, 'cadastro'])->name('marca.cadastro');
-        Route::get('/buscar-marca',[MarcaController::class, 'Buscar'])->name('marca.buscar');
-        Route::get('/editar/{id}',[MarcaController::class, 'Editar'])->name('marca.editar');
         Route::post('/cadastro',[MarcaController::class, 'inserirMarca'])->name('marca.inserirMarca');
+        Route::get('/buscar-marca',[MarcaController::class, 'Buscar'])->name('marca.buscar');
+        Route::get('/editar/{marcaId}',[MarcaController::class, 'editar'])->name('marca.editar');
+        Route::post('/editar/{marcaId}',[MarcaController::class, 'salvarEditar'])->name('marca.salvarEditar');
     });
 
 });

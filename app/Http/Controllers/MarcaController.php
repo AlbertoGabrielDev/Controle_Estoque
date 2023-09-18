@@ -27,14 +27,20 @@ class MarcaController extends Controller
         return view('marca.index', compact('marcas'));
     } 
 
-    public function Editar(Request $request, $id)
+    public function editar(Request $request, $marcaId)
     {
-        $editar = Marca::find($id);
-        // if (!$editar) {
-        //     echo('Não encontrado');
-        // }
-        $editar->nome_marca = $request->input('nome_marca');
-        return view('marca.editar',compact('editar'));
+        $marcas = Marca::where('id_marca' , $marcaId)->get();
+        //dd($marcas);
+        return view('marca.editar',compact('marcas'));
+    }
+
+    public function salvarEditar(Request $request, $marcaId){
+        $marcas = Marca::where('id_marca' , $marcaId)
+        ->update([
+           'nome_marca' => $request->nome_marca 
+        ]);
+
+        return redirect()->route('marca.index')->with('success', 'Editadocom sucesso');
     }
 
     public function inserirMarca(Request $request)
@@ -43,7 +49,7 @@ class MarcaController extends Controller
             'nome_marca' => $request->nome_marca,
             'id_users_fk' => Auth::id()
         ]);
-        return redirect()->route('marca.index')->with('success', 'Inserido com sucesso'); //session flash
+        return redirect()->route('marca.index')->with('success', 'Inserido com sucesso');
     }
 
 }

@@ -29,7 +29,7 @@
       @foreach ($marcas as $marca)
       <tr>
           <td>{{$marca->nome_marca}}</td>
-          {{-- <td><a href="{{route('marca.editar', ['id'=> $editar->id_marca])}}"></a>Editar</td>  --}}
+          <td><a href="{{route('marca.editar', $marca->id_marca)}}" class="btn btn-primary">Editar</a></td> 
           <td>Inativar</td>
       </tr>
       @endforeach
