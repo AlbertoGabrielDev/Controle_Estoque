@@ -12,7 +12,7 @@ class CategoriaController extends Controller
 {
     public function inicio()
     {
-        $categorias = Categoria::all();
+        $categorias = Categoria::where('status', 1)->get();
         return view('categorias.categoria',compact('categorias'));
     }
 
@@ -50,8 +50,30 @@ class CategoriaController extends Controller
         $variaveis =  CategoriaProduto::join('produto as p', 'categoria_produto.id_produto_fk', '=' , 'p.id_produto')
         ->join('categoria as c', 'categoria_produto.id_categoria_fk' , '=' , 'c.id_categoria')
         ->where('categoria_produto.id_categoria_fk' ,'=' , $rota)->get();  
-        //dd($variaveis); 
         return view('categorias.produto',compact('variaveis'));
     }
 
+    public function editar(Request $request, $categoriaId){
+        $categorias = Categoria::where('id_categoria', $categoriaId)->get();
+        //dd($categorias);
+        return view('categorias.editar', compact('categorias'));
+    }
+
+    public function salvarEditar(Request $request, $categoriaId){
+        $categorias = Categoria::where('id_categoria', $categoriaId)
+        ->update([
+            'nome_categoria'    => $request->nome_categoria
+        ]);
+
+        return redirect()->route('categoria.index');
+    }
+
+    public function status(Request $request, $statusId){
+        $status = Categoria::findOrFail($statusId);
+   
+        $status->status = ($status->status == 1) ? 0 : 1;
+        $status->save();
+   
+        return response()->json(['status' => $status->status]);
+    }
 }

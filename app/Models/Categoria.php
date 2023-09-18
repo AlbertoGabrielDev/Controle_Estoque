@@ -15,7 +15,8 @@ class Categoria extends Model
     protected $fillable = [
         'nome_categoria',
         'id_users_fk',
-        'imagem'
+        'imagem',
+        'status'
     ];
 
     public function produto() : BelongsToMany

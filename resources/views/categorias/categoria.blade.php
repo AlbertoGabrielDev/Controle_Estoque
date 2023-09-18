@@ -9,7 +9,7 @@
             </button>
     </div> --}}
     <div class="div_criar_categoria">
-        <a class="button_criar_categoria" href="{{route('categoria.index')}}">Criar Categoria</a>
+        <a class="button_criar_categoria" href="{{route('categoria.index')}}">Index</a>
     </div>
         <div class="row">
             @foreach ($categorias as $categoria)

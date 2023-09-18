@@ -19,6 +19,9 @@ Route::middleware([
         Route::get('/cadastro',[CategoriaController::class, 'cadastro'])->name('categoria.cadastro');
         Route::post('/cadastro',[CategoriaController::class, 'inserirCategoria'])->name('categoria.inserirCategoria');
         Route::get('/produto/{categoria}',[CategoriaController::class, 'produto'])->name('categorias.produto');
+        Route::get('/editar/{categoriaId}',[CategoriaController::class, 'editar'])->name('categorias.editar');
+        Route::post('/editar/{categoriaId}',[CategoriaController::class, 'salvarEditar'])->name('categorias.salvarEditar');
+        Route::post('/status/{categoriaId}',[CategoriaController::class, 'status'])->name('categorias.status');
     });
 
     Route::prefix('/produtos')->group(function(){

@@ -105,7 +105,7 @@ class EstoqueController extends Controller
                    ->orWhereNull('estoque.preco_custo');
         })
         ->get();
-        dd($estoque);
+        //dd($estoque);
         return view('estoque.index', compact('estoque', 'fornecedores', 'marcas', 'categorias'));
     }
 
