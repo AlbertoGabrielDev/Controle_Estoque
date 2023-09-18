@@ -53,27 +53,26 @@ class CategoriaController extends Controller
         return view('categorias.produto',compact('variaveis'));
     }
 
-    public function editar(Request $request, $categoriaId){
+    public function editar(Request $request, $categoriaId)
+    {
         $categorias = Categoria::where('id_categoria', $categoriaId)->get();
         //dd($categorias);
         return view('categorias.editar', compact('categorias'));
     }
 
-    public function salvarEditar(Request $request, $categoriaId){
+    public function salvarEditar(Request $request, $categoriaId)
+    {
         $categorias = Categoria::where('id_categoria', $categoriaId)
         ->update([
             'nome_categoria'    => $request->nome_categoria
         ]);
-
         return redirect()->route('categoria.index');
     }
-
-    public function status(Request $request, $statusId){
+    public function status(Request $request, $statusId)
+    {
         $status = Categoria::findOrFail($statusId);
-   
         $status->status = ($status->status == 1) ? 0 : 1;
         $status->save();
-   
         return response()->json(['status' => $status->status]);
     }
 }

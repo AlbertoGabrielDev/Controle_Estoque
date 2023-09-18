@@ -27,7 +27,6 @@
             @endforeach
         </tbody>
     </table>
-
     <script>
         $(document).ready(function () {
             $('.toggle-ativacao').click(function () {

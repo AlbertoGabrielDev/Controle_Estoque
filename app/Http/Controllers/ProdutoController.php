@@ -93,4 +93,13 @@ class ProdutoController extends Controller
         return redirect()->route('produtos.index')->with('success', 'Editadocom sucesso');
     }
 
+    public function deletar($produtoId){
+        $produto = Produto::find($produtoId);
+        $produto->categoria()->detach($produtoId);
+       // $produto->fornecedor()->detach($produtoId);
+        $produto->delete();
+        return response()->json(['message' => 'Produto excluído com sucesso'], 200);
+        
+    }
+
 }

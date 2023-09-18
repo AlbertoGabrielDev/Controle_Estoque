@@ -26,5 +26,9 @@ class Fornecedor extends Model
         'status',
         'id_telefone_fk'
     ];
+
+    public function produto(): BelongsToMany{
+        return $this->belongsToMany(Produto::class, 'estoque', 'id_fornecedor_fk', 'id_produto_fk');
+    }
     use HasFactory;
 }
