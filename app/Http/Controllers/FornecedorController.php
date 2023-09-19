@@ -4,8 +4,6 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Fornecedor;
-use App\Models\Estado;
-use App\Models\Cidade;
 use App\Models\Telefone;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
@@ -20,9 +18,7 @@ class FornecedorController extends Controller
 
     public function cadastro()
     {
-        $estado = Estado::all();
-        $cidade = Cidade::all();
-        return view('fornecedor.cadastro', compact('estado','cidade'));
+        return view('fornecedor.cadastro');
     }
     public function getCidade($estado)
     {
@@ -74,7 +70,6 @@ class FornecedorController extends Controller
     }
 
     public function editar(Request $request, $fornecedorId){
-      //  dd($fornecedorId);
         $fornecedores = Fornecedor::where('fornecedor.id_fornecedor' , $fornecedorId)->get();
         $telefones = Telefone::join('fornecedor as f' , 'f.id_telefone_fk' , '=' , 'telefones.id_telefone')
         ->where('f.id_fornecedor', $fornecedorId)->get();
@@ -113,9 +108,11 @@ class FornecedorController extends Controller
         return redirect()->route('fornecedor.index')->with('success', 'Editado com sucesso');
     }
 
-    public function deletar($fornecedorId){
-       // $fornecedores = Fornecedores::find($fornecedorId);
-        $fornecedores->categoria()->detach($fornecedorId);
-        
+    public function status(Request $request, $statusId)
+    {
+        $status = Fornecedor::findOrFail($statusId);
+        $status->status = ($status->status == 1) ? 0 : 1;
+        $status->save();
+        return response()->json(['status' => $status->status]);
     }
 }

@@ -29,7 +29,6 @@ class CategoriaController extends Controller
 
     public function inserirCategoria(Request $request)
     {
-
         if($request->hasFile('imagem') && $request->file('imagem')->isValid()){
             $requestImage = $request->imagem;
             $extension = $requestImage->extension();
@@ -56,7 +55,6 @@ class CategoriaController extends Controller
     public function editar(Request $request, $categoriaId)
     {
         $categorias = Categoria::where('id_categoria', $categoriaId)->get();
-        //dd($categorias);
         return view('categorias.editar', compact('categorias'));
     }
 
@@ -64,10 +62,11 @@ class CategoriaController extends Controller
     {
         $categorias = Categoria::where('id_categoria', $categoriaId)
         ->update([
-            'nome_categoria'    => $request->nome_categoria
+            'nome_categoria' => $request->nome_categoria
         ]);
         return redirect()->route('categoria.index');
     }
+
     public function status(Request $request, $statusId)
     {
         $status = Categoria::findOrFail($statusId);

@@ -45,9 +45,10 @@
             <td>{{ \Carbon\Carbon::parse($produto->validade)->format('d/m/Y') }}</td> 
             <td> <a href="{{route('produtos.editar', $produto->id_produto)}}" class="btn btn-primary">Editar</a></td>
             <td>
-              <button class="btn btn-primary delete-button" data-id={{$produto->id_produto}}>Excluir</button>
+              <button class="btn btn-primary toggle-ativacao" data-id="{{ $produto->id_produto }}" data-status="{{ $produto->status ? 'true' : 'false' }}">
+                {{ $produto->status ? 'Inativar' : 'Ativar' }}
+              </button>
             </td>
-     
           </tr>
         @endforeach
       
@@ -55,26 +56,55 @@
 </table>
 
 <script>
-  $(document).ready(function() {
-      $('.delete-button').click(function() {
-          const produtoId = $(this).data('id');
+  // $(document).ready(function() {
+  //     $('.delete-button').click(function() {
+  //         const produtoId = $(this).data('id');
 
-          if (confirm('Tem certeza de que deseja excluir este produto?')) {
-              $.ajax({
-                  url: '/verdurao/produtos/delete/' + produtoId,
-                  type: 'DELETE',
-                  data: {
-                      _token: '{{ csrf_token() }}'
-                  },
-                  success: function(response) {
-                      location.reload();
-                  },
-                  error: function() {
-                      alert('Erro ao excluir o produto.');
-                  }
-              });
-          }
-      });
-  });
+  //         if (confirm('Tem certeza de que deseja excluir este produto?')) {
+  //             $.ajax({
+  //                 url: '/verdurao/produtos/delete/' + produtoId,
+  //                 type: 'DELETE',
+  //                 data: {
+  //                     _token: '{{ csrf_token() }}'
+  //                 },
+  //                 success: function(response) {
+  //                     location.reload();
+  //                 },
+  //                 error: function() {
+  //                     alert('Erro ao excluir o produto.');
+  //                 }
+  //             });
+  //         }
+  //     });
+  // });
+  $(document).ready(function () {
+            $('.toggle-ativacao').click(function () {
+                var button = $(this);
+                var produtoId = button.data('id');
+                console.log(button);
+                var csrfToken = $('meta[name="csrf-token"]').attr('content');
+
+                $.ajax({
+                    url: '/verdurao/produtos/status/' + produtoId,
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': csrfToken
+                    },
+                    success: function (data) {
+                        if (data.status === 1) {
+                            button.text('Inativar');
+                            button.data('status', true);
+                        } else {
+                            button.text('Ativar');
+                            button.data('status', false);
+                        }
+                    },
+                    error: function () {
+                       console.log(error);
+                    }
+                });
+            });
+        });  
+
 </script>
 @endsection

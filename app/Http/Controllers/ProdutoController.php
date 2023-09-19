@@ -93,16 +93,12 @@ class ProdutoController extends Controller
         return redirect()->route('produtos.index')->with('success', 'Editadocom sucesso');
     }
 
-    public function deletar($produtoId){
-        // $produto = Produto::find($produtoId);
-        // $produto->categoria()->detach($produtoId);
-        $categoria = CategoriaProduto::where('id_produto_fk', $produtoId)->delete();
-        $marca = MarcaProduto::where('id_produto_fk', $produtoId)->delete();
-        $estoque = Estoque::where('id_produto_fk', $produtoId)->delete();
-        
-        $produto = Produto::where('id_produto', $produtoId)->delete();
-        return response()->json(['message' => 'Produto excluído com sucesso'], 200);
-        
+    public function status(Request $request, $statusId)
+    {
+        $status = Produto::findOrFail($statusId);
+        $status->status = ($status->status == 1) ? 0 : 1;
+        $status->save();
+        return response()->json(['status' => $status->status]);
     }
 
 }

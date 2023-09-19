@@ -21,20 +21,52 @@
     <thead>
       <tr>
         <th scope="col">Marca</th>
-        <th>X</th>
-        <th>Y</th>
+        <th>Editar</th>
+        <th>Inativar</th>
       </tr>
     </thead>
     <tbody>
       @foreach ($marcas as $marca)
       <tr>
-          <td>{{$marca->nome_marca}}</td>
-          <td><a href="{{route('marca.editar', $marca->id_marca)}}" class="btn btn-primary">Editar</a></td> 
-          <td>Inativar</td>
+        <td>{{$marca->nome_marca}}</td>
+        <td><a href="{{route('marca.editar', $marca->id_marca)}}" class="btn btn-primary">Editar</a></td> 
+        <td>
+          <button class="btn btn-primary toggle-ativacao" data-id="{{ $marca->id_marca }}" data-status="{{ $marca->status ? 'true' : 'false' }}">
+            {{ $marca->status ? 'Inativar' : 'Ativar' }}
+          </button>
+        </td>
       </tr>
       @endforeach
     </tbody>
 </table>
-  <br>
+<script>
+  $(document).ready(function () {
+      $('.toggle-ativacao').click(function () {
+          var button = $(this);
+          var produtoId = button.data('id');
+          console.log(button);
+          var csrfToken = $('meta[name="csrf-token"]').attr('content');
 
+          $.ajax({
+              url: '/verdurao/marca/status/' + produtoId,
+              method: 'POST',
+              headers: {
+                  'X-CSRF-TOKEN': csrfToken
+              },
+              success: function (data) {
+                  if (data.status === 1) {
+                      button.text('Inativar');
+                      button.data('status', true);
+                  } else {
+                      button.text('Ativar');
+                      button.data('status', false);
+                  }
+              },
+              error: function () {
+                 console.log(error);
+              }
+          });
+      });
+  });
+</script> 
 @endsection

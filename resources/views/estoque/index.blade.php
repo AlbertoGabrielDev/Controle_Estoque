@@ -75,23 +75,56 @@
       </tr>
     </thead>
     <tbody>
-      @foreach ($estoque as $estoques)
+      @foreach ($estoques as $estoque)
       <tr>
-          <td>{{$estoques->nome_produto}}</td>
-          <td>{{$estoques->nome_marca}}</td>
-          <td>{{$estoques->nome_fornecedor}}</td>
-          <td>{{$estoques->preco_custo}}</td>
-          <td>{{$estoques->preco_venda}}</td>
-          <td>{{$estoques->quantidade}}</td>
-          <td>{{ \Carbon\Carbon::parse($estoques->data_chegada)->format('d/m/Y') }}</td> 
-          <td>{{$estoques->created_at}}</td>
-          <td>{{$estoques->lote}}</td>
-          <td>{{$estoques->localizacao}}</td>
-          <td><a href="{{route('estoque.editar', $estoques->id_estoque)}}" class="btn btn-primary">Editar</a></td> 
-          <td>Deletar</td>
+          <td>{{$estoque->nome_produto}}</td>
+          <td>{{$estoque->nome_marca}}</td>
+          <td>{{$estoque->nome_fornecedor}}</td>
+          <td>{{$estoque->preco_custo}}</td>
+          <td>{{$estoque->preco_venda}}</td>
+          <td>{{$estoque->quantidade}}</td>
+          <td>{{ \Carbon\Carbon::parse($estoque->data_chegada)->format('d/m/Y') }}</td> 
+          <td>{{$estoque->created_at}}</td>
+          <td>{{$estoque->lote}}</td>
+          <td>{{$estoque->localizacao}}</td>
+          <td><a href="{{route('estoque.editar', $estoque->id_estoque)}}" class="btn btn-primary">Editar</a></td> 
+          <td>
+            <button class="btn btn-primary toggle-ativacao" data-id="{{ $estoque->id_estoque }}" data-status="{{ $estoque->status ? 'true' : 'false' }}">
+              {{ $estoque->status ? 'Inativar' : 'Ativar' }}
+            </button>
+          </td>
       </tr>
       @endforeach
     </tbody>
 </table>
+<script>
+  $(document).ready(function () {
+      $('.toggle-ativacao').click(function () {
+          var button = $(this);
+          var produtoId = button.data('id');
+          console.log(button);
+          var csrfToken = $('meta[name="csrf-token"]').attr('content');
 
+          $.ajax({
+              url: '/verdurao/estoque/status/' + produtoId,
+              method: 'POST',
+              headers: {
+                  'X-CSRF-TOKEN': csrfToken
+              },
+              success: function (data) {
+                  if (data.status === 1) {
+                      button.text('Inativar');
+                      button.data('status', true);
+                  } else {
+                      button.text('Ativar');
+                      button.data('status', false);
+                  }
+              },
+              error: function () {
+                 console.log(error);
+              }
+          });
+      });
+  });
+</script> 
 @endsection

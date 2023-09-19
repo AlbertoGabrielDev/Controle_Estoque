@@ -52,4 +52,12 @@ class MarcaController extends Controller
         return redirect()->route('marca.index')->with('success', 'Inserido com sucesso');
     }
 
+    public function status($statusId)
+    {
+        $status = Marca::findOrFail($statusId);
+        $status->status = ($status->status == 1) ? 0 : 1;
+        $status->save();
+        return response()->json(['status' => $status->status]);
+    }
+
 }

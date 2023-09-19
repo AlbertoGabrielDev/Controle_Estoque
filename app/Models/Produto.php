@@ -19,7 +19,8 @@ class Produto extends Model
         'unidade_medida',
         'validade',
         'id_categoria_fk',
-        'id_users_fk'
+        'id_users_fk',
+        'status'
     ];
 
     public function categoria() : BelongsToMany

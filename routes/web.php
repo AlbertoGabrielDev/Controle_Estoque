@@ -32,7 +32,7 @@ Route::middleware([
         Route::get('/buscar-produto',[ProdutoController::class, 'buscarProduto'])->name('produtos.buscar');
         Route::get('/editar/{produtoId}',[ProdutoController::class, 'editar'])->name('produtos.editar');
         Route::post('/editar/{produtoId}',[ProdutoController::class, 'salvarEditar'])->name('produtos.salvarEditar');
-        Route::delete('delete/{produtoId}', [ProdutoController::class, 'deletar'])->name('produtos.delete');
+        Route::post('/status/{produtoId}',[ProdutoController::class, 'status'])->name('produtos.status');
     });
      
     Route::prefix('/estoque')->group(function(){
@@ -42,6 +42,7 @@ Route::middleware([
         Route::get('/buscar-estoque',[EstoqueController::class, 'buscar'])->name('estoque.buscar');
         Route::get('/editar/{estoqueId}',[EstoqueController::class, 'editar'])->name('estoque.editar');
         Route::post('/editar/{estoqueId}',[EstoqueController::class, 'salvarEditar'])->name('estoque.salvarEditar');
+        Route::post('/status/{estoqueId}',[EstoqueController::class, 'status'])->name('estoque.status');
     });
 
     Route::prefix('/fornecedor')->group(function(){
@@ -52,6 +53,7 @@ Route::middleware([
         Route::get('/buscar-fornecedor',[FornecedorController::class, 'Buscar'])->name('fornecedor.buscar');
         Route::get('/editar/{fornecedorId}',[FornecedorController::class, 'editar'])->name('fornecedor.editar');
         Route::post('/editar/{fornecedorId}',[FornecedorController::class, 'salvarEditar'])->name('fornecedor.salvarEditar');
+        Route::post('/status/{fornecedorId}',[FornecedorController::class, 'status'])->name('fornecedor.status');
     });
 
     Route::prefix('/marca')->group(function(){
@@ -61,6 +63,7 @@ Route::middleware([
         Route::get('/buscar-marca',[MarcaController::class, 'Buscar'])->name('marca.buscar');
         Route::get('/editar/{marcaId}',[MarcaController::class, 'editar'])->name('marca.editar');
         Route::post('/editar/{marcaId}',[MarcaController::class, 'salvarEditar'])->name('marca.salvarEditar');
+        Route::post('/status/{marcaId}',[MarcaController::class, 'status'])->name('marca.status');
     });
 
 });

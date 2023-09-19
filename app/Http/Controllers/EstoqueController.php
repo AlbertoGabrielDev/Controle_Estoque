@@ -18,11 +18,11 @@ class EstoqueController extends Controller
         $fornecedores = Fornecedor::all();
         $marcas = Marca::all();
         $categorias = Categoria::all();
-        $estoque = Estoque::join('produto', 'produto.id_produto', '=' , 'estoque.id_produto_fk')
+        $estoques = Estoque::join('produto', 'produto.id_produto', '=' , 'estoque.id_produto_fk')
         ->join('marca', 'id_marca', '=' , 'estoque.id_marca_fk')
         ->join('fornecedor', 'fornecedor.id_fornecedor' , '=' , 'estoque.id_fornecedor_fk')
         ->get();
-        return view('estoque.index',compact('estoque', 'fornecedores', 'marcas', 'categorias'));
+        return view('estoque.index',compact('estoques', 'fornecedores', 'marcas', 'categorias'));
     }
 
     public function cadastro()
@@ -174,5 +174,13 @@ class EstoqueController extends Controller
             'id_produto_fk'     =>$produtoId->id_produto,
             'id_marca_fk'       =>$marca->id_marca
         ]);
+    }
+
+    public function status($statusId)
+    {
+        $status = Estoque::findOrFail($statusId);
+        $status->status = ($status->status == 1) ? 0 : 1;
+        $status->save();
+        return response()->json(['status' => $status->status]);
     }
 }
