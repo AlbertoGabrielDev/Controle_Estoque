@@ -37,7 +37,6 @@ class ProdutoController extends Controller
 
     public function inserirCadastro(Request $request)
     {
-        
         $produto = Produto::create([
             'nome_produto'      =>$request->nome_produto,
             'cod_produto'       =>$request->cod_produto,
@@ -46,15 +45,12 @@ class ProdutoController extends Controller
             'unidade_medida'    =>$request->unidade_medida,
             'id_users_fk'       =>Auth::id()
         ]);
-
         $produtoId = Produto::latest('id_produto')->first();
         $categoriaId = $request->input('nome_categoria');
-        
         CategoriaProduto::create([
             'id_categoria_fk'      =>$categoriaId,
             'id_produto_fk'        =>$produtoId->id_produto        
         ]);
-        
         return redirect()->route('produtos.index')->with('success', 'Inserido com sucesso');
     }
 
@@ -101,4 +97,5 @@ class ProdutoController extends Controller
         return response()->json(['status' => $status->status]);
     }
 
+    
 }

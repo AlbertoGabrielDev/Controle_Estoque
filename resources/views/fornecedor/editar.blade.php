@@ -16,9 +16,9 @@
       <span class="input-group-text" id="inputGroup-sizing-lg">Nome</span>
       <input type="text" name="nome_fornecedor" class="form-control" aria-label="Sizing example input" value="{{$fornecedor->nome_fornecedor}}">
       <span class="input-group-text" id="inputGroup-sizing-lg">CNPJ</span>
-      <input type="number" name="cnpj" class="form-control" aria-label="Sizing example input" value="{{$fornecedor->cnpj}}">
+      <input type="text" name="cnpj" class="form-control" aria-label="Sizing example input" value="{{$fornecedor->cnpj}}">
       <span class="input-group-text" id="inputGroup-sizing-lg">CEP</span>
-      <input type="number" name="cep" class="form-control" aria-label="Sizing example input" value="{{$fornecedor->cep}}">
+      <input type="text" name="cep" class="form-control" aria-label="Sizing example input" value="{{$fornecedor->cep}}">
     </div>
     <div class="input-group input-group-lg">
       <span class="input-group-text" id="inputGroup-sizing-lg">Logradouro</span>

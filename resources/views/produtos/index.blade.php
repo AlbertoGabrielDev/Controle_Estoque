@@ -42,7 +42,8 @@
             <td>{{$produto->descricao}}</td>
             <td>{{$produto->unidade_medida}}</td>
             <td>{{$produto->inf_nutrientes}}</td>
-            <td>{{ \Carbon\Carbon::parse($produto->validade)->format('d/m/Y') }}</td> 
+            {{-- <td class= "expiration-date" id="data">{{ \Carbon\Carbon::parse($produto->validade)->format('d/m/Y') }}</td> --}}
+            <td class= "expiration-date" id="data">{{($produto->validade) }}</td>
             <td> <a href="{{route('produtos.editar', $produto->id_produto)}}" class="btn btn-primary">Editar</a></td>
             <td>
               <button class="btn btn-primary toggle-ativacao" data-id="{{ $produto->id_produto }}" data-status="{{ $produto->status ? 'true' : 'false' }}">
@@ -56,55 +57,52 @@
 </table>
 
 <script>
-  // $(document).ready(function() {
-  //     $('.delete-button').click(function() {
-  //         const produtoId = $(this).data('id');
+$(document).ready(function () 
+{
+  $('.toggle-ativacao').click(function () 
+  {
+    var button = $(this);
+    var produtoId = button.data('id');
+    var csrfToken = $('meta[name="csrf-token"]').attr('content');
+    $.ajax({
+      url: '/verdurao/produtos/status/' + produtoId,
+      method: 'POST',
+      headers: 
+      {
+        'X-CSRF-TOKEN': csrfToken
+      },
+      success: function (data) 
+      {
+        if (data.status === 1) {
+          button.text('Inativar');
+          button.data('status', true);
+        } else {
+          button.text('Ativar');
+          button.data('status', false);
+        }
+      },
+      error: function () {
+        console.log(error);
+      }
+    });
+  });
 
-  //         if (confirm('Tem certeza de que deseja excluir este produto?')) {
-  //             $.ajax({
-  //                 url: '/verdurao/produtos/delete/' + produtoId,
-  //                 type: 'DELETE',
-  //                 data: {
-  //                     _token: '{{ csrf_token() }}'
-  //                 },
-  //                 success: function(response) {
-  //                     location.reload();
-  //                 },
-  //                 error: function() {
-  //                     alert('Erro ao excluir o produto.');
-  //                 }
-  //             });
-  //         }
-  //     });
-  // });
-  $(document).ready(function () {
-            $('.toggle-ativacao').click(function () {
-                var button = $(this);
-                var produtoId = button.data('id');
-                console.log(button);
-                var csrfToken = $('meta[name="csrf-token"]').attr('content');
+  var today = new Date();
+  $(".expiration-date").each(function () {
+    var data = $(this).text();
+    var dataFormatada = moment(data).format('DD/MM/YYYY');
+    $(this).text(dataFormatada); 
 
-                $.ajax({
-                    url: '/verdurao/produtos/status/' + produtoId,
-                    method: 'POST',
-                    headers: {
-                        'X-CSRF-TOKEN': csrfToken
-                    },
-                    success: function (data) {
-                        if (data.status === 1) {
-                            button.text('Inativar');
-                            button.data('status', true);
-                        } else {
-                            button.text('Ativar');
-                            button.data('status', false);
-                        }
-                    },
-                    error: function () {
-                       console.log(error);
-                    }
-                });
-            });
-        });  
+    var expirationDate = new Date(data);
+    var vencimento = Math.floor((expirationDate - today) / (24 * 60 * 60 * 1000));
 
+    if (vencimento < 0) {
+      $(this).closest('tr').find('td').css("background-color", "red");
+    } else if (vencimento <= 7) {
+      $(this).closest('tr').find('td').css("background-color", "yellow");
+    }
+  });
+  
+});  
 </script>
 @endsection

@@ -26,7 +26,8 @@ class Estoque extends Model
         'lote',
         'id_marca_fk',
         'localizacao',
-        'created_at'
+        'created_at',
+        'quantidade_aviso'
     ];
 
     use HasFactory;

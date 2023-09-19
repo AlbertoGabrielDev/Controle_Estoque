@@ -18,10 +18,18 @@ class EstoqueController extends Controller
         $fornecedores = Fornecedor::all();
         $marcas = Marca::all();
         $categorias = Categoria::all();
-        $estoques = Estoque::join('produto', 'produto.id_produto', '=' , 'estoque.id_produto_fk')
-        ->join('marca', 'id_marca', '=' , 'estoque.id_marca_fk')
-        ->join('fornecedor', 'fornecedor.id_fornecedor' , '=' , 'estoque.id_fornecedor_fk')
-        ->get();
+        // $estoques = Estoque::join('produto', 'produto.id_produto', '=' , 'estoque.id_produto_fk')
+        // ->join('marca', 'id_marca', '=' , 'estoque.id_marca_fk')
+        // ->join('fornecedor', 'fornecedor.id_fornecedor' , '=' , 'estoque.id_fornecedor_fk')
+        // ->get();
+        $produtos = Produto::all();
+        $estoques = [];
+        foreach ($produtos as $produto) {
+            $estoquesProduto = $produto->fornecedores->pluck('pivot')->all();
+            $estoques = array_merge($estoques, $estoquesProduto);
+        }
+        //dd($estoques);
+       
         return view('estoque.index',compact('estoques', 'fornecedores', 'marcas', 'categorias'));
     }
 
@@ -105,7 +113,6 @@ class EstoqueController extends Controller
                    ->orWhereNull('estoque.preco_custo');
         })
         ->get();
-        //dd($estoque);
         return view('estoque.index', compact('estoque', 'fornecedores', 'marcas', 'categorias'));
     }
 
@@ -127,7 +134,8 @@ class EstoqueController extends Controller
             'lote'              =>$request->lote,
             'id_produto_fk'     =>$produtoId->id_produto,
             'id_fornecedor_fk'  =>$fornecedor->id_fornecedor,
-            'id_marca_fk'       =>$marca->id_marca
+            'id_marca_fk'       =>$marca->id_marca,
+            'quantidade_aviso'  =>$request->quantidade_aviso
         ]);
 
         MarcaProduto::create([
@@ -155,7 +163,6 @@ class EstoqueController extends Controller
         $marca = Marca::where('id_marca', $marcaInput)->first();
         $produtoInput = $request->input('nome_produto');
         $produtoId = Produto::where('id_produto', $produtoInput)->first();
-        dd($produtoInput);
         $estoques = Estoque::where('id_estoque' , $estoqueId)
         ->update([
             'quantidade'        =>$request->quantidade,
@@ -166,14 +173,17 @@ class EstoqueController extends Controller
             'lote'              =>$request->lote,
             'id_produto_fk'     =>$produtoId->id_produto,
             'id_fornecedor_fk'  =>$fornecedor->id_fornecedor,
-            'id_marca_fk'       =>$marca->id_marca
+            'id_marca_fk'       =>$marca->id_marca,
+            'quantidade_aviso'  =>$request->quantidade_aviso
         ]);
 
-         MarcaProduto::where('id_estoque_fk', $estoqueId)
-         ->update([
-            'id_produto_fk'     =>$produtoId->id_produto,
-            'id_marca_fk'       =>$marca->id_marca
+        MarcaProduto::where('id_produto_fk', $produtoInput)
+        ->update([
+            'id_produto_fk' => $produtoId->id_produto,
+            'id_marca_fk'   => $marca->id_marca
         ]);
+
+        return redirect()->route('estoque.index');
     }
 
     public function status($statusId)
@@ -182,5 +192,9 @@ class EstoqueController extends Controller
         $status->status = ($status->status == 1) ? 0 : 1;
         $status->save();
         return response()->json(['status' => $status->status]);
+    }
+
+    public function quantidade(Request $request){
+
     }
 }

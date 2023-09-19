@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Controllers;
 
 use App\Models\Categoria;
@@ -15,7 +14,6 @@ class CategoriaController extends Controller
         $categorias = Categoria::where('status', 1)->get();
         return view('categorias.categoria',compact('categorias'));
     }
-
     public function index()
     {
         $categorias = Categoria::all();
@@ -43,13 +41,11 @@ class CategoriaController extends Controller
         return redirect()->route('categoria.index')->with('success', 'Inserido com sucesso');
     }
 
-    public function produto(Request $request , $categoria)
+    public function produto(Request $request , $categoriaId)
     {
-        $rota = $categoria;    
-        $variaveis =  CategoriaProduto::join('produto as p', 'categoria_produto.id_produto_fk', '=' , 'p.id_produto')
-        ->join('categoria as c', 'categoria_produto.id_categoria_fk' , '=' , 'c.id_categoria')
-        ->where('categoria_produto.id_categoria_fk' ,'=' , $rota)->get();  
-        return view('categorias.produto',compact('variaveis'));
+        $categoria = Categoria::find($categoriaId);
+        $produtos = $categoria->produtos()->get();
+        return view('categorias.produto',compact('produtos'));
     }
 
     public function editar(Request $request, $categoriaId)

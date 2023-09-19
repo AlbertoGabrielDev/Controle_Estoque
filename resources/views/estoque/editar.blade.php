@@ -28,6 +28,10 @@
       <span class="input-group-text" id="inputGroup-sizing-lg">Localização</span>
       <input type="text" name="localizacao" class="form-control" aria-label="Sizing example input" value="{{$estoque->localizacao}}">
     </div>
+    <div class="row">
+      <div class="col-md-4">
+        <input type="number" class="form-control form-control-lg w-75" required name="quantidade_aviso" placeholder="Quantidade para aviso">
+  </div>
     <div class="input-group input-group-lg">
         <div class="col-md-4">
             <select class="form-control form-control-lg w-75" name="marca" >

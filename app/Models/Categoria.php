@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Categoria extends Model
 {
+    use HasFactory;
 
     protected $table = 'categoria';
     protected $primaryKey = 'id_categoria';
@@ -19,10 +20,8 @@ class Categoria extends Model
         'status'
     ];
 
-    public function produto() : BelongsToMany
+    public function produtos() : BelongsToMany
     {
         return $this->belongsToMany(Produto::class, 'categoria_produto','id_categoria_fk', 'id_produto_fk');
     }
-    
-    use HasFactory;
 }

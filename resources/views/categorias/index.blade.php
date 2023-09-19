@@ -27,34 +27,33 @@
             @endforeach
         </tbody>
     </table>
-    <script>
-        $(document).ready(function () {
-            $('.toggle-ativacao').click(function () {
-                var button = $(this);
-                var produtoId = button.data('id');
-                console.log(button);
-                var csrfToken = $('meta[name="csrf-token"]').attr('content');
-
-                $.ajax({
-                    url: '/verdurao/categoria/status/' + produtoId,
-                    method: 'POST',
-                    headers: {
-                        'X-CSRF-TOKEN': csrfToken
-                    },
-                    success: function (data) {
-                        if (data.status === 1) {
-                            button.text('Inativar');
-                            button.data('status', true);
-                        } else {
-                            button.text('Ativar');
-                            button.data('status', false);
-                        }
-                    },
-                    error: function () {
-                       console.log(error);
-                    }
-                });
-            });
-        });
-    </script> 
+<script>
+$(document).ready(function () {
+    $('.toggle-ativacao').click(function () {
+    var button = $(this);
+    var produtoId = button.data('id');
+    console.log(button);
+    var csrfToken = $('meta[name="csrf-token"]').attr('content');
+    $.ajax({
+        url: '/verdurao/categoria/status/' + produtoId,
+        method: 'POST',
+        headers: {
+            'X-CSRF-TOKEN': csrfToken
+        },
+        success: function (data) {
+            if (data.status === 1) {
+                button.text('Inativar');
+                button.data('status', true);
+            } else {
+                button.text('Ativar');
+                button.data('status', false);
+            }
+        },
+        error: function () {
+            console.log(error);
+        }
+    });
+    });
+});
+</script> 
 @endsection

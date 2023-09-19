@@ -60,9 +60,9 @@
 <table class="table mt-5">
     <thead>
       <tr>
-        <th scope="col">Nome Produto</th>
-        <th scope="col">Nome Marca</th>
-        <th scope="col">Nome Fornecedor</th>
+         <th scope="col">Nome Produto</th>
+        {{-- <th scope="col">Nome Marca</th>
+        <th scope="col">Nome Fornecedor</th>  --}}
         <th scope="col">Preço Custo</th>
         <th scope="col">Preço Venda</th>
         <th scope="col">Quantidade</th>
@@ -70,19 +70,21 @@
         <th scope="col">Data de Cadastro</th>
         <th scope="col">Lote</th>
         <th scope="col">localização</th>
-        <th>X</th>
-        <th>Y</th>
+        <th>Editar</th>
+        <th>Inativar</th>
       </tr>
     </thead>
     <tbody>
+      @foreach ($fornecedores as $fornecedor)
+      <tr>
+        <td>{{$fornecedor->nome_fornecedor}}</td>
+      </tr>
+      @endforeach
       @foreach ($estoques as $estoque)
       <tr>
-          <td>{{$estoque->nome_produto}}</td>
-          <td>{{$estoque->nome_marca}}</td>
-          <td>{{$estoque->nome_fornecedor}}</td>
           <td>{{$estoque->preco_custo}}</td>
           <td>{{$estoque->preco_venda}}</td>
-          <td>{{$estoque->quantidade}}</td>
+          <td id="quantidade" class="quantidade">{{$estoque->quantidade}}</td>
           <td>{{ \Carbon\Carbon::parse($estoque->data_chegada)->format('d/m/Y') }}</td> 
           <td>{{$estoque->created_at}}</td>
           <td>{{$estoque->lote}}</td>
@@ -98,33 +100,41 @@
     </tbody>
 </table>
 <script>
-  $(document).ready(function () {
-      $('.toggle-ativacao').click(function () {
-          var button = $(this);
-          var produtoId = button.data('id');
-          console.log(button);
-          var csrfToken = $('meta[name="csrf-token"]').attr('content');
-
-          $.ajax({
-              url: '/verdurao/estoque/status/' + produtoId,
-              method: 'POST',
-              headers: {
-                  'X-CSRF-TOKEN': csrfToken
-              },
-              success: function (data) {
-                  if (data.status === 1) {
-                      button.text('Inativar');
-                      button.data('status', true);
-                  } else {
-                      button.text('Ativar');
-                      button.data('status', false);
-                  }
-              },
-              error: function () {
-                 console.log(error);
-              }
-          });
-      });
+$(document).ready(function () 
+{
+  $('.toggle-ativacao').click(function () {
+    var button = $(this);
+    var produtoId = button.data('id');
+    var csrfToken = $('meta[name="csrf-token"]').attr('content');
+    $.ajax({
+      url: '/verdurao/estoque/status/' + produtoId,
+      method: 'POST',
+      headers: 
+      {
+        'X-CSRF-TOKEN': csrfToken
+      },
+      success: function (data) {
+        if (data.status === 1) {
+          button.text('Inativar');
+          button.data('status', true);
+        } else {
+          button.text('Ativar');
+          button.data('status', false);
+        }
+      },
+      error: function () {
+        console.log(error);
+      }
+    });
   });
+  $(".quantidade").each(function(){
+      var quantidade = $(this).data('');
+    
+      if(quantidade <= 10){
+        $(this).closest('tr').find('td').css("background-color", "red");
+      }
+  });
+
+});
 </script> 
 @endsection
