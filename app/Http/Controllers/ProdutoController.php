@@ -94,10 +94,13 @@ class ProdutoController extends Controller
     }
 
     public function deletar($produtoId){
-        $produto = Produto::find($produtoId);
-        $produto->categoria()->detach($produtoId);
-       // $produto->fornecedor()->detach($produtoId);
-        $produto->delete();
+        // $produto = Produto::find($produtoId);
+        // $produto->categoria()->detach($produtoId);
+        $categoria = CategoriaProduto::where('id_produto_fk', $produtoId)->delete();
+        $marca = MarcaProduto::where('id_produto_fk', $produtoId)->delete();
+        $estoque = Estoque::where('id_produto_fk', $produtoId)->delete();
+        
+        $produto = Produto::where('id_produto', $produtoId)->delete();
         return response()->json(['message' => 'Produto excluído com sucesso'], 200);
         
     }
