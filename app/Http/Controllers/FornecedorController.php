@@ -112,4 +112,10 @@ class FornecedorController extends Controller
 
         return redirect()->route('fornecedor.index')->with('success', 'Editado com sucesso');
     }
+
+    public function deletar($fornecedorId){
+       // $fornecedores = Fornecedores::find($fornecedorId);
+        $fornecedores->categoria()->detach($fornecedorId);
+        
+    }
 }
