@@ -109,10 +109,11 @@ class Produto extends Model
 
     public function categorias() : BelongsToMany
     {
-        return $this->belongsToMany(Categoria::class, 'categoria_produto','id_categoria_fk', 'id_produto_fk');
-    }  
+        return $this->belongsToMany(Categoria::class,  'categoria_produto', 'id_categoria_fk', 'id_produto_fk');
+    }
 
-    public function marca(): BelongsToMany{
+    public function marca(): BelongsToMany
+    {
         return $this->belongsToMany(Marca::class, 'marca_produto' ,'id_marca_fk', 'id_marca')
         ->as('marca_produto');
     }

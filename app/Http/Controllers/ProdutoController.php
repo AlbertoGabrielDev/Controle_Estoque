@@ -3,17 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\Produto;
-use App\Models\Estoque;
-use App\Models\Marca;
-use App\Models\Fornecedor;
-use App\Models\Inf_nutri;
 use App\Models\Categoria;
 use App\Models\CategoriaProduto;
-use App\Models\MarcaProduto;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
-
 
 class ProdutoController extends Controller
 {
@@ -63,11 +57,14 @@ class ProdutoController extends Controller
 
     public function editar(Request $request, $produtoId) 
     {
-        // $categorias = Categoria::join('categoria_produto', 'categoria.id_categoria', '=', 'categoria_produto.id_categoria_fk')
-        // ->join('produto', 'produto.id_produto', '=', 'categoria_produto.id_produto_fk')
-        // ->get();
-       // $produto = Produto::find($produtoId);
-        $categorias = Categoria::all();
+        // $produto = Categoria::find(53);
+        // dd($produto->produtos()->get());
+        $produto = Produto::find(63);
+        dd($produto->categorias()->get());
+       
+       // dd($categorias);
+
+        // $categorias = Categoria::all();
         $produtos = Produto::where('produto.id_produto' , $produtoId)->get();
         return view('produtos.editar',compact('produtos', 'categorias'));    
     }
@@ -86,7 +83,7 @@ class ProdutoController extends Controller
         $categoria = CategoriaProduto::where('id_produto_fk' , $produtoId)
         ->update(['id_categoria_fk' =>$categoriaId]);
         
-        return redirect()->route('produtos.index')->with('success', 'Editadocom sucesso');
+        return redirect()->route('produtos.index')->with('success', 'Editado com sucesso');
     }
 
     public function status(Request $request, $statusId)

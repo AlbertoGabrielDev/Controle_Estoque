@@ -23,26 +23,6 @@
       <div id="flush-collapseOne" class="accordion-collapse collapse" aria-labelledby="flush-headingOne" data-bs-parent="#accordionFlushExample">
         <div class="accordion-body">
             <input type="text" class="w-50" name="nome_produto" placeholder="Nome do Produto">
-            <div class="col-md-4">
-             <select class="form-control form-control-lg w-50" name="nome_fornecedor" >
-                 <option value="">Selecione um Fornecedor</option>
-                @foreach ($fornecedores as $fornecedor)
-                    <option value="{{ $fornecedor->nome_fornecedor }}">{{ $fornecedor->nome_fornecedor}}</option>
-                @endforeach
-              </select> 
-               <select class="form-control form-control-lg w-50" name="nome_marca" >
-                <option value="">Selecione uma Marca</option>
-                @foreach ($marcas as $marca)
-                    <option value="{{ $marca->nome_marca}}">{{ $marca->nome_marca}}</option>
-                @endforeach
-              </select>
-              <select class="form-control form-control-lg w-50" name="nome_categoria" >
-                <option value="">Selecione uma Categoria</option>
-                @foreach ($categorias as $categoria)
-                    <option value="{{ $categoria->nome_categoria}}">{{ $categoria->nome_categoria}}</option>
-                @endforeach
-              </select>
-            </div>
             <input type="text" class="w-50" name="lote" placeholder="Lote">
             <input type="text" class="w-50" name="localizacao" placeholder="Localização">
             <input type="text" class="w-50" name="preco_custo" placeholder="Preço Custo">
@@ -50,6 +30,26 @@
             <input type="text" class="w-50" name="quantidade" placeholder="Quantidade">
             <input type="date" class="w-50" name="data_chegada" placeholder="Quantidade">
           </div>
+          <div class="col-md-4">
+            <select class="form-control form-control-lg w-50" name="nome_fornecedor" >
+                <option value="">Selecione um Fornecedor</option>
+               @foreach ($fornecedores as $fornecedor)
+                   <option value="{{ $fornecedor->nome_fornecedor }}">{{ $fornecedor->nome_fornecedor}}</option>
+               @endforeach
+             </select> 
+              <select class="form-control form-control-lg w-50" name="nome_marca" >
+               <option value="">Selecione uma Marca</option>
+               @foreach ($marcas as $marca)
+                   <option value="{{ $marca->nome_marca}}">{{ $marca->nome_marca}}</option>
+               @endforeach
+             </select>
+             <select class="form-control form-control-lg w-50" name="nome_categoria" >
+               <option value="">Selecione uma Categoria</option>
+               @foreach ($categorias as $categoria)
+                   <option value="{{ $categoria->nome_categoria}}">{{ $categoria->nome_categoria}}</option>
+               @endforeach
+             </select>
+           </div>
           <button type="submit">Pesquisar</button>
       </div>
     </div>
@@ -60,8 +60,7 @@
 <table class="table mt-5">
     <thead>
       <tr>
-         <th scope="col">Nome Produto</th>
-        {{-- <th scope="col">Nome Marca</th>--}}
+        <th scope="col">Nome Produto</th>
         <th scope="col">Preço Custo</th>
         <th scope="col">Preço Venda</th>
         <th scope="col">Quantidade</th>
