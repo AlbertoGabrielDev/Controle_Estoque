@@ -52,8 +52,7 @@ class EstoqueController extends Controller
         }
         
         return view('estoque.index', compact('estoques', 'produtos'));
-        //dd($estoques);
-}
+    }
     
 
     // public function buscar(Request $request)

@@ -23,33 +23,40 @@ class Produto extends Model
         'status'
     ];
 
-    public function search(): BelongsToMany {
-        return $this->belongsToMany(Fornecedor::class ,'estoque', 'id_produto_fk', 'id_fornecedor_fk')
-        ->as('estoque')
-        ->withPivot([
-            'id_estoque',
-            'quantidade',
-            'localizacao',
-            'preco_custo',
-            'preco_venda',
-            'lote',
-            'data_chegada',
-            'localizacao',
-            'quantidade_aviso',
-            'created_at'
-        ])->where(function ($query){
-            $query->where('lote', request()->input('lote'))
-            ->orWhereNull('lote');
-        })->orWhere(function ($query){
-            $query->where('quantidade', request()->input('quantidade'))
-            ->orWhereNull('quantidade');
-        })->orWhere(function ($query){
-            $query->where('preco_custo', request()->input('preco_custo'))
-            ->wherePivotNull('preco_custo');
-        });
-}
+    public function search(): BelongsToMany
+    {
+        return $this->belongsToMany(Fornecedor::class, 'estoque', 'id_produto_fk', 'id_fornecedor_fk')
+            ->as('estoque')
+            ->withPivot([
+                'id_estoque',
+                'quantidade',
+                'localizacao',
+                'preco_custo',
+                'preco_venda',
+                'lote',
+                'data_chegada',
+                'localizacao',
+                'quantidade_aviso',
+                'created_at'
+            ])->where(function ($query) {
+                $query->where(function ($subquery) {
+                    if (!is_null(request()->input('lote'))) {
+                        $subquery->where('estoque.lote', request()->input('lote'));
+                    }
+                })->orWhere(function ($subquery) {
+                    if (!is_null(request()->input('quantidade'))) {
+                        $subquery->where('estoque.quantidade', request()->input('quantidade'));
+                    }
+                })->orWhere(function ($subquery) {
+                    if (!is_null(request()->input('preco_custo'))) {
+                        $subquery->where('estoque.preco_custo', request()->input('preco_custo'));
+                    }
+                });
+            });
+    }
 
-    public function fornecedores() : BelongsToMany {
+    public function fornecedores() : BelongsToMany 
+    {
         return $this->belongsToMany(Fornecedor::class ,'estoque', 'id_produto_fk', 'id_fornecedor_fk')
         ->as('estoque')
         ->withPivot([

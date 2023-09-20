@@ -61,8 +61,7 @@
     <thead>
       <tr>
          <th scope="col">Nome Produto</th>
-        {{-- <th scope="col">Nome Marca</th>
-        <th scope="col">Nome Fornecedor</th>  --}}
+        {{-- <th scope="col">Nome Marca</th>--}}
         <th scope="col">Preço Custo</th>
         <th scope="col">Preço Venda</th>
         <th scope="col">Quantidade</th>
@@ -70,6 +69,7 @@
         <th scope="col">Data de Cadastro</th>
         <th scope="col">Lote</th>
         <th scope="col">localização</th>
+        <th scope="col">Quantidade para aviso</th>  
         <th>Editar</th>
         <th>Inativar</th>
       </tr>
@@ -80,11 +80,12 @@
           <td>{{$estoque->pivotParent->nome_produto}}</td>
           <td>{{$estoque->preco_custo}}</td>
           <td>{{$estoque->preco_venda}}</td>
-          <td id="quantidade" class="quantidade">{{$estoque->quantidade}}</td>
+          <td class="quantidade" data-quantidade={{$estoque->quantidade}}>{{$estoque->quantidade}}</td>
           <td>{{ \Carbon\Carbon::parse($estoque->data_chegada)->format('d/m/Y') }}</td> 
           <td>{{$estoque->created_at}}</td>
           <td>{{$estoque->lote}}</td>
           <td>{{$estoque->localizacao}}</td>
+          <td class="quantidade_aviso" id="aviso" data-aviso={{$estoque->quantidade_aviso}}>{{$estoque->quantidade_aviso}}</td>
           <td><a href="{{route('estoque.editar', $estoque->id_estoque)}}" class="btn btn-primary">Editar</a></td> 
           <td>
             <button class="btn btn-primary toggle-ativacao" data-id="{{ $estoque->id_estoque }}" data-status="{{ $estoque->status ? 'true' : 'false' }}">
@@ -123,13 +124,18 @@ $(document).ready(function ()
       }
     });
   });
-  $(".quantidade").each(function(){
-      var quantidade = $(this).data('');
-    
-      if(quantidade <= 10){
-        $(this).closest('tr').find('td').css("background-color", "red");
-      }
+
+$(".quantidade").each(function() {
+  var quantidade = $(this).data('quantidade');
+  var tr = $(this).closest('tr');
+
+  $(".quantidade_aviso").each(function() {
+    var aviso = $(this).data('aviso');
+    if (quantidade <= aviso) {
+      tr.find('td').css("background-color", "red");
+    }
   });
+});
 
 });
 </script> 

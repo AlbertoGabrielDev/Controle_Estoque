@@ -42,7 +42,6 @@
             <td>{{$produto->descricao}}</td>
             <td>{{$produto->unidade_medida}}</td>
             <td>{{$produto->inf_nutrientes}}</td>
-            {{-- <td class= "expiration-date" id="data">{{ \Carbon\Carbon::parse($produto->validade)->format('d/m/Y') }}</td> --}}
             <td class= "expiration-date" id="data">{{($produto->validade) }}</td>
             <td> <a href="{{route('produtos.editar', $produto->id_produto)}}" class="btn btn-primary">Editar</a></td>
             <td>
