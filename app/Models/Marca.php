@@ -15,8 +15,8 @@ class Marca extends Model
         'id_users_fk'
     ];
 
-    public function produto(){
-        return $this->hasMany(Produto::class, 'marca_produto' ,'id_marca_fk', 'id_marca')
+    public function produto(): BelongsToMany{
+        return $this->belongsToMany(Produto::class, 'marca_produto' ,'id_marca_fk', 'id_marca')
         ->as('marca_produto');
     }
 

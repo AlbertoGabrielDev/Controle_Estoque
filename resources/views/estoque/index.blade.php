@@ -24,13 +24,13 @@
         <div class="accordion-body">
             <input type="text" class="w-50" name="nome_produto" placeholder="Nome do Produto">
             <div class="col-md-4">
-              {{-- <select class="form-control form-control-lg w-50" name="nome_fornecedor" >
-                <option value="">Selecione um Fornecedor</option>
+             <select class="form-control form-control-lg w-50" name="nome_fornecedor" >
+                 <option value="">Selecione um Fornecedor</option>
                 @foreach ($fornecedores as $fornecedor)
                     <option value="{{ $fornecedor->nome_fornecedor }}">{{ $fornecedor->nome_fornecedor}}</option>
                 @endforeach
-              </select> --}}
-              {{-- <select class="form-control form-control-lg w-50" name="nome_marca" >
+              </select> 
+               <select class="form-control form-control-lg w-50" name="nome_marca" >
                 <option value="">Selecione uma Marca</option>
                 @foreach ($marcas as $marca)
                     <option value="{{ $marca->nome_marca}}">{{ $marca->nome_marca}}</option>
@@ -41,7 +41,7 @@
                 @foreach ($categorias as $categoria)
                     <option value="{{ $categoria->nome_categoria}}">{{ $categoria->nome_categoria}}</option>
                 @endforeach
-              </select> --}}
+              </select>
             </div>
             <input type="text" class="w-50" name="lote" placeholder="Lote">
             <input type="text" class="w-50" name="localizacao" placeholder="Localização">
