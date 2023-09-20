@@ -18,19 +18,15 @@ class EstoqueController extends Controller
         $fornecedores = Fornecedor::all();
         $marcas = Marca::all();
         $categorias = Categoria::all();
-        // $estoques = Estoque::join('produto', 'produto.id_produto', '=' , 'estoque.id_produto_fk')
-        // ->join('marca', 'id_marca', '=' , 'estoque.id_marca_fk')
-        // ->join('fornecedor', 'fornecedor.id_fornecedor' , '=' , 'estoque.id_fornecedor_fk')
-        // ->get();
-        $produtos = Produto::all();
-        $estoques = [];
-        foreach ($produtos as $produto) {
-            $estoquesProduto = $produto->fornecedores->pluck('pivot')->all();
-            $estoques = array_merge($estoques, $estoquesProduto);
-        }
-        //dd($estoques);
+        //$produtos = Produto::all();
+        // $estoques = [];
+        // foreach ($produtos as $produto) {
+        //     $estoquesProduto = $produto->fornecedores->pluck('pivot')->all();
+        //     $estoques = array_merge($estoques, $estoquesProduto); 
+        // }
+        $produtos = Produto::with('estoques')->get();
        
-        return view('estoque.index',compact('estoques', 'fornecedores', 'marcas', 'categorias'));
+        return view('estoque.index',compact('estoques', 'fornecedores', 'marcas', 'categorias','produtos'));
     }
 
     public function cadastro()

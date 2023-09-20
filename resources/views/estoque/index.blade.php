@@ -75,13 +75,10 @@
       </tr>
     </thead>
     <tbody>
-      @foreach ($fornecedores as $fornecedor)
-      <tr>
-        <td>{{$fornecedor->nome_fornecedor}}</td>
-      </tr>
-      @endforeach
       @foreach ($estoques as $estoque)
       <tr>
+        {{dd($estoque->produto->nome_produto)}}
+        <td>{{$estoque->produto->nome_produto}}</td>
           <td>{{$estoque->preco_custo}}</td>
           <td>{{$estoque->preco_venda}}</td>
           <td id="quantidade" class="quantidade">{{$estoque->quantidade}}</td>
