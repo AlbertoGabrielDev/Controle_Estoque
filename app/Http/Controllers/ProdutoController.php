@@ -59,12 +59,10 @@ class ProdutoController extends Controller
     {
         // $produto = Categoria::find(53);
         // dd($produto->produtos()->get());
-        $produto = Produto::find(63);
-        dd($produto->categorias()->get());
-       
+        // $produto = Produto::find(63);
+        // dd($produto->categorias()->get());
        // dd($categorias);
-
-        // $categorias = Categoria::all();
+        $categorias = Categoria::all();
         $produtos = Produto::where('produto.id_produto' , $produtoId)->get();
         return view('produtos.editar',compact('produtos', 'categorias'));    
     }

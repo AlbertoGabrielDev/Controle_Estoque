@@ -2,28 +2,27 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Http\Request;
-use App\Models\Usuario;
+use App\Models\User;
 
 class UsuarioController extends Controller
 {
     public function Index(){
-        return view('usuario.index');
+        $usuarios = User::where('id', '!=', 1)->get();
+        return view('usuario.index', compact('usuarios'));
     }
 
     public function Cadastro(){
         return view('usuario.cadastro');
     }
 
-    public function inserirUsuario(Request $request){
-       
-
-        $produto = Usuario::create([
-        'nome_usuario'      =>$request->nome_usuario,
-        'login'             =>$request->login,
-        'senha'             =>$request->senha
-        ]);
-        return redirect()->route('usuario.index')->with('success', 'Inserido com sucesso');
-        
+    public function status(Request $request, $statusId)
+    {
+        $status = User::findOrFail($statusId);
+        Gate::authorize('permissao');
+        $status->status = ($status->status == 1) ? 0 : 1;
+        $status->save();
+        return response()->json(['status' => $status->status]);
     }
-}
+ }

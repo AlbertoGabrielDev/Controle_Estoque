@@ -66,4 +66,15 @@ Route::middleware([
         Route::post('/status/{marcaId}',[MarcaController::class, 'status'])->name('marca.status');
     });
 
+    Route::prefix('/usuario')->group(function(){
+        Route::get('/index', [UsuarioController::class , 'index'])->name('usuario.index');
+        Route::get('/cadastro', [UsuarioController::class , 'cadastro'])->name('usuario.cadastro');
+        Route::post('/status/{userId}',[UsuarioController::class, 'status'])->name('usuario.status');
+    });
+
 });
+
+Route::post('/logout', function () {
+    Auth::logout();
+    return redirect('/login');
+})->name('logout');

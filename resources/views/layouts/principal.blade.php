@@ -25,6 +25,9 @@
             <a class="list-group-item fs-5" href="{{route('fornecedor.index')}}">Fornecedores</a>
             <a class="list-group-item fs-5" href="{{route('estoque.index')}}">Estoque</a>
             <a class="list-group-item fs-5" href="{{route('marca.index')}}">Marca</a>
+            @can('permissao')
+              <a class="list-group-item fs-5" href="{{route('usuario.index')}}">Usuarios</a>
+            @endcan
           </ul>
         </div>
         <form action="/logout" method="POST">

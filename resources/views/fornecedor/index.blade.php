@@ -1,5 +1,4 @@
 @extends('layouts.principal')
-
 @section('conteudo')
 <div class="container d-flex justify-content-between align-items-center">
   <div class="mx-auto">
@@ -29,7 +28,6 @@
         <th scope="col">Bairro</th>
         <th scope="col">N. Casa</th>
         <th scope="col">Email</th>
-        <th scope="col">Status</th>
         <th scope="col">Cidade</th>
         <th scope="col">UF</th>
         <th>Editar</th>
@@ -46,7 +44,6 @@
           <td>{{$fornecedor->bairro}}</td>
           <td>{{$fornecedor->numero_casa}}</td>
           <td>{{$fornecedor->email}}</td>
-          <td>{{$fornecedor->status}}</td>
           <td>{{$fornecedor->cidade}}</td>
           <td>{{$fornecedor->uf}}</td>
           <td><a href="{{route('fornecedor.editar', $fornecedor->id_fornecedor)}}" class="btn btn-primary">Editar</a></td> 
@@ -60,33 +57,38 @@
     </tbody>
 </table>
 <script>
-  $(document).ready(function () {
-      $('.toggle-ativacao').click(function () {
-          var button = $(this);
-          var produtoId = button.data('id');
-          console.log(button);
-          var csrfToken = $('meta[name="csrf-token"]').attr('content');
-
-          $.ajax({
-              url: '/verdurao/fornecedor/status/' + produtoId,
-              method: 'POST',
-              headers: {
-                  'X-CSRF-TOKEN': csrfToken
-              },
-              success: function (data) {
-                  if (data.status === 1) {
-                      button.text('Inativar');
-                      button.data('status', true);
-                  } else {
-                      button.text('Ativar');
-                      button.data('status', false);
-                  }
-              },
-              error: function () {
-                 console.log(error);
-              }
-          });
-      });
+$(document).ready(function () 
+{
+  $('.toggle-ativacao').click(function () 
+  {
+    var button = $(this);
+    var produtoId = button.data('id');
+    console.log(button);
+    var csrfToken = $('meta[name="csrf-token"]').attr('content');
+    $.ajax({
+      url: '/verdurao/fornecedor/status/' + produtoId,
+      method: 'POST',
+      headers: {
+        'X-CSRF-TOKEN': csrfToken
+      },
+      success: function (data) 
+      {
+        if (data.status === 1) 
+        {
+          button.text('Inativar');
+          button.data('status', true);
+        } else 
+        {
+          button.text('Ativar');
+          button.data('status', false);
+        }
+      },
+      error: function () 
+      {
+        console.log(error);
+      }
+    });
   });
+});
 </script> 
 @endsection

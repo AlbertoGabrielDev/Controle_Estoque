@@ -3,32 +3,59 @@
 @section('conteudo')
 <div class="usuario">Index Usuario</div> 
 
-<div class="div_criar_produto">
-    <a class="button_criar_produto" href="{{route('usuario.cadastro')}}">Cadastrar Usúario</a>     
-</div>
-
 <table class="table mt-5">
     <thead>
       <tr>
         <th scope="col">ID Usuario</th>
         <th scope="col">Nome</th>
-        <th scope="col">Permissões</th>
-        <th>X</th>
-        <th>Y</th>
+        <th scope="col">Email</th>
+        <th>Editar</th>
+        <th>Ativar/Inativar</th>
       </tr>
     </thead>
     <tbody>
+      @foreach ($usuarios as $usuario)
       <tr>
-      <td>1</td>
-      <td>Alberto</td>
-      <td>Todas</td>
-      <td>Editar</td>
-      <td>Deletar</td>
-      </tr>
+        <td>{{$usuario->id}}</td>
+        <td>{{$usuario->name}}</td>
+        <td>{{$usuario->email}}</td>
+        <td>Editar</td>
+        <td>
+          <button class="btn btn-primary toggle-ativacao" data-id="{{ $usuario->id}}" data-status="{{ $usuario->status ? 'true' : 'false' }}">
+            {{ $usuario->status ? 'Inativar' : 'Ativar' }}
+          </button>
+        </td>
+        </tr>
+      @endforeach
     </tbody>
 </table>
-        <div>OBS: editar e deletar tem que alterar a tabela estoque/ O estoque so vai servir para vizualizar. 
-            Inserir produtos vai ser dentro dessa página/ Todos os dados tem que ser inseridos juntos, assim as chaves primarias serão inseridas juntas e serão iguais </div>
-  <br>
-
+<script>
+  $(document).ready(function () {
+    $('.toggle-ativacao').click(function () {
+      var button = $(this);
+      var produtoId = button.data('id');
+      console.log(button);
+      var csrfToken = $('meta[name="csrf-token"]').attr('content');
+      $.ajax({
+        url: '/verdurao/usuario/status/' + produtoId,
+        method: 'POST',
+        headers: {
+          'X-CSRF-TOKEN': csrfToken
+        },
+        success: function (data) {
+          if (data.status === 1) {
+            button.text('Inativar');
+            button.data('status', true);
+          } else {
+            button.text('Ativar');
+            button.data('status', false);
+          }
+        },
+        error: function () {
+          console.log(error);
+        }
+      });
+    });
+  });
+</script> 
 @endsection
