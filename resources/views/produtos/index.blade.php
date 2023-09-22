@@ -70,12 +70,11 @@ $('.toggle-ativacao').click(function ()
     },
     success: function (response) 
     {
-      if (response.status === 1) {
-        button.text('Inativar').css("background-color", "red");
-      } else 
+      if (response.status === 1) 
       {
-        button.text('Ativar').css("background-color", "green");
-  
+        button.text('Inativar').removeClass('btn-success').addClass('btn-danger');
+      } else {
+        button.text('Ativar').removeClass('btn-danger').addClass('btn-success');
       }
     },
     error: function () {
