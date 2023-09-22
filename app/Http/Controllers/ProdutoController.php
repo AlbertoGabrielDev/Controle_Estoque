@@ -8,6 +8,7 @@ use App\Models\CategoriaProduto;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class ProdutoController extends Controller
 {
@@ -31,6 +32,11 @@ class ProdutoController extends Controller
 
     public function inserirCadastro(Request $request)
     {
+        // $validator = Validator::make($request->all(), [
+        //     'nome_produto' => 'required|unique:posts|max:255',
+
+        //   ]);
+
         $produto = Produto::create([
             'nome_produto'      =>$request->nome_produto,
             'cod_produto'       =>$request->cod_produto,
@@ -88,6 +94,7 @@ class ProdutoController extends Controller
     {
         $status = Produto::findOrFail($statusId);
         $status->status = ($status->status == 1) ? 0 : 1;
+       
         $status->save();
         return response()->json(['status' => $status->status]);
     }

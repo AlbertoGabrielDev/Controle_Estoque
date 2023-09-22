@@ -221,3 +221,10 @@ button[type="submit"]{
     background-color: transparent;
   }
 
+.ativo {
+    background-color: green;
+}
+
+.inativo {
+    background-color: red; 
+}

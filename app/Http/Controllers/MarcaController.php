@@ -40,7 +40,7 @@ class MarcaController extends Controller
            'nome_marca' => $request->nome_marca 
         ]);
 
-        return redirect()->route('marca.index')->with('success', 'Editadocom sucesso');
+        return redirect()->route('marca.index')->with('success', 'Editado com sucesso');
     }
 
     public function inserirMarca(Request $request)

@@ -14,7 +14,6 @@
   <a class="button_criar_produto" href="{{route('produtos.cadastro')}}">Cadastrar Produto</a>     
 </div>
 
-
 <form action="{{ route('produtos.buscar') }}" method="GET" class="d-flex">
   <input type="text" name="nome_produto" class="form-control w-25" placeholder="Procurar">
   <button class="btn btn-outline-success" type="submit">Pesquisar</button>
@@ -23,7 +22,6 @@
 <table class="table mt-5">
     <thead>
       <tr>
-        {{-- <th>Categoria</th> --}}
         <th scope="col">Cod. Produto</th>
         <th scope="col">Nome Produto</th>
         <th scope="col">Descrição</th>
@@ -43,48 +41,48 @@
             <td>{{$produto->unidade_medida}}</td>
             <td>{{$produto->inf_nutrientes}}</td>
             <td class= "expiration-date" id="data">{{($produto->validade) }}</td>
-            <td> <a href="{{route('produtos.editar', $produto->id_produto)}}" class="btn btn-primary">Editar</a></td>
+            <td><a href="{{route('produtos.editar', $produto->id_produto)}}" class="btn btn-primary">Editar</a></td>
             <td>
-              <button class="btn btn-primary toggle-ativacao" data-id="{{ $produto->id_produto }}" data-status="{{ $produto->status ? 'true' : 'false' }}">
+              <button class="btn btn-primary toggle-ativacao @if($produto->status === 1) btn-danger @elseif($produto->status === 0) btn-success @else btn-primary @endif"
+                data-id="{{ $produto->id_produto }}">
                 {{ $produto->status ? 'Inativar' : 'Ativar' }}
               </button>
             </td>
           </tr>
         @endforeach
-      
     </tbody>
 </table>
 
 <script>
-$(document).ready(function () 
+$(document).ready(function () {
+
+$('.toggle-ativacao').click(function () 
 {
-  $('.toggle-ativacao').click(function () 
-  {
-    var button = $(this);
-    var produtoId = button.data('id');
-    var csrfToken = $('meta[name="csrf-token"]').attr('content');
-    $.ajax({
-      url: '/verdurao/produtos/status/' + produtoId,
-      method: 'POST',
-      headers: 
+  var button = $(this);
+  var produtoId = button.data('id');
+  var csrfToken = $('meta[name="csrf-token"]').attr('content');
+  $.ajax({
+    url: '/verdurao/produtos/status/' + produtoId,
+    method: 'POST',
+    headers: 
+    {
+      'X-CSRF-TOKEN': csrfToken
+    },
+    success: function (response) 
+    {
+      if (response.status === 1) {
+        button.text('Inativar').css("background-color", "red");
+      } else 
       {
-        'X-CSRF-TOKEN': csrfToken
-      },
-      success: function (data) 
-      {
-        if (data.status === 1) {
-          button.text('Inativar');
-          button.data('status', true);
-        } else {
-          button.text('Ativar');
-          button.data('status', false);
-        }
-      },
-      error: function () {
-        console.log(error);
+        button.text('Ativar').css("background-color", "green");
+  
       }
-    });
+    },
+    error: function () {
+        console.log(error);
+    }
   });
+});
 
   var today = new Date();
   $(".expiration-date").each(function () {

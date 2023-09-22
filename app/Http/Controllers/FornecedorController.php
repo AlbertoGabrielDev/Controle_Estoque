@@ -104,7 +104,7 @@ class FornecedorController extends Controller
             'whatsapp' => $whatsapp,
             'telegram' => $telegram
         ]);
-
+        
         return redirect()->route('fornecedor.index')->with('success', 'Editado com sucesso');
     }
 

@@ -12,6 +12,7 @@
 <div class="div_criar_produto">
   <a class="button_criar_produto" href="{{route('estoque.cadastro')}}">Cadastrar Estoque</a>     
 </div>
+
 <form action="{{ route('estoque.buscar') }}" method="GET">
   <div class="accordion accordion-flush" id="accordionFlushExample">
     <div class="accordion-item">
