@@ -53,13 +53,6 @@ class EstoqueController extends Controller
 
     public function inserirEstoque(Request $request)
     {
-        $fornecedorInput = $request->input('fornecedor');
-        $fornecedor = Fornecedor::where('id_fornecedor', $fornecedorInput)->first();
-        $marcaInput = $request->input('marca');
-        $marca = Marca::where('id_marca', $marcaInput)->first();
-        $produtoInput = $request->input('nome_produto');
-        $produtoId = Produto::where('id_produto', $produtoInput)->first();
-
         $estoque = Estoque::create([
             'quantidade'        =>$request->quantidade,
             'localizacao'       =>$request->localizacao,
@@ -67,15 +60,15 @@ class EstoqueController extends Controller
             'preco_venda'       =>$request->preco_venda,
             'data_chegada'      =>$request->data_chegada,
             'lote'              =>$request->lote,
-            'id_produto_fk'     =>$produtoId->id_produto,
-            'id_fornecedor_fk'  =>$fornecedor->id_fornecedor,
-            'id_marca_fk'       =>$marca->id_marca,
+            'id_produto_fk'     =>$request->input('nome_produto'),
+            'id_fornecedor_fk'  =>$request->input('fornecedor'),
+            'id_marca_fk'       =>$request->input('marca'),
             'quantidade_aviso'  =>$request->quantidade_aviso
         ]);
 
         MarcaProduto::create([
-            'id_produto_fk'     =>$produtoId->id_produto,
-            'id_marca_fk'       =>$marca->id_marca
+            'id_produto_fk'     =>$request->input('nome_produto'),
+            'id_marca_fk'       =>$request->input('marca')
         ]);
 
         return redirect()->route('estoque.index')->with('success', 'Inserido com sucesso');
@@ -92,12 +85,7 @@ class EstoqueController extends Controller
 
     public function salvarEditar(Request $request, $estoqueId)
     {
-        $fornecedorInput = $request->input('fornecedor');
-        $fornecedor = Fornecedor::where('id_fornecedor', $fornecedorInput)->first();
-        $marcaInput = $request->input('marca');
-        $marca = Marca::where('id_marca', $marcaInput)->first();
-        $produtoInput = $request->input('nome_produto');
-        $produtoId = Produto::where('id_produto', $produtoInput)->first();
+
         $estoques = Estoque::where('id_estoque' , $estoqueId)
         ->update([
             'quantidade'        =>$request->quantidade,
@@ -106,19 +94,19 @@ class EstoqueController extends Controller
             'preco_venda'       =>$request->preco_venda,
             'data_chegada'      =>$request->data_chegada,
             'lote'              =>$request->lote,
-            'id_produto_fk'     =>$produtoId->id_produto,
-            'id_fornecedor_fk'  =>$fornecedor->id_fornecedor,
-            'id_marca_fk'       =>$marca->id_marca,
+            'id_produto_fk'     =>$request->input('nome_produto'),
+            'id_fornecedor_fk'  =>$request->input('fornecedor'),
+            'id_marca_fk'       =>$request->input('marca'),
             'quantidade_aviso'  =>$request->quantidade_aviso
         ]);
 
-        MarcaProduto::where('id_produto_fk', $produtoInput)
+        MarcaProduto::where('id_produto_fk', $request->input('nome_produto'))
         ->update([
-            'id_produto_fk' => $produtoId->id_produto,
-            'id_marca_fk'   => $marca->id_marca
+            'id_produto_fk' => $request->input('nome_produto'),
+            'id_marca_fk'   => $request->input('marca')
         ]);
 
-        return redirect()->route('estoque.index');
+        return redirect()->route('estoque.index')->with('success', 'Editado com sucesso');
     }
 
     public function status($statusId)

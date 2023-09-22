@@ -20,11 +20,7 @@ class FornecedorController extends Controller
     {
         return view('fornecedor.cadastro');
     }
-    public function getCidade($estado)
-    {
-        $cidade = Cidade::where('id_estado_fk', $estado)->get();
-        return response()->json($cidade);  
-    }
+
     public function buscar(Request $request)
     {   
         $buscarFornecedor = $request->input('nome_fornecedor');
@@ -34,24 +30,18 @@ class FornecedorController extends Controller
 
     public function inserirCadastro(Request $request)
     {
-        $principal = $request->input('principal') ? $request->principal : 0;
-        $whatsapp = $request->input('whatsapp') ? $request->whatsapp : 0;
-        $telegram = $request->input('telegram') ? $request->telegram : 0;
-        
         $telefones = Telefone::create([
             'ddd' => $request->ddd,
             'telefone' => $request->telefone,
-            'principal' => $principal,
-            'whatsapp' => $whatsapp,
-            'telegram' => $telegram
+            'principal' => $request->input('principal') ? $request->principal : 0,
+            'whatsapp' => $request->input('whatsapp') ? $request->whatsapp : 0,
+            'telegram' => $request->input('telegram') ? $request->telegram : 0
         ]);
 
         $fornecedor = $request->validate([
             'status' => 'required|boolean',
         ]);
         $telefonesId = Telefone::latest('id_telefone')->first();
-        $cidadeUf = $request->input('cidades');
-        $cidade = Cidade::where('id', $cidadeUf)->first();
         $fornecedor = Fornecedor::create([
             'nome_fornecedor'   =>$request->nome_fornecedor,
             'cnpj'              =>$request->cnpj,
@@ -90,19 +80,15 @@ class FornecedorController extends Controller
             'uf'                =>$request->uf,
             'status'            =>$request->status                     
         ]);
-
-        $principal = $request->input('principal') ? $request->principal : 0;
-        $whatsapp = $request->input('whatsapp') ? $request->whatsapp : 0;
-        $telegram = $request->input('telegram') ? $request->telegram : 0;
           
         $telefones = Telefone::join('fornecedor as f' , 'f.id_telefone_fk' , '=' , 'telefones.id_telefone')
         ->where('f.id_fornecedor', $fornecedorId)
         ->update([
             'ddd' => $request->ddd,
             'telefone' => $request->telefone,
-            'principal' => $principal,
-            'whatsapp' => $whatsapp,
-            'telegram' => $telegram
+            'principal' => $request->input('principal') ? $request->principal : 0,
+            'whatsapp' => $request->input('whatsapp') ? $request->whatsapp : 0,
+            'telegram' => $request->input('telegram') ? $request->telegram : 0
         ]);
         
         return redirect()->route('fornecedor.index')->with('success', 'Editado com sucesso');

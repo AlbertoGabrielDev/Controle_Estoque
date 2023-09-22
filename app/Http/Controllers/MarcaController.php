@@ -30,7 +30,6 @@ class MarcaController extends Controller
     public function editar(Request $request, $marcaId)
     {
         $marcas = Marca::where('id_marca' , $marcaId)->get();
-        //dd($marcas);
         return view('marca.editar',compact('marcas'));
     }
 

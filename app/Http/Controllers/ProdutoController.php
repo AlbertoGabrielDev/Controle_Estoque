@@ -45,6 +45,7 @@ class ProdutoController extends Controller
             'unidade_medida'    =>$request->unidade_medida,
             'id_users_fk'       =>Auth::id()
         ]);
+        
         $produtoId = Produto::latest('id_produto')->first();
         $categoriaId = $request->input('nome_categoria');
         CategoriaProduto::create([
@@ -75,7 +76,6 @@ class ProdutoController extends Controller
 
     public function salvarEditar(Request $request, $produtoId)
     {   
-        $categoriaId = $request->input('nome_categoria');
         $produtos = Produto::where('id_produto',$produtoId)
         ->update([
             'nome_produto'      =>$request->nome_produto,
@@ -85,8 +85,7 @@ class ProdutoController extends Controller
             'unidade_medida'    =>$request->unidade_medida,
         ]);
         $categoria = CategoriaProduto::where('id_produto_fk' , $produtoId)
-        ->update(['id_categoria_fk' =>$categoriaId]);
-        
+        ->update(['id_categoria_fk' =>$request->input('nome_categoria')]);
         return redirect()->route('produtos.index')->with('success', 'Editado com sucesso');
     }
 
@@ -94,7 +93,6 @@ class ProdutoController extends Controller
     {
         $status = Produto::findOrFail($statusId);
         $status->status = ($status->status == 1) ? 0 : 1;
-       
         $status->save();
         return response()->json(['status' => $status->status]);
     }
