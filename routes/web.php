@@ -70,6 +70,7 @@ Route::middleware([
         Route::get('/index', [UsuarioController::class , 'index'])->name('usuario.index');
         Route::get('/cadastro', [UsuarioController::class , 'cadastro'])->name('usuario.cadastro');
         Route::post('/status/{userId}',[UsuarioController::class, 'status'])->name('usuario.status');
+        Route::get('/buscar-usuario',[UsuarioController::class, 'Buscar'])->name('usuario.buscar');
     });
 
 });

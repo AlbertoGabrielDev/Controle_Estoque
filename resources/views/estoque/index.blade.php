@@ -88,7 +88,8 @@
           <td class="quantidade_aviso" id="aviso" data-aviso={{$estoque->quantidade_aviso}}>{{$estoque->quantidade_aviso}}</td>
           <td><a href="{{route('estoque.editar', $estoque->id_estoque)}}" class="btn btn-primary">Editar</a></td> 
           <td>
-            <button class="btn btn-primary toggle-ativacao" data-id="{{ $estoque->id_estoque }}" data-status="{{ $estoque->status ? 'true' : 'false' }}">
+            <button class="btn btn-primary toggle-ativacao @if($estoque->status === 1) btn-danger @elseif($estoque->status === 0) btn-success @else btn-primary @endif" 
+              data-id="{{ $estoque->id_estoque }}">
               {{ $estoque->status ? 'Inativar' : 'Ativar' }}
             </button>
           </td>
@@ -113,10 +114,8 @@ $(document).ready(function ()
       success: function (data) {
         if (data.status === 1) {
           button.text('Inativar');
-          button.data('status', true);
         } else {
           button.text('Ativar');
-          button.data('status', false);
         }
       },
       error: function () {

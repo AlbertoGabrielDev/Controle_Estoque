@@ -116,8 +116,4 @@ class EstoqueController extends Controller
         $status->save();
         return response()->json(['status' => $status->status]);
     }
-
-    public function quantidade(Request $request){
-
-    }
 }

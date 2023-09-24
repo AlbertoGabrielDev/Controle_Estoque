@@ -9,13 +9,11 @@
     <a class="btn btn-primary" href="{{route('categoria.inicio')}}">Voltar</a>
   </div>
 </div>
-<div class="div_criar_produto">
-  <a class="button_criar_produto" href="{{route('marca.cadastro')}}">Cadastrar Marca</a>     
-</div>
+  <a class="btn btn-lg btn-primary left" href="{{route('marca.cadastro')}}">Cadastrar Marca</a>     
 
-<form action="{{ route('marca.buscar') }}" method="GET">
-  <input type="text" name="nome_marca" placeholder="Digite o nome da Marca">
-  <button type="submit">Pesquisar</button>
+<form action="{{ route('marca.buscar') }}" class="d-flex" method="GET">
+  <input type="text" name="nome_marca" class="form-control w-25" placeholder="Digite o nome da Marca">
+  <button class="btn btn-outline-success" type="submit">Pesquisar</button>
 </form>
 <table class="table mt-5">
     <thead>
@@ -31,7 +29,7 @@
         <td>{{$marca->nome_marca}}</td>
         <td><a href="{{route('marca.editar', $marca->id_marca)}}" class="btn btn-primary">Editar</a></td> 
         <td>
-          <button class="btn btn-primary toggle-ativacao" data-id="{{ $marca->id_marca }}" data-status="{{ $marca->status ? 'true' : 'false' }}">
+          <button class="btn btn-primary toggle-ativacao  @if($marca->status === 1) btn-danger @elseif($marca->status === 0) btn-success @else btn-primary @endif"" data-id="{{ $marca->id_marca }}" >
             {{ $marca->status ? 'Inativar' : 'Ativar' }}
           </button>
         </td>
@@ -40,33 +38,31 @@
     </tbody>
 </table>
 <script>
-  $(document).ready(function () {
-      $('.toggle-ativacao').click(function () {
-          var button = $(this);
-          var produtoId = button.data('id');
-          console.log(button);
-          var csrfToken = $('meta[name="csrf-token"]').attr('content');
-
-          $.ajax({
-              url: '/verdurao/marca/status/' + produtoId,
-              method: 'POST',
-              headers: {
-                  'X-CSRF-TOKEN': csrfToken
-              },
-              success: function (data) {
-                  if (data.status === 1) {
-                      button.text('Inativar');
-                      button.data('status', true);
-                  } else {
-                      button.text('Ativar');
-                      button.data('status', false);
-                  }
-              },
-              error: function () {
-                 console.log(error);
-              }
-          });
-      });
+ $('.toggle-ativacao').click(function () 
+{
+  var button = $(this);
+  var produtoId = button.data('id');
+  var csrfToken = $('meta[name="csrf-token"]').attr('content');
+  $.ajax({
+    url: '/verdurao/marca/status/' + produtoId,
+    method: 'POST',
+    headers: 
+    {
+      'X-CSRF-TOKEN': csrfToken
+    },
+    success: function (response) 
+    {
+      if (response.status === 1) 
+      {
+        button.text('Inativar').removeClass('btn-success').addClass('btn-danger');
+      } else {
+        button.text('Ativar').removeClass('btn-danger').addClass('btn-success');
+      }
+    },
+    error: function () {
+        console.log(error);
+    }
   });
+});
 </script> 
 @endsection

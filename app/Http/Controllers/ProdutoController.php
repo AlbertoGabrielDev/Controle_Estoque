@@ -89,7 +89,7 @@ class ProdutoController extends Controller
         return redirect()->route('produtos.index')->with('success', 'Editado com sucesso');
     }
 
-    public function status(Request $request, $statusId)
+    public function status($statusId)
     {
         $status = Produto::findOrFail($statusId);
         $status->status = ($status->status == 1) ? 0 : 1;

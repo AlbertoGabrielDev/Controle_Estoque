@@ -19,7 +19,7 @@
             <td>{{$categoria->nome_categoria}}</td>
             <td><a href="{{route('categorias.editar', $categoria->id_categoria)}}" class="btn btn-primary">Editar</a></td> 
             <td>
-                <button class="btn btn-primary toggle-ativacao" data-id="{{ $categoria->id_categoria }}" data-status="{{ $categoria->status ? 'true' : 'false' }}">
+                <button class="btn btn-primary toggle-ativacao @if($categoria->status === 1) btn-danger @elseif($categoria->status === 0) btn-success @else btn-primary @endif" data-id="{{ $categoria->id_categoria }}">
                     {{ $categoria->status ? 'Inativar' : 'Ativar' }}
                 </button>
             </td>
@@ -40,14 +40,14 @@ $(document).ready(function () {
         headers: {
             'X-CSRF-TOKEN': csrfToken
         },
-        success: function (data) {
-            if (data.status === 1) {
-                button.text('Inativar');
-                button.data('status', true);
-            } else {
-                button.text('Ativar');
-                button.data('status', false);
-            }
+        success: function (response) 
+        {
+        if (response.status === 1) 
+        {
+            button.text('Inativar').removeClass('btn-success').addClass('btn-danger');
+        } else {
+            button.text('Ativar').removeClass('btn-danger').addClass('btn-success');
+        }
         },
         error: function () {
             console.log(error);

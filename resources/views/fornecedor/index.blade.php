@@ -13,9 +13,9 @@
   <a class="button_criar_produto" href="{{route('fornecedor.cadastro')}}">Cadastrar Fornecedor</a>     
 </div>
 
-<form action="{{ route('fornecedor.buscar') }}" method="GET">
-  <input type="text" name="nome_fornecedor" placeholder="Digite nome do fornecedor">
-  <button type="submit">Pesquisar</button>
+<form action="{{ route('fornecedor.buscar') }}" method="GET" class="d-flex">
+  <input type="text" name="nome_fornecedor" class="form-control w-25" placeholder="Digite o nome do Fornecedor">
+  <button class="btn btn-outline-success" type="submit">Pesquisar</button>
 </form>
 
 <table class="table mt-5">
@@ -48,7 +48,7 @@
           <td>{{$fornecedor->uf}}</td>
           <td><a href="{{route('fornecedor.editar', $fornecedor->id_fornecedor)}}" class="btn btn-primary">Editar</a></td> 
           <td>
-            <button class="btn btn-primary toggle-ativacao" data-id="{{ $fornecedor->id_fornecedor }}" data-status="{{ $fornecedor->status ? 'true' : 'false' }}">
+            <button class="btn btn-primary toggle-ativacao  @if($fornecedor->status === 1) btn-danger @elseif($fornecedor->status === 0) btn-success @else btn-primary @endif"" data-id="{{ $fornecedor->id_fornecedor }}">
               {{ $fornecedor->status ? 'Inativar' : 'Ativar' }}
             </button>
           </td> 
@@ -60,35 +60,31 @@
 $(document).ready(function () 
 {
   $('.toggle-ativacao').click(function () 
-  {
-    var button = $(this);
-    var produtoId = button.data('id');
-    console.log(button);
-    var csrfToken = $('meta[name="csrf-token"]').attr('content');
-    $.ajax({
-      url: '/verdurao/fornecedor/status/' + produtoId,
-      method: 'POST',
-      headers: {
-        'X-CSRF-TOKEN': csrfToken
-      },
-      success: function (data) 
+{
+  var button = $(this);
+  var produtoId = button.data('id');
+  var csrfToken = $('meta[name="csrf-token"]').attr('content');
+  $.ajax({
+    url: '/verdurao/fornecedor/status/' + produtoId,
+    method: 'POST',
+    headers: 
+    {
+      'X-CSRF-TOKEN': csrfToken
+    },
+    success: function (response) 
+    {
+      if (response.status === 1) 
       {
-        if (data.status === 1) 
-        {
-          button.text('Inativar');
-          button.data('status', true);
-        } else 
-        {
-          button.text('Ativar');
-          button.data('status', false);
-        }
-      },
-      error: function () 
-      {
-        console.log(error);
+        button.text('Inativar').removeClass('btn-success').addClass('btn-danger');
+      } else {
+        button.text('Ativar').removeClass('btn-danger').addClass('btn-success');
       }
-    });
+    },
+    error: function () {
+        console.log(error);
+    }
   });
+});
 });
 </script> 
 @endsection

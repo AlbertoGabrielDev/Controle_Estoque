@@ -30,11 +30,14 @@
             @endcan
           </ul>
         </div>
-        <form action="/logout" method="POST">
-          @csrf
-          <a href="/logout" class="list-group-item" onclick="event.preventDefault();
-            this.closest('form').submit();">Sair</a>
-        </form>
+        <ul class="list-group list-group-horizontal">
+          <form action="/logout" method="POST">
+            @csrf
+            <a href="/logout" class="list-group-item fs-5" onclick="event.preventDefault();
+              this.closest('form').submit();">Sair</a>
+          </form>
+        </ul>
+       
       </div>
 {{-- 
     Cabeçalho

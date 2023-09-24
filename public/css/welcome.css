@@ -228,3 +228,8 @@ button[type="submit"]{
 .inativo {
     background-color: red; 
 }
+
+.left{
+    position: relative;
+     
+}

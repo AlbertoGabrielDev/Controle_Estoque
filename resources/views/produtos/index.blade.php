@@ -15,7 +15,7 @@
 </div>
 
 <form action="{{ route('produtos.buscar') }}" method="GET" class="d-flex">
-  <input type="text" name="nome_produto" class="form-control w-25" placeholder="Procurar">
+  <input type="text" name="nome_produto" class="form-control w-25" placeholder="Digite o nome do Produto">
   <button class="btn btn-outline-success" type="submit">Pesquisar</button>
 </form>
 
