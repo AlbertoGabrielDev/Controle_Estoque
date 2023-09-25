@@ -8,6 +8,7 @@ use App\Models\Categoria;
 use App\Models\MarcaProduto;
 use App\Models\CategoriaProduto;
 use Carbon\Carbon;
+use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 
@@ -18,36 +19,37 @@ class EstoqueController extends Controller
         $fornecedores = Fornecedor::all();
         $marcas = Marca::all();
         $categorias = Categoria::all();
-        $produtos = Produto::all();
+        $produtos = Produto::paginate(2);
         $estoques = [];
-        foreach ($produtos as $produto) {
+        foreach ($produtos as $produto) 
+        {
             $estoquesProduto = $produto->fornecedores->pluck('estoque')->all();
             $estoques = array_merge($estoques, $estoquesProduto); 
         }
-        return view('estoque.index',compact('estoques', 'fornecedores', 'marcas', 'categorias','produtos'));
+      
+        return view('estoque.index',compact('estoques','produtos','fornecedores','marcas','categorias'));
     }
 
     public function cadastro()
     {
         $produto = Produto::all();
         $marca = Marca::all();
-        $fornecedor = Fornecedor::all();
-        return view('estoque.cadastro',compact('fornecedor','marca','produto'));
+        $fornecedores = Fornecedor::all();
+        return view('estoque.cadastro',compact('fornecedores','marca','produto'));
     }
 
     public function buscar(Request $request){
         $fornecedores = Fornecedor::all();
         $marcas = Marca::all();
         $categorias = Categoria::all();
-        $categoriaProduto = CategoriaProduto::all();
-        $produtos = Produto::all();
-    
+        $produtos = Produto::paginate(2);
         $estoques = [];
         foreach ($produtos as $produto) 
         {   
             $estoquesProduto = $produto->search->pluck('estoque')->all();
             $estoques = array_merge($estoques, $estoquesProduto); 
         }
+    
         return view('estoque.index', compact('estoques', 'produtos','fornecedores','marcas','categorias'));
     }
 

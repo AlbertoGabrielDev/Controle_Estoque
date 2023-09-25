@@ -97,6 +97,11 @@
       @endforeach
     </tbody>
 </table>
+<nav class="Page navigation example">
+  <ul class="pagination">
+    {{ $produtos->links()}}
+  </ul>
+</nav>
 <script>
 $(document).ready(function () 
 {

@@ -57,9 +57,11 @@
     </tbody>
 
 </table>
-<div class="d-flex justify-content-center">
-  {{ $fornecedores->links()}}
-</div>
+<nav class="Page navigation example">
+  <ul class="pagination">
+    {{ $fornecedores->links()}}
+  </ul>
+</nav>
 <script>
 $(document).ready(function () 
 {

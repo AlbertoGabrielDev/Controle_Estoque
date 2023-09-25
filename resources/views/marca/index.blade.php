@@ -37,6 +37,11 @@
       @endforeach
     </tbody>
 </table>
+<nav class="Page navigation example">
+  <ul class="pagination">
+    {{ $marcas->links()}}
+  </ul>
+</nav>
 <script>
  $('.toggle-ativacao').click(function () 
 {

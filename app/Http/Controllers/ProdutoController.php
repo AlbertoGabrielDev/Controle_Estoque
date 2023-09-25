@@ -7,6 +7,7 @@ use App\Models\Categoria;
 use App\Models\CategoriaProduto;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Pagination\Paginator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -19,9 +20,8 @@ class ProdutoController extends Controller
 
     public function Index()
     {
-        $categorias = Categoria::all();
-        $produtos = Produto::all();
-        return view('produtos.index',compact('produtos','categorias'));
+        $produtos = Produto::paginate(2);
+        return view('produtos.index',compact('produtos'));
     }
 
     public function Cadastro(Request $request) 
@@ -58,7 +58,7 @@ class ProdutoController extends Controller
     public function buscarProduto(Request $request)
     {
         $buscarProduto= $request->input('nome_produto');
-        $produtos = Produto::where('nome_produto', 'like', '%' .$buscarProduto. '%')->get();
+        $produtos = Produto::where('nome_produto', 'like', '%' .$buscarProduto. '%')->paginate(2);
         return view('produtos.index', compact('produtos'));
     }
 

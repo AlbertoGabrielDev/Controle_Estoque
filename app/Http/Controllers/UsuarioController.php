@@ -4,12 +4,13 @@ namespace App\Http\Controllers;
 
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Http\Request;
+use Illuminate\Pagination\Paginator;
 use App\Models\User;
 
 class UsuarioController extends Controller
 {
     public function Index(){
-        $usuarios = User::where('id', '!=', 1)->get();
+        $usuarios = User::where('id', '!=', 1)->paginate(2);
         return view('usuario.index', compact('usuarios'));
     }
 
@@ -21,7 +22,7 @@ class UsuarioController extends Controller
     {   
         $usuarios = User::where('name', 'like' , '%' . $request->input('name'). '%')
         ->where('id' , '!=' , 1 )
-        ->get();
+        ->paginate(2);
         return view('usuario.index', compact('usuarios'));
     }
 

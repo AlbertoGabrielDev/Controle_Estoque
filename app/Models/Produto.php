@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Pagination\Paginator;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Produto extends Model
@@ -25,7 +26,7 @@ class Produto extends Model
 
     public function search(): BelongsToMany
     {
-        return $this->belongsToMany(Fornecedor::class, 'estoque', 'id_produto_fk', 'id_fornecedor_fk')
+        $query = $this->belongsToMany(Fornecedor::class, 'estoque', 'id_produto_fk', 'id_fornecedor_fk')
             ->as('estoque')
             ->withPivot([
                 'id_estoque',
@@ -87,6 +88,8 @@ class Produto extends Model
                     }
                 });
             });
+
+            return $query;
     }
    
     public function fornecedores() : BelongsToMany 

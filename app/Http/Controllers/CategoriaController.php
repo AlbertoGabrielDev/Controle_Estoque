@@ -5,6 +5,7 @@ use App\Models\Categoria;
 use App\Models\Produto;
 use App\Models\CategoriaProduto;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Pagination\Paginator;
 use Illuminate\Http\Request;
 
 class CategoriaController extends Controller

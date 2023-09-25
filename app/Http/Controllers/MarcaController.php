@@ -5,13 +5,14 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Marca;
 use App\Models\User;
+use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\Auth;
 
 class MarcaController extends Controller
 {
     public function index()
     {
-        $marcas = Marca::all();
+        $marcas = Marca::paginate(2);
         return view('marca.index', compact('marcas'));
     }
 
@@ -23,7 +24,7 @@ class MarcaController extends Controller
     public function buscar(Request $request) 
     {
         $buscar = $request->input('nome_marca');
-        $marcas = Marca::where('nome_marca', 'like', '%' . $buscar . '%')->get();
+        $marcas = Marca::where('nome_marca', 'like', '%' . $buscar . '%')->paginate(2);
         return view('marca.index', compact('marcas'));
     } 
 
