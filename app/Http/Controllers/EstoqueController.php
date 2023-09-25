@@ -19,7 +19,7 @@ class EstoqueController extends Controller
         $fornecedores = Fornecedor::all();
         $marcas = Marca::all();
         $categorias = Categoria::all();
-        $produtos = Produto::paginate(2);
+        $produtos = Produto::paginate(3);
         $estoques = [];
         foreach ($produtos as $produto) 
         {
@@ -42,7 +42,7 @@ class EstoqueController extends Controller
         $fornecedores = Fornecedor::all();
         $marcas = Marca::all();
         $categorias = Categoria::all();
-        $produtos = Produto::paginate(2);
+        $produtos = Produto::paginate(10);
         $estoques = [];
         foreach ($produtos as $produto) 
         {   

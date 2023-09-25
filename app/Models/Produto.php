@@ -72,7 +72,7 @@ class Produto extends Model
                     }
                 })->orWhere(function ($subquery){
                     if (!is_null(request()->input('nome_produto'))) {
-                        $subquery->where('p.nome_produto', request()->input('nome_produto'));
+                        $subquery->where('p.nome_produto', 'like' ,'%' .request()->input('nome_produto') . '%' );
                     }
                 })->orWhere(function ($subquery){
                     if (!is_null(request()->input('nome_marca'))) {
@@ -80,7 +80,7 @@ class Produto extends Model
                     }
                 })->orWhere(function ($subquery){
                     if (!is_null(request()->input('nome_fornecedor'))) {
-                        $subquery->where('fornecedor.nome_fornecedor', request()->input('nome_fornecedor'));
+                        $subquery->where('fornecedor.nome_fornecedor',  request()->input('nome_fornecedor'));
                     }
                 })->orWhere(function ($subquery){
                     if (!is_null(request()->input('nome_categoria'))) {

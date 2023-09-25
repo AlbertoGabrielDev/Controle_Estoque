@@ -61,8 +61,8 @@
        <div class="col-md-4">
         <select class="form-control form-control-lg w-75" name="fornecedor" required>
             <option value="">Selecione um Fornecedor</option>
-            @foreach ($fornecedor as $fornecedores)
-                <option value="{{ $fornecedores->id_fornecedor }}">{{ $fornecedores->nome_fornecedor }}</option>
+            @foreach ($fornecedores as $fornecedor)
+                <option value="{{ $fornecedor->id_fornecedor }}">{{ $fornecedor->nome_fornecedor }}</option>
             @endforeach
         </select>
         </div>
