@@ -110,47 +110,4 @@
     {{ $produtos->links()}}
   </ul>
 </nav>
-<script>
-$(document).ready(function () 
-{
-  $('.toggle-ativacao').click(function () {
-    var button = $(this);
-    var produtoId = button.data('id');
-    var csrfToken = $('meta[name="csrf-token"]').attr('content');
-    $.ajax({
-      url: '/verdurao/estoque/status/' + produtoId,
-      method: 'POST',
-      headers: 
-      {
-        'X-CSRF-TOKEN': csrfToken
-      },
-      success: function (data) {
-        if (data.status === 1) {
-          button.text('Inativar');
-        } else {
-          button.text('Ativar');
-        }
-      },
-      error: function () {
-        console.log(error);
-      }
-    });
-  });
-
-$(".quantidade").each(function() {
-  var quantidade = $(this).data('quantidade');
-  var tr = $(this).closest('tr');
-
-  $("#aviso").each(function() {
-    var aviso = $(this).data('aviso');
-    if (quantidade <= aviso) {
-      console.log('quantidade',quantidade, 'aviso' ,aviso)
-      tr.find('td').css("background-color", "red");
-    }
-  });
-
-});
-
-});
-</script> 
 @endsection

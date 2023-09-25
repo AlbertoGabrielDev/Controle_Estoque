@@ -71,4 +71,6 @@ class CategoriaController extends Controller
         $status->save();
         return response()->json(['status' => $status->status]);
     }
+
+    
 }

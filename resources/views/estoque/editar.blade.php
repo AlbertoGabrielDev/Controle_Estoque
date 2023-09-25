@@ -63,5 +63,4 @@
 </div> 
     <button class="" type="submit">Editar</button>
 </form>
-
 @endsection
