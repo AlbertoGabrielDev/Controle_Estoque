@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Fornecedor;
 use App\Models\Telefone;
+use Illuminate\Pagination\Paginator;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 
@@ -12,7 +13,7 @@ class FornecedorController extends Controller
 {
     public function index()
     {
-        $fornecedores = Fornecedor::all();
+        $fornecedores = Fornecedor::paginate(2);
         return view('fornecedor.index', compact('fornecedores'));
     }
 
@@ -24,7 +25,7 @@ class FornecedorController extends Controller
     public function buscar(Request $request)
     {   
         $buscarFornecedor = $request->input('nome_fornecedor');
-        $fornecedores = Fornecedor::where('nome_fornecedor', 'like' , '%' . $buscarFornecedor. '%')->get();
+        $fornecedores = Fornecedor::where('nome_fornecedor', 'like' , '%' . $buscarFornecedor. '%')->paginate(2);
         return view('fornecedor.index', compact('fornecedores'));
     }
 

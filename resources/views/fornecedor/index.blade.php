@@ -55,7 +55,11 @@
         </tr>
       @endforeach
     </tbody>
+
 </table>
+<div class="d-flex justify-content-center">
+  {{ $fornecedores->links()}}
+</div>
 <script>
 $(document).ready(function () 
 {
