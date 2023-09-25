@@ -47,43 +47,43 @@ class Produto extends Model
             ->where(function ($query) 
             {
                 $query->where(function ($subquery) {
-                    if (!is_null(request()->input('lote'))) {
+                    if (request()->input('lote')) {
                         $subquery->where('estoque.lote', request()->input('lote'));
                     }
                 })->orWhere(function ($subquery) {
-                    if (!is_null(request()->input('quantidade'))) {
+                    if (request()->input('quantidade')) {
                         $subquery->where('estoque.quantidade', request()->input('quantidade'));
                     }
                 })->orWhere(function ($subquery) {
-                    if (!is_null(request()->input('preco_custo'))) {
+                    if (request()->input('preco_custo')){
                         $subquery->where('estoque.preco_custo', request()->input('preco_custo'));
                     }
                 })->orWhere(function ($subquery){
-                    if (!is_null(request()->input('localizacao'))) {
+                    if (request()->input('localizacao')) {
                         $subquery->where('estoque.localizacao', request()->input('localizacao'));
                     }
                 })->orWhere(function ($subquery){
-                    if (!is_null(request()->input('preco_venda'))) {
+                    if (request()->input('preco_venda')) {
                         $subquery->where('estoque.preco_venda', request()->input('preco_venda'));
                     }
                 })->orWhere(function ($subquery){
-                    if (!is_null(request()->input('data_chegada'))) {
+                    if (request()->input('data_chegada')) {
                         $subquery->where('estoque.data_chegada', request()->input('data_chegada'));
                     }
                 })->orWhere(function ($subquery){
-                    if (!is_null(request()->input('nome_produto'))) {
+                    if (request()->input('nome_produto')) {
                         $subquery->where('p.nome_produto', 'like' ,'%' .request()->input('nome_produto') . '%' );
                     }
                 })->orWhere(function ($subquery){
-                    if (!is_null(request()->input('nome_marca'))) {
+                    if (request()->input('nome_marca')) {
                         $subquery->where('m.nome_marca', request()->input('nome_marca'));
                     }
                 })->orWhere(function ($subquery){
-                    if (!is_null(request()->input('nome_fornecedor'))) {
+                    if (request()->input('nome_fornecedor')) {
                         $subquery->where('fornecedor.nome_fornecedor',  request()->input('nome_fornecedor'));
                     }
                 })->orWhere(function ($subquery){
-                    if (!is_null(request()->input('nome_categoria'))) {
+                    if (request()->input('nome_categoria')) {
                         $subquery->where('c.nome_categoria', request()->input('nome_categoria'));
                     }
                 });

@@ -76,7 +76,7 @@ class EstoqueController extends Controller
         return redirect()->route('estoque.index')->with('success', 'Inserido com sucesso');
     }
 
-    public function editar(Request $request, $estoqueId)
+    public function editar($estoqueId)
     {
         $produtos = Produto::all();
         $fornecedores = Fornecedor::all();
@@ -117,5 +117,19 @@ class EstoqueController extends Controller
         $status->status = ($status->status == 1) ? 0 : 1;
         $status->save();
         return response()->json(['status' => $status->status]);
+    }
+
+    public function quantidade($quantidadeId, $operacao){
+        $produto = Estoque::find($quantidadeId);
+
+        if ($operacao === 'aumentar') {
+            $produto->quantidade += 1;
+        } elseif ($operacao === 'diminuir') {
+            if ($produto->quantidade > 0) {
+                $produto->quantidade -= 1;
+            }
+        }
+        $produto->save();
+        return redirect()->route('estoque.index')->with('success', 'Quantidade atualizada com sucesso');
     }
 }

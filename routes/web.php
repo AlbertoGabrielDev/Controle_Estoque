@@ -43,6 +43,7 @@ Route::middleware([
         Route::get('/editar/{estoqueId}',[EstoqueController::class, 'editar'])->name('estoque.editar');
         Route::post('/editar/{estoqueId}',[EstoqueController::class, 'salvarEditar'])->name('estoque.salvarEditar');
         Route::post('/status/{estoqueId}',[EstoqueController::class, 'status'])->name('estoque.status');
+        Route::get('/quantidade/{quantidadeId}/{operacao}',[EstoqueController::class, 'quantidade'])->name('estoque.quantidade');
     });
 
     Route::prefix('/fornecedor')->group(function(){

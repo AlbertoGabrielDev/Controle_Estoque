@@ -30,7 +30,7 @@
     </div>
     <div class="row">
       <div class="col-md-4">
-        <input type="number" class="form-control form-control-lg w-75" required name="quantidade_aviso" placeholder="Quantidade para aviso">
+        <input type="number" class="form-control form-control-lg w-75" required name="quantidade_aviso" placeholder="Quantidade para aviso" value="{{$estoque->quantidade_aviso}}">
   </div>
     <div class="input-group input-group-lg">
         <div class="col-md-4">

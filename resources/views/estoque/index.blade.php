@@ -70,6 +70,8 @@
         <th scope="col">Lote</th>
         <th scope="col">localização</th>
         <th scope="col">Quantidade para aviso</th>  
+        <th scope="col">Aumentar</th>
+        <th scope="col">Diminuir</th>
         <th>Editar</th>
         <th>Inativar</th>
       </tr>
@@ -86,6 +88,12 @@
           <td>{{$estoque->lote}}</td>
           <td>{{$estoque->localizacao}}</td>
           <td class="quantidade_aviso" id="aviso" data-aviso={{$estoque->quantidade_aviso}}>{{$estoque->quantidade_aviso}}</td>
+          <td>
+            <a href="{{ route('estoque.quantidade', ['quantidadeId' => $estoque->id_estoque, 'operacao' => 'aumentar']) }}" class="btn btn-success">Aumentar</a>
+          </td>
+          <td>
+            <a href="{{ route('estoque.quantidade', ['quantidadeId' => $estoque->id_estoque, 'operacao' => 'diminuir']) }}" class="btn btn-success">Diminuir</a>
+          </td>
           <td><a href="{{route('estoque.editar', $estoque->id_estoque)}}" class="btn btn-primary">Editar</a></td> 
           <td>
             <button class="btn btn-primary toggle-ativacao @if($estoque->status === 1) btn-danger @elseif($estoque->status === 0) btn-success @else btn-primary @endif" 
@@ -133,12 +141,14 @@ $(".quantidade").each(function() {
   var quantidade = $(this).data('quantidade');
   var tr = $(this).closest('tr');
 
-  $(".quantidade_aviso").each(function() {
+  $("#aviso").each(function() {
     var aviso = $(this).data('aviso');
     if (quantidade <= aviso) {
+      console.log('quantidade',quantidade, 'aviso' ,aviso)
       tr.find('td').css("background-color", "red");
     }
   });
+
 });
 
 });
