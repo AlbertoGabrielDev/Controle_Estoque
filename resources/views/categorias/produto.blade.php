@@ -35,7 +35,7 @@
           <td class= "expiration-date" id="data">{{($produto->validade) }}</td>
           <td><a href="{{route('produtos.editar', $produto->id_produto)}}" class="btn btn-primary">Editar</a></td>
           <td>
-            <button class="btn btn-primary toggle-ativacao @if($produto->status === 1) btn-danger @elseif($produto->status === 0) btn-success @else btn-primary @endif" data-id="{{ $produto->id_categoria }}">
+            <button class="btn btn-primary toggle-ativacao @if($produto->status === 1) btn-danger @elseif($produto->status === 0) btn-success @else btn-primary @endif" data-id="{{ $produto->id_produto}}">
               {{ $produto->status ? 'Inativar' : 'Ativar' }}
             </button>
           </td>
@@ -45,49 +45,34 @@
 </table>
 <script>
   $(document).ready(function () {
-  
-  // $('.toggle-ativacao').click(function () 
-  // {
-  //   var button = $(this);
-  //   var produtoId = button.data('id');
-  //   var csrfToken = $('meta[name="csrf-token"]').attr('content');
-  //   $.ajax({
-  //     url: '/verdurao/produtos/status/' + produtoId,
-  //     method: 'POST',
-  //     headers: 
-  //     {
-  //       'X-CSRF-TOKEN': csrfToken
-  //     },
-  //     success: function (response) 
-  //     {
-  //       if (response.status === 1) {
-  //         button.text('Inativar').removeClass('btn-success').addClass('btn-danger');
-  //       } else 
-  //       {
-  //         button.text('Ativar').removeClass('btn-danger').addClass('btn-success');
-  //       }
-  //     },
-  //     error: function () {
-  //         console.log(error);
-  //     }
-  //   });
-  // });
-  
-    var today = new Date();
-    $(".expiration-date").each(function () {
-      var data = $(this).text();
-      var dataFormatada = moment(data).format('DD/MM/YYYY');
-      $(this).text(dataFormatada); 
-  
-      var expirationDate = new Date(data);
-      var vencimento = Math.floor((expirationDate - today) / (24 * 60 * 60 * 1000));
-  
-      if (vencimento < 0) {
-        $(this).closest('tr').find('td').css("background-color", "red");
-      } else if (vencimento <= 7) {
-        $(this).closest('tr').find('td').css("background-color", "yellow");
+    var grupo = window.location.pathname.split('/')[4];
+    console.log(grupo);
+  $('.toggle-ativacao').click(function () 
+  {
+    var button = $(this);
+    var produtoId = button.data('id');
+    var csrfToken = $('meta[name="csrf-token"]').attr('content');
+    $.ajax({
+      url: '/verdurao/categoria/produto/status/'+ produtoId,
+      method: 'POST',
+      headers: 
+      {
+        'X-CSRF-TOKEN': csrfToken
+      },
+      success: function (response) 
+      {
+        if (response.status === 1) {
+          button.text('Inativar').removeClass('btn-success').addClass('btn-danger');
+        } else 
+        {
+          button.text('Ativar').removeClass('btn-danger').addClass('btn-success');
+        }
+      },
+      error: function () {
+          console.log(error);
       }
     });
+  });
     
   });  
   </script>

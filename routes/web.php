@@ -22,6 +22,7 @@ Route::middleware([
         Route::get('/editar/{categoriaId}',[CategoriaController::class, 'editar'])->name('categorias.editar');
         Route::post('/editar/{categoriaId}',[CategoriaController::class, 'salvarEditar'])->name('categorias.salvarEditar');
         Route::post('/status/{categoriaId}',[CategoriaController::class, 'status'])->name('categorias.status');
+        Route::post('/produto/status/{produtoId}',[ProdutoController::class, 'status'])->name('produtos.status');
     });
 
     Route::prefix('/produtos')->group(function(){
@@ -32,7 +33,7 @@ Route::middleware([
         Route::get('/buscar-produto',[ProdutoController::class, 'buscarProduto'])->name('produtos.buscar');
         Route::get('/editar/{produtoId}',[ProdutoController::class, 'editar'])->name('produtos.editar');
         Route::post('/editar/{produtoId}',[ProdutoController::class, 'salvarEditar'])->name('produtos.salvarEditar');
-        Route::post('/status/{produtoId}',[ProdutoController::class, 'status'])->name('produtos.status');
+        Route::post('/status/{produtoId}',[ProdutoController::class, 'status'])->name('produtos.');
     });
      
     Route::prefix('/estoque')->group(function(){

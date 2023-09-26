@@ -42,7 +42,7 @@ class CategoriaController extends Controller
         return redirect()->route('categoria.index')->with('success', 'Inserido com sucesso');
     }
 
-    public function produto(Request $request , $categoriaId)
+    public function produto($categoriaId)
     {
         $categoria = Categoria::find($categoriaId);
         $produtos = $categoria->produtos()->get();
@@ -64,13 +64,11 @@ class CategoriaController extends Controller
         return redirect()->route('categoria.index');
     }
 
-    public function status(Request $request, $statusId)
-    {
+    public function status($statusId)
+    {   
         $status = Categoria::findOrFail($statusId);
         $status->status = ($status->status == 1) ? 0 : 1;
         $status->save();
         return response()->json(['status' => $status->status]);
     }
-
-    
 }
