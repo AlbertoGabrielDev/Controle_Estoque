@@ -20,13 +20,5 @@ class AuthServiceProvider extends ServiceProvider
         Gate::define('permissao',function(User $user){
             return $user->id ===1;
         });
-
-        Fortify::authenticateUsing(function (LoginRequest $request) {
-            $user = User::where('email', $request->email)->first();
-            if ($user &&
-                Hash::check($request->password, $user->password) && $user->status === 1 ) {
-               return $user;
-            }
-        });
     }
 }

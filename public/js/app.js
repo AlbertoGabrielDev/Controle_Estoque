@@ -83,6 +83,7 @@ $(document).ready(function ()
         }
     });
     });
+    
 //Método para impedir que a requisição seja feita caso o CEP ou CNPJ esteja errado    
     $("#cadastro-btn").click(function(event){
         event.preventDefault(); 
