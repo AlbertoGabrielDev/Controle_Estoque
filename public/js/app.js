@@ -1,3 +1,4 @@
+
 //Método para mudar o status de inativo para ativo, das tabelas fornecedor,produtos,categoria, estoque,usuario,marca
 $(document).ready(function () 
 {
@@ -57,37 +58,47 @@ $(document).ready(function ()
     });
 
 //Método para fornecedor o endereço do fornecedor baseado no CEP    
-    $("#cep").blur(function()
+    $("#cep").blur(function(event)
     {
-        var cep = this.value.replace(/[^0-9]/g, "");
-    if (cep.length !== 8) {
-        this.style.backgroundColor = "red"; 
-    } else {
-        this.style.backgroundColor = ""; 
-    }
+        event.preventDefault(); 
+        var cep = this.value.replace(/[^0-9]/, "");
         var url = "https://viacep.com.br/ws/"+cep+"/json/";
     $.getJSON(url, function(dadosRetorno){
+        console.log(dadosRetorno)
         try{
+           if (!dadosRetorno.erro) {
             $("#endereco").val(dadosRetorno.logradouro);
             $("#bairro").val(dadosRetorno.bairro);
             $("#cidade").val(dadosRetorno.localidade);
             $("#uf").val(dadosRetorno.uf);
+
+            $("#error-message").text("");
+            $("#error-message").hide();
+           } else{
+            $("#error-message").text("CEP inválido. O CEP não existe.");
+            $("#error-message").show();
+           }
         }catch(ex){
             console.log(ex);
         }
     });
     });
-    
-//Método de validação para confirmar se o CNPJ digitado está de acordo com as regras
-    $("#cnpj").blur(function() {
-        var cnpj = this.value.replace(/[^0-9]/g, "");
-        if (cnpj.length !== 14) {
-            this.style.backgroundColor = "red"; 
-        } else {
-            this.style.backgroundColor = ""; 
+//Método para impedir que a requisição seja feita caso o CEP ou CNPJ esteja errado    
+    $("#cadastro-btn").click(function(event){
+        event.preventDefault(); 
+        var cep = $("#cep").val();
+        var cnpj = $("#cnpj").val();
+        if (cep.length !== 8 || isNaN(cep)) {
+            $("#error-message").text("CEP inválido. O CEP deve conter exatamente 8 dígitos.");
+            $("#error-message").show();
+            return;
         }
-    });
-
+        if (cnpj.length !== 14 || isNaN(cnpj)) {
+            $("#error-message").text("CNPJ inválido. O CNPJ deve conter exatamente 14 dígitos.");
+            $("#error-message").show();
+            return;
+        }
+    });  
 });
 
 

@@ -62,35 +62,4 @@
     {{ $fornecedores->links()}}
   </ul>
 </nav>
-<script>
-// $(document).ready(function () 
-// {
-//   $('.toggle-ativacao').click(function () 
-// {
-//   var button = $(this);
-//   var produtoId = button.data('id');
-//   var csrfToken = $('meta[name="csrf-token"]').attr('content');
-//   $.ajax({
-//     url: '/verdurao/fornecedor/status/' + produtoId,
-//     method: 'POST',
-//     headers: 
-//     {
-//       'X-CSRF-TOKEN': csrfToken
-//     },
-//     success: function (response) 
-//     {
-//       if (response.status === 1) 
-//       {
-//         button.text('Inativar').removeClass('btn-success').addClass('btn-danger');
-//       } else {
-//         button.text('Ativar').removeClass('btn-danger').addClass('btn-success');
-//       }
-//     },
-//     error: function () {
-//         console.log(error);
-//     }
-//   });
-// });
-// });
-</script> 
 @endsection

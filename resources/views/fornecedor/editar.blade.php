@@ -64,10 +64,6 @@
         </div>
     @endforeach
 </div> 
-    <button class="" type="submit">Editar</button>
+    <button class="" id="cadastro-btn" type="submit">Editar</button>
 </form>
-
-<script>
- 
-  </script>
 @endsection

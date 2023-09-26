@@ -70,7 +70,7 @@
     </div> 
 
   <div class="div_criar_fornecedor">
-    <button class="button_criar_fornecedor" type="submit">Cadastrar Fornecedor</button>     
+    <button class="button_criar_fornecedor" id="cadastro-btn" type="submit">Cadastrar Fornecedor</button>     
   </div>
 </form>
 @endsection
