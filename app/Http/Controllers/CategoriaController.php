@@ -61,7 +61,7 @@ class CategoriaController extends Controller
         ->update([
             'nome_categoria' => $request->nome_categoria
         ]);
-        return redirect()->route('categoria.index');
+        return redirect()->route('categoria.index')->with('success', 'Editado com sucesso');
     }
 
     public function status($statusId)

@@ -71,7 +71,9 @@ Route::middleware([
     Route::prefix('/usuario')->group(function(){
         Route::get('/index', [UsuarioController::class , 'index'])->name('usuario.index');
         Route::get('/cadastro', [UsuarioController::class , 'cadastro'])->name('usuario.cadastro');
+        Route::get('/editar/{userId}', [UsuarioController::class , 'editar'])->name('usuario.editar');
         Route::post('/status/{userId}',[UsuarioController::class, 'status'])->name('usuario.status');
+        Route::post('/editar/{userid}',[UsuarioController::class, 'salvarEditar'])->name('usuario.salvarEditar');
         Route::get('/buscar-usuario',[UsuarioController::class, 'Buscar'])->name('usuario.buscar');
     });
 

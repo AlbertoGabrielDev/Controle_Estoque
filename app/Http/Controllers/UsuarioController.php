@@ -15,7 +15,7 @@ class UsuarioController extends Controller
     }
 
     public function Cadastro(){
-        return view('usuario.cadastro');
+        return view('usuario.cadastro')->with('success', 'Usuario inserido com sucesso');
     }
 
     public function buscar(Request $request)
@@ -26,9 +26,20 @@ class UsuarioController extends Controller
         return view('usuario.index', compact('usuarios'));
     }
 
-    public function editar(Request $request, $usuarioId){
-        $usuarios = User::where('user.id' , $usuarioId)->get();
-        return view('usuario.editar');  
+    public function editar($usuarioId){
+        $usuarios = User::where('id' , $usuarioId)->get();
+        return view('usuario.editar', compact('usuarios'));  
+    }
+    
+    public function salvarEditar(Request $request, $userId)
+    {   
+        $users = User::where('id',$userId)
+        ->update([
+            'name'  =>$request->name,
+            'email' =>$request->email
+        ]);
+      
+        return redirect()->route('usuario.index')->with('success', 'Editado com sucesso');
     }
 
     public function status($statusId)

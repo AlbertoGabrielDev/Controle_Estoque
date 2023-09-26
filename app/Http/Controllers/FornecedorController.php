@@ -31,16 +31,16 @@ class FornecedorController extends Controller
 
     public function inserirCadastro(Request $request)
     {
+        $fornecedor = $request->validate([
+            'status' => 'required|boolean',
+        ]);
+
         $telefones = Telefone::create([
             'ddd' => $request->ddd,
             'telefone' => $request->telefone,
             'principal' => $request->input('principal') ? $request->principal : 0,
             'whatsapp' => $request->input('whatsapp') ? $request->whatsapp : 0,
             'telegram' => $request->input('telegram') ? $request->telegram : 0
-        ]);
-
-        $fornecedor = $request->validate([
-            'status' => 'required|boolean',
         ]);
         $telefonesId = Telefone::latest('id_telefone')->first();
         $fornecedor = Fornecedor::create([
