@@ -47,9 +47,9 @@ class ProdutoController extends Controller
         ]);
         
         $produtoId = Produto::latest('id_produto')->first();
-        $categoriaId = $request->input('nome_categoria');
+        //$categoriaId = $request->input('nome_categoria');
         CategoriaProduto::create([
-            'id_categoria_fk'      =>$categoriaId,
+            'id_categoria_fk'      =>$request->input('nome_categoria'),
             'id_produto_fk'        =>$produtoId->id_produto        
         ]);
         return redirect()->route('produtos.index')->with('success', 'Inserido com sucesso');

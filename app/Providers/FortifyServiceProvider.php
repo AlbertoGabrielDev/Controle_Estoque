@@ -60,5 +60,6 @@ class FortifyServiceProvider extends ServiceProvider
                 return session()->flash('error', 'Email não existe.');
             }
         });
+
     }
 }

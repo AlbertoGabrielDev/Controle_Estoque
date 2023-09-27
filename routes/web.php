@@ -79,7 +79,7 @@ Route::middleware([
 
 });
 
-Route::post('/logout', function () {
-    Auth::logout();
-    return redirect('/login');
-})->name('logout');
+// Route::post('/logout', function () {
+//     Auth::logout();
+//     return redirect('/login');
+// })->name('logout');
