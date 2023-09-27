@@ -44,7 +44,8 @@ Route::middleware([
         Route::get('/editar/{estoqueId}',[EstoqueController::class, 'editar'])->name('estoque.editar');
         Route::post('/editar/{estoqueId}',[EstoqueController::class, 'salvarEditar'])->name('estoque.salvarEditar');
         Route::post('/status/{estoqueId}',[EstoqueController::class, 'status'])->name('estoque.status');
-        Route::get('/quantidade/{quantidadeId}/{operacao}',[EstoqueController::class, 'quantidade'])->name('estoque.quantidade');
+        Route::get('/quantidade/{estoqueId}/{operacao}',[EstoqueController::class, 'quantidade'])->name('estoque.quantidade');
+        Route::get('/historico',[EstoqueController::class, 'historico'])->name('estoque.historico');
     });
 
     Route::prefix('/fornecedor')->group(function(){
@@ -76,10 +77,4 @@ Route::middleware([
         Route::post('/editar/{userid}',[UsuarioController::class, 'salvarEditar'])->name('usuario.salvarEditar');
         Route::get('/buscar-usuario',[UsuarioController::class, 'Buscar'])->name('usuario.buscar');
     });
-
 });
-
-// Route::post('/logout', function () {
-//     Auth::logout();
-//     return redirect('/login');
-// })->name('logout');

@@ -6,6 +6,7 @@ use App\Models\Produto;
 use App\Models\Fornecedor;
 use App\Models\Categoria;
 use App\Models\MarcaProduto;
+use App\Models\Historico;
 use App\Models\CategoriaProduto;
 use Carbon\Carbon;
 use Illuminate\Pagination\Paginator;
@@ -28,6 +29,12 @@ class EstoqueController extends Controller
         }
       
         return view('estoque.index',compact('estoques','produtos','fornecedores','marcas','categorias'));
+    }
+
+    public function historico(){
+        $estoques = Estoque::all();
+        $historicos = Historico::all();
+        return view('estoque.historico', compact('estoques', 'historicos'));
     }
 
     public function cadastro()
@@ -108,6 +115,11 @@ class EstoqueController extends Controller
             'id_marca_fk'   => $request->input('marca')
         ]);
 
+        Historico::create([
+            'id_estoque_fk'  =>$estoqueId,    
+            'quantidade_diminuida' =>$request->input('quantidade')
+        ]);
+
         return redirect()->route('estoque.index')->with('success', 'Editado com sucesso');
     }
 
@@ -119,14 +131,15 @@ class EstoqueController extends Controller
         return response()->json(['status' => $status->status]);
     }
 
-    public function quantidade($quantidadeId, $operacao){
-        $produto = Estoque::find($quantidadeId);
+    public function quantidade(Request $request,$estoqueId, $operacao){
+        //dd($request->input('quantidadeHistorico'),$estoqueId);
+        $produto = Estoque::find($estoqueId);
 
         if ($operacao === 'aumentar') {
-            $produto->quantidade += 1;
+            $produto->quantidade += $request->input('quantidadeHistorico');
         } elseif ($operacao === 'diminuir') {
             if ($produto->quantidade > 0) {
-                $produto->quantidade -= 1;
+                $produto->quantidade -= $request->input('quantidadeHistorico');
             }
         }
         $produto->save();

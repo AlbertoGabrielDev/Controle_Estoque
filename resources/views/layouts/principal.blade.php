@@ -19,28 +19,30 @@
   {{-- 
     Cabeçalho
   --}}
-    <div class="container d-flex flex-row justify-content-between align-items-center">
-        <div class="mx-auto">
-          <ul class="list-group list-group-horizontal">
-            <a class="list-group-item fs-5" href="{{route('categoria.inicio')}}">Inicio</a>
-            <a class="list-group-item fs-5" href="{{route('produtos.index')}}">Produtos</a>
-            <a class="list-group-item fs-5" href="{{route('fornecedor.index')}}">Fornecedores</a>
-            <a class="list-group-item fs-5" href="{{route('estoque.index')}}">Estoque</a>
-            <a class="list-group-item fs-5" href="{{route('marca.index')}}">Marca</a>
-            @can('permissao')
-              <a class="list-group-item fs-5" href="{{route('usuario.index')}}">Usuarios</a>
-            @endcan
-          </ul>
-        </div>
-        <ul class="list-group list-group-horizontal">
-          <form action="/logout" method="POST">
-            @csrf
-            <a href="/logout" class="list-group-item fs-5" onclick="event.preventDefault();
-              this.closest('form').submit();">Sair</a>
-          </form>
-        </ul>
-       
-      </div>
+<div class="container d-flex flex-row justify-content-between align-items-center">
+  <div class="mx-auto">
+    <ul class="list-group list-group-horizontal">
+      <a class="list-group-item fs-5" href="{{route('categoria.inicio')}}">Inicio</a>
+      <a class="list-group-item fs-5" href="{{route('produtos.index')}}">Produtos</a>
+      <a class="list-group-item fs-5" href="{{route('fornecedor.index')}}">Fornecedores</a>
+      <a class="list-group-item fs-5" href="{{route('estoque.index')}}">Estoque</a>
+      <a class="list-group-item fs-5" href="{{route('marca.index')}}">Marca</a>
+      @can('permissao')
+        <a class="list-group-item fs-5" href="{{route('usuario.index')}}">Usuarios</a>
+      @endcan
+      @can('permissao')
+      <a class="list-group-item fs-5" href="{{route('estoque.historico')}}">Historico</a>
+      @endcan
+    </ul>
+  </div>
+  <ul class="list-group list-group-horizontal">
+    <form action="/logout" method="POST">
+      @csrf
+      <a href="/logout" class="list-group-item fs-5" onclick="event.preventDefault();
+        this.closest('form').submit();">Sair</a>
+    </form>
+  </ul>
+</div>
 {{-- 
     Cabeçalho
   --}}      

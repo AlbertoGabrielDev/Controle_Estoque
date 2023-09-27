@@ -30,5 +30,9 @@ class Estoque extends Model
         'quantidade_aviso'
     ];
 
+    public function historico(): HasOne{
+        return $this->hasOne(historico::class);
+    }
+
     use HasFactory;
 }

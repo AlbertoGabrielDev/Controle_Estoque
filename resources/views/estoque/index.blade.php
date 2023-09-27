@@ -89,10 +89,18 @@
           <td>{{$estoque->localizacao}}</td>
           <td class="quantidade_aviso" id="aviso" data-aviso={{$estoque->quantidade_aviso}}>{{$estoque->quantidade_aviso}}</td>
           <td>
-            <a href="{{ route('estoque.quantidade', ['quantidadeId' => $estoque->id_estoque, 'operacao' => 'aumentar']) }}" class="btn btn-success">Aumentar</a>
+            <form method="GET" action="{{ route('estoque.quantidade', ['estoqueId' => $estoque->id_estoque, 'operacao' => 'aumentar']) }}">
+              @csrf
+              <input type="number" name="quantidadeHistorico">
+              <button type="submit" class="btn btn-success">Aumentar</button>
+          </form>
           </td>
           <td>
-            <a href="{{ route('estoque.quantidade', ['quantidadeId' => $estoque->id_estoque, 'operacao' => 'diminuir']) }}" class="btn btn-success">Diminuir</a>
+            <form method="GET" action="{{ route('estoque.quantidade', ['estoqueId' => $estoque->id_estoque, 'operacao' => 'diminuir']) }}">
+              @csrf
+              <input type="number" name="quantidadeHistorico">
+              <button type="submit" class="btn btn-success">Diminuir</button>
+          </form>
           </td>
           <td><a href="{{route('estoque.editar', $estoque->id_estoque)}}" class="btn btn-primary">Editar</a></td> 
           <td>
