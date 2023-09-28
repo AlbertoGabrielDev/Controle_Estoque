@@ -4,6 +4,9 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Estoque extends Model
 {
@@ -30,9 +33,22 @@ class Estoque extends Model
         'quantidade_aviso'
     ];
 
-    public function historico(): HasOne{
-        return $this->hasOne(historico::class);
+    public function historicos(): HasMany
+    {
+        return $this->hasMany(Historico::class, 'id_estoque_fk' , 'id_estoque');
     }
 
+    public function produtos(): BelongsToMany
+    {
+        return $this->belongsToMany(Produto::class, 'estoque', 'id_estoque' , 'id_produto_fk');
+    }
+
+    public function marcas() : BelongsToMany{
+        return $this->belongsToMany(Marca::class, 'estoque', 'id_estoque' , 'id_marca_fk');
+    }
+
+    public function fornecedores() : BelongsToMany{
+        return $this->belongsToMany(Fornecedor::class, 'estoque', 'id_estoque' , 'id_fornecedor_fk');
+    }
     use HasFactory;
 }

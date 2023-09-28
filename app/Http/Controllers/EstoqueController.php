@@ -31,10 +31,12 @@ class EstoqueController extends Controller
         return view('estoque.index',compact('estoques','produtos','fornecedores','marcas','categorias'));
     }
 
-    public function historico(){
-        $estoques = Estoque::all();
-        $historicos = Historico::all();
-        return view('estoque.historico', compact('estoques', 'historicos'));
+    public function historico(){ 
+        
+        
+        $historicos = Historico::with('estoques.produtos', 'estoques.marcas','estoques.fornecedores')->get();
+        //dd($historicos);
+        return view('estoque.historico', compact('historicos'));
     }
 
     public function cadastro()
@@ -94,7 +96,6 @@ class EstoqueController extends Controller
 
     public function salvarEditar(Request $request, $estoqueId)
     {
-
         $estoques = Estoque::where('id_estoque' , $estoqueId)
         ->update([
             'quantidade'        =>$request->quantidade,
@@ -132,14 +133,17 @@ class EstoqueController extends Controller
     }
 
     public function quantidade(Request $request,$estoqueId, $operacao){
-        //dd($request->input('quantidadeHistorico'),$estoqueId);
         $produto = Estoque::find($estoqueId);
-
         if ($operacao === 'aumentar') {
             $produto->quantidade += $request->input('quantidadeHistorico');
         } elseif ($operacao === 'diminuir') {
             if ($produto->quantidade > 0) {
                 $produto->quantidade -= $request->input('quantidadeHistorico');
+                Historico::create([
+                    'id_estoque_fk'  =>$estoqueId,    
+                    'quantidade_diminuida' =>$request->input('quantidadeHistorico'),
+                    'quantidade_historico' =>$produto->quantidade
+                ]);
             }
         }
         $produto->save();

@@ -20,5 +20,9 @@ class Marca extends Model
         ->as('marca_produto');
     }
 
+    public function estoques(): BelongsToMany{
+        return $this->belongsToMany(Estoque::class, 'marca' ,'id_marca');
+    }
+
     use HasFactory;
 }
