@@ -15,8 +15,14 @@ class Telefone extends Model
         'telefone',
         'whatsapp',
         'telegram',
-        'principal'
+        'principal',
+        'id_fornecedor_fk'
     ];
+
+    public function fornecedores(): BelongsTo
+    {
+        return $this->belongsTo(Fornecedor::class, 'id_fornecedor_fk');
+    }
 
     use HasFactory;
 }

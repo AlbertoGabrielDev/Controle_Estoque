@@ -34,15 +34,6 @@ class FornecedorController extends Controller
         $fornecedor = $request->validate([
             'status' => 'required|boolean',
         ]);
-
-        $telefones = Telefone::create([
-            'ddd' => $request->ddd,
-            'telefone' => $request->telefone,
-            'principal' => $request->input('principal') ? $request->principal : 0,
-            'whatsapp' => $request->input('whatsapp') ? $request->whatsapp : 0,
-            'telegram' => $request->input('telegram') ? $request->telegram : 0
-        ]);
-        $telefonesId = Telefone::latest('id_telefone')->first();
         $fornecedor = Fornecedor::create([
             'nome_fornecedor'   =>$request->nome_fornecedor,
             'cnpj'              =>$request->cnpj,
@@ -54,16 +45,25 @@ class FornecedorController extends Controller
             'id_users_fk'       =>Auth::id(),
             'cidade'            =>$request->cidade,
             'uf'                =>$request->uf,
-            'status'            =>$request->status,    
-            'id_telefone_fk'    => $telefonesId->id_telefone                           
+            'status'            =>$request->status          
        ]);
+       $fornecedorId = Fornecedor::latest('id_fornecedor')->first();
+        $telefones = Telefone::create([
+            'ddd' => $request->ddd,
+            'telefone' => $request->telefone,
+            'principal' => $request->input('principal') ? $request->principal : 0,
+            'whatsapp' => $request->input('whatsapp') ? $request->whatsapp : 0,
+            'telegram' => $request->input('telegram') ? $request->telegram : 0,
+            'id_fornecedor_fk' => $fornecedorId->id_fornecedor
+        ]);
+       
+       
      return redirect()->route('fornecedor.index')->with('success','Inserido com sucesso');
     }
 
     public function editar(Request $request, $fornecedorId){
-        $fornecedores = Fornecedor::where('fornecedor.id_fornecedor' , $fornecedorId)->get();
-        $telefones = Telefone::join('fornecedor as f' , 'f.id_telefone_fk' , '=' , 'telefones.id_telefone')
-        ->where('f.id_fornecedor', $fornecedorId)->get();
+        $fornecedores = Fornecedor::where('fornecedor.id_fornecedor',$fornecedorId)->get();
+        $telefones = Fornecedor::find($fornecedorId)->telefones;
         return view('fornecedor.editar', compact('fornecedores','telefones'));
     }
 
@@ -82,8 +82,7 @@ class FornecedorController extends Controller
                               
         ]);
           
-        $telefones = Telefone::join('fornecedor as f' , 'f.id_telefone_fk' , '=' , 'telefones.id_telefone')
-        ->where('f.id_fornecedor', $fornecedorId)
+        Telefone::where('id_fornecedor_fk', $fornecedorId)
         ->update([
             'ddd' => $request->ddd,
             'telefone' => $request->telefone,
