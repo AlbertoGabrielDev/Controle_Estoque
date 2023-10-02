@@ -79,7 +79,7 @@ class FornecedorController extends Controller
             'email'             =>$request->email,
             'cidade'            =>$request->cidade,
             'uf'                =>$request->uf,
-            'status'            =>$request->status                     
+                              
         ]);
           
         $telefones = Telefone::join('fornecedor as f' , 'f.id_telefone_fk' , '=' , 'telefones.id_telefone')

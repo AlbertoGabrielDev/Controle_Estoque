@@ -39,12 +39,4 @@
 </div>
     <button class="" type="submit">Editar</button>
 </form>
-{{-- <script>
-  $(document).ready(function() {
-      var categoriaAtual = "{{$categorias->first()->nome_categoria}}";
-    console.log(categoriaAtual);
-      $("#nome_categoria").find("option:contains('" + categoriaAtual + "')").prependTo("#nome_categoria");
-      $("#nome_categoria").val(categoriaAtual);
-  });
-  </script> --}}
 @endsection

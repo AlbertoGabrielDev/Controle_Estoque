@@ -36,12 +36,12 @@
         <span class="input-group-text" id="inputGroup-sizing-lg">UF</span>
         <input type="text" name="uf" class="form-control" aria-label="Sizing example input" id="uf" value="{{$fornecedor->uf}}">
       </div>
-    <div class="input-group input-group-lg w-25">
+    {{-- <div class="input-group input-group-lg w-25">
     <select name="status" id="status" class="form-control">
         <option value="1">Ativo</option>
         <option value="0">Inativo</option>
     </select>
-    </div>
+    </div> --}}
  @endforeach
     @foreach ($telefones as $telefone)
         <div class="input-group input-group-lg w-50">
@@ -50,20 +50,20 @@
             <span class="input-group-text" id="inputGroup-sizing-lg">Telefone</span>
             <input type="text" name="telefone" class="form-control" aria-label="Sizing example input" value="{{$telefone->telefone}}">
             <div class="btn-group" role="group" aria-label="Basic checkbox toggle button group">
-                <input type="checkbox" class="btn-check" id="btncheck1" name="principal" value="1" autocomplete="off">
-                <label class="btn btn-outline-primary" for="btncheck1">Principal</label>
+              <input type="checkbox" class="btn-check" id="btncheck1" name="principal" value="1" autocomplete="off" {{ $telefone->principal == 1 ? 'checked' : '' }}>
+              <label class="btn btn-outline-primary @if ($telefone->principal == 1) 'btn-primary' @else 'btn-outline-primary' @endif" for="btncheck1">Principal</label>
             </div>
             <div class="btn-group" role="group" aria-label="Basic checkbox toggle button group">
-                <input type="checkbox" class="btn-check" id="btncheck2" name="whatsapp" value="1" autocomplete="off">
-                <label class="btn btn-outline-primary" for="btncheck2">Whatsapp</label>
-            </div>
-            <div class="btn-group" role="group" aria-label="Basic checkbox toggle button group">
-                <input type="checkbox" class="btn-check" id="btncheck3" name="telegram" value="1" autocomplete="off">
-                <label class="btn btn-outline-primary" for="btncheck3">Telegram</label>
-            </div>    
+              <input type="checkbox" class="btn-check" id="btncheck2" name="whatsapp" value="1" autocomplete="off" {{ $telefone->whatsapp == 1 ? 'checked' : '' }}>
+              <label class="btn btn-outline-primary @if ($telefone->whatsapp == 1) 'btn-primary' @else 'btn-outline-primary' @endif" for="btncheck2">Whatsapp</label>
+          </div>
+          <div class="btn-group" role="group" aria-label="Basic checkbox toggle button group">
+              <input type="checkbox" class="btn-check" id="btncheck3" name="telegram" value="1" autocomplete="off" {{ $telefone->telegram == 1 ? 'checked' : '' }}>
+              <label class="btn btn-outline-primary @if ($telefone->telegram == 1) 'btn-primary' @else 'btn-outline-primary' @endif " for="btncheck3">Telegram</label>
+          </div>    
         </div>
     @endforeach
 </div> 
-    <button class="" id="cadastro-btn" type="submit">Editar</button>
+    <button class="" type="submit">Editar</button>
 </form>
 @endsection
