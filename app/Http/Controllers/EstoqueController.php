@@ -32,10 +32,7 @@ class EstoqueController extends Controller
     }
 
     public function historico(){ 
-        
-        
         $historicos = Historico::with('estoques.produtos', 'estoques.marcas','estoques.fornecedores')->get();
-        //dd($historicos);
         return view('estoque.historico', compact('historicos'));
     }
 
@@ -87,8 +84,8 @@ class EstoqueController extends Controller
 
     public function editar($estoqueId)
     {
-        $produtos = Produto::all();
-        $fornecedores = Fornecedor::all();
+        $produtos = Estoque::find($estoqueId)->produtos->merge(Produto::all());
+        $fornecedores = Estoque::find($estoqueId)->fornecedores->merge(Fornecedor::all());;
         $marcas = Marca::all();
         $estoques = Estoque::where('id_estoque', $estoqueId)->get();
         return view('estoque.editar', compact('estoques','produtos','fornecedores','marcas'));

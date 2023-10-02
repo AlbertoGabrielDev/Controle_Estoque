@@ -64,9 +64,8 @@ class ProdutoController extends Controller
 
     public function editar($produtoId) 
     {
-        $select = Produto::find($produtoId)->categorias;
         $categoria = Categoria::all();
-        $categorias = $select->merge($categoria);
+        $categorias = Produto::find($produtoId)->categorias->merge($categoria);
         $produtos = Produto::where('id_produto',$produtoId)->get();
         return view('produtos.editar',compact('produtos', 'categorias'));    
     }

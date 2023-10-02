@@ -34,16 +34,14 @@
   </div>
     <div class="input-group input-group-lg">
         <div class="col-md-4">
-            <select class="form-control form-control-lg w-75" name="marca" >
-                <option value="">Selecione uma Marca</option>
+            <select class="form-control form-control-lg w-75" name="marca">
                 @foreach ($marcas as $marca)
                     <option value="{{ $marca->id_marca }}">{{ $marca->nome_marca }}</option>
                 @endforeach
             </select>
        </div>
        <div class="col-md-4">
-            <select class="form-control form-control-lg w-75" name="nome_produto" >
-                <option value="">Selecione um Produto</option>
+            <select class="form-control form-control-lg w-75" name="nome_produto">
                 @foreach ($produtos as $produto)
                     <option value="{{ $produto->id_produto }}">{{ $produto->nome_produto }}</option>
                 @endforeach
@@ -51,8 +49,7 @@
        </div>
        
        <div class="col-md-4">
-        <select class="form-control form-control-lg w-75" name="fornecedor" >
-            <option value="">Selecione um Fornecedor</option>
+        <select class="form-control form-control-lg w-75" name="fornecedor">
             @foreach ($fornecedores as $fornecedor)
                 <option value="{{ $fornecedor->id_fornecedor }}">{{ $fornecedor->nome_fornecedor }}</option>
             @endforeach
