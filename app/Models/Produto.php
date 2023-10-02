@@ -112,7 +112,7 @@ class Produto extends Model
 
     public function categorias() : BelongsToMany
     {
-        return $this->belongsToMany(Categoria::class,  'categoria_produto', 'id_categoria_fk', 'id_produto_fk');
+        return $this->belongsToMany(Categoria::class,  'categoria_produto', 'id_produto_fk', 'id_categoria_fk');
     }
 
     public function marca(): BelongsToMany

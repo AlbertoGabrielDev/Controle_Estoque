@@ -12,6 +12,7 @@
 <form action="{{route('produtos.salvarEditar', $produtos->first()->id_produto)}}" method="POST">
   @csrf
   @foreach ($produtos as $produto)
+  {{-- {{dd($produto)}} --}}
     <div class="input-group input-group-lg">
       <span class="input-group-text" id="inputGroup-sizing-lg">Cod. Produto</span>
       <input type="number" name="cod_produto" class="form-control" aria-label="Sizing example input" value="{{$produto->cod_produto}}">
@@ -29,15 +30,21 @@
       <input type="date" name="validade" class="form-control" aria-label="Sizing example input" value="{{$produto->validade}}">
     </div>
  @endforeach
-    <div class="input-group input-group-lg w-25">
-      <select class="form-select" aria-label="Default select example" name="nome_categoria">
-        {{-- <option selected>Categoria</option> --}}
-        @foreach ($categorias as $categoria)
-        <option value="{{$categoria->id_categoria}}" >{{$categoria->nome_categoria}}</option>
+ <div class="input-group input-group-lg w-25">
+  <select class="form-select" aria-label="Default select example" name="nome_categoria">
+    @foreach ($categorias as $categoria)
+        <option value="{{ $categoria->id_categoria }}" >{{ $categoria->nome_categoria }}</option>
     @endforeach
-      </select>
-    </div>
+</select>
+</div>
     <button class="" type="submit">Editar</button>
 </form>
-
+{{-- <script>
+  $(document).ready(function() {
+      var categoriaAtual = "{{$categorias->first()->nome_categoria}}";
+    console.log(categoriaAtual);
+      $("#nome_categoria").find("option:contains('" + categoriaAtual + "')").prependTo("#nome_categoria");
+      $("#nome_categoria").val(categoriaAtual);
+  });
+  </script> --}}
 @endsection

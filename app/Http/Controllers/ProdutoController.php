@@ -62,15 +62,12 @@ class ProdutoController extends Controller
         return view('produtos.index', compact('produtos'));
     }
 
-    public function editar(Request $request, $produtoId) 
+    public function editar($produtoId) 
     {
-        // $produto = Categoria::find(53);
-        // dd($produto->produtos()->get());
-        // $produto = Produto::find(63);
-        // dd($produto->categorias()->get());
-       // dd($categorias);
-        $categorias = Categoria::all();
-        $produtos = Produto::where('produto.id_produto' , $produtoId)->get();
+        $select = Produto::find($produtoId)->categorias;
+        $categoria = Categoria::all();
+        $categorias = $select->merge($categoria);
+        $produtos = Produto::where('id_produto',$produtoId)->get();
         return view('produtos.editar',compact('produtos', 'categorias'));    
     }
 
