@@ -13,10 +13,10 @@ use Illuminate\Support\Facades\Validator;
 
 class ProdutoController extends Controller
 {
-    public function Produtos()
-    {
-        return view('produtos.produtos');
-    }
+    // public function Produtos()
+    // {
+    //     return view('produtos.produtos');
+    // }
 
     public function Index()
     {
@@ -26,17 +26,21 @@ class ProdutoController extends Controller
 
     public function Cadastro(Request $request) 
     {
-        $categorias= Categoria::all();
+        $categorias = Categoria::all();
         return view('produtos.cadastro',compact('categorias'));
     }
 
     public function inserirCadastro(Request $request)
     {
-        // $validator = Validator::make($request->all(), [
-        //     'nome_produto' => 'required|unique:posts|max:255',
-
-        //   ]);
-
+        $rules = $request->validate([
+            'nome_produto' => 'required|unique:produto,nome_produto|max:255',
+        ],
+        [
+            'nome_produto.required' =>'O campo "Nome do produto" é obrigatorio',
+            'nome_produto.unique' => 'O nome do produto já está cadastrado',
+            'nome_produto.max' => 'Máximo de caracteres excedido'
+        ]);
+//tirar validação daqui, e criar um componente excluisivo para eles
         $produto = Produto::create([
             'nome_produto'      =>$request->nome_produto,
             'cod_produto'       =>$request->cod_produto,
@@ -45,9 +49,8 @@ class ProdutoController extends Controller
             'unidade_medida'    =>$request->unidade_medida,
             'id_users_fk'       =>Auth::id()
         ]);
-        
+       
         $produtoId = Produto::latest('id_produto')->first();
-        //$categoriaId = $request->input('nome_categoria');
         CategoriaProduto::create([
             'id_categoria_fk'      =>$request->input('nome_categoria'),
             'id_produto_fk'        =>$produtoId->id_produto        
