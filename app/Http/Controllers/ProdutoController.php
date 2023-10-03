@@ -13,14 +13,9 @@ use Illuminate\Support\Facades\Validator;
 
 class ProdutoController extends Controller
 {
-    // public function Produtos()
-    // {
-    //     return view('produtos.produtos');
-    // }
-
     public function Index()
     {
-        $produtos = Produto::paginate(2);
+        $produtos = Produto::paginate(3);
         return view('produtos.index',compact('produtos'));
     }
 
@@ -47,6 +42,7 @@ class ProdutoController extends Controller
             'descricao'         =>$request->descricao,
             'validade'          =>$request->validade,
             'unidade_medida'    =>$request->unidade_medida,
+            'inf_nutrientes'    =>json_encode($request->inf_nutrientes),
             'id_users_fk'       =>Auth::id()
         ]);
        
@@ -82,6 +78,7 @@ class ProdutoController extends Controller
             'descricao'         =>$request->descricao,
             'validade'          =>$request->validade,
             'unidade_medida'    =>$request->unidade_medida,
+            'inf_nutrientes'    =>json_encode($request->inf_nutrientes)
         ]);
         $categoria = CategoriaProduto::where('id_produto_fk' , $produtoId)
         ->update(['id_categoria_fk' =>$request->input('nome_categoria')]);
@@ -95,6 +92,4 @@ class ProdutoController extends Controller
         $status->save();
         return response()->json(['status' => $status->status]);
     }
-
-    
 }

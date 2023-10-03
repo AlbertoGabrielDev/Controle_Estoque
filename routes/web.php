@@ -33,7 +33,7 @@ Route::middleware([
         Route::get('/buscar-produto',[ProdutoController::class, 'buscarProduto'])->name('produtos.buscar');
         Route::get('/editar/{produtoId}',[ProdutoController::class, 'editar'])->name('produtos.editar');
         Route::post('/editar/{produtoId}',[ProdutoController::class, 'salvarEditar'])->name('produtos.salvarEditar');
-        Route::post('/status/{produtoId}',[ProdutoController::class, 'status'])->name('produtos.');
+        Route::post('/status/{produtoId}',[ProdutoController::class, 'status'])->name('produtos.status');
     });
      
     Route::prefix('/estoque')->group(function(){

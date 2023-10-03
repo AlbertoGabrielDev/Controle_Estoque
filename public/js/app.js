@@ -100,6 +100,13 @@ $(document).ready(function ()
             return;
         }
     });  
+
+    //Método para mostrar as inf. nutrientes em produtos
+    $('.btn-show-nutrition').on('click', function () {
+        var produtoId = $(this).data('produto-id');
+        var infNutrientes = $('.nutritional-info[data-produto-id="' + produtoId + '"]').text();
+        $('#offcanvasWithBackdrop .offcanvas-body p').text(infNutrientes);
+      });
 });
 
 

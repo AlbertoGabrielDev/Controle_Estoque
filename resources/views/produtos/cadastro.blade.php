@@ -27,10 +27,11 @@
             <div class="col-md-4">
                 <input type="text" class="form-control form-control-lg w-75" value="{{old('unidade_medida')}}" name="unidade_medida"  placeholder="Unidade de Medida">
             </div>
-        </div>
-        <div class="row">
             <div class="col-md-4">
                 <input type="number" class="form-control form-control-lg w-75" value="{{old('cod_produto')}}" name="cod_produto"  placeholder="Cod. Produto">
+            </div>
+            <div class="col-md-4">
+                <input type="text" class="form-control form-control-lg w-75" value="{{old('inf_nutrientes')}}" name="inf_nutrientes"  placeholder="Inf. Nutricionais">
             </div>
         </div>
         <div class="col-md-4">

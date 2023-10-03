@@ -39,8 +39,11 @@
             <td>{{$produto->nome_produto}}</td>
             <td>{{$produto->descricao}}</td>
             <td>{{$produto->unidade_medida}}</td>
-            <td>{{$produto->inf_nutrientes}}</td>
-            <td class= "expiration-date" id="data">{{($produto->validade) }}</td>
+            <td>
+              <button class="btn btn-primary btn-show-nutrition" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasWithBackdrop" aria-controls="offcanvasWithBackdrop" data-produto-id="{{ $produto->id_produto }}">Infor. Nutricionais</button>
+              <span class="nutritional-info" data-produto-id="{{ $produto->id_produto }}" style="display: none;">{{ $produto->inf_nutrientes }}</span>
+            </td>
+            <td class= "expiration-date" id="data">{{($produto->validade)}}</td>
             <td><a href="{{route('produtos.editar', $produto->id_produto)}}" class="btn btn-primary">Editar</a></td>
             <td>
               <button class="btn btn-primary toggle-ativacao @if($produto->status === 1) btn-danger @elseif($produto->status === 0) btn-success @else btn-primary @endif"
@@ -52,6 +55,16 @@
         @endforeach
     </tbody>
 </table>
+<div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasWithBackdrop" aria-labelledby="offcanvasWithBackdropLabel">
+  <div class="offcanvas-header">
+    <h5 class="offcanvas-title" id="offcanvasWithBackdropLabel">Informações Nútricionais</h5>
+    <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+  </div>
+  <div class="offcanvas-body">
+    <p id="nutritional-info">{{ $produto->inf_nutrientes }}</p>
+  </div>
+</div>
+
 <nav class="Page navigation example">
   <ul class="pagination">
     {{ $produtos->links()}}
