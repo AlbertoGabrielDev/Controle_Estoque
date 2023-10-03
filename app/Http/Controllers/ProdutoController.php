@@ -27,6 +27,7 @@ class ProdutoController extends Controller
 
     public function inserirCadastro(Request $request)
     {
+      
         $rules = $request->validate([
             'nome_produto' => 'required|unique:produto,nome_produto|max:255',
         ],
@@ -45,7 +46,7 @@ class ProdutoController extends Controller
             'inf_nutrientes'    =>json_encode($request->inf_nutrientes),
             'id_users_fk'       =>Auth::id()
         ]);
-       
+         //dd($produto);
         $produtoId = Produto::latest('id_produto')->first();
         CategoriaProduto::create([
             'id_categoria_fk'      =>$request->input('nome_categoria'),

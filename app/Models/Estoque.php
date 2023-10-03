@@ -48,7 +48,7 @@ class Estoque extends Model
     }
 
     public function fornecedores() : BelongsToMany{
-        return $this->belongsToMany(Fornecedor::class, 'estoque', 'id_estoque' , 'id_fornecedor_fk');
+        return $this->belongsToMany(Fornecedor::class, 'estoque', 'id_estoque', 'id_fornecedor_fk');
     }
     use HasFactory;
 }

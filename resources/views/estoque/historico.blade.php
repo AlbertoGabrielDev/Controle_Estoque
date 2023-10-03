@@ -18,6 +18,7 @@
         <th scope="col">Quantidade retirada</th>
         <th scope="col">Quantidade</th>
         <th scope="col">Data de alteração</th>
+        <th scope="col">Usuário que altero</th>
       </tr>
     </thead>
     <tbody>
@@ -35,6 +36,7 @@
           <td>{{$historico->quantidade_diminuida}}</td>
           <td>{{$historico->quantidade_historico}}</td>
           <td>{{ \Carbon\Carbon::parse($historico->updated_at)->format('d/m/Y h:i:s A') }}</td> 
+          <td>{{}}</td>
       </tr>
       @endforeach
     </tbody>

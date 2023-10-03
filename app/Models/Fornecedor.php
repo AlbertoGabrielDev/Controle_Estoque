@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 class Fornecedor extends Model
 {
     protected $table = 'fornecedor';
@@ -32,7 +32,7 @@ class Fornecedor extends Model
     }
 
     public function estoques(): BelongsToMany{
-        return $this->belongsToMany(Estoque::class, 'fornecedor' ,'id_fornecedor');
+        return $this->belongsToMany(Estoque::class, 'fornecedor' ,'id_fornecedor', 'id_fornecedor');
     }
 
     public function telefones(): HasMany

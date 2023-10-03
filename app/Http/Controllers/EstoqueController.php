@@ -20,14 +20,13 @@ class EstoqueController extends Controller
         $fornecedores = Fornecedor::all();
         $marcas = Marca::all();
         $categorias = Categoria::all();
-        $produtos = Produto::paginate(3);
-        $estoques = [];
-        foreach ($produtos as $produto) 
-        {
-            $estoquesProduto = $produto->fornecedores->pluck('estoque')->all();
-            $estoques = array_merge($estoques, $estoquesProduto); 
-        }
-      
+        $produtos = Produto::all();
+        $estoques = Estoque::with('produtos')->paginate(2);
+        // $estoques = [];
+        // foreach ($produtos as $produto) {
+        //     $estoquesProduto = $produto->fornecedores->pluck('estoque')->all();
+        //     $estoques = array_merge($estoques, $estoquesProduto); 
+        // }
         return view('estoque.index',compact('estoques','produtos','fornecedores','marcas','categorias'));
     }
 
@@ -48,13 +47,14 @@ class EstoqueController extends Controller
         $fornecedores = Fornecedor::all();
         $marcas = Marca::all();
         $categorias = Categoria::all();
-        $produtos = Produto::paginate(10);
-        $estoques = [];
-        foreach ($produtos as $produto) 
-        {   
-            $estoquesProduto = $produto->search->pluck('estoque')->all();
-            $estoques = array_merge($estoques, $estoquesProduto); 
-        }
+        $produtos = Produto::all();
+        $estoques = Estoque::with('produtos.search')->paginate(2);
+        // $estoques = [];
+        // foreach ($produtos as $produto) 
+        // {   
+        //     $estoquesProduto = $produto->search->pluck('estoque')->all();
+        //     $estoques = array_merge($estoques, $estoquesProduto); 
+        // }
     
         return view('estoque.index', compact('estoques', 'produtos','fornecedores','marcas','categorias'));
     }
@@ -95,7 +95,6 @@ class EstoqueController extends Controller
     {
         $estoques = Estoque::where('id_estoque' , $estoqueId)
         ->update([
-            'quantidade'        =>$request->quantidade,
             'localizacao'       =>$request->localizacao,
             'preco_custo'       =>$request->preco_custo,
             'preco_venda'       =>$request->preco_venda,
@@ -112,12 +111,6 @@ class EstoqueController extends Controller
             'id_produto_fk' => $request->input('nome_produto'),
             'id_marca_fk'   => $request->input('marca')
         ]);
-
-        Historico::create([
-            'id_estoque_fk'  =>$estoqueId,    
-            'quantidade_diminuida' =>$request->input('quantidade')
-        ]);
-
         return redirect()->route('estoque.index')->with('success', 'Editado com sucesso');
     }
 
@@ -131,6 +124,7 @@ class EstoqueController extends Controller
 
     public function quantidade(Request $request,$estoqueId, $operacao){
         $produto = Estoque::find($estoqueId);
+        //dd($produto);
         if ($operacao === 'aumentar') {
             $produto->quantidade += $request->input('quantidadeHistorico');
         } elseif ($operacao === 'diminuir') {

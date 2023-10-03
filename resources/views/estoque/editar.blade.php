@@ -17,8 +17,8 @@
       <input type="number" name="preco_custo" class="form-control" aria-label="Sizing example input" value="{{$estoque->preco_custo}}">
       <span class="input-group-text" id="inputGroup-sizing-lg">Preço Venda</span>
       <input type="number" name="preco_venda" class="form-control" aria-label="Sizing example input" value="{{$estoque->preco_venda}}">
-      <span class="input-group-text" id="inputGroup-sizing-lg">Quantidade</span>
-      <input type="number" name="quantidade" class="form-control" aria-label="Sizing example input" value="{{$estoque->quantidade}}">
+      {{-- <span class="input-group-text" id="inputGroup-sizing-lg">Quantidade</span>
+      <input type="number" name="quantidade" class="form-control" aria-label="Sizing example input" value="{{$estoque->quantidade}}"> --}}
     </div>
     <div class="input-group input-group-lg">
       <span class="input-group-text" id="inputGroup-sizing-lg">Data Chegada</span>
@@ -47,7 +47,6 @@
                 @endforeach
             </select>
        </div>
-       
        <div class="col-md-4">
         <select class="form-control form-control-lg w-75" name="fornecedor">
             @foreach ($fornecedores as $fornecedor)

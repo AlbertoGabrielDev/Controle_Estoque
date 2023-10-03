@@ -79,7 +79,9 @@
     <tbody>
       @foreach ($estoques as $estoque)
       <tr>
-          <td>{{$estoque->pivotParent->nome_produto}}</td>
+          @foreach ($estoque->produtos as $produto)
+            <td>{{$produto->nome_produto}}</td>
+          @endforeach
           <td>{{$estoque->preco_custo}}</td>
           <td>{{$estoque->preco_venda}}</td>
           <td class="quantidade" data-quantidade={{$estoque->quantidade}}>{{$estoque->quantidade}}</td>
@@ -115,7 +117,7 @@
 </table>
 <nav class="Page navigation example">
   <ul class="pagination">
-    {{ $produtos->links()}}
+    {{ $estoques->links()}}
   </ul>
 </nav>
 @endsection

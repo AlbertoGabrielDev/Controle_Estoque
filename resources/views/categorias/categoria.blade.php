@@ -12,7 +12,11 @@
                     <img src="/img/categorias/{{$categoria->imagem}}" class="card-img-top" alt="{{$categoria->nome_categoria}}">
                     <div class="card-body">
                         <h5 class="card-title">{{ $categoria->nome_categoria }}</h5>
+                        @if ($categoria->produtos->count() > 0)
                         <a href="{{ route('categorias.produto', $categoria->id_categoria) }}" class="btn btn-primary">Ver Produtos</a>
+                    @else
+                        <p>Nenhum produto disponível nesta categoria.</p>
+                    @endif
                     </div>
                 </div>
             </div>
