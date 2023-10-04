@@ -1,14 +1,10 @@
 @extends('layouts.principal')
 @section('conteudo')
 
-<div class="container d-flex justify-content-between align-items-center">
-  <div class="mx-auto">
-    <h1 class="card-title">Index Historico</h1>
-  </div>
-  <div>
-    <a class="btn btn-primary" href="{{route('categoria.inicio')}}">Voltar</a>
-  </div>
-</div>
+
+  <h1 class="h1 text-center m-5">Index Historico</h1>
+  <a class="btn btn-primary m-3" href="{{route('categoria.inicio')}}">Voltar</a>
+ 
 <table class="table mt-5">
     <thead>
       <tr>

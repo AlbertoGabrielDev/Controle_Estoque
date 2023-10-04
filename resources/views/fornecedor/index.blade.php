@@ -1,21 +1,13 @@
 @extends('layouts.principal')
 @section('conteudo')
-<div class="container d-flex justify-content-between align-items-center">
-  <div class="mx-auto">
-    <h1 class="card-title">Index Fornecedores</h1>
-  </div>
-  <div>
-    <a class="btn btn-primary" href="{{route('categoria.inicio')}}">Voltar</a>
-  </div>
-</div>
 
-<div class="div_criar_produto">
-  <a class="button_criar_produto" href="{{route('fornecedor.cadastro')}}">Cadastrar Fornecedor</a>     
-</div>
+  <h1 class="h1 text-center m-5">Index Fornecedores</h1>
+  <a class="btn btn-primary m-3" href="{{route('categoria.inicio')}}">Voltar</a>
+  <a class="btn btn-primary m-3" href="{{route('fornecedor.cadastro')}}">Cadastrar Fornecedor</a>     
 
 <form action="{{ route('fornecedor.buscar') }}" method="GET" class="d-flex">
   <input type="text" name="nome_fornecedor" class="form-control w-25" placeholder="Digite o nome do Fornecedor">
-  <button class="btn btn-outline-success" type="submit">Pesquisar</button>
+  <button class="btn btn-outline-success m-1" type="submit">Pesquisar</button>
 </form>
 
 <table class="table mt-5">

@@ -4,9 +4,8 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class ValidacaoProduto extends FormRequest
+class ValidacaoProdutoEditar extends FormRequest
 {
-
     public function authorize(): bool
     {
         return true;
@@ -14,7 +13,7 @@ class ValidacaoProduto extends FormRequest
     public function rules(): array
     {
         return [
-            'nome_produto' => 'required|unique:produto,nome_produto|max:60',
+            'nome_produto' => 'max:60',
             'descricao'  => 'required|max:255',
             'validade'  => 'required',
             'unidade_medida'  => 'required',
@@ -27,9 +26,7 @@ class ValidacaoProduto extends FormRequest
     public function messages(): array
     {
         return [
-            'nome_produto.required' =>'O campo "Nome do produto" é obrigatorio',
-            'nome_produto.unique' => 'O nome do produto já está cadastrado',
-            'nome_produto.max' => 'Máximo de caracteres excedido'
+            'nome_produto.max' => 'Máximo de caracteres para o nome excedido. Max:60'
         ];
     }
 }

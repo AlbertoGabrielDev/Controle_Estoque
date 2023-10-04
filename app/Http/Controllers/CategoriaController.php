@@ -44,9 +44,9 @@ class CategoriaController extends Controller
 
     public function produto($categoriaId)
     {
-        $categoria = Categoria::find($categoriaId);
-        $produtos = $categoria->produtos()->get();
-        return view('categorias.produto',compact('produtos'));
+        $categoria = Categoria::find($categoriaId)->nome_categoria; 
+        $produtos = Categoria::find($categoriaId)->produtos()->get();
+        return view('categorias.produto',compact('produtos','categoria'));
     }
 
     public function editar(Request $request, $categoriaId)

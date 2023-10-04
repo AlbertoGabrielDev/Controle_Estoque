@@ -1,19 +1,14 @@
 @extends('layouts.principal')
 
 @section('conteudo')
-<div class="container d-flex justify-content-between align-items-center">
-  <div class="mx-auto">
-    <h1 class="card-title">Index Marca</h1>
-  </div>
-  <div>
-    <a class="btn btn-primary" href="{{route('categoria.inicio')}}">Voltar</a>
-  </div>
-</div>
-  <a class="btn btn-lg btn-primary left" href="{{route('marca.cadastro')}}">Cadastrar Marca</a>     
+
+  <h1 class="h1 text-center m-5">Index Marca</h1>
+  <a class="btn btn-primary m-3" href="{{route('categoria.inicio')}}">Voltar</a>
+  <a class="btn btn-primary m-3" href="{{route('marca.cadastro')}}">Cadastrar Marca</a>     
 
 <form action="{{ route('marca.buscar') }}" class="d-flex" method="GET">
   <input type="text" name="nome_marca" class="form-control w-25" placeholder="Digite o nome da Marca">
-  <button class="btn btn-outline-success" type="submit">Pesquisar</button>
+  <button class="btn btn-outline-success m-1" type="submit">Pesquisar</button>
 </form>
 <table class="table mt-5">
     <thead>

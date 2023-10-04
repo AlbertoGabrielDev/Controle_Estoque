@@ -1,15 +1,8 @@
 @extends('layouts.principal')
 
 @section('conteudo')
-<div class="container d-flex justify-content-between align-items-center">
-  <div class="mx-auto">
-    <h1 class="card-title">Cadastro de Estoque</h1>
-  </div>
-  <div>
-    <a class="btn btn-primary" href="{{route('estoque.index')}}">Voltar</a>
-  </div>
-</div>
-
+  <h1 class="h1 text-center">Cadastro de Estoque</h1>
+  <a class="btn btn-primary m-3" href="{{route('estoque.index')}}">Voltar</a>
 <form action="{{route('estoque.inserirEstoque')}}" method="POST">
     @csrf
     <div class="row">
@@ -38,37 +31,35 @@
     <div class="row">
       <div class="col-md-4">
         <input type="number" class="form-control form-control-lg w-75" required name="quantidade_aviso" placeholder="Quantidade para aviso">
-  </div>
+      </div>  
+    </div>
 
-    <div class="row">
-        <div class="col-md-4">
-            <select class="form-control form-control-lg w-75" name="marca" required>
-                <option value="">Selecione uma Marca</option>
-                @foreach ($marca as $marcas)
-                    <option value="{{ $marcas->id_marca }}">{{ $marcas->nome_marca }}</option>
-                @endforeach
-            </select>
-       </div>
-       <div class="col-md-4">
-            <select class="form-control form-control-lg w-75" name="nome_produto" required>
-                <option value="">Selecione um Produto</option>
-                @foreach ($produto as $produtos)
-                    <option value="{{ $produtos->id_produto }}">{{ $produtos->nome_produto }}</option>
-                @endforeach
-            </select>
-       </div>
-       
-       <div class="col-md-4">
-        <select class="form-control form-control-lg w-75" name="fornecedor" required>
-            <option value="">Selecione um Fornecedor</option>
-            @foreach ($fornecedores as $fornecedor)
-                <option value="{{ $fornecedor->id_fornecedor }}">{{ $fornecedor->nome_fornecedor }}</option>
-            @endforeach
-        </select>
-        </div>
+  <div class="row">
+    <div class="col-md-4">
+      <select class="form-control form-control-lg w-75" name="marca" required>
+        <option value="">Selecione uma Marca</option>
+        @foreach ($marca as $marcas)
+            <option value="{{ $marcas->id_marca }}">{{ $marcas->nome_marca }}</option>
+        @endforeach
+      </select>
     </div>
-    <div class="div_criar_categoria2">
-        <button class="button_criar_categoria2" type="submit">Criar Estoque</button>     
+    <div class="col-md-4">
+      <select class="form-control form-control-lg w-75" name="nome_produto" required>
+        <option value="">Selecione um Produto</option>
+        @foreach ($produto as $produtos)
+            <option value="{{ $produtos->id_produto }}">{{ $produtos->nome_produto }}</option>
+        @endforeach
+      </select>
     </div>
+    <div class="col-md-4">
+      <select class="form-control form-control-lg w-75" name="fornecedor" required>
+        <option value="">Selecione um Fornecedor</option>
+        @foreach ($fornecedores as $fornecedor)
+            <option value="{{ $fornecedor->id_fornecedor }}">{{ $fornecedor->nome_fornecedor }}</option>
+        @endforeach
+      </select>
+    </div>
+  </div>
+    <button class="btn btn-primary m-1" type="submit">Criar Estoque</button>     
 </form>
 @endsection

@@ -1,8 +1,8 @@
 *{
-    padding: 20px;
+    padding: 5px;
    
 }
-.botão{
+/* .botão{
     background-color: transparent;
     border: 1px solid;
     padding: 10px 40px;
@@ -57,7 +57,7 @@
     position: relative;
     bottom: 35px;
     outline: none;
-} */
+} 
 .icon{
     position: relative;
     width: 20px;
@@ -127,7 +127,7 @@ button[type="submit"]{
     right: 60px;
     width: 440px;
     bottom: 60px;
-} */
+} 
 
 .div_pai{
     width: 400px;
@@ -232,4 +232,4 @@ button[type="submit"]{
 .left{
     position: relative;
      
-}
+} */

@@ -37,7 +37,6 @@ class ProdutoController extends Controller
             'inf_nutrientes'    =>json_encode($request->inf_nutrientes),
             'id_users_fk'       =>Auth::id()
         ]);
-         //dd($produto);
         $produtoId = Produto::latest('id_produto')->first();
         CategoriaProduto::create([
             'id_categoria_fk'      =>$request->input('nome_categoria'),
@@ -49,7 +48,7 @@ class ProdutoController extends Controller
     public function buscarProduto(Request $request)
     {
         $buscarProduto= $request->input('nome_produto');
-        $produtos = Produto::where('nome_produto', 'like', '%' .$buscarProduto. '%')->paginate(2);
+        $produtos = Produto::where('nome_produto', 'like', '%' .$buscarProduto. '%')->paginate(5);
         return view('produtos.index', compact('produtos'));
     }
 

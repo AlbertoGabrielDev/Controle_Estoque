@@ -8,6 +8,7 @@ use App\Models\Telefone;
 use Illuminate\Pagination\Paginator;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
+use App\Http\Requests\ValidacaoFornecedor;
 
 class FornecedorController extends Controller
 {
@@ -29,11 +30,8 @@ class FornecedorController extends Controller
         return view('fornecedor.index', compact('fornecedores'));
     }
 
-    public function inserirCadastro(Request $request)
+    public function inserirCadastro(ValidacaoFornecedor $request)
     {
-        $fornecedor = $request->validate([
-            'status' => 'required|boolean',
-        ]);
         $fornecedor = Fornecedor::create([
             'nome_fornecedor'   =>$request->nome_fornecedor,
             'cnpj'              =>$request->cnpj,
@@ -44,8 +42,7 @@ class FornecedorController extends Controller
             'email'             =>$request->email,
             'id_users_fk'       =>Auth::id(),
             'cidade'            =>$request->cidade,
-            'uf'                =>$request->uf,
-            'status'            =>$request->status          
+            'uf'                =>$request->uf
        ]);
        $fornecedorId = Fornecedor::latest('id_fornecedor')->first();
         $telefones = Telefone::create([

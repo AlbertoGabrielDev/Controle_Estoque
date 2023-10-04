@@ -32,7 +32,7 @@ class Fornecedor extends Model
     }
 
     public function estoques(): BelongsToMany{
-        return $this->belongsToMany(Estoque::class, 'fornecedor' ,'id_fornecedor', 'id_fornecedor');
+        return $this->belongsToMany(Estoque::class, 'fornecedor' ,'id_fornecedor');
     }
 
     public function telefones(): HasMany

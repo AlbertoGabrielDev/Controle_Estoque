@@ -1,17 +1,9 @@
 @extends('layouts.principal')
 @section('conteudo')
 
-<div class="container d-flex justify-content-between align-items-center">
-  <div class="mx-auto">
-    <h1 class="card-title">Index Estoque</h1>
-  </div>
-  <div>
-    <a class="btn btn-primary" href="{{route('categoria.inicio')}}">Voltar</a>
-  </div>
-</div>
-<div class="div_criar_produto">
-  <a class="button_criar_produto" href="{{route('estoque.cadastro')}}">Cadastrar Estoque</a>     
-</div>
+  <h1 class="h1 text-center m-5">Index Estoque</h1>
+  <a class="btn btn-primary m-3" href="{{route('categoria.inicio')}}">Voltar</a>
+  <a class="btn btn-primary m-3" href="{{route('estoque.cadastro')}}">Cadastrar Estoque</a>     
 
 <form action="{{ route('estoque.buscar') }}" method="GET">
   <div class="accordion accordion-flush" id="accordionFlushExample">
@@ -23,35 +15,38 @@
       </h2>
       <div id="flush-collapseOne" class="accordion-collapse collapse" aria-labelledby="flush-headingOne" data-bs-parent="#accordionFlushExample">
         <div class="accordion-body">
-            <input type="text" class="w-50" name="nome_produto" placeholder="Nome do Produto">
-            <input type="text" class="w-50" name="lote" placeholder="Lote">
-            <input type="text" class="w-50" name="localizacao" placeholder="Localização">
-            <input type="text" class="w-50" name="preco_custo" placeholder="Preço Custo">
-            <input type="text" class="w-50" name="preco_venda" placeholder="Preço Venda">
-            <input type="text" class="w-50" name="quantidade" placeholder="Quantidade">
-            <input type="date" class="w-50" name="data_chegada" placeholder="Quantidade">
+            <input type="text" class="form-control form-control-lg w-50 m-1" name="nome_produto" placeholder="Nome do Produto">
+            <input type="text" class="form-control form-control-lg w-50 m-1" name="lote" placeholder="Lote">
+            <input type="text" class="form-control form-control-lg w-50 m-1" name="localizacao" placeholder="Localização">
+            <input type="text" class="form-control form-control-lg w-50 m-1" name="preco_custo" placeholder="Preço Custo">
+            <input type="text" class="form-control form-control-lg w-50 m-1" name="preco_venda" placeholder="Preço Venda">
+            <input type="text" class="form-control form-control-lg w-50 m-1" name="quantidade" placeholder="Quantidade">
+            <div class="input-group input-group-lg w-50">
+            <span class="input-group-text" id="inputGroup-sizing-lg">Data Chegada</span>
+            <input type="date" name="data_chegada" class="form-control form-control-lg " aria-label="Sizing example input">
+            </div>
           </div>
           <div class="col-md-4">
-            <select class="form-control form-control-lg w-50" name="nome_fornecedor" >
+            <select class="form-control form-control-lg w-75 m-1" name="nome_fornecedor" >
                 <option value="">Selecione um Fornecedor</option>
                @foreach ($fornecedores as $fornecedor)
                    <option value="{{ $fornecedor->nome_fornecedor }}">{{ $fornecedor->nome_fornecedor}}</option>
                @endforeach
              </select> 
-              <select class="form-control form-control-lg w-50" name="nome_marca" >
+              <select class="form-control form-control-lg w-75 m-1" name="nome_marca" >
                <option value="">Selecione uma Marca</option>
                @foreach ($marcas as $marca)
                    <option value="{{ $marca->nome_marca}}">{{ $marca->nome_marca}}</option>
                @endforeach
              </select>
-             <select class="form-control form-control-lg w-50" name="nome_categoria" >
+             <select class="form-control form-control-lg w-75 m-1" name="nome_categoria" >
                <option value="">Selecione uma Categoria</option>
                @foreach ($categorias as $categoria)
                    <option value="{{ $categoria->nome_categoria}}">{{ $categoria->nome_categoria}}</option>
                @endforeach
              </select>
            </div>
-          <button type="submit">Pesquisar</button>
+          <button class="btn btn-primary m-1" type="submit">Pesquisar</button>
       </div>
     </div>
   </div>
@@ -79,9 +74,12 @@
     <tbody>
       @foreach ($estoques as $estoque)
       <tr>
-          @foreach ($estoque->produtos as $produto)
+      {{-- {{dd($estoque->pivotParent)}}  --}}
+            {{-- @foreach ($estoque->produtos as $produto)
             <td>{{$produto->nome_produto}}</td>
-          @endforeach
+          @endforeach --}}
+         
+          <td>{{$estoque->pivotParent->nome_produto}}</td>
           <td>{{$estoque->preco_custo}}</td>
           <td>{{$estoque->preco_venda}}</td>
           <td class="quantidade" data-quantidade={{$estoque->quantidade}}>{{$estoque->quantidade}}</td>
@@ -93,20 +91,20 @@
           <td>
             <form method="GET" action="{{ route('estoque.quantidade', ['estoqueId' => $estoque->id_estoque, 'operacao' => 'aumentar']) }}">
               @csrf
-              <input type="number" name="quantidadeHistorico">
-              <button type="submit" class="btn btn-success">Aumentar</button>
+              <input type="number" class="form-control form-control-lg m-1" name="quantidadeHistorico">
+              <button type="submit" class="btn btn-success m-1">Aumentar</button>
           </form>
           </td>
           <td>
             <form method="GET" action="{{ route('estoque.quantidade', ['estoqueId' => $estoque->id_estoque, 'operacao' => 'diminuir']) }}">
               @csrf
-              <input type="number" name="quantidadeHistorico">
-              <button type="submit" class="btn btn-success">Diminuir</button>
+              <input type="number" class="form-control form-control-lg m-1" name="quantidadeHistorico">
+              <button type="submit" class="btn btn-success m-1">Diminuir</button>
           </form>
           </td>
-          <td><a href="{{route('estoque.editar', $estoque->id_estoque)}}" class="btn btn-primary">Editar</a></td> 
+          <td><a href="{{route('estoque.editar', $estoque->id_estoque)}}" class="btn btn-primary m-2">Editar</a></td> 
           <td>
-            <button class="btn btn-primary toggle-ativacao @if($estoque->status === 1) btn-danger @elseif($estoque->status === 0) btn-success @else btn-primary @endif" 
+            <button class="btn btn-primary toggle-ativacao m-2 @if($estoque->status === 1) btn-danger @elseif($estoque->status === 0) btn-success @else btn-primary @endif" 
               data-id="{{ $estoque->id_estoque }}">
               {{ $estoque->status ? 'Inativar' : 'Ativar' }}
             </button>
@@ -117,7 +115,7 @@
 </table>
 <nav class="Page navigation example">
   <ul class="pagination">
-    {{ $estoques->links()}}
+    {{ $produtos->links()}}
   </ul>
 </nav>
 @endsection

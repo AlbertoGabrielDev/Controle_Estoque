@@ -28,7 +28,7 @@ class Produto extends Model
     public function search(): BelongsToMany
     {
         $query = $this->belongsToMany(Fornecedor::class, 'estoque', 'id_produto_fk', 'id_fornecedor_fk')
-            ->as('estoques')
+            ->as('estoque')
             ->withPivot([
                 'id_estoque',
                 'quantidade',

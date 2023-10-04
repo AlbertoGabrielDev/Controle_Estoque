@@ -1,14 +1,10 @@
 @extends('layouts.principal')
 
 @section('conteudo')
-<div class="container d-flex justify-content-between align-items-center">
-  <div class="mx-auto">
-    <h1 class="card-title">Editar Fornecedor</h1>
-  </div>
-  <div>
-    <a class="btn btn-primary" href="{{route('categoria.inicio')}}">Voltar</a>
-  </div>
-</div>
+
+  <h1 class="h1 text-center m-5">Editar Fornecedor</h1>
+  <a class="btn btn-primary m-3" href="{{route('categoria.inicio')}}">Voltar</a>
+
 <form action="{{route('fornecedor.salvarEditar', $fornecedores->first()->id_fornecedor)}}" method="POST">
   @csrf
   @foreach ($fornecedores as $fornecedor)
@@ -36,12 +32,6 @@
         <span class="input-group-text" id="inputGroup-sizing-lg">UF</span>
         <input type="text" name="uf" class="form-control" aria-label="Sizing example input" id="uf" value="{{$fornecedor->uf}}">
       </div>
-    {{-- <div class="input-group input-group-lg w-25">
-    <select name="status" id="status" class="form-control">
-        <option value="1">Ativo</option>
-        <option value="0">Inativo</option>
-    </select>
-    </div> --}}
  @endforeach
     @foreach ($telefones as $telefone)
         <div class="input-group input-group-lg w-50">
@@ -64,6 +54,6 @@
         </div>
     @endforeach
 </div> 
-    <button class="" type="submit">Editar</button>
+    <button class="btn btn-primary m-1" type="submit">Editar</button>
 </form>
 @endsection

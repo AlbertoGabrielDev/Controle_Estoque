@@ -1,11 +1,13 @@
 @extends('layouts.principal')
 
 @section('conteudo')
-<div class="usuario">Index Usuario</div> 
+<div class="h1 text-center m-5">Index Usuario</div> 
+<a class="btn btn-primary m-3" href="{{route('categoria.inicio')}}">Voltar</a>
+<a class="btn btn-primary m-3" href="{{route('usuario.cadastro')}}">Cadastrar Usuario</a>  
 
 <form action="{{ route('usuario.buscar') }}" class="d-flex" method="GET">
   <input type="text" name="name" class="form-control w-25" placeholder="Digite o nome do Usuario">
-  <button class="btn btn-outline-success" type="submit">Pesquisar</button>
+  <button class="btn btn-outline-success m-1" type="submit">Pesquisar</button>
 </form>
 
 <table class="table mt-5">

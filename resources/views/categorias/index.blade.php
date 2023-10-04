@@ -1,10 +1,8 @@
 @extends('layouts.principal')
 
 @section('conteudo')
-    <div class="categoria">Index</div> 
-    <div class="div_criar_produto">
-        <a class="button_criar_produto" href="{{route('categoria.cadastro')}}">Cadastrar Categoria</a>     
-    </div>
+    <div class="h1 text-center">Index</div> 
+    <a class="btn btn-primary" href="{{route('categoria.cadastro')}}">Cadastrar Categoria</a>     
 <table class="table mt-5">
     <thead>
         <tr>

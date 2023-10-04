@@ -1,14 +1,9 @@
 @extends('layouts.principal')
 
 @section('conteudo')
-<div class="container d-flex justify-content-between align-items-center">
-  <div class="mx-auto">
-    <h1 class="card-title">Editar Estoque</h1>
-  </div>
-  <div>
-    <a class="btn btn-primary" href="{{route('categoria.inicio')}}">Voltar</a>
-  </div>
-</div>
+
+    <h1 class="h1 text-center m-5">Editar Estoque</h1>
+    <a class="btn btn-primary m-3" href="{{route('categoria.inicio')}}">Voltar</a>
 <form action="{{route('estoque.salvarEditar', $estoques->first()->id_estoque)}}" method="POST">
   @csrf
   @foreach ($estoques as $estoque)
@@ -17,8 +12,8 @@
       <input type="number" name="preco_custo" class="form-control" aria-label="Sizing example input" value="{{$estoque->preco_custo}}">
       <span class="input-group-text" id="inputGroup-sizing-lg">Preço Venda</span>
       <input type="number" name="preco_venda" class="form-control" aria-label="Sizing example input" value="{{$estoque->preco_venda}}">
-      {{-- <span class="input-group-text" id="inputGroup-sizing-lg">Quantidade</span>
-      <input type="number" name="quantidade" class="form-control" aria-label="Sizing example input" value="{{$estoque->quantidade}}"> --}}
+      <span class="input-group-text" id="inputGroup-sizing-lg">Quantidade para aviso</span>
+      <input type="number" class="form-control form-control-lg" required name="quantidade_aviso" value="{{$estoque->quantidade_aviso}}">
     </div>
     <div class="input-group input-group-lg">
       <span class="input-group-text" id="inputGroup-sizing-lg">Data Chegada</span>
@@ -27,11 +22,8 @@
       <input type="text" name="lote" class="form-control" aria-label="Sizing example input" value="{{$estoque->lote}}">
       <span class="input-group-text" id="inputGroup-sizing-lg">Localização</span>
       <input type="text" name="localizacao" class="form-control" aria-label="Sizing example input" value="{{$estoque->localizacao}}">
+      
     </div>
-    <div class="row">
-      <div class="col-md-4">
-        <input type="number" class="form-control form-control-lg w-75" required name="quantidade_aviso" placeholder="Quantidade para aviso" value="{{$estoque->quantidade_aviso}}">
-  </div>
     <div class="input-group input-group-lg">
         <div class="col-md-4">
             <select class="form-control form-control-lg w-75" name="marca">
@@ -57,6 +49,6 @@
     </div>
  @endforeach
 </div> 
-    <button class="" type="submit">Editar</button>
+    <button class="btn btn-primary m-2" type="submit">Editar</button>
 </form>
 @endsection
