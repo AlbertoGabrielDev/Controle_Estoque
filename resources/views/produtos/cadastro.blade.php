@@ -17,7 +17,7 @@
               <input type="text" class="form-control form-control-lg w-75" value="{{old('nome_produto')}}" name="nome_produto" placeholder="Nome do Produto">
             </div>
             <div class="col-md-4">
-              <input type="text" class="form-control form-control-lg w-75" value="{{old('descricao')}}" name="descricao"  placeholder="Descrição do produto">
+              <input type="text" class="form-control form-control-lg w-75" value="{{old('descricao')}}"  name="descricao"  placeholder="Descrição do produto">
             </div>
             <div class="col-md-4">
               <input type="Date" class="form-control form-control-lg w-75" value="{{old('validade')}}" name="validade"  placeholder="Validade do produto">

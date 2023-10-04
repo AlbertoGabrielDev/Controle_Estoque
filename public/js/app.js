@@ -85,21 +85,21 @@ $(document).ready(function ()
     });
     
 //Método para impedir que a requisição seja feita caso o CEP ou CNPJ esteja errado    
-    $("#cadastro-btn").click(function(event){
-        event.preventDefault(); 
-        var cep = $("#cep").val();
-        var cnpj = $("#cnpj").val();
-        if (cep.length !== 8 || isNaN(cep)) {
-            $("#error-message").text("CEP inválido. O CEP deve conter exatamente 8 dígitos.");
-            $("#error-message").show();
-            return;
-        }
-        if (cnpj.length !== 14 || isNaN(cnpj)) {
-            $("#error-message").text("CNPJ inválido. O CNPJ deve conter exatamente 14 dígitos.");
-            $("#error-message").show();
-            return;
-        }
-    });  
+    // $("#cadastro-btn").click(function(event){
+    //     event.preventDefault(); 
+    //     var cep = $("#cep").val();
+    //     var cnpj = $("#cnpj").val();
+    //     if (cep.length !== 8 || isNaN(cep)) {
+    //         $("#error-message").text("CEP inválido. O CEP deve conter exatamente 8 dígitos.");
+    //         $("#error-message").show();
+    //         return;
+    //     }
+    //     if (cnpj.length !== 14 || isNaN(cnpj)) {
+    //         $("#error-message").text("CNPJ inválido. O CNPJ deve conter exatamente 14 dígitos.");
+    //         $("#error-message").show();
+    //         return;
+    //     }
+    // });  
 
     //Método para mostrar as inf. nutrientes em produtos
     $('.btn-show-nutrition').on('click', function () {

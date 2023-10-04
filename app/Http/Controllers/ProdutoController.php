@@ -9,6 +9,7 @@ use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Http\Request;
+use App\Http\Requests\ValidacaoProduto;
 use Illuminate\Support\Facades\Validator;
 
 class ProdutoController extends Controller
@@ -25,18 +26,8 @@ class ProdutoController extends Controller
         return view('produtos.cadastro',compact('categorias'));
     }
 
-    public function inserirCadastro(Request $request)
+    public function inserirCadastro(ValidacaoProduto $request)
     {
-      
-        $rules = $request->validate([
-            'nome_produto' => 'required|unique:produto,nome_produto|max:255',
-        ],
-        [
-            'nome_produto.required' =>'O campo "Nome do produto" é obrigatorio',
-            'nome_produto.unique' => 'O nome do produto já está cadastrado',
-            'nome_produto.max' => 'Máximo de caracteres excedido'
-        ]);
-//tirar validação daqui, e criar um componente excluisivo para eles
         $produto = Produto::create([
             'nome_produto'      =>$request->nome_produto,
             'cod_produto'       =>$request->cod_produto,

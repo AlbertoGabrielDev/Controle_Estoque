@@ -1,0 +1,43 @@
+<?php
+
+namespace App\Http\Requests;
+
+use Illuminate\Foundation\Http\FormRequest;
+
+class ValidacaoProduto extends FormRequest
+{
+    /**
+     * Determine if the user is authorized to make this request.
+     */
+    public function authorize(): bool
+    {
+        return true;
+    }
+
+    /**
+     * Get the validation rules that apply to the request.
+     *
+     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array|string>
+     */
+    public function rules(): array
+    {
+        return [
+            'nome_produto' => 'required|unique:produto,nome_produto|max:255',
+            'descricao'  => 'required|max:255',
+            'validade'  => 'required',
+            'unidade_medida'  => 'required',
+            'cod_produto'  => 'required|unique:produto,cod_produto|max:60',
+            'inf_nutrientes'  => 'required|max:255',
+            'nome_categoria'  => 'required',
+        ];
+    }
+
+    public function messages(): array
+    {
+        return [
+            'nome_produto.required' =>'O campo "Nome do produto" é obrigatorio',
+            'nome_produto.unique' => 'O nome do produto já está cadastrado',
+            'nome_produto.max' => 'Máximo de caracteres excedido'
+        ];
+    }
+}
