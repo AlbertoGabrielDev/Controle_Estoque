@@ -30,7 +30,8 @@ class Estoque extends Model
         'id_marca_fk',
         'localizacao',
         'created_at',
-        'quantidade_aviso'
+        'quantidade_aviso',
+        'id_users_fk'
     ];
 
     public function historicos(): HasMany

@@ -7,7 +7,7 @@ use App\Models\Marca;
 use App\Models\User;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\Auth;
-
+use App\Http\Requests\ValidacaoMarca;
 class MarcaController extends Controller
 {
     public function index()
@@ -34,7 +34,7 @@ class MarcaController extends Controller
         return view('marca.editar',compact('marcas'));
     }
 
-    public function salvarEditar(Request $request, $marcaId){
+    public function salvarEditar(ValidacaoMarca $request, $marcaId){
         $marcas = Marca::where('id_marca' , $marcaId)
         ->update([
            'nome_marca' => $request->nome_marca 
@@ -43,7 +43,7 @@ class MarcaController extends Controller
         return redirect()->route('marca.index')->with('success', 'Editado com sucesso');
     }
 
-    public function inserirMarca(Request $request)
+    public function inserirMarca(ValidacaoMarca $request)
     {
         $marca = Marca::create([
             'nome_marca' => $request->nome_marca,

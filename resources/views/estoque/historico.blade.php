@@ -32,7 +32,7 @@
           <td>{{$historico->quantidade_diminuida}}</td>
           <td>{{$historico->quantidade_historico}}</td>
           <td>{{ \Carbon\Carbon::parse($historico->updated_at)->format('d/m/Y h:i:s A') }}</td> 
-          <td>{{}}</td>
+          <td>{{$historico->estoques->id_users_fk}}</td>
       </tr>
       @endforeach
     </tbody>

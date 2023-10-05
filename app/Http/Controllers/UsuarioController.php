@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Gate;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\Paginator;
 use App\Models\User;
+use App\Http\Requests\ValidacaoUsuario;
 
 class UsuarioController extends Controller
 {
@@ -31,7 +32,7 @@ class UsuarioController extends Controller
         return view('usuario.editar', compact('usuarios'));  
     }
     
-    public function salvarEditar(Request $request, $userId)
+    public function salvarEditar(ValidacaoUsuario $request, $userId)
     {   
         $users = User::where('id',$userId)
         ->update([

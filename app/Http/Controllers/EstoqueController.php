@@ -12,6 +12,8 @@ use Carbon\Carbon;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
+use App\Http\Requests\ValidacaoEstoque;
+use Illuminate\Support\Facades\Auth;
 
 class EstoqueController extends Controller
 {
@@ -20,7 +22,7 @@ class EstoqueController extends Controller
         $fornecedores = Fornecedor::all();
         $marcas = Marca::all();
         $categorias = Categoria::all();
-        $produtos = Produto::paginate(5);
+        $produtos = Produto::paginate(2);
         //$estoques = Estoque::with('produtos')->paginate(5);
         //dd($estoques);
         $estoques = [];
@@ -35,6 +37,7 @@ class EstoqueController extends Controller
 
     public function historico(){ 
         $historicos = Historico::with('estoques')->get();
+        //dd($historicos);
         return view('estoque.historico', compact('historicos'));
     }
 
@@ -50,7 +53,7 @@ class EstoqueController extends Controller
         $fornecedores = Fornecedor::all();
         $marcas = Marca::all();
         $categorias = Categoria::all();
-        $produtos = Produto::paginate(10);
+        $produtos = Produto::paginate(5);
         //$estoques = Estoque::with('produtos')->paginate(2);
         
         // dd($estoques);
@@ -64,7 +67,7 @@ class EstoqueController extends Controller
         return view('estoque.index', compact('estoques', 'produtos','fornecedores','marcas','categorias'));
     }
 
-    public function inserirEstoque(Request $request)
+    public function inserirEstoque(ValidacaoEstoque $request)
     {
         $estoque = Estoque::create([
             'quantidade'        =>$request->quantidade,
@@ -76,7 +79,8 @@ class EstoqueController extends Controller
             'id_produto_fk'     =>$request->input('nome_produto'),
             'id_fornecedor_fk'  =>$request->input('fornecedor'),
             'id_marca_fk'       =>$request->input('marca'),
-            'quantidade_aviso'  =>$request->quantidade_aviso
+            'quantidade_aviso'  =>$request->quantidade_aviso,
+            'id_users_fk'       =>Auth::id()
         ]);
 
         MarcaProduto::create([
@@ -96,7 +100,7 @@ class EstoqueController extends Controller
         return view('estoque.editar', compact('estoques','produtos','fornecedores','marcas'));
     }
 
-    public function salvarEditar(Request $request, $estoqueId)
+    public function salvarEditar(ValidacaoEstoque $request, $estoqueId)
     {
         $estoques = Estoque::where('id_estoque' , $estoqueId)
         ->update([

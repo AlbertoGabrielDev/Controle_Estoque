@@ -10,13 +10,14 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Http\Request;
 use App\Http\Requests\ValidacaoProduto;
+use App\Http\Requests\ValidacaoProdutoEditar;
 use Illuminate\Support\Facades\Validator;
 
 class ProdutoController extends Controller
 {
     public function Index()
     {
-        $produtos = Produto::paginate(3);
+        $produtos = Produto::paginate(2);
         return view('produtos.index',compact('produtos'));
     }
 
@@ -60,7 +61,7 @@ class ProdutoController extends Controller
         return view('produtos.editar',compact('produtos', 'categorias'));    
     }
 
-    public function salvarEditar(Request $request, $produtoId)
+    public function salvarEditar(ValidacaoProdutoEditar $request, $produtoId)
     {   
         $produtos = Produto::where('id_produto',$produtoId)
         ->update([
