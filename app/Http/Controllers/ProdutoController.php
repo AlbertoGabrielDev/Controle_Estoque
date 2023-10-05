@@ -18,11 +18,7 @@ class ProdutoController extends Controller
 {
     public function Index()
     {
-        if (Gate::allows('permissao')) {
-            $produtos = Produto::paginate(2); 
-        } else {
-            $produtos = Produto::where('status', 1)->paginate(2);
-        }
+        $produtos = Gate::allows('permissao') ? Produto::paginate(2) : Produto::where('status', 1)->paginate(2);
         return view('produtos.index', compact('produtos'));
     }
 
@@ -53,8 +49,12 @@ class ProdutoController extends Controller
 
     public function buscarProduto(Request $request)
     {
-        $buscarProduto= $request->input('nome_produto');
-        $produtos = Produto::where('nome_produto', 'like', '%' .$buscarProduto. '%')->paginate(5);
+        if (Gate::allows('permissao')) {
+            $produtos = Produto::where('nome_produto', 'like', '%' .$request->input('nome_produto'). '%')->paginate(5);
+        } else {
+            $produtos = Produto::where('nome_produto', 'like', '%' .$request->input('nome_produto'). '%')->where('status',1)->paginate(5);
+        }
+        
         return view('produtos.index', compact('produtos'));
     }
 

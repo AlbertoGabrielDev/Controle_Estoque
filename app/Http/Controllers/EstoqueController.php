@@ -21,11 +21,11 @@ class EstoqueController extends Controller
 {
     public function index()
     {
+        $fornecedores = Fornecedor::all();
+        $marcas = Marca::all();
+        $categorias = Categoria::all();
+        $produtos = Produto::paginate(4);
         if (Gate::allows('permissao')) {
-            $fornecedores = Fornecedor::all();
-            $marcas = Marca::all();
-            $categorias = Categoria::all();
-            $produtos = Produto::paginate(4);
             $estoques = [];
             foreach ($produtos as $produto) 
             {
@@ -33,11 +33,6 @@ class EstoqueController extends Controller
                 $estoques = array_merge($estoques, $estoquesProduto); 
             }
         } else {
-            //$estoques = Estoque::with('produtos')->paginate(5);
-            $fornecedores = Fornecedor::all();
-            $marcas = Marca::all();
-            $categorias = Categoria::all();
-            $produtos = Produto::paginate(4);
             $estoques = [];
             foreach ($produtos as $produto) 
             {
@@ -71,13 +66,21 @@ class EstoqueController extends Controller
         $fornecedores = Fornecedor::all();
         $marcas = Marca::all();
         $categorias = Categoria::all();
-        $produtos = Produto::paginate(5);
-        //$estoques = Estoque::with('produtos')->paginate(2);
-        $estoques = [];
-        foreach ($produtos as $produto) 
-        {   
-            $estoquesProduto = $produto->search->pluck('estoque')->all();
-            $estoques = array_merge($estoques, $estoquesProduto); 
+        $produtos = Produto::paginate(4);
+        if (Gate::allows('permissao')) {
+            $estoques = [];
+            foreach ($produtos as $produto) 
+            {
+                $estoquesProduto = $produto->fornecedores->pluck('estoque')->all();
+                $estoques = array_merge($estoques, $estoquesProduto); 
+            }
+        } else {
+            $estoques = [];
+            foreach ($produtos as $produto) 
+            {
+                $estoquesProduto = $produto->search->pluck('estoque')->where('status', 1)->all();
+                $estoques = array_merge($estoques, $estoquesProduto); 
+            }
         }
         return view('estoque.index', compact('estoques', 'produtos','fornecedores','marcas','categorias'));
     }

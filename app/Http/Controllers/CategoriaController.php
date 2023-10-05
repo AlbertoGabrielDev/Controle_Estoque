@@ -48,8 +48,12 @@ class CategoriaController extends Controller
 
     public function produto($categoriaId)
     {
+     
         $categoria = Categoria::find($categoriaId)->nome_categoria; 
-        $produtos = Categoria::find($categoriaId)->produtos()->get();
+        $produtos = Gate::allows('permissao') ? Categoria::produtos()->paginate(2) : Categoria::produtos()->where('status', 1)->paginate(2);
+
+        // $categoria = Categoria::find($categoriaId)->nome_categoria; 
+        // $produtos = Categoria::find($categoriaId)->produtos()->get();
         return view('categorias.produto',compact('produtos','categoria'));
     }
 

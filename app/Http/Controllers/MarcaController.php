@@ -13,11 +13,7 @@ class MarcaController extends Controller
 {
     public function index()
     {
-        if (Gate::allows('permissao')) {
-            $marcas = Marca::paginate(2);
-        } else {
-            $marcas = Marca::where('status', 1)->paginate(2);
-        }
+        $marcas = Gate::allows('permissao') ?  $marcas = Marca::paginate(2) : $marcas = Marca::where('status', 1)->paginate(2);
         return view('marca.index', compact('marcas'));
     }
 
@@ -28,8 +24,12 @@ class MarcaController extends Controller
 
     public function buscar(Request $request) 
     {
-        $buscar = $request->input('nome_marca');
-        $marcas = Marca::where('nome_marca', 'like', '%' . $buscar . '%')->paginate(2);
+        if (Gate::allows('permissao')) {
+            $marcas = Marca::where('nome_marca', 'like', '%' . $request->input('nome_marca') . '%')->paginate(2);
+        } else {
+            $marcas = Marca::where('nome_marca', 'like', '%' . $request->input('nome_marca') . '%')->where('status',1)->paginate(2);
+        }
+        
         return view('marca.index', compact('marcas'));
     } 
 
@@ -39,12 +39,12 @@ class MarcaController extends Controller
         return view('marca.editar',compact('marcas'));
     }
 
-    public function salvarEditar(ValidacaoMarca $request, $marcaId){
+    public function salvarEditar(ValidacaoMarca $request, $marcaId)
+    {
         $marcas = Marca::where('id_marca' , $marcaId)
         ->update([
            'nome_marca' => $request->nome_marca 
         ]);
-
         return redirect()->route('marca.index')->with('success', 'Editado com sucesso');
     }
 

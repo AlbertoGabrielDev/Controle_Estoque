@@ -18,7 +18,7 @@
         <th scope="col">Descrição</th>
         <th scope="col">Unidade de Medida</th>
         <th scope="col">Infor. Nutricional</th>
-        <th scope="col">Validade</th>
+        <th data-order="asc" data-col="data_validade">Data de Validade</th>
         <th>Editar</th>
         @can('permissao')
           <th>Inativar</th>
@@ -67,4 +67,18 @@
     {{ $produtos->links()}}
   </ul>
 </nav>
+
+<script>
+ $(document).ready(function() {
+    $('th[data-order]').click(function() {
+        var column = $(this).data('col');
+        var currentOrder = $(this).data('order');
+        var newOrder = currentOrder === 'asc' ? 'desc' : 'asc';
+        $('th[data-order]').removeClass('asc desc');
+        $(this).addClass(newOrder);
+        console.log(column,currentOrder, newOrder);
+        window.location.href = '{{ route("produtos.index") }}?ordenar=' + column + '&direcao=' + newOrder;
+    });
+});
+</script>
 @endsection

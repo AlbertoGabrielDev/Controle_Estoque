@@ -1,7 +1,6 @@
 @extends('layouts.principal')
 
 @section('conteudo')
-  {{-- {{dd($produtos->produtos())}} --}}
       <h1 class="h1 text-center m-5">{{ $categoria }}</h1>
       <a class="btn btn-primary" href="{{route('categoria.inicio')}}">Voltar</a>
 
@@ -27,7 +26,10 @@
           <td>{{$produto->nome_produto}}</td>
           <td>{{$produto->descricao}}</td>
           <td>{{$produto->unidade_medida}}</td>
-          <td>{{$produto->inf_nutrientes}}</td>
+          <td>
+            <button class="btn btn-primary btn-show-nutrition" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasWithBackdrop" aria-controls="offcanvasWithBackdrop" data-produto-id="{{ $produto->id_produto }}">Infor. Nutricionais</button>
+            <span class="nutritional-info" data-produto-id="{{ $produto->id_produto }}" style="display: none;">{{json_decode($produto->inf_nutrientes)}}</span>
+          </td>
           <td class= "expiration-date" id="data">{{($produto->validade) }}</td>
           <td><a href="{{route('produtos.editar', $produto->id_produto)}}" class="btn btn-primary">Editar</a></td>
           <td>
@@ -71,7 +73,6 @@
       }
     });
   });
-    
   });  
   </script>
 @endsection

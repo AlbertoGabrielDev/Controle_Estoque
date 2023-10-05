@@ -15,11 +15,7 @@ class FornecedorController extends Controller
 {
     public function index()
     {
-        if (Gate::allows('permissao')) {
-            $fornecedores = Fornecedor::paginate(2);
-        } else {
-            $fornecedores = Fornecedor::where('status',1)->paginate(2);
-        }
+        $fornecedores = Gate::allows('permissao') ? Fornecedor::paginate(2) : Fornecedor::where('status',1)->paginate(2);
         return view('fornecedor.index', compact('fornecedores'));
     }
 
@@ -29,9 +25,13 @@ class FornecedorController extends Controller
     }
 
     public function buscar(Request $request)
-    {   
-        $buscarFornecedor = $request->input('nome_fornecedor');
-        $fornecedores = Fornecedor::where('nome_fornecedor', 'like' , '%' . $buscarFornecedor. '%')->paginate(2);
+    {    
+        if (Gate::allows('permissao')) {
+            $fornecedores = Fornecedor::where('nome_fornecedor', 'like' , '%' . $request->input('nome_fornecedor'). '%')->paginate(2);
+        } else {
+            $fornecedores = Fornecedor::where('nome_fornecedor', 'like' , '%' . $request->input('nome_fornecedor'). '%')
+            ->where('status',1)->paginate(2);
+        }
         return view('fornecedor.index', compact('fornecedores'));
     }
 
