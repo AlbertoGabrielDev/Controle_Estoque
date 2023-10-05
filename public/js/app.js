@@ -29,18 +29,18 @@ $(document).ready(function ()
     });
 
 //Método para informar se a quantidade de produto de estoque e menor que a que o usuario desejou ser informado
-    $(".quantidade").each(function() {
-        var quantidade = $(this).data('quantidade');
-        console.log(quantidade);
-        var tr = $(this).closest('tr');
-    $("#aviso").each(function() {
-        var aviso = $(this).data('aviso');
-        console.log(aviso);
+$(".quantidade").each(function() {
+    var quantidade = parseInt($(this).data('quantidade'));
+    var tr = $(this).closest('tr');
+    
+    var aviso = parseInt(tr.find('.aviso').data('aviso'));
+    console.log('quantidade', quantidade);
+    console.log('aviso', aviso);
+
     if (quantidade <= aviso) {
         tr.find('td').css("background-color", "red");
     }
-    });
-    });
+});
 
 //Método para informar se o produto já validou ou se está prestes a vencer
         var today = new Date();

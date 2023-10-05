@@ -19,13 +19,16 @@
 
     <div class="row">
         <div class="col-md-4">
-          <input type="date" class="form-control form-control-lg w-75" required name="data_chegada" placeholder="Data Chegada">
-        </div>
-        <div class="col-md-4">
           <input type="text" class="form-control form-control-lg w-75" required name="lote"  placeholder="Lote">
         </div>
         <div class="col-md-4">
           <input type="text" class="form-control form-control-lg w-75" required name="localizacao"  placeholder="Localização">
+        </div>
+        <div class="col-md-3">
+          <div class="d-flex align-items-center">
+            <span>Data Chegada</span>
+          <input type="date" class="form-control form-control-lg w-75" required name="data_chegada" placeholder="Data Chegada">
+          </div>
         </div>
     </div>
     <div class="row">

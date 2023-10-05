@@ -56,7 +56,9 @@
     <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
   </div>
   <div class="offcanvas-body">
-    <p id="nutritional-info">{{ $produto->inf_nutrientes }}</p>
+    @if ($produtos->count() > 0)
+        <p >{{ $produto->inf_nutrientes }}</p>
+    @endif
   </div>
 </div>
 

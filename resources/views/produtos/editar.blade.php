@@ -2,13 +2,12 @@
 
 @section('conteudo')
 
-    <h1 class="h1 text-center m-5">Editar Produtos</h1>
-    <a class="btn btn-primary m-2" href="{{route('categoria.inicio')}}">Voltar</a>
+  <h1 class="h1 text-center m-5">Editar Produtos</h1>
+  <a class="btn btn-primary m-2" href="{{route('categoria.inicio')}}">Voltar</a>
 
 <form action="{{route('produtos.salvarEditar', $produtos->first()->id_produto)}}" method="POST">
   @csrf
   @foreach ($produtos as $produto)
-  {{-- {{dd($produto)}} --}}
     <div class="input-group input-group-lg">
       <span class="input-group-text" id="inputGroup-sizing-lg">Cod. Produto</span>
       <input type="number" name="cod_produto" class="form-control" aria-label="Sizing example input" value="{{$produto->cod_produto}}">

@@ -23,14 +23,12 @@ class EstoqueController extends Controller
         $fornecedores = Fornecedor::all();
         $marcas = Marca::all();
         $categorias = Categoria::all();
-        $produtos = Produto::paginate(2);
+        $produtos = Produto::paginate(4);
         //$estoques = Estoque::with('produtos')->paginate(5);
-        //dd($estoques);
         $estoques = [];
         foreach ($produtos as $produto) 
         {
             $estoquesProduto = $produto->fornecedores->pluck('estoque')->all();
-            // dd($estoquesProduto);
             $estoques = array_merge($estoques, $estoquesProduto); 
         }
         return view('estoque.index',compact('estoques','produtos','fornecedores','marcas','categorias'));

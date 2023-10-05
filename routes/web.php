@@ -45,7 +45,7 @@ Route::middleware([
         Route::post('/editar/{estoqueId}',[EstoqueController::class, 'salvarEditar'])->name('estoque.salvarEditar');
         Route::post('/status/{estoqueId}',[EstoqueController::class, 'status'])->name('estoque.status');
         Route::get('/quantidade/{estoqueId}/{operacao}',[EstoqueController::class, 'quantidade'])->name('estoque.quantidade');
-        Route::get('/historico',[EstoqueController::class, 'historico'])->name('estoque.historico');
+        Route::get('/historico',[EstoqueController::class, 'historico'])->name('estoque.historico')->middleware('can:permissao');
     });
 
     Route::prefix('/fornecedor')->group(function(){
@@ -69,7 +69,7 @@ Route::middleware([
         Route::post('/status/{marcaId}',[MarcaController::class, 'status'])->name('marca.status');
     });
 
-    Route::prefix('/usuario')->group(function(){
+    Route::prefix('/usuario')->middleware('can:permissao')->group(function(){
         Route::get('/index', [UsuarioController::class , 'index'])->name('usuario.index');
         Route::get('/cadastro', [UsuarioController::class , 'cadastro'])->name('usuario.cadastro');
         Route::post('/cadastro',[UsuarioController::class, 'inserirusuario'])->name('usuario.inserirUsuario');

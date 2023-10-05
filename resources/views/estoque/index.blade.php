@@ -64,7 +64,7 @@
         <th scope="col">Data de Cadastro</th>
         <th scope="col">Lote</th>
         <th scope="col">localização</th>
-        <th scope="col">Quantidade para aviso</th>  
+        <th class="aviso" scope="col">Quantidade para aviso</th>  
         <th scope="col">Aumentar</th>
         <th scope="col">Diminuir</th>
         <th>Editar</th>
@@ -83,12 +83,12 @@
           <td>{{$estoque->pivotParent->nome_produto}}</td>
           <td>{{$estoque->preco_custo}}</td>
           <td>{{$estoque->preco_venda}}</td>
-          <td class="quantidade" data-quantidade={{$estoque->quantidade}}>{{$estoque->quantidade}}</td>
+          <td class="quantidade" data-quantidade="{{$estoque->quantidade}}">{{$estoque->quantidade}}</td>
           <td>{{ \Carbon\Carbon::parse($estoque->data_chegada)->format('d/m/Y') }}</td> 
           <td>{{$estoque->created_at}}</td>
           <td>{{$estoque->lote}}</td>
           <td>{{$estoque->localizacao}}</td>
-          <td class="quantidade_aviso" id="aviso" data-aviso={{$estoque->quantidade_aviso}}>{{$estoque->quantidade_aviso}}</td>
+          <td class="aviso" data-aviso="{{$estoque->quantidade_aviso}}">{{$estoque->quantidade_aviso}}</td>
           <td>
             <form method="GET" action="{{ route('estoque.quantidade', ['estoqueId' => $estoque->id_estoque, 'operacao' => 'aumentar']) }}">
               @csrf

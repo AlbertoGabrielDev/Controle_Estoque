@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Produto;
+use Illuminate\Support\Facades\Gate;
 use App\Models\Categoria;
 use App\Models\CategoriaProduto;
 use App\Models\User;
@@ -17,8 +18,12 @@ class ProdutoController extends Controller
 {
     public function Index()
     {
-        $produtos = Produto::paginate(2);
-        return view('produtos.index',compact('produtos'));
+        if (Gate::allows('permissao')) {
+            $produtos = Produto::paginate(2); 
+        } else {
+            $produtos = Produto::where('status', 1)->paginate(2);
+        }
+        return view('produtos.index', compact('produtos'));
     }
 
     public function Cadastro(Request $request) 
