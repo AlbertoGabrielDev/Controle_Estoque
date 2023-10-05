@@ -23,7 +23,9 @@
         <th scope="col">Cidade</th>
         <th scope="col">UF</th>
         <th>Editar</th>
-        <th>Inativar</th>
+          @can('permissao')
+            <th>Inativar</th>
+          @endcan
       </tr>
     </thead>
     <tbody>
@@ -40,9 +42,11 @@
           <td>{{$fornecedor->uf}}</td>
           <td><a href="{{route('fornecedor.editar', $fornecedor->id_fornecedor)}}" class="btn btn-primary">Editar</a></td> 
           <td>
-            <button class="btn btn-primary toggle-ativacao  @if($fornecedor->status === 1) btn-danger @elseif($fornecedor->status === 0) btn-success @else btn-primary @endif"" data-id="{{ $fornecedor->id_fornecedor }}">
-              {{ $fornecedor->status ? 'Inativar' : 'Ativar' }}
-            </button>
+            @can('permissao')
+              <button class="btn btn-primary toggle-ativacao  @if($fornecedor->status === 1) btn-danger @elseif($fornecedor->status === 0) btn-success @else btn-primary @endif"" data-id="{{ $fornecedor->id_fornecedor }}">
+                {{ $fornecedor->status ? 'Inativar' : 'Ativar' }}
+              </button>
+            @endcan
           </td> 
         </tr>
       @endforeach

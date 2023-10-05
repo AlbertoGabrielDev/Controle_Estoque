@@ -7,8 +7,10 @@
     <thead>
         <tr>
             <th scope="col">Categoria</th>
-            <th>X</th>
-            <th>Y</th>
+            <th>Editar</th>
+            @can('permissao')
+                <th>Inativar</th>
+            @endcan
         </tr>
     </thead>
     <tbody>

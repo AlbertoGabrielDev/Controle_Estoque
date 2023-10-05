@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use App\Http\Requests\ValidacaoEstoque;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 
 class EstoqueController extends Controller
 {
@@ -36,8 +37,11 @@ class EstoqueController extends Controller
     }
 
     public function historico(){ 
-        $historicos = Historico::with('estoques')->get();
-        //dd($historicos);
+        
+        $historicos = Cache::remember('historico', now()->addMinutes(10), function () {
+            $historicos = Historico::with('estoques')->get();
+            return $historicos;
+        });
         return view('estoque.historico', compact('historicos'));
     }
 

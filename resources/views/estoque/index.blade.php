@@ -68,7 +68,9 @@
         <th scope="col">Aumentar</th>
         <th scope="col">Diminuir</th>
         <th>Editar</th>
-        <th>Inativar</th>
+        @can('permissao')
+          <th>Inativar</th>
+        @endcan
       </tr>
     </thead>
     <tbody>
@@ -78,7 +80,6 @@
             {{-- @foreach ($estoque->produtos as $produto)
             <td>{{$produto->nome_produto}}</td>
           @endforeach --}}
-         
           <td>{{$estoque->pivotParent->nome_produto}}</td>
           <td>{{$estoque->preco_custo}}</td>
           <td>{{$estoque->preco_venda}}</td>
@@ -104,10 +105,12 @@
           </td>
           <td><a href="{{route('estoque.editar', $estoque->id_estoque)}}" class="btn btn-primary m-2">Editar</a></td> 
           <td>
-            <button class="btn btn-primary toggle-ativacao m-2 @if($estoque->status === 1) btn-danger @elseif($estoque->status === 0) btn-success @else btn-primary @endif" 
-              data-id="{{ $estoque->id_estoque }}">
-              {{ $estoque->status ? 'Inativar' : 'Ativar' }}
-            </button>
+            @can('permissao')
+              <button class="btn btn-primary toggle-ativacao m-2 @if($estoque->status === 1) btn-danger @elseif($estoque->status === 0) btn-success @else btn-primary @endif" 
+                data-id="{{ $estoque->id_estoque }}">
+                {{ $estoque->status ? 'Inativar' : 'Ativar' }}
+              </button>
+            @endcan
           </td>
       </tr>
       @endforeach

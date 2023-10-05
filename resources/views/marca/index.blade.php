@@ -15,7 +15,9 @@
       <tr>
         <th scope="col">Marca</th>
         <th>Editar</th>
-        <th>Inativar</th>
+        @can('permissao')
+          <th>Inativar</th> 
+        @endcan
       </tr>
     </thead>
     <tbody>
@@ -24,9 +26,11 @@
         <td>{{$marca->nome_marca}}</td>
         <td><a href="{{route('marca.editar', $marca->id_marca)}}" class="btn btn-primary">Editar</a></td> 
         <td>
-          <button class="btn btn-primary toggle-ativacao  @if($marca->status === 1) btn-danger @elseif($marca->status === 0) btn-success @else btn-primary @endif"" data-id="{{ $marca->id_marca }}" >
-            {{ $marca->status ? 'Inativar' : 'Ativar' }}
-          </button>
+          @can('permissao')
+            <button class="btn btn-primary toggle-ativacao  @if($marca->status === 1) btn-danger @elseif($marca->status === 0) btn-success @else btn-primary @endif"" data-id="{{ $marca->id_marca }}" >
+              {{ $marca->status ? 'Inativar' : 'Ativar' }}
+            </button>
+          @endcan
         </td>
       </tr>
       @endforeach
