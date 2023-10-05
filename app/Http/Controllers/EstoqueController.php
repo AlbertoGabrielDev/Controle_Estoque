@@ -9,6 +9,7 @@ use App\Models\MarcaProduto;
 use App\Models\Historico;
 use App\Models\CategoriaProduto;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
@@ -20,21 +21,35 @@ class EstoqueController extends Controller
 {
     public function index()
     {
-        $fornecedores = Fornecedor::all();
-        $marcas = Marca::all();
-        $categorias = Categoria::all();
-        $produtos = Produto::paginate(4);
-        //$estoques = Estoque::with('produtos')->paginate(5);
-        $estoques = [];
-        foreach ($produtos as $produto) 
-        {
-            $estoquesProduto = $produto->fornecedores->pluck('estoque')->all();
-            $estoques = array_merge($estoques, $estoquesProduto); 
+        if (Gate::allows('permissao')) {
+            $fornecedores = Fornecedor::all();
+            $marcas = Marca::all();
+            $categorias = Categoria::all();
+            $produtos = Produto::paginate(4);
+            $estoques = [];
+            foreach ($produtos as $produto) 
+            {
+                $estoquesProduto = $produto->fornecedores->pluck('estoque')->all();
+                $estoques = array_merge($estoques, $estoquesProduto); 
+            }
+        } else {
+            //$estoques = Estoque::with('produtos')->paginate(5);
+            $fornecedores = Fornecedor::all();
+            $marcas = Marca::all();
+            $categorias = Categoria::all();
+            $produtos = Produto::paginate(4);
+            $estoques = [];
+            foreach ($produtos as $produto) 
+            {
+                $estoquesProduto = $produto->fornecedores->pluck('estoque')->where('status', 1)->all();
+                $estoques = array_merge($estoques, $estoquesProduto); 
+            }
         }
         return view('estoque.index',compact('estoques','produtos','fornecedores','marcas','categorias'));
     }
 
-    public function historico(){ 
+    public function historico()
+    { 
         
         $historicos = Cache::remember('historico', now()->addMinutes(10), function () {
             $historicos = Historico::with('estoques')->get();
@@ -51,21 +66,19 @@ class EstoqueController extends Controller
         return view('estoque.cadastro',compact('fornecedores','marca','produto'));
     }
 
-    public function buscar(Request $request){
+    public function buscar(Request $request)
+    {
         $fornecedores = Fornecedor::all();
         $marcas = Marca::all();
         $categorias = Categoria::all();
         $produtos = Produto::paginate(5);
         //$estoques = Estoque::with('produtos')->paginate(2);
-        
-        // dd($estoques);
         $estoques = [];
         foreach ($produtos as $produto) 
         {   
             $estoquesProduto = $produto->search->pluck('estoque')->all();
             $estoques = array_merge($estoques, $estoquesProduto); 
         }
-      
         return view('estoque.index', compact('estoques', 'produtos','fornecedores','marcas','categorias'));
     }
 
@@ -89,7 +102,6 @@ class EstoqueController extends Controller
             'id_produto_fk'     =>$request->input('nome_produto'),
             'id_marca_fk'       =>$request->input('marca')
         ]);
-
         return redirect()->route('estoque.index')->with('success', 'Inserido com sucesso');
     }
 
@@ -133,7 +145,8 @@ class EstoqueController extends Controller
         return response()->json(['status' => $status->status]);
     }
 
-    public function quantidade(Request $request,$estoqueId, $operacao){
+    public function quantidade(Request $request,$estoqueId, $operacao)
+    {
         $produto = Estoque::find($estoqueId);
         if ($operacao === 'aumentar') {
             $produto->quantidade += $request->input('quantidadeHistorico');

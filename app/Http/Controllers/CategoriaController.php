@@ -7,12 +7,16 @@ use App\Models\CategoriaProduto;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Http\Request;
-
+use Illuminate\Support\Facades\Gate;
 class CategoriaController extends Controller
 {
     public function inicio()
     {
-        $categorias = Categoria::where('status', 1)->get();
+        if (Gate::allows('permissao')) {
+            $categorias = Categoria::all();
+        } else {
+            $categorias = Categoria::where('status', 1)->get();
+        }
         return view('categorias.categoria',compact('categorias'));
     }
     public function index()

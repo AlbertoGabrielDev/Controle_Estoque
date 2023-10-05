@@ -34,7 +34,7 @@
             <td>{{$produto->unidade_medida}}</td>
             <td>
               <button class="btn btn-primary btn-show-nutrition" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasWithBackdrop" aria-controls="offcanvasWithBackdrop" data-produto-id="{{ $produto->id_produto }}">Infor. Nutricionais</button>
-              <span class="nutritional-info" data-produto-id="{{ $produto->id_produto }}" style="display: none;">{{ $produto->inf_nutrientes }}</span>
+              <span class="nutritional-info" data-produto-id="{{ $produto->id_produto }}" style="display: none;">{{json_decode($produto->inf_nutrientes)}}</span>
             </td>
             <td class= "expiration-date" id="data">{{($produto->validade)}}</td>
             <td><a href="{{route('produtos.editar', $produto->id_produto)}}" class="btn btn-primary">Editar</a></td>

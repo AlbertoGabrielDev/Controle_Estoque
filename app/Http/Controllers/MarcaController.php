@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Marca;
 use App\Models\User;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Requests\ValidacaoMarca;
@@ -12,7 +13,11 @@ class MarcaController extends Controller
 {
     public function index()
     {
-        $marcas = Marca::paginate(2);
+        if (Gate::allows('permissao')) {
+            $marcas = Marca::paginate(2);
+        } else {
+            $marcas = Marca::where('status', 1)->paginate(2);
+        }
         return view('marca.index', compact('marcas'));
     }
 

@@ -20,7 +20,7 @@
       <span class="input-group-text" id="inputGroup-sizing-lg">Uni. Medida</span>
       <input type="text" name="unidade_medida" class="form-control" aria-label="Sizing example input" value="{{$produto->unidade_medida}}">
       <span class="input-group-text" id="inputGroup-sizing-lg">Inf. Nutricionais</span>
-      <input type="text" name="inf_nutrientes" class="form-control" aria-label="Sizing example input" value="{{$produto->inf_nutrientes}}">
+      <input type="text" name="inf_nutrientes" class="form-control" aria-label="Sizing example input" value="{{json_decode($produto->inf_nutrientes)}}">
       <span class="input-group-text" id="inputGroup-sizing-lg">Validade</span>
       <input type="date" name="validade" class="form-control" aria-label="Sizing example input" value="{{$produto->validade}}">
     </div>

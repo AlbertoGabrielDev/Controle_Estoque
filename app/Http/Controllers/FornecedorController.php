@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Http\Request;
 use App\Models\Fornecedor;
 use App\Models\Telefone;
@@ -14,7 +15,11 @@ class FornecedorController extends Controller
 {
     public function index()
     {
-        $fornecedores = Fornecedor::paginate(2);
+        if (Gate::allows('permissao')) {
+            $fornecedores = Fornecedor::paginate(2);
+        } else {
+            $fornecedores = Fornecedor::where('status',1)->paginate(2);
+        }
         return view('fornecedor.index', compact('fornecedores'));
     }
 

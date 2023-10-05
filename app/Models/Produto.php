@@ -39,7 +39,8 @@ class Produto extends Model
                 'data_chegada',
                 'localizacao',
                 'quantidade_aviso',
-                'created_at'
+                'created_at',
+                'status'
             ])
             ->join('produto as p', 'estoque.id_produto_fk', '=', 'p.id_produto')
             ->join('marca as m', 'estoque.id_marca_fk', '=', 'm.id_marca')
@@ -107,7 +108,8 @@ class Produto extends Model
             'data_chegada',
             'localizacao',
             'quantidade_aviso',
-            'created_at'
+            'created_at',
+            'status'
         ]);
     }
 

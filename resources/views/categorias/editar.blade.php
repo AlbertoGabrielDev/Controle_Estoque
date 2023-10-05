@@ -13,9 +13,7 @@
             <input type="text" required class="form-control form-control-lg w-75" name="nome_categoria" value="{{$categoria->nome_categoria}}" placeholder="Nome da Marca">
         </div>
         @endforeach
-        <div class="div_criar_marca">
-            <button class="button_criar_marca" type="submit">Editar Marca</button>     
-        </div>
     </div>   
+    <button class="btn btn-primary m-1" type="submit">Editar Marca</button>     
 </form>    
 @endsection
