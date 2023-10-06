@@ -24,7 +24,7 @@ class EstoqueController extends Controller
         $fornecedores = Fornecedor::all();
         $marcas = Marca::all();
         $categorias = Categoria::all();
-        $produtos = Produto::paginate(4);
+        $produtos = Produto::all();
         if (Gate::allows('permissao')) {
             $estoques = [];
             foreach ($produtos as $produto) 
@@ -45,8 +45,7 @@ class EstoqueController extends Controller
 
     public function historico()
     { 
-        
-        $historicos = Cache::remember('historico', now()->addMinutes(10), function () {
+        $historicos = Cache::remember('historico', now()->addMinutes(1), function () {
             $historicos = Historico::with('estoques')->get();
             return $historicos;
         });
@@ -66,13 +65,13 @@ class EstoqueController extends Controller
         $fornecedores = Fornecedor::all();
         $marcas = Marca::all();
         $categorias = Categoria::all();
-        $produtos = Produto::paginate(4);
+        $produtos = Produto::all();
         if (Gate::allows('permissao')) {
             $estoques = [];
             foreach ($produtos as $produto) 
             {
-                $estoquesProduto = $produto->fornecedores->pluck('estoque')->all();
-                $estoques = array_merge($estoques, $estoquesProduto); 
+                $estoquesProduto = $produto->search->pluck('estoque')->all();
+                $estoques = array_merge($estoques, $estoquesProduto);
             }
         } else {
             $estoques = [];
@@ -82,6 +81,7 @@ class EstoqueController extends Controller
                 $estoques = array_merge($estoques, $estoquesProduto); 
             }
         }
+        
         return view('estoque.index', compact('estoques', 'produtos','fornecedores','marcas','categorias'));
     }
 

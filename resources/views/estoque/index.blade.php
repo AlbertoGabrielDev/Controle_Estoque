@@ -76,10 +76,6 @@
     <tbody>
       @foreach ($estoques as $estoque)
       <tr>
-      {{-- {{dd($estoque->pivotParent)}}  --}}
-            {{-- @foreach ($estoque->produtos as $produto)
-            <td>{{$produto->nome_produto}}</td>
-          @endforeach --}}
           <td>{{$estoque->pivotParent->nome_produto}}</td>
           <td>{{$estoque->preco_custo}}</td>
           <td>{{$estoque->preco_venda}}</td>
@@ -116,9 +112,4 @@
       @endforeach
     </tbody>
 </table>
-<nav class="Page navigation example">
-  <ul class="pagination">
-    {{ $produtos->links()}}
-  </ul>
-</nav>
 @endsection

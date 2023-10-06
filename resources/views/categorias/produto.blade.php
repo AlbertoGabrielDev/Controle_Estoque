@@ -43,6 +43,17 @@
       @endforeach
   </tbody>
 </table>
+<div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasWithBackdrop" aria-labelledby="offcanvasWithBackdropLabel">
+  <div class="offcanvas-header">
+    <h5 class="offcanvas-title" id="offcanvasWithBackdropLabel">Informações Nútricionais</h5>
+    <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+  </div>
+  <div class="offcanvas-body">
+    @if ($produtos->count() > 0)
+        <p >{{ $produto->inf_nutrientes }}</p>
+    @endif
+  </div>
+</div>
 <script>
   $(document).ready(function () {
     var grupo = window.location.pathname.split('/')[4];

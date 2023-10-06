@@ -9,9 +9,9 @@
   @foreach ($estoques as $estoque)
     <div class="input-group input-group-lg">
       <span class="input-group-text" id="inputGroup-sizing-lg">Preço Custo</span>
-      <input type="number" name="preco_custo" class="form-control" aria-label="Sizing example input" value="{{$estoque->preco_custo}}">
+      <input type="text" name="preco_custo" class="form-control" aria-label="Sizing example input" value="{{$estoque->preco_custo}}">
       <span class="input-group-text" id="inputGroup-sizing-lg">Preço Venda</span>
-      <input type="number" name="preco_venda" class="form-control" aria-label="Sizing example input" value="{{$estoque->preco_venda}}">
+      <input type="text" name="preco_venda" class="form-control" aria-label="Sizing example input" value="{{$estoque->preco_venda}}">
       <span class="input-group-text" id="inputGroup-sizing-lg">Quantidade para aviso</span>
       <input type="number" class="form-control form-control-lg" required name="quantidade_aviso" value="{{$estoque->quantidade_aviso}}">
     </div>

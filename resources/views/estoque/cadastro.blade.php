@@ -10,10 +10,10 @@
           <input type="text" class="form-control form-control-lg w-75" required name="quantidade" placeholder="Quantidade">
         </div>
         <div class="col-md-4">
-          <input type="number" class="form-control form-control-lg w-75" required name="preco_custo"  placeholder="Preco Custo">
+          <input type="text" class="form-control form-control-lg w-75" required name="preco_custo"  placeholder="Preco Custo">
         </div>
         <div class="col-md-4">
-          <input type="number" class="form-control form-control-lg w-75" required name="preco_venda"  placeholder="Preço Venda">
+          <input type="text" class="form-control form-control-lg w-75" required name="preco_venda"  placeholder="Preço Venda">
         </div>
     </div>
 

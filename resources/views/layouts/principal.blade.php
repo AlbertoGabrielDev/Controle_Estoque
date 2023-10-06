@@ -25,8 +25,8 @@
       <a class="list-group-item fs-5" href="{{route('categoria.inicio')}}">Inicio</a>
       <a class="list-group-item fs-5" href="{{route('produtos.index')}}">Produtos</a>
       <a class="list-group-item fs-5" href="{{route('fornecedor.index')}}">Fornecedores</a>
-      <a class="list-group-item fs-5" href="{{route('estoque.index')}}">Estoque</a>
       <a class="list-group-item fs-5" href="{{route('marca.index')}}">Marca</a>
+      <a class="list-group-item fs-5" href="{{route('estoque.index')}}">Estoque</a>
       @can('permissao')
         <a class="list-group-item fs-5" href="{{route('usuario.index')}}">Usuarios</a>
       @endcan

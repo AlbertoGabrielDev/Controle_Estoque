@@ -29,7 +29,8 @@ class ValidacaoProduto extends FormRequest
         return [
             'nome_produto.required' =>'O campo "Nome do produto" é obrigatorio',
             'nome_produto.unique' => 'O nome do produto já está cadastrado',
-            'nome_produto.max' => 'Máximo de caracteres excedido'
+            'nome_produto.max' => 'Máximo de caracteres excedido',
+            'cod_produto.unique' => 'Código de Produto já cadastrado'
         ];
     }
 }

@@ -52,39 +52,39 @@ class Produto extends Model
                     if (request()->input('lote')) {
                         $subquery->where('estoque.lote', request()->input('lote'));
                     }
-                })->orWhere(function ($subquery) {
+                })->where(function ($subquery) {
                     if (request()->input('quantidade')) {
                         $subquery->where('estoque.quantidade', request()->input('quantidade'));
                     }
-                })->orWhere(function ($subquery) {
+                })->where(function ($subquery) {
                     if (request()->input('preco_custo')){
                         $subquery->where('estoque.preco_custo', request()->input('preco_custo'));
                     }
-                })->orWhere(function ($subquery){
+                })->where(function ($subquery){
                     if (request()->input('localizacao')) {
                         $subquery->where('estoque.localizacao', request()->input('localizacao'));
                     }
-                })->orWhere(function ($subquery){
+                })->where(function ($subquery){
                     if (request()->input('preco_venda')) {
                         $subquery->where('estoque.preco_venda', request()->input('preco_venda'));
                     }
-                })->orWhere(function ($subquery){
+                })->where(function ($subquery){
                     if (request()->input('data_chegada')) {
                         $subquery->where('estoque.data_chegada', request()->input('data_chegada'));
                     }
-                })->orWhere(function ($subquery){
+                })->where(function ($subquery){
                     if (request()->input('nome_produto')) {
                         $subquery->where('p.nome_produto', 'like' ,'%' .request()->input('nome_produto') . '%' );
                     }
-                })->orWhere(function ($subquery){
+                })->where(function ($subquery){
                     if (request()->input('nome_marca')) {
                         $subquery->where('m.nome_marca', request()->input('nome_marca'));
                     }
-                })->orWhere(function ($subquery){
+                })->where(function ($subquery){
                     if (request()->input('nome_fornecedor')) {
                         $subquery->where('fornecedor.nome_fornecedor',  request()->input('nome_fornecedor'));
                     }
-                })->orWhere(function ($subquery){
+                })->where(function ($subquery){
                     if (request()->input('nome_categoria')) {
                         $subquery->where('c.nome_categoria', request()->input('nome_categoria'));
                     }
