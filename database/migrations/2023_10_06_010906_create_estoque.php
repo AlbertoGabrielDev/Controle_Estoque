@@ -1,0 +1,50 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('estoque', function (Blueprint $table) {
+            $table->smallIncrements('id_estoque');
+            $table->double('preco_custo',8,2);
+            $table->double('preco_venda',8,2);
+            $table->integer('quantidade');
+            $table->date('data_chegada');
+            $table->string('lote',20);
+            $table->string('localizacao',10);
+            $table->integer('quantidade_aviso');
+            $table->boolean('status')->default(1);
+            $table->timestamps();
+
+            $table->unsignedSmallInteger('id_users_fk');
+            $table->foreign('id_users_fk')->references('id')->on('users');
+
+            $table->unsignedSmallInteger('id_marca_fk');
+            $table->foreign('id_marca_fk')->references('id_marca')->on('marca');
+
+            
+            $table->unsignedSmallInteger('id_fornecedor_fk');
+            $table->foreign('id_fornecedor_fk')->references('id_fornecedor')->on('fornecedor');
+
+            
+            $table->unsignedSmallInteger('id_produto_fk');
+            $table->foreign('id_produto_fk')->references('id_produto')->on('produto');
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('estoque');
+    }
+};
+

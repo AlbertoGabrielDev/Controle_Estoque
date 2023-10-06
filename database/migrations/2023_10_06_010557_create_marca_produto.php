@@ -11,7 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('marca_produto', function (Blueprint $table) {
+        Schema::create('marca_produto', function (Blueprint $table) {
+            $table->smallIncrements('id_marca_produto');
+            $table->timestamps();
+
             $table->unsignedSmallInteger('id_produto_fk');
             $table->foreign('id_produto_fk')->references('id_produto')->on('produto');
 
@@ -20,17 +23,9 @@ return new class extends Migration
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
+
     public function down(): void
     {
-        Schema::table('marca_produto', function (Blueprint $table) {
-            $table->dropForeign('id_marca_produto_fk');
-            $table->dropColumn('id_marca_produto_fk')->references('id_produto')->on('produto');
-
-            $table->dropForeign('id_marca_fk');
-            $table->dropColumn('id_marca_fk')->references('id_marca')->on('marca');
-        });
+        Schema::dropIfExists('marca_produto');
     }
 };

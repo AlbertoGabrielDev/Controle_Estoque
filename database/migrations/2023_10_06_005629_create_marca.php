@@ -11,8 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('categoria', function (Blueprint $table) {
-            $table->unsignedBigInteger('id_users_fk');
+        Schema::create('marca', function (Blueprint $table) {
+            $table->smallIncrements('id_marca');
+            $table->string('nome_marca',20);
+            $table->boolean('status')->default(1);
+            $table->timestamps();
+
+            $table->unsignedSmallInteger('id_users_fk');
             $table->foreign('id_users_fk')->references('id')->on('users');
         });
     }
@@ -22,9 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('categoria', function (Blueprint $table) {
-            $table->dropForeign('id_users_fk');
-            $table->dropColumn('id_users_fk')->references('id')->on('users');
-        });
+        Schema::dropIfExists('marca');
     }
 };

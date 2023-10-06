@@ -14,16 +14,15 @@ return new class extends Migration
         Schema::create('historico', function (Blueprint $table) {
             $table->smallIncrements('historico_id');
             $table->integer('quantidade_diminuida');
+            $table->integer('quantidade_historico');
+            $table->boolean('status')->default(1);
             $table->timestamps();
+
             $table->unsignedSmallInteger('id_estoque_fk');
             $table->foreign('id_estoque_fk')->references('id_estoque')->on('estoque');
-
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('historico');

@@ -13,9 +13,13 @@ return new class extends Migration
     {
         Schema::create('categoria', function (Blueprint $table) {
             $table->smallIncrements('id_categoria');
-            $table->string('nome_categoria',20)->unique();
+            $table->string('nome_categoria',20);
             $table->string('imagem');
+            $table->boolean('status')->default(1);
             $table->timestamps();
+
+            $table->unsignedSmallInteger('id_users_fk');
+            $table->foreign('id_users_fk')->references('id')->on('users');
         });
     }
 
