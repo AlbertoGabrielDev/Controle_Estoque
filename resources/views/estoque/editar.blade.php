@@ -16,30 +16,12 @@
       <input type="number" class="form-control form-control-lg" required name="quantidade_aviso" value="{{$estoque->quantidade_aviso}}">
     </div>
     <div class="input-group input-group-lg">
-      <span class="input-group-text" id="inputGroup-sizing-lg">Data Chegada</span>
-      <input type="date" name="data_chegada" class="form-control" aria-label="Sizing example input" value="{{$estoque->data_chegada}}">
-      <span class="input-group-text" id="inputGroup-sizing-lg">Lote</span>
-      <input type="text" name="lote" class="form-control" aria-label="Sizing example input" value="{{$estoque->lote}}">
-      <span class="input-group-text" id="inputGroup-sizing-lg">Localização</span>
-      <input type="text" name="localizacao" class="form-control" aria-label="Sizing example input" value="{{$estoque->localizacao}}">
-      
+        <span class="input-group-text" id="inputGroup-sizing-lg">Localização</span>
+        <input type="text" name="localizacao" class="form-control" aria-label="Sizing example input" value="{{$estoque->localizacao}}">
     </div>
     <div class="input-group input-group-lg">
-        <div class="col-md-4">
-            <select class="form-control form-control-lg w-75" name="marca">
-                @foreach ($marcas as $marca)
-                    <option value="{{ $marca->id_marca }}">{{ $marca->nome_marca }}</option>
-                @endforeach
-            </select>
-       </div>
        <div class="col-md-4">
-            <select class="form-control form-control-lg w-75" name="nome_produto">
-                @foreach ($produtos as $produto)
-                    <option value="{{ $produto->id_produto }}">{{ $produto->nome_produto }}</option>
-                @endforeach
-            </select>
-       </div>
-       <div class="col-md-4">
+        <span class="input-group-text w-75" id="inputGroup-sizing-lg">Fornecedor</span>
         <select class="form-control form-control-lg w-75" name="fornecedor">
             @foreach ($fornecedores as $fornecedor)
                 <option value="{{ $fornecedor->id_fornecedor }}">{{ $fornecedor->nome_fornecedor }}</option>

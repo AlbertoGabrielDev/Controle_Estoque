@@ -68,7 +68,7 @@
   </ul>
 </nav>
 
-<script>
+{{-- <script>
  $(document).ready(function() {
     $('th[data-order]').click(function() {
         var column = $(this).data('col');
@@ -76,9 +76,8 @@
         var newOrder = currentOrder === 'asc' ? 'desc' : 'asc';
         $('th[data-order]').removeClass('asc desc');
         $(this).addClass(newOrder);
-        console.log(column,currentOrder, newOrder);
         window.location.href = '{{ route("produtos.index") }}?ordenar=' + column + '&direcao=' + newOrder;
     });
 });
-</script>
+</script> --}}
 @endsection

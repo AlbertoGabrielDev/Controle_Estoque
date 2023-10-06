@@ -124,11 +124,7 @@ class EstoqueController extends Controller
             'localizacao'       =>$request->localizacao,
             'preco_custo'       =>$request->preco_custo,
             'preco_venda'       =>$request->preco_venda,
-            'data_chegada'      =>$request->data_chegada,
-            'lote'              =>$request->lote,
-            'id_produto_fk'     =>$request->input('nome_produto'),
             'id_fornecedor_fk'  =>$request->input('fornecedor'),
-            'id_marca_fk'       =>$request->input('marca'),
             'quantidade_aviso'  =>$request->quantidade_aviso
         ]);
 

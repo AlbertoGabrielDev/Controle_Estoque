@@ -53,11 +53,11 @@ class CategoriaController extends Controller
         return view('categorias.produto',compact('produtos','categoria'));
     }
 
-    // public function editar(Request $request, $categoriaId)
-    // {
-    //     $categorias = Categoria::where('id_categoria', $categoriaId)->get();
-    //     return view('categorias.editar', compact('categorias'));
-    // }
+    public function editar(Request $request, $categoriaId)
+    {
+        $categorias = Categoria::where('id_categoria', $categoriaId)->get();
+        return view('categorias.editar', compact('categorias'));
+    }
 
     public function salvarEditar(Request $request, $categoriaId)
     {

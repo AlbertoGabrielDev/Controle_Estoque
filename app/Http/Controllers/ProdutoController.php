@@ -70,15 +70,10 @@ class ProdutoController extends Controller
     {   
         $produtos = Produto::where('id_produto',$produtoId)
         ->update([
-            'nome_produto'      =>$request->nome_produto,
-            'cod_produto'       =>$request->cod_produto,
             'descricao'         =>$request->descricao,
             'validade'          =>$request->validade,
-            'unidade_medida'    =>$request->unidade_medida,
             'inf_nutrientes'    =>json_encode($request->inf_nutrientes)
         ]);
-        $categoria = CategoriaProduto::where('id_produto_fk' , $produtoId)
-        ->update(['id_categoria_fk' =>$request->input('nome_categoria')]);
         return redirect()->route('produtos.index')->with('success', 'Editado com sucesso');
     }
 
