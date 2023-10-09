@@ -17,17 +17,12 @@ use Laravel\Fortify\Fortify;
 
 class FortifyServiceProvider extends ServiceProvider
 {
-    /**
-     * Register any application services.
-     */
+
     public function register(): void
     {
-        //
+     
     }
 
-    /**
-     * Bootstrap any application services.
-     */
     public function boot(): void
     {
         Fortify::createUsersUsing(CreateNewUser::class);
@@ -55,6 +50,7 @@ class FortifyServiceProvider extends ServiceProvider
             if($user &&
             Hash::check($request->password, $user->password) && $user->status === 0){
                 return session()->flash('error', 'Usuario desativado. Fale com o Administrador');
+                return $user;
             }
             if ($user == "") {
                 return session()->flash('error', 'Email não existe.');

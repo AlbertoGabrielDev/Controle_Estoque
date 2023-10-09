@@ -11,27 +11,7 @@
     <div class="input-group input-group-lg">
       <span class="input-group-text" id="inputGroup-sizing-lg">Nome</span>
       <input type="text" name="nome_fornecedor" class="form-control" aria-label="Sizing example input" value="{{$fornecedor->nome_fornecedor}}">
-      <span class="input-group-text" id="inputGroup-sizing-lg">CNPJ</span>
-      <input type="text" name="cnpj" class="form-control" aria-label="Sizing example input" id="cnpj" value="{{$fornecedor->cnpj}}">
-      <span class="input-group-text" id="inputGroup-sizing-lg">CEP</span>
-      <input type="text" name="cep" class="form-control" aria-label="Sizing example input" id="cep" value="{{$fornecedor->cep}}">
     </div>
-    <div class="input-group input-group-lg">
-      <span class="input-group-text" id="inputGroup-sizing-lg">Logradouro</span>
-      <input type="text" name="logradouro" class="form-control" aria-label="Sizing example input" id="endereco" value="{{$fornecedor->logradouro}}">
-      <span class="input-group-text" id="inputGroup-sizing-lg">Bairro</span>
-      <input type="text" name="bairro" class="form-control" aria-label="Sizing example input" id="bairro" value="{{$fornecedor->bairro}}">
-      <span class="input-group-text" id="inputGroup-sizing-lg">N. Casa</span>
-      <input type="number" name="numero_casa" class="form-control" aria-label="Sizing example input" value="{{$fornecedor->numero_casa}}">
-    </div>
-    <div class="input-group input-group-lg">
-        <span class="input-group-text" id="inputGroup-sizing-lg">Email</span>
-        <input type="email" name="email" class="form-control" aria-label="Sizing example input" value="{{$fornecedor->email}}">
-        <span class="input-group-text" id="inputGroup-sizing-lg">Cidade</span>
-        <input type="text" name="cidade" class="form-control" aria-label="Sizing example input" id="cidade" value="{{$fornecedor->cidade}}">
-        <span class="input-group-text" id="inputGroup-sizing-lg">UF</span>
-        <input type="text" name="uf" class="form-control" aria-label="Sizing example input" id="uf" value="{{$fornecedor->uf}}">
-      </div>
  @endforeach
     @foreach ($telefones as $telefone)
         <div class="input-group input-group-lg w-50">

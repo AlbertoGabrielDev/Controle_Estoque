@@ -15,8 +15,10 @@
         <div class="col-md-4">
           <input type="text" class="form-control form-control-lg w-75" required name="preco_venda"  placeholder="Preço Venda">
         </div>
+        <div class="col-md-4">
+          <input type="number" class="form-control form-control-lg w-75" required name="quantidade_aviso" placeholder="Quantidade para aviso">
+        </div>
     </div>
-
     <div class="row">
         <div class="col-md-4">
           <input type="text" class="form-control form-control-lg w-75" required name="lote"  placeholder="Lote">
@@ -31,12 +33,6 @@
           </div>
         </div>
     </div>
-    <div class="row">
-      <div class="col-md-4">
-        <input type="number" class="form-control form-control-lg w-75" required name="quantidade_aviso" placeholder="Quantidade para aviso">
-      </div>  
-    </div>
-
   <div class="row">
     <div class="col-md-4">
       <select class="form-control form-control-lg w-75" name="marca" required>

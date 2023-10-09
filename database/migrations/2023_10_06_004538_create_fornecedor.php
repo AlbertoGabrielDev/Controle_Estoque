@@ -25,7 +25,7 @@ return new class extends Migration
             $table->boolean('status')->default(1);
             $table->timestamps();
 
-            $table->unsignedSmallInteger('id_users_fk');
+            $table->unsignedBigInteger('id_users_fk');
             $table->foreign('id_users_fk')->references('id')->on('users');
         });
     }
