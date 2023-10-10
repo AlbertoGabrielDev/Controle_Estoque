@@ -34,7 +34,7 @@ class ProdutoController extends Controller
             'nome_produto'      =>$request->nome_produto,
             'cod_produto'       =>$request->cod_produto,
             'descricao'         =>$request->descricao,
-            'validade'          =>$request->validade,
+           
             'unidade_medida'    =>$request->unidade_medida,
             'inf_nutrientes'    =>json_encode($request->inf_nutrientes),
             'id_users_fk'       =>Auth::id()
@@ -71,7 +71,6 @@ class ProdutoController extends Controller
         $produtos = Produto::where('id_produto',$produtoId)
         ->update([
             'descricao'         =>$request->descricao,
-            'validade'          =>$request->validade,
             'inf_nutrientes'    =>json_encode($request->inf_nutrientes)
         ]);
         return redirect()->route('produtos.index')->with('success', 'Editado com sucesso');

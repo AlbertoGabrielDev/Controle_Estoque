@@ -19,7 +19,6 @@ return new class extends Migration
             $table->json('inf_nutrientes');
             $table->string('unidade_medida',2);
             $table->boolean('status')->default(1);
-            $table->date('validade');
             $table->timestamps();
 
             $table->unsignedBigInteger('id_users_fk');

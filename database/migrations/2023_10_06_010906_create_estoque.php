@@ -20,6 +20,7 @@ return new class extends Migration
             $table->string('lote',20);
             $table->string('localizacao',10);
             $table->integer('quantidade_aviso');
+            $table->date('validade');
             $table->boolean('status')->default(1);
             $table->timestamps();
 

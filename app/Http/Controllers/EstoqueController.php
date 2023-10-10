@@ -98,6 +98,7 @@ class EstoqueController extends Controller
             'id_fornecedor_fk'  =>$request->input('fornecedor'),
             'id_marca_fk'       =>$request->input('marca'),
             'quantidade_aviso'  =>$request->quantidade_aviso,
+            'validade'          =>$request->validade,
             'id_users_fk'       =>Auth::id()
         ]);
 

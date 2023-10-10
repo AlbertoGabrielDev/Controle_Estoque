@@ -19,8 +19,6 @@
     <div class="input-group input-group-lg">
       <span class="input-group-text" id="inputGroup-sizing-lg">Inf. Nutricionais</span>
       <input type="text" name="inf_nutrientes" class="form-control" aria-label="Sizing example input" value="{{json_decode($produto->inf_nutrientes)}}">
-      <span class="input-group-text" id="inputGroup-sizing-lg">Validade</span>
-      <input type="date" name="validade" class="form-control" aria-label="Sizing example input" value="{{$produto->validade}}">
     </div>
  @endforeach
     <button class="btn btn-primary m-2" type="submit">Editar</button>

@@ -23,6 +23,7 @@ class Estoque extends Model
         'preco_custo',
         'preco_venda',
         'lote',
+        'validade',
         'data_chegada',
         'id_produto_fk',
         'id_fornecedor_fk',

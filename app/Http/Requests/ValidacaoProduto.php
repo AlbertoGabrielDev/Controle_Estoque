@@ -16,7 +16,6 @@ class ValidacaoProduto extends FormRequest
         return [
             'nome_produto' => 'required|unique:produto,nome_produto|max:60',
             'descricao'  => 'required|max:255',
-            'validade'  => 'required',
             'unidade_medida'  => 'required',
             'cod_produto'  => 'required|unique:produto,cod_produto|max:60',
             'inf_nutrientes'  => 'required|max:255',

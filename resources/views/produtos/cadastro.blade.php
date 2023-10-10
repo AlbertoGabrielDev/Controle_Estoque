@@ -15,11 +15,8 @@
         <div class="col-md-4">
             <input type="text" class="form-control form-control-lg w-75" value="{{old('descricao')}}"  name="descricao"  placeholder="Descrição do produto">
         </div>
-        <div class="col-md-3">
-            <div class="d-flex align-items-center">
-                <span>Validade</span>
-                <input type="Date" class="form-control form-control-lg w-75" value="{{old('validade')}}" name="validade"  placeholder="Validade do produto">
-            </div>
+        <div class="col-md-4">
+            <input type="text" class="form-control form-control-lg w-75" value="{{old('inf_nutrientes')}}" name="inf_nutrientes"  placeholder="Inf. Nutricionais">
         </div>
     </div>
     <div class="row">
@@ -30,16 +27,13 @@
             <input type="number" class="form-control form-control-lg w-75" value="{{old('cod_produto')}}" name="cod_produto"  placeholder="Cod. Produto">
         </div>
         <div class="col-md-4">
-            <input type="text" class="form-control form-control-lg w-75" value="{{old('inf_nutrientes')}}" name="inf_nutrientes"  placeholder="Inf. Nutricionais">
-        </div>
-    </div>
-    <div class="col-md-4">
         <select class="form-control form-control-lg w-75" name="nome_categoria" >
             <option value="{{old('nome_categoria')}}">Selecione uma Categoria</option>
             @foreach ($categorias as $categoria)
                 <option value="{{ $categoria->id_categoria }}">{{ $categoria->nome_categoria}}</option>
             @endforeach
         </select>
+        </div>
     </div>
         <button class="btn btn-primary m-2" type="submit">Criar Produto</button>          
 </form>    

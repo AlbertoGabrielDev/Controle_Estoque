@@ -22,8 +22,8 @@
             <input type="text" class="form-control form-control-lg w-50 m-1" name="preco_venda" placeholder="Preço Venda">
             <input type="text" class="form-control form-control-lg w-50 m-1" name="quantidade" placeholder="Quantidade">
             <div class="input-group input-group-lg w-50">
-            <span class="input-group-text" id="inputGroup-sizing-lg">Data Chegada</span>
-            <input type="date" name="data_chegada" class="form-control form-control-lg " aria-label="Sizing example input">
+            <span class="input-group-text" id="inputGroup-sizing-lg">Data Vencimento</span>
+            <input type="date" name="validade" class="form-control form-control-lg " aria-label="Sizing example input">
             </div>
           </div>
           <div class="col-md-4">
@@ -65,6 +65,7 @@
         <th scope="col">Lote</th>
         <th scope="col">localização</th>
         <th class="aviso" scope="col">Quantidade para aviso</th>  
+        <th data-order="asc" data-col="data_validade">Data de Validade</th>
         <th scope="col">Aumentar</th>
         <th scope="col">Diminuir</th>
         <th>Editar</th>
@@ -85,6 +86,7 @@
           <td>{{$estoque->lote}}</td>
           <td>{{$estoque->localizacao}}</td>
           <td class="aviso" data-aviso="{{$estoque->quantidade_aviso}}">{{$estoque->quantidade_aviso}}</td>
+          <td class= "expiration-date" id="data">{{($estoque->validade)}}</td>
           <td>
             <form method="GET" action="{{ route('estoque.quantidade', ['estoqueId' => $estoque->id_estoque, 'operacao' => 'aumentar']) }}">
               @csrf

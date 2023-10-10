@@ -15,18 +15,27 @@
         <div class="col-md-4">
           <input type="text" class="form-control form-control-lg w-75" required name="preco_venda"  placeholder="Preço Venda">
         </div>
-        <div class="col-md-4">
-          <input type="number" class="form-control form-control-lg w-75" required name="quantidade_aviso" placeholder="Quantidade para aviso">
-        </div>
+        
     </div>
     <div class="row">
-        <div class="col-md-4">
-          <input type="text" class="form-control form-control-lg w-75" required name="lote"  placeholder="Lote">
+      <div class="col-md-4">
+          <input type="number" class="form-control form-control-lg w-75" required name="quantidade_aviso" placeholder="Quantidade para aviso">
+      </div>
+      <div class="col-md-4">
+        <input type="text" class="form-control form-control-lg w-75" required name="lote"  placeholder="Lote">
+      </div>
+      <div class="col-md-4">
+        <input type="text" class="form-control form-control-lg w-75" required name="localizacao"  placeholder="Localização">
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-3">
+        <div class="d-flex align-items-center">
+          <span>Data Vencimento</span>
+          <input type="date" class="form-control form-control-lg w-75" required name="validade">
         </div>
-        <div class="col-md-4">
-          <input type="text" class="form-control form-control-lg w-75" required name="localizacao"  placeholder="Localização">
-        </div>
-        <div class="col-md-3">
+      </div>
+      <div class="col-md-3">
           <div class="d-flex align-items-center">
             <span>Data Chegada</span>
           <input type="date" class="form-control form-control-lg w-75" required name="data_chegada" placeholder="Data Chegada">

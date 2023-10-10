@@ -18,7 +18,6 @@ class Produto extends Model
         'nome_produto',
         'descricao',
         'unidade_medida',
-        'validade',
         'id_categoria_fk',
         'inf_nutrientes',
         'id_users_fk',
@@ -37,6 +36,7 @@ class Produto extends Model
                 'preco_venda',
                 'lote',
                 'data_chegada',
+                'validade',
                 'localizacao',
                 'quantidade_aviso',
                 'created_at',
@@ -69,8 +69,8 @@ class Produto extends Model
                         $subquery->where('estoque.preco_venda', request()->input('preco_venda'));
                     }
                 })->where(function ($subquery){
-                    if (request()->input('data_chegada')) {
-                        $subquery->where('estoque.data_chegada', request()->input('data_chegada'));
+                    if (request()->input('validade')) {
+                        $subquery->where('estoque.validade', request()->input('validade'));
                     }
                 })->where(function ($subquery){
                     if (request()->input('nome_produto')) {
@@ -106,6 +106,7 @@ class Produto extends Model
             'preco_venda',
             'lote',
             'data_chegada',
+            'validade',
             'localizacao',
             'quantidade_aviso',
             'created_at',
