@@ -1,8 +1,8 @@
 @extends('layouts.principal')
 
 @section('conteudo')
-    <h1 class="h1 text-center m-5">Index Produtos</h1>
-    <a class="btn btn-primary m-3" href="{{route('categoria.inicio')}}">Voltar</a>
+    <h1 class="bg-slate-600">Index Produtos</h1>
+    <a class="bg-slate-600"" href="{{route('categoria.inicio')}}">Voltar</a>
     <a class="btn btn-primary m-3" href="{{route('produtos.cadastro')}}">Cadastrar Produto</a>     
 
 <form action="{{ route('produtos.buscar') }}" method="GET" class="d-flex">
@@ -68,7 +68,7 @@
   </ul>
 </nav>
 
-{{-- <script>
+ <!-- <script>
  $(document).ready(function() {
     $('th[data-order]').click(function() {
         var column = $(this).data('col');
@@ -79,5 +79,5 @@
         window.location.href = '{{ route("produtos.index") }}?ordenar=' + column + '&direcao=' + newOrder;
     });
 });
-</script> --}}
+</script>  -->
 @endsection
