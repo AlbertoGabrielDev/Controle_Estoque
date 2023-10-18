@@ -15,7 +15,6 @@
         <div class="col-md-4">
           <input type="text" class="form-control form-control-lg w-75" required name="preco_venda"  placeholder="Preço Venda">
         </div>
-        
     </div>
     <div class="row">
       <div class="col-md-4">

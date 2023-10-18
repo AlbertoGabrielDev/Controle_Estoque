@@ -25,27 +25,27 @@
             <span class="input-group-text" id="inputGroup-sizing-lg">Data Vencimento</span>
             <input type="date" name="validade" class="form-control form-control-lg " aria-label="Sizing example input">
             </div>
-          </div>
+        </div>
           <div class="col-md-4">
-            <select class="form-control form-control-lg w-75 m-1" name="nome_fornecedor" >
+             <select class="form-control form-control-lg w-75 m-1" name="nome_fornecedor" >
                 <option value="">Selecione um Fornecedor</option>
                @foreach ($fornecedores as $fornecedor)
                    <option value="{{ $fornecedor->nome_fornecedor }}">{{ $fornecedor->nome_fornecedor}}</option>
                @endforeach
-             </select> 
+              </select> 
               <select class="form-control form-control-lg w-75 m-1" name="nome_marca" >
                <option value="">Selecione uma Marca</option>
                @foreach ($marcas as $marca)
                    <option value="{{ $marca->nome_marca}}">{{ $marca->nome_marca}}</option>
                @endforeach
-             </select>
-             <select class="form-control form-control-lg w-75 m-1" name="nome_categoria" >
+              </select>
+              <select class="form-control form-control-lg w-75 m-1" name="nome_categoria" >
                <option value="">Selecione uma Categoria</option>
                @foreach ($categorias as $categoria)
-                   <option value="{{ $categoria->nome_categoria}}">{{ $categoria->nome_categoria}}</option>
+                  <option value="{{ $categoria->nome_categoria}}">{{ $categoria->nome_categoria}}</option>
                @endforeach
-             </select>
-           </div>
+              </select>
+          </div>
           <button class="btn btn-primary m-1" type="submit">Pesquisar</button>
       </div>
     </div>
