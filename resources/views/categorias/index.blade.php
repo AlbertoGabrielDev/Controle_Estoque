@@ -1,32 +1,38 @@
 @extends('layouts.principal')
 
 @section('conteudo')
-    <div class="h1 text-center">Index</div> 
-    <a class="btn btn-primary" href="{{route('categoria.cadastro')}}">Cadastrar Categoria</a>     
-<table class="table mt-5">
-    <thead>
-        <tr>
-            <th scope="col">Categoria</th>
-            <th>Editar</th>
-            @can('permissao')
-                <th>Inativar</th>
-            @endcan
-        </tr>
-    </thead>
-    <tbody>
-        @foreach ($categorias as $categoria)
-        <tr>
-            <td>{{$categoria->nome_categoria}}</td>
-            <td><a href="{{route('categorias.editar', $categoria->id_categoria)}}" class="btn btn-primary">Editar</a></td> 
-            <td>
+
+<div class="bg-white p-4 rounded-md w-full">
+<div class="mx-auto m-5 text-4xl font-medium text-slate-700 flex justify-center">Index</div>
+<a class="block text-gray-500 py-2.5 px-4 relative mx-5 my-4 w-48 rounded transition duration-200 hover:bg-gradient-to-r hover:from-cyan-400 hover:to-cyan-300 hover:text-white"href="{{route('categoria.cadastro')}}">
+    <i class="fas fa-home mr-2"></i>Cadastrar
+  </a>
+    <table class="w-full table-auto ">
+        <thead>
+            <tr class="text-sm leading-normal">
+                <th class="py-4 px-6 bg-grey-lightest font-bold uppercase text-sm text-grey-dark border-b border-grey-light">Categoria</th>
+                <!-- <th class="py-4 px-6 bg-grey-lightest font-bold uppercase text-sm text-grey-dark border-b border-grey-light">Editar</th>
                 @can('permissao')
-                    <button class="btn btn-primary toggle-ativacao @if($categoria->status === 1) btn-danger @elseif($categoria->status === 0) btn-success @else btn-primary @endif" data-id="{{ $categoria->id_categoria }}">
-                        {{ $categoria->status ? 'Inativar' : 'Ativar' }}
-                    </button>
+                <th class="py-4 px-6 bg-grey-lightest font-bold uppercase text-sm text-grey-dark border-b border-grey-light text-right">Inativar</th>
+                @endcan -->
+            </tr>
+        </thead>
+        <tbody>
+          @foreach ($categorias as $categoria)
+            <tr class="hover:bg-grey-lighter">
+                <td class="py-4 px-6 border-b border-grey-light">{{$categoria->nome_categoria}}</td>
+                <td class="py-4 px-6 border-b border-grey-light"><a href="{{route('categorias.editar', $categoria->id_categoria)}}" class="btn btn-primary">Editar</a></td>
+                <td class="py-4 px-6 border-b border-grey-light text-right">
+                @can('permissao')
+                  <button class="btn btn-primary toggle-ativacao @if($categoria->status === 1) btn-danger @elseif($categoria->status === 0) btn-success @else btn-primary @endif" data-id="{{ $categoria->id_categoria }}">
+                    {{ $categoria->status ? 'Inativar' : 'Ativar' }}
+                  </button>
                 @endcan
-            </td>
-        </tr>
-        @endforeach
-    </tbody>
-</table>
+                </td>
+            </tr>
+          @endforeach
+        </tbody>
+    </table>
+  </div>    
+
 @endsection

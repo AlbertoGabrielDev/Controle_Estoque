@@ -2,7 +2,10 @@
 
 @section('conteudo')
 <div class="bg-gray-100 font-sans text-2xl">
-  <h2 class="col-span-2 p-4 flex justify-center">Index</h2>
+
+  <a class="block text-gray-500 py-2.5 px-4 relative mx-5 my-4 w-48 rounded transition duration-200 hover:bg-gradient-to-r hover:from-cyan-400 hover:to-cyan-300 hover:text-white"href="{{route('categoria.index')}}">
+    <i class="fas fa-home mr-2"></i>Index
+  </a>
   <div class="grid grid-rows-3 grid-flow-col gap-4">
     @foreach ($categorias as $categoria) 
     <div class="row-span-2 col-span-2 flex w-96 flex-col m-5 rounded-xl bg-white bg-clip-border text-gray-700 shadow-md">
