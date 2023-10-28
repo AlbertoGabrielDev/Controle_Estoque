@@ -7,9 +7,7 @@
 <form action="{{route('categoria.inserirCategoria')}}" method="POST" enctype="multipart/form-data">
   @csrf
   <div class="flex items-center w-full mt-2 p-4">
-    <div class="relative w-full">
       <input type="text" name="categoria" required class="pl-10 pr-4 py-2 rounded-full border border-gray-300 w-2/12 text-sm placeholder-gray-400" placeholder="Categoria" />
-    </div>
   </div>
   <div class="flex items-center w-full mt-2 p-4">
     <div class="relative w-full">
