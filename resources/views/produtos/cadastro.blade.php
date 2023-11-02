@@ -8,35 +8,41 @@
     </a>
     <form action="{{route('produtos.salvarCadastro')}}" method="POST">
         @csrf
-        <div class="estoque_espacamento"></div>
-        <div class="row">
-            <div class="col-md-4">
-                <input type="text" class="form-control form-control-lg w-75" value="{{old('nome_produto')}}" name="nome_produto" placeholder="Nome do Produto">
+        <div class="grid md:grid-cols-2 md:gap-6 py-4">
+            <div class="relative z-0 w-full mb-6 group">
+                <input type="text" class="block py-2.5 px-0 w-full text-sm bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer" value="{{old('nome_produto')}}" name="nome_produto" placeholder=" ">
+                <label for="text" class="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6">Nome Produto</label>
             </div>
-            <div class="col-md-4">
-                <input type="text" class="form-control form-control-lg w-75" value="{{old('descricao')}}" name="descricao"  placeholder="Descrição do produto">
-            </div>
-            <div class="col-md-4">
-                <input type="text" class="form-control form-control-lg w-75" value="{{old('inf_nutrientes')}}" name="inf_nutrientes"  placeholder="Inf. Nutricionais">
+            <div class="relative z-0 w-full mb-6 group"> 
+                <input type="text" class="block py-2.5 px-0 w-full text-sm bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer" value="{{old('descricao')}}" name="descricao"  placeholder=" ">
+                <label for="text" class="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6">Descrição do Produto</label>
             </div>
         </div>
-        <div class="row">
-            <div class="col-md-4">
-                <input type="text" class="form-control form-control-lg w-75" value="{{old('unidade_medida')}}" name="unidade_medida"  placeholder="Unidade de Medida">
+        <div class="grid md:grid-cols-2 md:gap-6 py-4">
+            <div class="relative z-0 w-full mb-6 group"> 
+                <input type="text" class="block py-2.5 px-0 w-full text-sm bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer" value="{{old('inf_nutrientes')}}" name="inf_nutrientes"  placeholder=" ">    
+                <label for="text" class="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6">Inf. Nutricionais</label>
             </div>
-            <div class="col-md-4">
-                <input type="number" class="form-control form-control-lg w-75" value="{{old('cod_produto')}}" name="cod_produto"  placeholder="Cod. Produto">
+            <div class="relative z-0 w-full mb-6 group">
+                <input type="text"  class="block py-2.5 px-0 w-full text-sm bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer" value="{{old('unidade_medida')}}" name="unidade_medida"  placeholder=" ">
+                <label for="text" class="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6">Unidade de Medida</label>
             </div>
-            <div class="col-md-4">
-            <select class="form-control form-control-lg w-75" name="nome_categoria" >
-                <option value="{{old('nome_categoria')}}">Selecione uma Categoria</option>
+        </div>
+        
+        
+            
+            <input type="number" class="w-5/12 h-10 pl-10 text-base placeholder-gray-500 border rounded-full focus:shadow-outline" value="{{old('cod_produto')}}" name="cod_produto"  placeholder="Cod. Produto">
+            <select class="w-7/12 h-10 pl-10 text-base placeholder-gray-500 border rounded-full focus:shadow-outline appearance-none" name="nome_categoria" >
+            <option value="{{old('nome_categoria')}}">Selecione uma Categoria</option>
                 @foreach ($categorias as $categoria)
                     <option value="{{ $categoria->id_categoria }}">{{ $categoria->nome_categoria}}</option>
                 @endforeach
             </select>
-            </div>
-        </div>
-            <button class="btn btn-primary m-2" type="submit">Criar Produto</button>          
+       
+        <button type="submit" class="block text-gray-500 py-2.5 relative my-4 w-48 rounded transition duration-200 hover:bg-gradient-to-r hover:from-cyan-400 hover:to-cyan-300 hover:text-white">
+            <i class="fas fa-plus mr-2"></i> Criar Produto
+        </button>
+        
     </form>    
 </div>
 @endsection

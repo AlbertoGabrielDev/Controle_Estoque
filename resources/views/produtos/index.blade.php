@@ -54,16 +54,12 @@
                   x-cloak x-show="reportsOpen" x-collapse x-collapse.duration.500ms >
                     {{json_decode($produto->inf_nutrientes)}}
                   </div>
-            </td>
-              <!-- <td>
-                <button class="btn btn-primary btn-show-nutrition text-left" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasWithBackdrop" aria-controls="offcanvasWithBackdrop" data-produto-id="{{ $produto->id_produto }}">Infor. Nutricionais</button>
-                <span class="nutritional-info" data-produto-id="{{ $produto->id_produto }}" style="display: none;">{{json_decode($produto->inf_nutrientes)}}</span>
-              </td> -->
+              </td>
               <!-- <td class= "expiration-date" id="data">{{($produto->validade)}}</td> -->
-              <td><a href="{{route('produtos.editar', $produto->id_produto)}}" class="text-left">Editar</a></td>
-              <td>
+              <td class="p-4 border-b border-grey-light text-left"><a href="{{route('produtos.editar', $produto->id_produto)}}">Editar</a></td>
+              <td class="p-4 border-b border-grey-light text-left">
                 @can('permissao')
-                  <button class="text-left toggle-ativacao @if($produto->status === 1) btn-danger @elseif($produto->status === 0) btn-success @else btn-primary @endif"
+                  <button class="toggle-ativacao @if($produto->status === 1) btn-danger @elseif($produto->status === 0) btn-success @else btn-primary @endif"
                     data-id="{{ $produto->id_produto }}">
                       {{ $produto->status ? 'Inativar' : 'Ativar' }}
                   </button>
@@ -73,17 +69,6 @@
           @endforeach
       </tbody>
   </table>
-  <!-- <div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasWithBackdrop" aria-labelledby="offcanvasWithBackdropLabel">
-    <div class="offcanvas-header">
-      <h5 class="offcanvas-title" id="offcanvasWithBackdropLabel">Informações Nútricionais</h5>
-      <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-    </div>
-    <div class="offcanvas-body">
-      @if ($produtos->count() > 0)
-          <p >{{ $produto->inf_nutrientes }}</p>
-      @endif
-    </div>
-  </div> -->
 </div>
 
 <nav class="Page navigation example">

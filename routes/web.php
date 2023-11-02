@@ -12,8 +12,8 @@ Route::middleware([
     'auth:sanctum',
     config('jetstream.auth_session'),
     'verified',
-])->prefix('/verdurao')->group(function(){
-    Route::prefix('/categoria')->group(function(){
+])->prefix('/verdurao')->group(function() {
+    Route::prefix('/categoria')->group(function() {
         Route::get('/',[CategoriaController::class, 'Inicio'])->name('categoria.inicio');
         Route::get('/index',[CategoriaController::class, 'Index'])->name('categoria.index');
         Route::get('/cadastro',[CategoriaController::class, 'cadastro'])->name('categoria.cadastro');
@@ -25,7 +25,7 @@ Route::middleware([
         Route::post('/produto/status/{produtoId}',[ProdutoController::class, 'status'])->name('produtos.status');
     });
 
-    Route::prefix('/produtos')->group(function(){
+    Route::prefix('/produtos')->group(function() {
         Route::get('/',[ProdutoController::class, 'produtos'])->name('produtos.inicio');
         Route::get('/index',[ProdutoController::class, 'Index'])->name('produtos.index');
         Route::get('/cadastro',[ProdutoController::class, 'cadastro'])->name('produtos.cadastro');
@@ -36,7 +36,7 @@ Route::middleware([
         Route::post('/status/{produtoId}',[ProdutoController::class, 'status'])->name('produtos.status');
     });
      
-    Route::prefix('/estoque')->group(function(){
+    Route::prefix('/estoque')->group(function() {
         Route::get('/',[EstoqueController::class, 'Index'])->name('estoque.index');
         Route::get('/cadastro',[EstoqueController::class, 'Cadastro'])->name('estoque.cadastro');
         Route::post('/cadastro',[EstoqueController::class, 'inserirEstoque'])->name('estoque.inserirEstoque');
@@ -48,7 +48,7 @@ Route::middleware([
         Route::get('/historico',[EstoqueController::class, 'historico'])->name('estoque.historico')->middleware('can:permissao');
     });
 
-    Route::prefix('/fornecedor')->group(function(){
+    Route::prefix('/fornecedor')->group(function() {
         Route::get('/',[FornecedorController::class, 'index'])->name('fornecedor.index');
         Route::get('/cadastro',[FornecedorController::class, 'Cadastro'])->name('fornecedor.cadastro');
         Route::post('/cadastro',[FornecedorController::class, 'inserirCadastro'])->name('fornecedor.inserirCadastro');
@@ -59,7 +59,7 @@ Route::middleware([
         Route::post('/status/{fornecedorId}',[FornecedorController::class, 'status'])->name('fornecedor.status');
     });
 
-    Route::prefix('/marca')->group(function(){
+    Route::prefix('/marca')->group(function() {
         Route::get('/index',[MarcaController::class, 'index'])->name('marca.index');
         Route::get('/cadastro',[MarcaController::class, 'cadastro'])->name('marca.cadastro');
         Route::post('/cadastro',[MarcaController::class, 'inserirMarca'])->name('marca.inserirMarca');
@@ -69,7 +69,7 @@ Route::middleware([
         Route::post('/status/{marcaId}',[MarcaController::class, 'status'])->name('marca.status');
     });
 
-    Route::prefix('/usuario')->middleware('can:permissao')->group(function(){
+    Route::prefix('/usuario')->middleware('can:permissao')->group(function() {
         Route::get('/index', [UsuarioController::class , 'index'])->name('usuario.index');
         Route::get('/cadastro', [UsuarioController::class , 'cadastro'])->name('usuario.cadastro');
         Route::post('/cadastro',[UsuarioController::class, 'inserirusuario'])->name('usuario.inserirUsuario');

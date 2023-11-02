@@ -43,12 +43,11 @@ class FortifyServiceProvider extends ServiceProvider
             $user = User::where('email', $request->email)->first();
             if ($user &&
                 Hash::check($request->password, $user->password) && $user->status === 1 ) {
-               return $user;
+                return $user;
             }else{
                 session()->flash('error', 'Senha ou email errado. Confira os dados.');
             }
-            if($user &&
-            Hash::check($request->password, $user->password) && $user->status === 0){
+            if($user->status === 0){
                 return session()->flash('error', 'Usuario desativado. Fale com o Administrador');
                 return $user;
             }
