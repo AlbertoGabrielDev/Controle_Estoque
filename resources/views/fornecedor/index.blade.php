@@ -11,7 +11,7 @@
     </a>
   </div>
   
-<form action="{{ route('fornecedor.buscar') }}" method="GET" class="d-flex">
+<form action="{{ route('fornecedor.buscar') }}" method="GET" class="relative w-6/12">
   <div class="relative w-full">
     <input type="text" name="nome_fornecedor" class="w-5/12 h-10 pl-10 text-base placeholder-gray-500 border rounded-full focus:shadow-outline" placeholder="Digite o nome do Fornecedor">
     <button class="w-2/12 h-10 text-base placeholder-gray-500 border rounded-full focus:shadow-outline" type="submit">Pesquisar</button>

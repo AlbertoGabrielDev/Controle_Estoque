@@ -1,26 +1,38 @@
 @extends('layouts.principal')
 
 @section('conteudo')
-
-  <h1 class="h1 text-center m-5">Editar Produtos</h1>
-  <a class="btn btn-primary m-2" href="{{route('categoria.inicio')}}">Voltar</a>
-
-<form action="{{route('produtos.salvarEditar', $produtos->first()->id_produto)}}" method="POST">
-  @csrf
-  @foreach ($produtos as $produto)
-    <div class="input-group input-group-lg">
-      <span class="input-group-text" id="inputGroup-sizing-lg">Cod. Produto</span>
-      <input type="number" name="cod_produto" class="form-control" disabled aria-label="Sizing example input" value="{{$produto->cod_produto}}">
-      <span class="input-group-text" id="inputGroup-sizing-lg">Produto</span>
-      <input type="text" name="nome_produto" class="form-control" disabled aria-label="Sizing example input" value="{{$produto->nome_produto}}">
-      <span class="input-group-text" id="inputGroup-sizing-lg">Descrição</span>
-      <input type="text" name="descricao" class="form-control" aria-label="Sizing example input" value="{{$produto->descricao}}">
-    </div>
-    <div class="input-group input-group-lg">
-      <span class="input-group-text" id="inputGroup-sizing-lg">Inf. Nutricionais</span>
-      <input type="text" name="inf_nutrientes" class="form-control" aria-label="Sizing example input" value="{{json_decode($produto->inf_nutrientes)}}">
-    </div>
- @endforeach
-    <button class="btn btn-primary m-2" type="submit">Editar</button>
-</form>
+<div class="bg-white p-4 rounded-md w-full">
+  <div class="mx-auto m-5 text-4xl font-medium text-slate-700 flex justify-center ">Editar Produtos</div> 
+    <a class=" text-gray-500 py-2.5 px-4 relative mx-5 my-4 w-1/12 rounded hover:bg-gradient-to-r hover:from-cyan-400 hover:to-cyan-300 hover:text-white" href="{{route('produtos.index')}}">
+      <i class="fa fa-angle-left mr-2"></i>Voltar
+    </a>
+  <form action="{{route('produtos.salvarEditar', $produtos->first()->id_produto)}}" method="POST">
+    @csrf
+    @foreach ($produtos as $produto)
+      <div class="grid md:grid-cols-2 md:gap-6 py-4">
+        <div class="relative z-0 w-full mb-6 group">
+          <input type="number" name="cod_produto" class="block py-2.5 px-0 w-full text-sm bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer" disabled aria-label="Sizing example input" placeholder=" " value="{{$produto->cod_produto}}">
+          <label for="text" class="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6">Cod. Produto</label>
+        </div>  
+        <div class="relative z-0 w-full mb-6 group">
+          <input type="text" name="nome_produto" class="block py-2.5 px-0 w-full text-sm bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer" disabled aria-label="Sizing example input" placeholder=" " value="{{$produto->nome_produto}}">
+          <label for="text" class="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6">Produto</label>
+        </div>
+      </div>
+      <div class="grid md:grid-cols-2 md:gap-6 py-4">
+        <div class="relative z-0 w-full mb-6 group">
+          <input type="text" name="descricao" class="block py-2.5 px-0 w-full text-sm bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer" aria-label="Sizing example input" value="{{$produto->descricao}}">
+          <label for="text" class="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6">Descrição</label>
+        </div>
+        <div class="relative z-0 w-full mb-6 group">       
+          <input type="text" name="inf_nutrientes" class="block py-2.5 px-0 w-full text-sm bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer" aria-label="Sizing example input" value="{{json_decode($produto->inf_nutrientes)}}">
+          <label for="text" class="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6">Inf. Nútricionais</label>
+        </div>
+      </div>
+    @endforeach
+      <button type="submit" class="block text-gray-500 py-2.5 relative my-4 w-48 rounded transition duration-200 hover:bg-gradient-to-r hover:from-cyan-400 hover:to-cyan-300 hover:text-white">
+        <i class="fas fa-plus mr-2"></i> Editar Produtos
+      </button>
+  </form>
+</div>
 @endsection

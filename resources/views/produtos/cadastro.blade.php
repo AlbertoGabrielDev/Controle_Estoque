@@ -24,21 +24,24 @@
                 <label for="text" class="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6">Inf. Nutricionais</label>
             </div>
             <div class="relative z-0 w-full mb-6 group">
-                <input type="text"  class="block py-2.5 px-0 w-full text-sm bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer" value="{{old('unidade_medida')}}" name="unidade_medida"  placeholder=" ">
+                <input type="text" class="block py-2.5 px-0 w-full text-sm bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer" value="{{old('unidade_medida')}}" name="unidade_medida"  placeholder=" ">
                 <label for="text" class="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6">Unidade de Medida</label>
             </div>
         </div>
-        
-        
-            
-            <input type="number" class="w-5/12 h-10 pl-10 text-base placeholder-gray-500 border rounded-full focus:shadow-outline" value="{{old('cod_produto')}}" name="cod_produto"  placeholder="Cod. Produto">
-            <select class="w-7/12 h-10 pl-10 text-base placeholder-gray-500 border rounded-full focus:shadow-outline appearance-none" name="nome_categoria" >
-            <option value="{{old('nome_categoria')}}">Selecione uma Categoria</option>
-                @foreach ($categorias as $categoria)
-                    <option value="{{ $categoria->id_categoria }}">{{ $categoria->nome_categoria}}</option>
-                @endforeach
-            </select>
-       
+        <div class="grid md:grid-cols-2 md:gap-6 py-4">
+            <div class="relative z-0 w-full mb-6 group"> 
+                <input type="number" class="block py-2.5 px-0 w-full text-sm bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer" value="{{old('cod_produto')}}" name="cod_produto"  placeholder=" ">
+                <label for="text" class="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6">Cod. Produto</label>
+            </div>
+            <div class="relative z-0 w-full mb-6 group">
+                <select class="block py-2.5 px-0 w-full text-sm bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer" name="nome_categoria" >
+                <option value="{{old('nome_categoria')}}">Selecione uma Categoria</option>
+                    @foreach ($categorias as $categoria)
+                        <option value="{{ $categoria->id_categoria }}">{{ $categoria->nome_categoria}}</option>
+                    @endforeach
+                </select>
+            </div>
+        </div>   
         <button type="submit" class="block text-gray-500 py-2.5 relative my-4 w-48 rounded transition duration-200 hover:bg-gradient-to-r hover:from-cyan-400 hover:to-cyan-300 hover:text-white">
             <i class="fas fa-plus mr-2"></i> Criar Produto
         </button>

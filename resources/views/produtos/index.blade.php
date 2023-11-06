@@ -1,5 +1,4 @@
 @extends('layouts.principal')
-
 @section('conteudo')
 <div class="bg-white p-4 rounded-md w-full">
   <h5 class="mx-auto m-5 text-4xl font-medium text-slate-700 flex justify-center">Index</h5>
