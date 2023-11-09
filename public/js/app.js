@@ -36,7 +36,7 @@ $(".quantidade").each(function() {
     console.log('quantidade', quantidade);
     console.log('aviso', aviso);
     if (quantidade <= aviso) {
-        tr.find('td').css("background-color", "red");
+        tr.find('td').css("background-color", "bg-red-600");
     }
 });
 
@@ -48,11 +48,11 @@ $(".quantidade").each(function() {
       $(this).text(dataFormatada); 
       var expirationDate = new Date(data);
       var vencimento = Math.floor((expirationDate - today) / (24 * 60 * 60 * 1000));
-      if (vencimento < 0) {
-        $(this).closest('tr').find('td').css("background-color", "red");
-      } else if (vencimento <= 7) {
-        $(this).closest('tr').find('td').css("background-color", "yellow");
-      }
+    //   if (vencimento < 0) {
+    //     $(this).closest('tr').find('td').css("background-color", "red");
+    //   } else if (vencimento <= 7) {
+    //     $(this).closest('tr').find('td').css("background-color", "yellow");
+    //   }
     });
 
 //Método para fornecedor o endereço do fornecedor baseado no CEP    
@@ -81,13 +81,7 @@ $(".quantidade").each(function() {
         }
     });
     });
-    
-//Método para mostrar as inf. nutrientes em produtos
-    $('.btn-show-nutrition').on('click', function () {
-        var produtoId = $(this).data('produto-id');
-        var infNutrientes = $('.nutritional-info[data-produto-id="' + produtoId + '"]').text();
-        $('#offcanvasWithBackdrop .offcanvas-body p').text(infNutrientes);
-      });
+
 
 //Replace para virgula em ponto      
       $('input[name="preco_custo"], input[name="preco_venda"]').on('input', function() {
