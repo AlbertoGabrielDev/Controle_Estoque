@@ -36,7 +36,7 @@ $(".quantidade").each(function() {
     console.log('quantidade', quantidade);
     console.log('aviso', aviso);
     if (quantidade <= aviso) {
-        tr.find('td').css("background-color", "bg-red-600");
+        tr.find('td').css("background-color", "#FF6347");
     }
 });
 
@@ -93,6 +93,8 @@ $(".quantidade").each(function() {
     $('#cnpj').mask('99.999.999/9999-99');
 
 });
+
+
 
 
 

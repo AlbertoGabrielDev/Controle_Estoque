@@ -12,11 +12,7 @@ class CategoriaController extends Controller
 {
     public function inicio()
     {
-        if (Gate::allows('permissao')) {
-            $categorias = Categoria::all();
-        } else {
-            $categorias = Categoria::where('status', 1)->get();
-        }
+        $categorias = Gate::allows('permissao') ? Categoria::paginate(2) : Categoria::where('status', 1)->paginate(2);
         return view('categorias.categoria',compact('categorias'));
     }
     public function index()
