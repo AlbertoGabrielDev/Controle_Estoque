@@ -1,18 +1,20 @@
-# Use the official PHP image with ZTS on Alpine
-FROM php:zts-alpine3.18
+# Utiliza a imagem oficial do PHP com suporte ao FPM (FastCGI Process Manager)
+FROM php:8-fpm
 
-# Install necessary extensions and tools
-RUN docker-php-ext-install pdo pdo_mysql
-RUN apk --update --no-cache add nginx
+# Instala as dependências necessárias
+RUN apt-get update && apt-get install -y \
+    git \
+    zip \
+    unzip \
+    libpng-dev \
+    libjpeg-dev \
+    libfreetype6-dev \
+    libzip-dev \
+    && docker-php-ext-configure gd --with-freetype --with-jpeg \
+    && docker-php-ext-install gd pdo_mysql zip
 
-# Copy Nginx configuration file
-COPY nginx/default.conf /etc/nginx/conf.d/default.conf
+# Instala o Composer (gerenciador de dependências do PHP)
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
-# Set the working directory to /var/www/html
+# Define o diretório de trabalho dentro do contêiner
 WORKDIR /var/www/html
-
-# Expose ports
-EXPOSE 80
-
-# Start Nginx and PHP
-CMD ["sh", "-c", "nginx && php -S 0.0.0.0:80"]
