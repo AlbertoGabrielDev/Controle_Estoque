@@ -5,7 +5,7 @@ services:
       context: .
       dockerfile: Dockerfile
     volumes:
-      - .:/var/www/html
+      - E:\Controle_Estoque:/var/www/html
     ports:
       - "9000:9000"
     networks:
