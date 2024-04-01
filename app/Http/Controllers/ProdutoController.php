@@ -67,7 +67,7 @@ class ProdutoController extends Controller
     }
 
     public function salvarEditar(ValidacaoProdutoEditar $request, $produtoId)
-    {   
+    {  
         $produtos = Produto::where('id_produto',$produtoId)
         ->update([
             'descricao'         =>$request->descricao,

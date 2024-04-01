@@ -70,20 +70,6 @@ class FornecedorController extends Controller
     }
 
     public function salvarEditar(Request $request, $fornecedorId) {
-        $fornecedores = Fornecedor::where('id_fornecedor' , $fornecedorId)
-        ->update([
-            'nome_fornecedor'   =>$request->nome_fornecedor,
-            'cnpj'              =>$request->cnpj,
-            'cep'               =>$request->cep,
-            'logradouro'        =>$request->logradouro,
-            'bairro'            =>$request->bairro,
-            'numero_casa'       =>$request->numero_casa,
-            'email'             =>$request->email,
-            'cidade'            =>$request->cidade,
-            'uf'                =>$request->uf,
-                              
-        ]);
-          
         Telefone::where('id_fornecedor_fk', $fornecedorId)
         ->update([
             'ddd' => $request->ddd,
