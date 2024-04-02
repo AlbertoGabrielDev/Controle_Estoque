@@ -84,8 +84,8 @@
         @foreach ($estoques as $estoque)
         <tr class="hover:bg-grey-lighter">
             <td class="p-4 border-b border-grey-light text-left">{{$estoque->pivotParent->nome_produto}}</td>
-            <td class="p-4 border-b border-grey-light text-left">{{$estoque->preco_custo}}</td>
-            <td class="p-4 border-b border-grey-light text-left">{{$estoque->preco_venda}}</td>
+            <td class="p-4 border-b border-grey-light text-left">R${{$estoque->preco_custo}}</td>
+            <td class="p-4 border-b border-grey-light text-left">R${{$estoque->preco_venda}}</td>
             <td class="p-4 border-b border-grey-light text-left quantidade" data-quantidade="{{$estoque->quantidade}}">{{$estoque->quantidade}}</td>
             <td class="p-4 border-b border-grey-light text-left">{{ \Carbon\Carbon::parse($estoque->data_chegada)->format('d/m/Y') }}</td> 
             <td class="p-4 border-b border-grey-light text-left">{{$estoque->created_at}}</td>
