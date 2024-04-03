@@ -6,9 +6,12 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Prettus\Repository\Contracts\Transformable;
+use Prettus\Repository\Traits\TransformableTrait;
 
-class Produto extends Model
-{
+class Produto extends Model implements Transformable
+{ 
+    use TransformableTrait;
     use HasFactory;
     protected $table= 'produto';
     protected $primaryKey = 'id_produto';

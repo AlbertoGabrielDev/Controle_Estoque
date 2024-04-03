@@ -12,13 +12,19 @@ use Illuminate\Pagination\Paginator;
 use Illuminate\Http\Request;
 use App\Http\Requests\ValidacaoProduto;
 use App\Http\Requests\ValidacaoProdutoEditar;
+use App\Repositories\ProdutoRepository;
 use Illuminate\Support\Facades\Validator;
 
 class ProdutoController extends Controller
 {
+    protected $produtoRepository;
+    public function __construct(ProdutoRepository $produtoRepository)
+    {
+        $this->$produtoRepository = $produtoRepository;
+    }
     public function Index()
     {
-        $produtos = Gate::allows('permissao') ? Produto::paginate(2) : Produto::where('status', 1)->paginate(2);
+        $produtos = Gate::allows('permissao') ? $this->produtoRepository->paginate(2) : $this->produtoRepository->where('status', 1)->paginate(2);
         return view('produtos.index', compact('produtos'));
     }
 
