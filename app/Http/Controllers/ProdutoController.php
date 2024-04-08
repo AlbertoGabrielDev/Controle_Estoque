@@ -12,13 +12,19 @@ use Illuminate\Pagination\Paginator;
 use Illuminate\Http\Request;
 use App\Http\Requests\ValidacaoProduto;
 use App\Http\Requests\ValidacaoProdutoEditar;
+use App\Repositories\ProdutoRepository;
 use Illuminate\Support\Facades\Validator;
 
 class ProdutoController extends Controller
 {
+    protected $produtoRepository;
+    public function __construct(ProdutoRepository $produtoRepository)
+    {
+        $this->produtoRepository = $produtoRepository;
+    }
     public function Index()
     {
-        $produtos = Gate::allows('permissao') ? Produto::paginate(2) : Produto::where('status', 1)->paginate(2);
+        $produtos = $this->produtoRepository->getAll();
         return view('produtos.index', compact('produtos'));
     }
 
@@ -30,57 +36,32 @@ class ProdutoController extends Controller
 
     public function inserirCadastro(ValidacaoProduto $request)
     {
-        $produto = Produto::create([
-            'nome_produto'      =>$request->nome_produto,
-            'cod_produto'       =>$request->cod_produto,
-            'descricao'         =>$request->descricao,
-           
-            'unidade_medida'    =>$request->unidade_medida,
-            'inf_nutrientes'    =>json_encode($request->inf_nutrientes),
-            'id_users_fk'       =>Auth::id()
-        ]);
-        $produtoId = Produto::latest('id_produto')->first();
-        CategoriaProduto::create([
-            'id_categoria_fk'      =>$request->input('nome_categoria'),
-            'id_produto_fk'        =>$produtoId->id_produto        
-        ]);
+        $this->produtoRepository->create($request);
         return redirect()->route('produtos.index')->with('success', 'Inserido com sucesso');
     }
 
     public function buscarProduto(Request $request)
     {
-        if (Gate::allows('permissao')) {
-            $produtos = Produto::where('nome_produto', 'like', '%' .$request->input('nome_produto'). '%')->paginate(5);
-        } else {
-            $produtos = Produto::where('nome_produto', 'like', '%' .$request->input('nome_produto'). '%')->where('status',1)->paginate(5);
-        }
-        
+        $produtos = $this->produtoRepository->buscar($request);
         return view('produtos.index', compact('produtos'));
     }
 
     public function editar($produtoId) 
     {
-        $categoria = Categoria::all();
-        $categorias = Produto::find($produtoId)->categorias->merge($categoria);
-        $produtos = Produto::where('id_produto',$produtoId)->get();
-        return view('produtos.editar',compact('produtos', 'categorias'));    
+        $produtos = $this->produtoRepository->editarView($produtoId);
+      
+        return view('produtos.editar',compact('produtos'));    
     }
 
     public function salvarEditar(ValidacaoProdutoEditar $request, $produtoId)
     {  
-        $produtos = Produto::where('id_produto',$produtoId)
-        ->update([
-            'descricao'         =>$request->descricao,
-            'inf_nutrientes'    =>json_encode($request->inf_nutrientes)
-        ]);
+        $this->produtoRepository->update($request,$produtoId);
         return redirect()->route('produtos.index')->with('success', 'Editado com sucesso');
     }
-
     public function status($statusId)
     {
-        $status = Produto::findOrFail($statusId);
-        $status->status = ($status->status == 1) ? 0 : 1;
-        $status->save();
+       $status = $this->produtoRepository->statusInativar($statusId);
+
         return response()->json(['status' => $status->status]);
     }
 }
