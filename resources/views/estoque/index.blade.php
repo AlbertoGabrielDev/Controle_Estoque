@@ -82,6 +82,7 @@
       </thead>
       <tbody>
         @foreach ($estoques as $estoque)
+      
         <tr class="hover:bg-grey-lighter">
             <td class="p-4 border-b border-grey-light text-left">{{$estoque->pivotParent->nome_produto}}</td>
             <td class="p-4 border-b border-grey-light text-left">{{$estoque->preco_custo}}</td>

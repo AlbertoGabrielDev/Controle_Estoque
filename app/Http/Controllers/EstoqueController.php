@@ -40,6 +40,7 @@ class EstoqueController extends Controller
                 $estoques = array_merge($estoques, $estoquesProduto); 
             }
         }
+       // dd(compact('estoques','produtos','fornecedores','marcas','categorias'));
         return view('estoque.index',compact('estoques','produtos','fornecedores','marcas','categorias'));
     }
 
