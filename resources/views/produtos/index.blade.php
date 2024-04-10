@@ -29,7 +29,7 @@
           <!-- <th data-order="asc" data-col="data_validade">Data de Validade</th> -->
           <th class="p-4 uppercase text-sm text-grey-dark border-b border-grey-light text-left">Editar</th>
           @can('permissao')
-            <th class="p-4 uppercase text-sm text-grey-dark border-b border-grey-light text-left">Inativar</th>
+          <th class="p-4 uppercase text-sm text-grey-dark border-b border-grey-light text-left">Inativar</th>
           @endcan
         </tr>
       </thead>

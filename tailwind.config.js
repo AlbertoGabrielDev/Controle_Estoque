@@ -10,6 +10,7 @@ export default {
         './storage/framework/views/*.php',
         './resources/views/**/*.blade.php',
         './resources/views/layouts/principal.blade.php',
+        "./src/**/*.{html,js}"
     ],
 
     theme: {
