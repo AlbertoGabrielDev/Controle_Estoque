@@ -7,7 +7,7 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Principal</title>
     <!-- <link rel="stylesheet" href="/dist/output.css"> -->
-     <!-- <link rel="stylesheet" href="{{asset('js/app.js')}}">  -->
+     <!-- <link rel="stylesheet" href="{{asset('resources\js\app.js')}}">  -->
      <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -15,6 +15,10 @@
     <script src="{{ asset('js/app.js') }}"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/alpinejs" defer></script>
+    <!-- <script src="{{ mix('js/app.js') }}"></script> -->
+    <!-- <script src="webpack.mix.js" defer></script> -->
+
+    <!-- @vite(['resources/css/app.css', 'resources/js/app.js']) -->
 </head>
 
 <body>
@@ -77,6 +81,7 @@
         </a>
       </form>
     </div>
+
     @yield('conteudo')  
   </div>
 </div>
