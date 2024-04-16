@@ -13,7 +13,10 @@ Route::middleware([
     config('jetstream.auth_session'),
     'verified',
 ])->prefix('/verdurao')->group(function() {
-    Route::get('/grafico',[ProdutoController::class, 'Grafico'])->name('produto.grafico');
+    Route::get('/grafico', function () {
+        return view('charts.vue');
+    })
+    ->name('application');
 
     Route::prefix('/categoria')->group(function() {
         Route::get('/',[CategoriaController::class, 'Inicio'])->name('categoria.inicio');

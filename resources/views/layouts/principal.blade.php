@@ -15,8 +15,8 @@
     <script src="{{ asset('js/app.js') }}"></script>
     <!-- <script src="https://cdn.tailwindcss.com"></script> -->
     <script src="https://unpkg.com/alpinejs" defer></script>
-    <!-- <script src="{{ mix('js/app.js') }}"></script> -->
-    <!-- <script src="webpack.mix.js" defer></script> -->
+    <!-- <script src="{{ mix('js/app.js') }}"></script>
+     <script src="webpack.mix.js" defer></script> -->
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
@@ -81,9 +81,7 @@
         </a>
       </form>
     </div>
-<div id="app">
-  @yield('conteudo')  
-</div>
+
   </div>
 </div>
 @if(session('success'))

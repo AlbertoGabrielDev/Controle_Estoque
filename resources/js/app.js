@@ -1,8 +1,9 @@
+import Grafico from '../views/vuejs/Grafico.vue';
+import { createApp } from 'vue';
 
-window.Vue = require('vue');
+const app = createApp({});
+app.component('Grafico', Grafico);
 
-Vue.component('grafico' , require('./vuejs/Grafico.vue').default);
+app.mount('#app');
 
-const app = new Vue({
-    el: '#app'
-});
+require('./bootstrap');

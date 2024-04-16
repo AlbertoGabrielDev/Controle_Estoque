@@ -1,5 +1,15 @@
 <template>
     <div>
-        nha
+      <h1>Welcome to Laravue Project!</h1>
+      <h2>{{ devName }}</h2>
     </div>
-</template>
+  </template>
+  
+  <script>
+  export default {
+    setup: () => ({
+      devName: "Jorge Luís Gregório",
+    }),
+  };
+  </script>
+  
