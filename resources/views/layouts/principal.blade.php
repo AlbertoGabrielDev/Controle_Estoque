@@ -13,12 +13,12 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
     <script src="{{ asset('js/app.js') }}"></script>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- <script src="https://cdn.tailwindcss.com"></script> -->
     <script src="https://unpkg.com/alpinejs" defer></script>
     <!-- <script src="{{ mix('js/app.js') }}"></script> -->
     <!-- <script src="webpack.mix.js" defer></script> -->
 
-    <!-- @vite(['resources/css/app.css', 'resources/js/app.js']) -->
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 
 <body>
@@ -81,8 +81,9 @@
         </a>
       </form>
     </div>
-
-    @yield('conteudo')  
+<div id="app">
+  @yield('conteudo')  
+</div>
   </div>
 </div>
 @if(session('success'))

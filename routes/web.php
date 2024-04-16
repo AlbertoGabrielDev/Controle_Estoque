@@ -13,9 +13,7 @@ Route::middleware([
     config('jetstream.auth_session'),
     'verified',
 ])->prefix('/verdurao')->group(function() {
-    Route::get('/grafico', function () {
-        return view('vuejs.app');
-    });
+    Route::get('/grafico',[ProdutoController::class, 'Grafico'])->name('produto.grafico');
 
     Route::prefix('/categoria')->group(function() {
         Route::get('/',[CategoriaController::class, 'Inicio'])->name('categoria.inicio');

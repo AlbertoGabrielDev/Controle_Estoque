@@ -1,9 +1,8 @@
-import { createApp } from 'vue';
-import Grafico from '../../src/componets/Grafico.vue';
 
+window.Vue = require('vue');
 
-createApp({
-    components: {
-        Grafico
-    }
-}).mount('#app');
+Vue.component('grafico' , require('./vuejs/Grafico.vue').default);
+
+const app = new Vue({
+    el: '#app'
+});

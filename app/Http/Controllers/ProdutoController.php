@@ -64,4 +64,8 @@ class ProdutoController extends Controller
 
         return response()->json(['status' => $status->status]);
     }
+
+    public function grafico(){
+        return view('charts.vue');
+    }
 }
