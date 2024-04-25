@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\GraficosApiController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\CategoriaController;
 use App\Http\Controllers\ProdutoController;
@@ -14,9 +15,10 @@ Route::middleware([
     'verified',
 ])->prefix('/verdurao')->group(function() {
     
-Route::get('/vue', function (){
-   return view('welcome');
-});
+// Route::get('/vue', function (){
+//    return view('welcome');
+// });
+ Route::get('/months',[GraficosApiController::class, 'months'])->name('months');
 
     Route::prefix('/categoria')->group(function() {
         Route::get('/',[CategoriaController::class, 'Inicio'])->name('categoria.inicio');
