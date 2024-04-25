@@ -4,20 +4,27 @@ namespace App\Http\Controllers;
 use App\Models\Categoria;
 use App\Models\Produto;
 use App\Models\CategoriaProduto;
+use App\Repositories\CategoriaRepository;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 class CategoriaController extends Controller
 {
+
+    protected $categoriaRepository;
+    public function __construct(CategoriaRepository $categoriaRepository)
+    {
+        $this->categoriaRepository = $categoriaRepository;
+    }
     public function inicio()
     {
-        $categorias = Gate::allows('permissao') ? Categoria::get() : Categoria::where('status', 1)->get();
+        $categorias = $this->categoriaRepository->getAll();
         return view('categorias.categoria',compact('categorias'));
     }
     public function index()
     {
-        $categorias = Categoria::all();
+        $categorias =$this->categoriaRepository->index();
         return view('categorias.index',compact('categorias'));
     }
 
@@ -28,17 +35,7 @@ class CategoriaController extends Controller
 
     public function inserirCategoria(Request $request)
     {
-        if ($request->hasFile('imagem') && $request->file('imagem')->isValid()) {
-            $requestImage = $request->imagem;
-            $extension = $requestImage->extension();
-            $imageName = md5($requestImage->getClientOriginalName() . strtotime("now")). "." . $extension;
-            $requestImage->move(public_path('img/categorias'), $imageName);
-            $categoria =  Categoria::create([
-                'nome_categoria' => $request->categoria,
-                'id_users_fk' => Auth::id(),
-                'imagem' => $imageName
-            ]);
-        };
+        $this->categoriaRepository->inserirCategoria($request);
         return redirect()->route('categoria.index')->with('success', 'Inserido com sucesso');
     }
 
@@ -46,29 +43,24 @@ class CategoriaController extends Controller
     {
         $categoria = Categoria::find($categoriaId)->nome_categoria; 
         $produtos = Gate::allows('permissao') ? Categoria::find($categoriaId)->produtos()->paginate(2) : Categoria::find($categoriaId)->produtos()->where('status', 1)->paginate(2);
-        return view('categorias.produto',compact('produtos','categoria'));
+        return view('categorias.produto',compact('categoria','produtos'));
+
     }
 
-    public function editar(Request $request, $categoriaId)
+    public function editar($categoriaId)
     {
-        $categorias = Categoria::where('id_categoria', $categoriaId)->get();
+        $categorias = $this->categoriaRepository->editar($categoriaId);
         return view('categorias.editar', compact('categorias'));
     }
 
-    public function salvarEditar(Request $request, $categoriaId)
+    public function salvarEditar($categoriaId)
     {
-        $categorias = Categoria::where('id_categoria', $categoriaId)
-        ->update([
-            'nome_categoria' => $request->nome_categoria
-        ]);
+        $this->categoriaRepository->editar($categoriaId);
         return redirect()->route('categoria.index')->with('success', 'Editado com sucesso');
     }
 
     public function status($statusId)
     {   
-        $status = Categoria::findOrFail($statusId);
-        $status->status = ($status->status == 1) ? 0 : 1;
-        $status->save();
-        return response()->json(['status' => $status->status]);
+        $this->categoriaRepository->editar($statusId);
     }
 }
