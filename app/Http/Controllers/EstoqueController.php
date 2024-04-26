@@ -14,33 +14,21 @@ use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use App\Http\Requests\ValidacaoEstoque;
+use App\Repositories\EstoqueRepository;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 
 class EstoqueController extends Controller
-{
+{    
+    protected $estoqueRepository;
+    public function __construct(EstoqueRepository $estoqueRepository)
+    {
+        $this->estoqueRepository = $estoqueRepository;
+    }
     public function index()
     {
-        $fornecedores = Fornecedor::all();
-        $marcas = Marca::all();
-        $categorias = Categoria::all();
-        $produtos = Produto::paginate(2);
-        if (Gate::allows('permissao')) {
-            $estoques = [];
-            foreach ($produtos as $produto) 
-            {
-                $estoquesProduto = $produto->fornecedores->pluck('estoque')->all();
-                $estoques = array_merge($estoques, $estoquesProduto); 
-            }
-        } else {
-            $estoques = [];
-            foreach ($produtos as $produto) 
-            {
-                $estoquesProduto = $produto->fornecedores->pluck('estoque')->where('status', 1)->all();
-                $estoques = array_merge($estoques, $estoquesProduto); 
-            }
-        }
-        return view('estoque.index',compact('estoques','produtos','fornecedores','marcas','categorias'));
+        $estoques = $this->estoqueRepository->index();
+        return view('estoque.index', $estoques);
     }
 
     public function historico()
@@ -86,26 +74,8 @@ class EstoqueController extends Controller
     }
 
     public function inserirEstoque(ValidacaoEstoque $request)
-    {
-        $estoque = Estoque::create([
-            'quantidade'        =>$request->quantidade,
-            'localizacao'       =>$request->localizacao,
-            'preco_custo'       =>$request->preco_custo,
-            'preco_venda'       =>$request->preco_venda,
-            'data_chegada'      =>$request->data_chegada,
-            'lote'              =>$request->lote,
-            'id_produto_fk'     =>$request->input('nome_produto'),
-            'id_fornecedor_fk'  =>$request->input('fornecedor'),
-            'id_marca_fk'       =>$request->input('marca'),
-            'quantidade_aviso'  =>$request->quantidade_aviso,
-            'validade'          =>$request->validade,
-            'id_users_fk'       =>Auth::id()
-        ]);
-
-        MarcaProduto::create([
-            'id_produto_fk'     =>$request->input('nome_produto'),
-            'id_marca_fk'       =>$request->input('marca')
-        ]);
+    { 
+         $this->estoqueRepository->inserirEstoque($request);
         return redirect()->route('estoque.index')->with('success', 'Inserido com sucesso');
     }
 
