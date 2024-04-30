@@ -50,16 +50,16 @@
       <div class="col-md-4">
         <select class="block py-2.5 px-0 w-full text-sm bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer" name="marca" required>
           <option value="">Selecione uma Marca</option>
-          @foreach ($marca as $marcas)
-            <option value="{{ $marcas->id_marca }}">{{ $marcas->nome_marca }}</option>
+          @foreach ($marcas as $marca)
+            <option value="{{ $marca->id_marca }}">{{ $marca->nome_marca }}</option>
           @endforeach
         </select>
       </div>
       <div class="col-md-4">
         <select class="block py-2.5 px-0 w-full text-sm bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer" name="nome_produto" required>
           <option>Selecione um Produto</option>
-          @foreach ($produto as $produtos)
-            <option value="{{ $produtos->id_produto }}">{{ $produtos->nome_produto }}</option>
+          @foreach ($produtos as $produto)
+            <option value="{{ $produto->id_produto }}">{{ $produto->nome_produto }}</option>
           @endforeach
         </select>
       </div>
