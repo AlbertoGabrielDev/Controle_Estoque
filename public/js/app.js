@@ -89,8 +89,18 @@ $(".quantidade").each(function() {
       });
 
 //Mascara para cep e cnpj
-    $('#cep').mask('99999-999');
-    $('#cnpj').mask('99.999.999/9999-99');
+   
+    $(document).ready(function() {
+        $('#cnpj_td').text(function(index, text) {
+            return text.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})$/, '$1.$2.$3/$4-$5');
+        });
+    });
+
+    $(document).ready(function() {
+        $('#cep_td').text(function(index, text) {
+            return text.replace(/^(\d{5})(\d{3})$/, '$1-$2');
+        });
+    });
 
 });
 

@@ -13,6 +13,11 @@ Route::middleware([
     config('jetstream.auth_session'),
     'verified',
 ])->prefix('/verdurao')->group(function() {
+    
+Route::get('/vue', function (){
+   return view('welcome');
+});
+
     Route::prefix('/categoria')->group(function() {
         Route::get('/',[CategoriaController::class, 'Inicio'])->name('categoria.inicio');
         Route::get('/index',[CategoriaController::class, 'Index'])->name('categoria.index');

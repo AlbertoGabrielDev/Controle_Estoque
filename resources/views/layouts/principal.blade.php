@@ -15,6 +15,7 @@
     <script src="{{ asset('js/app.js') }}"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/alpinejs" defer></script>
+    <!-- <script src="{{ asset('./resources/js/app.js') }}"></script> -->
 </head>
 
 <body>

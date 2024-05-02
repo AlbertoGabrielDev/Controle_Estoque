@@ -40,8 +40,8 @@
       @foreach ($fornecedores as $fornecedor)
         <tr class="hover:bg-grey-lighter">
           <td class="p-8 border-b border-grey-light text-left">{{$fornecedor->nome_fornecedor}}</td>
-          <td class="p-4 border-b border-grey-light text-left">{{$fornecedor->cnpj}}</td>
-          <td class="p-4 border-b border-grey-light text-left">{{$fornecedor->cep}}</td>
+          <td class="p-4 border-b border-grey-light text-left" id="cnpj_td">{{$fornecedor->cnpj}}</td>
+          <td class="p-4 border-b border-grey-light text-left" id="cep_td">{{$fornecedor->cep}}</td>
           <td class="p-4 border-b border-grey-light text-left">{{$fornecedor->logradouro}}</td>
           <td class="p-4 border-b border-grey-light text-left">{{$fornecedor->bairro}}</td>
           <td class="p-8 border-b border-grey-light text-left">{{$fornecedor->numero_casa}}</td>
