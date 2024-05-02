@@ -3,6 +3,10 @@
 namespace App\Providers;
 
 use App\Models\Produto;
+use App\Repositories\CategoriaRepository;
+use App\Repositories\CategoriaRepositoryEloquent;
+use App\Repositories\EstoqueRepository;
+use App\Repositories\EstoqueRepositoryEloquent;
 use App\Repositories\ProdutoRepository;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Pagination\Paginator;
@@ -16,6 +20,8 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(ProdutoRepository::class , function($app){
             return new ProdutoRepository(new Produto());
         });
+        $this->app->bind(CategoriaRepository::class, CategoriaRepositoryEloquent::class);
+        $this->app->bind(EstoqueRepository::class, EstoqueRepositoryEloquent::class);
     }
 
     /**

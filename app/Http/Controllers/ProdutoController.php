@@ -42,7 +42,7 @@ class ProdutoController extends Controller
 
     public function buscarProduto(Request $request)
     {
-        $produtos = $this->produtoRepository->buscar($request);
+       $produtos = $this->produtoRepository->buscar($request);
         return view('produtos.index', compact('produtos'));
     }
 
