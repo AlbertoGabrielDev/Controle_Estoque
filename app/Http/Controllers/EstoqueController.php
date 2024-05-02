@@ -12,156 +12,79 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Http\Request;
 use App\Http\Requests\ValidacaoEstoque;
+use App\Repositories\EstoqueRepository;
+use Illuminate\Http\Request as Requests;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Request;
 
 class EstoqueController extends Controller
-{
+{    
+    protected $estoqueRepository;
+    public function __construct(EstoqueRepository $estoqueRepository)
+    {
+        $this->estoqueRepository = $estoqueRepository;
+    }
     public function index()
     {
-        $fornecedores = Fornecedor::all();
-        $marcas = Marca::all();
-        $categorias = Categoria::all();
-        $produtos = Produto::paginate(2);
-        if (Gate::allows('permissao')) {
-            $estoques = [];
-            foreach ($produtos as $produto) 
-            {
-                $estoquesProduto = $produto->fornecedores->pluck('estoque')->all();
-                $estoques = array_merge($estoques, $estoquesProduto); 
-            }
-        } else {
-            $estoques = [];
-            foreach ($produtos as $produto) 
-            {
-                $estoquesProduto = $produto->fornecedores->pluck('estoque')->where('status', 1)->all();
-                $estoques = array_merge($estoques, $estoquesProduto); 
-            }
-        }
-       // dd(compact('estoques','produtos','fornecedores','marcas','categorias'));
-        return view('estoque.index',compact('estoques','produtos','fornecedores','marcas','categorias'));
+        $estoques = $this->estoqueRepository->index();
+        return view('estoque.index', $estoques);
     }
 
     public function historico()
     { 
-        $historicos = Cache::remember('historico', now()->addMinutes(1), function () {
-            $historicos = Historico::with('estoques')->get();
-            return $historicos;
-        });
+        $historicos = $this->estoqueRepository->historico();
         return view('estoque.historico', compact('historicos'));
     }
 
     public function cadastro()
     {
-        $produto = Produto::all();
-        $marca = Marca::all();
-        $fornecedores = Fornecedor::all();
-        return view('estoque.cadastro',compact('fornecedores','marca','produto'));
+        $cadastro = $this->estoqueRepository->cadastro();
+        return view('estoque.cadastro',$cadastro);
     }
 
     public function buscar(Request $request)
     {
-        $fornecedores = Fornecedor::all();
-        $marcas = Marca::all();
-        $categorias = Categoria::all();
-        $produtos = Produto::paginate(2);
-        if (Gate::allows('permissao')) {
-            $estoques = [];
-            foreach ($produtos as $produto) 
-            {
-                $estoquesProduto = $produto->search->pluck('estoque')->all();
-                $estoques = array_merge($estoques, $estoquesProduto);
-            }
-        } else {
-            $estoques = [];
-            foreach ($produtos as $produto) 
-            {
-                $estoquesProduto = $produto->search->pluck('estoque')->where('status', 1)->all();
-                $estoques = array_merge($estoques, $estoquesProduto); 
-            }
-        }
-        
-        return view('estoque.index', compact('estoques', 'produtos','fornecedores','marcas','categorias'));
+        $buscar = $this->estoqueRepository->buscar($request);
+        return view('estoque.index',$buscar);
     }
 
     public function inserirEstoque(ValidacaoEstoque $request)
-    {
-        $estoque = Estoque::create([
-            'quantidade'        =>$request->quantidade,
-            'localizacao'       =>$request->localizacao,
-            'preco_custo'       =>$request->preco_custo,
-            'preco_venda'       =>$request->preco_venda,
-            'data_chegada'      =>$request->data_chegada,
-            'lote'              =>$request->lote,
-            'id_produto_fk'     =>$request->input('nome_produto'),
-            'id_fornecedor_fk'  =>$request->input('fornecedor'),
-            'id_marca_fk'       =>$request->input('marca'),
-            'quantidade_aviso'  =>$request->quantidade_aviso,
-            'validade'          =>$request->validade,
-            'id_users_fk'       =>Auth::id()
-        ]);
-
-        MarcaProduto::create([
-            'id_produto_fk'     =>$request->input('nome_produto'),
-            'id_marca_fk'       =>$request->input('marca')
-        ]);
+    { 
+        $this->estoqueRepository->inserirEstoque($request);
         return redirect()->route('estoque.index')->with('success', 'Inserido com sucesso');
     }
 
     public function editar($estoqueId)
     {
-        $produtos = Estoque::find($estoqueId)->produtos->merge(Produto::all());
-        $fornecedores = Estoque::find($estoqueId)->fornecedores->merge(Fornecedor::all());
-        $marcas = Estoque::find($estoqueId)->marcas->merge(Marca::all());
-        $estoques = Estoque::where('id_estoque', $estoqueId)->get();
-        return view('estoque.editar', compact('estoques','produtos','fornecedores','marcas'));
+        $editar = $this->estoqueRepository->editar($estoqueId);
+        return view('estoque.editar', $editar);
     }
 
     public function salvarEditar(ValidacaoEstoque $request, $estoqueId)
     {
-        $estoques = Estoque::where('id_estoque' , $estoqueId)
-        ->update([
-            'localizacao'       =>$request->localizacao,
-            'preco_custo'       =>$request->preco_custo,
-            'preco_venda'       =>$request->preco_venda,
-            'id_fornecedor_fk'  =>$request->input('fornecedor'),
-            'quantidade_aviso'  =>$request->quantidade_aviso
-        ]);
-
-        MarcaProduto::where('id_produto_fk', $request->input('nome_produto'))
-        ->update([
-            'id_produto_fk' => $request->input('nome_produto'),
-            'id_marca_fk'   => $request->input('marca')
-        ]);
+        $this->estoqueRepository->salvarEditar($request,$estoqueId);
         return redirect()->route('estoque.index')->with('success', 'Editado com sucesso');
     }
 
     public function status($statusId)
     {
-        $status = Estoque::findOrFail($statusId);
-        $status->status = ($status->status == 1) ? 0 : 1;
-        $status->save();
-        return response()->json(['status' => $status->status]);
+      $status = $this->estoqueRepository->status($statusId);
+      return response()->json(['status' => $status->status]);
     }
 
-    public function quantidade(Request $request,$estoqueId, $operacao)
+    public function quantidade(Requests $request,$estoqueId, $operacao)
     {
-        $produto = Estoque::find($estoqueId);
-        if ($operacao === 'aumentar') {
-            $produto->quantidade += $request->input('quantidadeHistorico');
-        } elseif ($operacao === 'diminuir') {
-            if ($produto->quantidade > 0) {
-                $produto->quantidade -= $request->input('quantidadeHistorico');
-                Historico::create([
-                    'id_estoque_fk'  =>$estoqueId,    
-                    'quantidade_diminuida' =>$request->input('quantidadeHistorico'),
-                    'quantidade_historico' =>$produto->quantidade
-                ]);
-            }
-        }
-        $produto->save();
+        $this->estoqueRepository->quantidades($request, $estoqueId , $operacao);
+ 
         return redirect()->route('estoque.index')->with('success', 'Quantidade atualizada com sucesso');
+    }
+
+    public function ano()
+    {
+      $quantidade = $this->estoqueRepository->ano();
+ 
+        return response()->json($quantidade);
     }
 }
