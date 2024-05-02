@@ -185,6 +185,26 @@ class EstoqueRepositoryEloquent extends BaseRepository implements EstoqueReposit
         return $produto;
     }
 
+    public function ano():array
+    {
+        $quantidade = Estoque::selectRaw('quantidade')->get();
+      //  dd($quantidade);
+
+        $backgrounds = $quantidade->map(function ($value, $key){
+            return '#' . dechex(rand(0x000000 , 0xFFFFFF));
+        });
+
+        $values = $quantidade->map(function($order, $key){
+            return number_format($order->quantidade, 0,'','');
+        });
+
+        return [
+            'labels' => $quantidade->pluck('quantidade'),
+            'values' => $values,
+            'backgrounds' => $backgrounds
+        ];
+    }
+
     /**
      * Boot up the repository, pushing criteria
      */

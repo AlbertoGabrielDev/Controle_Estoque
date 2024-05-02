@@ -80,4 +80,11 @@ class EstoqueController extends Controller
  
         return redirect()->route('estoque.index')->with('success', 'Quantidade atualizada com sucesso');
     }
+
+    public function ano()
+    {
+      $quantidade = $this->estoqueRepository->ano();
+ 
+        return response()->json($quantidade);
+    }
 }
