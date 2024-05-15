@@ -187,19 +187,19 @@ class EstoqueRepositoryEloquent extends BaseRepository implements EstoqueReposit
 
     public function ano():array
     {
-        $quantidade = Estoque::selectRaw('quantidade')->get();
-      //  dd($quantidade);
+        $precos = Estoque::select('preco_custo as custo', 'preco_venda as venda')->get();
+        
 
-        $backgrounds = $quantidade->map(function ($value, $key){
+        $backgrounds = $precos->map(function ($value, $key){
             return '#' . dechex(rand(0x000000 , 0xFFFFFF));
         });
 
-        $values = $quantidade->map(function($order, $key){
-            return number_format($order->quantidade, 0,'','');
+        $values = $precos->map(function($order, $key){
+            return number_format($order->venda, 0,'','');
         });
-
+      //  dd($precos->pluck('custo'));
         return [
-            'labels' => $quantidade->pluck('quantidade'),
+            'labels' => $precos->pluck('custo'),
             'values' => $values,
             'backgrounds' => $backgrounds
         ];
