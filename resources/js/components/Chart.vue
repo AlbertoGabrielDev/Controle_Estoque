@@ -24,13 +24,29 @@ export default {
   data() {
     return {
       data: {
-        labels: ['January', 'February', 'March'],
-        datasets: [{ data: [40, 20, 12] }]
+        labels: [],
+        datasets: []
       },
       options: {
         responsive: true
       }
     }
-  }
+  },
+  mounted() {
+  fetch('http://127.0.0.1:8000/verdurao/estoque/teste')
+    .then((response) => response.json())
+    .then((fetchedData) => {
+      this.data = {
+        ...this.data, // Spread existing data properties
+        labels: fetchedData.labels,
+        datasets: [{ data: fetchedData.values }],
+      };
+    });
+},
+  // computed : {
+  //   labels : function () {
+  //     this.labels;
+  //   }
+  // },
 }
 </script>
