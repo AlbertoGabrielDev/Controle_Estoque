@@ -28,21 +28,21 @@ class ProdutoController extends Controller
         return view('produtos.index', compact('produtos'));
     }
 
-    public function Cadastro(Request $request) 
+    public function cadastro() 
     {
-        $categorias = Categoria::all();
+        $categorias = $this->produtoRepository->Cadastro();
         return view('produtos.cadastro',compact('categorias'));
     }
 
     public function inserirCadastro(ValidacaoProduto $request)
     {
-        $this->produtoRepository->create($request);
+        $this->produtoRepository->inserirCadastro($request);
         return redirect()->route('produtos.index')->with('success', 'Inserido com sucesso');
     }
 
     public function buscarProduto(Request $request)
     {
-       $produtos = $this->produtoRepository->buscar($request);
+        $produtos = $this->produtoRepository->buscar($request);
         return view('produtos.index', compact('produtos'));
     }
 

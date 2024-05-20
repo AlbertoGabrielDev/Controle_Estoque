@@ -6,6 +6,7 @@ use App\Http\Requests\ValidacaoProduto;
 use App\Models\CategoriaProduto;
 use App\Models\Produto;
 use App\Http\Requests\ValidacaoProdutoEditar;
+use App\Models\Categoria;
 use Illuminate\Support\Facades\Auth;
 use Prettus\Repository\Contracts\RepositoryInterface;
 use Illuminate\Support\Facades\Gate;
@@ -34,13 +35,18 @@ class ProdutoRepository
    }
 
    public function getAll(){
-    $produtos = Gate::allows('permissao') ? Produto::paginate(2) : Produto::where('status', 1)->paginate(2);
+    $produtos = Gate::allows('permissao') ? Produto::paginate(15) : Produto::where('status', 1)->paginate(15);
     return $produtos;
-   
    }
 
-   public function create(ValidacaoProduto $request)
-{
+   public function cadastro() 
+   {
+       $categorias = Categoria::all();
+       return $categorias;
+   }
+
+   public function inserirCadastro(ValidacaoProduto $request)
+{ 
     $produto = Produto::create([
         'nome_produto'      =>$request->nome_produto,
         'cod_produto'       =>$request->cod_produto,
@@ -54,14 +60,14 @@ class ProdutoRepository
         'id_categoria_fk'      =>$request->input('nome_categoria'),
         'id_produto_fk'        =>$produtoId->id_produto        
     ]);
-    return $produto;
+   
 }
 
 public function buscar(Request $request){
     if (Gate::allows('permissao')) {
-        $produtos = Produto::where('nome_produto', 'like', '%' .$request->input('nome_produto'). '%')->paginate(5);
+        $produtos = Produto::where('nome_produto', 'like', '%' .$request->input('nome_produto'). '%')->paginate(15);
     } else {
-        $produtos = Produto::where('nome_produto', 'like', '%' .$request->input('nome_produto'). '%')->where('status',1)->paginate(5);
+        $produtos = Produto::where('nome_produto', 'like', '%' .$request->input('nome_produto'). '%')->where('status',1)->paginate(15);
     }
     return $produtos;
 }

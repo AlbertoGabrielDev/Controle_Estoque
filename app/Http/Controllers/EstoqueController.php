@@ -74,17 +74,15 @@ class EstoqueController extends Controller
       return response()->json(['status' => $status->status]);
     }
 
-    public function quantidade(Requests $request,$estoqueId, $operacao)
+    public function atualizarEstoque(Requests $request,$estoqueId, $operacao)
     {
-        $this->estoqueRepository->quantidades($request, $estoqueId , $operacao);
- 
+        $this->estoqueRepository->atualizarEstoque($request, $estoqueId , $operacao);
         return redirect()->route('estoque.index')->with('success', 'Quantidade atualizada com sucesso');
     }
 
     public function ano()
     {
-      $quantidade = $this->estoqueRepository->ano();
- 
+        $quantidade = $this->estoqueRepository->ano();
         return response()->json($quantidade);
     }
 }

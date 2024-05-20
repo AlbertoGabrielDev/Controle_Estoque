@@ -30,7 +30,7 @@ export default {
   },
   data() {
     return {
-      chartType: 'Doughnut', // Defina o tipo de gráfico padrão
+      chartType: 'Bar', // Defina o tipo de gráfico padrão
       data: {
         labels: [],
         datasets: [{

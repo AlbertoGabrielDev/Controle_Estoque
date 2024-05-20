@@ -13,7 +13,7 @@ class MarcaController extends Controller
 {
     public function index()
     {
-        $marcas = Gate::allows('permissao') ?  $marcas = Marca::paginate(2) : $marcas = Marca::where('status', 1)->paginate(2);
+        $marcas = Gate::allows('permissao') ?  $marcas = Marca::paginate(15) : $marcas = Marca::where('status', 1)->paginate(15);
         return view('marca.index', compact('marcas'));
     }
 
@@ -25,9 +25,9 @@ class MarcaController extends Controller
     public function buscar(Request $request) 
     {
         if (Gate::allows('permissao')) {
-            $marcas = Marca::where('nome_marca', 'like', '%' . $request->input('nome_marca') . '%')->paginate(2);
+            $marcas = Marca::where('nome_marca', 'like', '%' . $request->input('nome_marca') . '%')->paginate(15);
         } else {
-            $marcas = Marca::where('nome_marca', 'like', '%' . $request->input('nome_marca') . '%')->where('status',1)->paginate(2);
+            $marcas = Marca::where('nome_marca', 'like', '%' . $request->input('nome_marca') . '%')->where('status',1)->paginate(15);
         }
         
         return view('marca.index', compact('marcas'));

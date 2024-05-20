@@ -14,7 +14,8 @@ class Historico extends Model
     protected $fillable = [
         'quantidade_diminuida',
         'id_estoque_fk',
-        'quantidade_historico'
+        'quantidade_historico',
+        'venda'
     ];
 
     public function estoques(): BelongsTo

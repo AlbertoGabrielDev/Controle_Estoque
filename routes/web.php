@@ -51,7 +51,7 @@ Route::middleware([
         Route::get('/editar/{estoqueId}',[EstoqueController::class, 'editar'])->name('estoque.editar');
         Route::post('/editar/{estoqueId}',[EstoqueController::class, 'salvarEditar'])->name('estoque.salvarEditar');
         Route::post('/status/{estoqueId}',[EstoqueController::class, 'status'])->name('estoque.status');
-        Route::get('/quantidade/{estoqueId}/{operacao}',[EstoqueController::class, 'quantidade'])->name('estoque.quantidade');
+        Route::get('/quantidade/{estoqueId}/{operacao}',[EstoqueController::class, 'atualizarEstoque'])->name('estoque.quantidade');
         Route::get('teste',[EstoqueController::class, 'ano'])->name('estoque.ano');
         Route::get('/historico',[EstoqueController::class, 'historico'])->name('estoque.historico')->middleware('can:permissao');
     });
