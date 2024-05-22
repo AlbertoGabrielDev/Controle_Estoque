@@ -190,27 +190,43 @@ class EstoqueRepositoryEloquent extends BaseRepository implements EstoqueReposit
     }
     
 
-    public function ano():array
+    public function graficoFiltro($startDate, $endDate):array
     {
+        if ($startDate && $endDate) {
+            
+            $startDate = Carbon::parse($startDate)->startOfDay();
+            $endDate = Carbon::parse($endDate)->endOfDay();
 
-        $vendas = Historico::selectRaw('MONTH(created_at) as mes, SUM(venda) as venda')
-        ->groupBy('mes')
-        ->orderBy('mes')
-        ->get();
-        
-      //  $precos = Estoque::select('preco_custo as custo', 'preco_venda as venda')->get();
-      $labels = $vendas->pluck('mes')->map(function ($mes) {
-        return Carbon::create()->month($mes)->format('F'); // Nome do mês
-    });
+            $vendas = Historico::selectRaw('DATE(created_at) as data, SUM(venda) as venda')
+                ->whereBetween('created_at', [$startDate, $endDate])
+                ->groupBy('data')
+                ->orderBy('data')
+                ->get();
 
-        // $backgrounds = $precos->map(function ($value, $key){
-        //     return '#' . dechex(rand(0x000000 , 0xFFFFFF));
-        // });
+            $labels = $vendas->pluck('data')->map(function ($data) {
+                return Carbon::parse($data)->format('d/m/Y');
+            });
 
-        $values = $vendas->map(function($order, $key){
-            return number_format($order->venda, 0,'','');
-        });
-      //  dd($precos->pluck('custo'));
+            $values = $vendas->map(function ($order) {
+                return number_format($order->venda, 0, '', '');
+            });
+        }else{
+            $vendas = Historico::selectRaw('MONTH(created_at) as mes, SUM(venda) as venda')
+            ->groupBy('mes')
+            ->orderBy('mes')
+            ->get();
+
+             $labels = $vendas->pluck('mes')->map(function ($mes) {
+                return Carbon::create()->month($mes)->format('F'); // Nome do mês
+            });
+            // $backgrounds = $precos->map(function ($value, $key){
+            //     return '#' . dechex(rand(0x000000 , 0xFFFFFF));
+            // });
+            $values = $vendas->map(function($order, $key){
+                return number_format($order->venda, 0,'','');
+            });
+        }
+
         return [
             'labels' => $labels,
             'values' => $values,

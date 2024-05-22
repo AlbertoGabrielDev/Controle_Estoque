@@ -80,9 +80,12 @@ class EstoqueController extends Controller
         return redirect()->route('estoque.index')->with('success', 'Quantidade atualizada com sucesso');
     }
 
-    public function ano()
+    public function graficoFiltro(Requests $request)
     {
-        $quantidade = $this->estoqueRepository->ano();
+        $startDate = $request->query('start_date');
+        $endDate = $request->query('end_date');
+
+        $quantidade = $this->estoqueRepository->graficoFiltro($startDate, $endDate);
         return response()->json($quantidade);
     }
 }

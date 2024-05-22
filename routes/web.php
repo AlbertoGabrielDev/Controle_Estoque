@@ -18,7 +18,6 @@ Route::middleware([
 // Route::get('/vue', function (){
 //    return view('welcome');
 // });
- Route::get('/months',[GraficosApiController::class, 'months'])->name('months');
 
     Route::prefix('/categoria')->group(function() {
         Route::get('/',[CategoriaController::class, 'Inicio'])->name('categoria.inicio');
@@ -52,7 +51,9 @@ Route::middleware([
         Route::post('/editar/{estoqueId}',[EstoqueController::class, 'salvarEditar'])->name('estoque.salvarEditar');
         Route::post('/status/{estoqueId}',[EstoqueController::class, 'status'])->name('estoque.status');
         Route::get('/quantidade/{estoqueId}/{operacao}',[EstoqueController::class, 'atualizarEstoque'])->name('estoque.quantidade');
-        Route::get('teste',[EstoqueController::class, 'ano'])->name('estoque.ano');
+        Route::get('grafico-filtro',[EstoqueController::class, 'graficoFiltro'])->name('estoque.graficoFiltro');
+        Route::get('/grafico',[GraficosApiController::class, 'months'])->name('months');
+
         Route::get('/historico',[EstoqueController::class, 'historico'])->name('estoque.historico')->middleware('can:permissao');
     });
 
