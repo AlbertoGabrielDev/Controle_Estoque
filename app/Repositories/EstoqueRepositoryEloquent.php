@@ -15,6 +15,7 @@ use Prettus\Repository\Criteria\RequestCriteria;
 use App\Repositories\EstoqueRepository;
 use Illuminate\Support\Facades\Auth;
 use App\Validators\EstoqueValidator;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Request;
@@ -42,7 +43,7 @@ class EstoqueRepositoryEloquent extends BaseRepository implements EstoqueReposit
         $fornecedores = Fornecedor::all();
         $marcas = Marca::all();
         $categorias = Categoria::all();
-        $produtos = Produto::paginate(2);
+        $produtos = Produto::paginate(15);
         if (Gate::allows('permissao')) {
             $estoques = [];
             foreach ($produtos as $produto) 
@@ -63,7 +64,7 @@ class EstoqueRepositoryEloquent extends BaseRepository implements EstoqueReposit
 
     public function inserirEstoque(ValidacaoEstoque $request)
     {
-        $estoque = Estoque::create([
+         Estoque::create([
             'quantidade'        =>$request->quantidade,
             'localizacao'       =>$request->localizacao,
             'preco_custo'       =>$request->preco_custo,
@@ -78,7 +79,7 @@ class EstoqueRepositoryEloquent extends BaseRepository implements EstoqueReposit
             'id_users_fk'       =>Auth::id()
         ]);
 
-      $marcaProduto = MarcaProduto::create([
+       MarcaProduto::create([
             'id_produto_fk'     =>$request->input('nome_produto'),
             'id_marca_fk'       =>$request->input('marca')
         ]);
@@ -88,16 +89,14 @@ class EstoqueRepositoryEloquent extends BaseRepository implements EstoqueReposit
 
     public function historico()
     { 
-        $historicos = Cache::remember('historico', now()->addMinutes(1), function () {
-            $historicos = Historico::with('estoques')->get();
-            return $historicos;
-        });
+        $historicos = Historico::with('estoques')->get();
+
         return $historicos;
     }
 
     public function cadastro()
     {
-        $produtos = Produto::all();
+        $produtos = Produto::all(); // resolver isso 
         $marcas = Marca::all();
         $fornecedores = Fornecedor::all();
         return compact('fornecedores','marcas','produtos');
@@ -165,43 +164,72 @@ class EstoqueRepositoryEloquent extends BaseRepository implements EstoqueReposit
         return $status;
     }
 
-    public function quantidades(Requests $request,$estoqueId, $operacao)
+    public function atualizarEstoque(Requests $request, $estoqueId, $operacao)
     {
-
         $produto = Estoque::find($estoqueId);
         if ($operacao === 'aumentar') {
             $produto->quantidade += $request->input('quantidadeHistorico');
+            $produto->save();
         } elseif ($operacao === 'diminuir') {
-            if ($produto->quantidade > 0) {
-                $produto->quantidade -= $request->input('quantidadeHistorico');
+            $quantidadeDiminuida = $request->input('quantidadeHistorico');
+            if ($produto->quantidade >= $quantidadeDiminuida) {
+                $produto->quantidade -= $quantidadeDiminuida;
+                $venda = $quantidadeDiminuida * $produto->preco_venda;
+    
                 Historico::create([
-                    'id_estoque_fk'  =>$estoqueId,    
-                    'quantidade_diminuida' =>$request->input('quantidadeHistorico'),
-                    'quantidade_historico' =>$produto->quantidade
+                    'id_estoque_fk' => $estoqueId,
+                    'quantidade_diminuida' => $quantidadeDiminuida,
+                    'quantidade_historico' => $produto->quantidade,
+                    'venda' => $venda,
                 ]);
+                $produto->save();
+            } else {
+                return response()->json(['error' => 'Quantidade insuficiente no estoque'], 400);
             }
         }
-        $produto->save();
-        return $produto;
     }
+    
 
-    public function ano():array
+    public function graficoFiltro($startDate, $endDate):array
     {
-        $precos = Estoque::select('preco_custo as custo', 'preco_venda as venda')->get();
-        
+        if ($startDate && $endDate) {
+            
+            $startDate = Carbon::parse($startDate)->startOfDay();
+            $endDate = Carbon::parse($endDate)->endOfDay();
 
-        $backgrounds = $precos->map(function ($value, $key){
-            return '#' . dechex(rand(0x000000 , 0xFFFFFF));
-        });
+            $vendas = Historico::selectRaw('DATE(created_at) as data, SUM(venda) as venda')
+                ->whereBetween('created_at', [$startDate, $endDate])
+                ->groupBy('data')
+                ->orderBy('data')
+                ->get();
 
-        $values = $precos->map(function($order, $key){
-            return number_format($order->venda, 0,'','');
-        });
-      //  dd($precos->pluck('custo'));
+            $labels = $vendas->pluck('data')->map(function ($data) {
+                return Carbon::parse($data)->format('d/m/Y');
+            });
+
+            $values = $vendas->map(function ($order) {
+                return number_format($order->venda, 0, '', '');
+            });
+        }else{
+            $vendas = Historico::selectRaw('MONTH(created_at) as mes, SUM(venda) as venda')
+            ->groupBy('mes')
+            ->orderBy('mes')
+            ->get();
+
+             $labels = $vendas->pluck('mes')->map(function ($mes) {
+                return Carbon::create()->month($mes)->format('F'); // Nome do mês
+            });
+            // $backgrounds = $precos->map(function ($value, $key){
+            //     return '#' . dechex(rand(0x000000 , 0xFFFFFF));
+            // });
+            $values = $vendas->map(function($order, $key){
+                return number_format($order->venda, 0,'','');
+            });
+        }
+
         return [
-            'labels' => $precos->pluck('custo'),
+            'labels' => $labels,
             'values' => $values,
-            'backgrounds' => $backgrounds
         ];
     }
 

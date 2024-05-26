@@ -17,6 +17,7 @@
           <th class="p-4 uppercase text-sm text-grey-dark border-b border-grey-light text-left">Fornecedor</th>
           <th class="p-4 uppercase text-sm text-grey-dark border-b border-grey-light text-left">Quantidade retirada</th>
           <th class="p-4 uppercase text-sm text-grey-dark border-b border-grey-light text-left">Quantidade</th>
+          <th class="p-4 uppercase text-sm text-grey-dark border-b border-grey-light text-left">Venda</th>
           <th class="p-4 uppercase text-sm text-grey-dark border-b border-grey-light text-left">Data de alteração</th>
           {{-- <th class="p-4 uppercase text-sm text-grey-dark border-b border-grey-light text-left">Usuário que altero</th> --}}
         </tr>
@@ -35,6 +36,7 @@
           @endforeach
             <td class="p-4 border-b border-grey-light text-left">{{$historico->quantidade_diminuida}}</td>
             <td class="p-4 border-b border-grey-light text-left">{{$historico->quantidade_historico}}</td>
+            <td class="p-4 border-b border-grey-light text-left">{{$historico->venda}}</td>
             <td class="p-4 border-b border-grey-light text-left">{{ \Carbon\Carbon::parse($historico->updated_at)->format('d/m/Y h:i:s A') }}</td> 
             {{-- <td class="p-4 border-b border-grey-light text-left">{{$historico->estoques->id_users_fk}}</td> --}}
         </tr>

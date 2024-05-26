@@ -74,17 +74,24 @@ class EstoqueController extends Controller
       return response()->json(['status' => $status->status]);
     }
 
-    public function quantidade(Requests $request,$estoqueId, $operacao)
+    public function atualizarEstoque(Requests $request,$estoqueId, $operacao)
     {
-        $this->estoqueRepository->quantidades($request, $estoqueId , $operacao);
- 
+        $this->estoqueRepository->atualizarEstoque($request, $estoqueId , $operacao);
         return redirect()->route('estoque.index')->with('success', 'Quantidade atualizada com sucesso');
     }
 
-    public function ano()
+    public function graficoFiltro(Requests $request)
     {
-      $quantidade = $this->estoqueRepository->ano();
- 
-        return response()->json($quantidade);
+        $startDate = $request->query('start_date');
+        $endDate = $request->query('end_date');
+
+        $quantidade = $this->estoqueRepository->graficoFiltro($startDate, $endDate);
+        $totalSum = $quantidade['values']->sum();
+       // dd($totalSum);
+        return response()->json([
+            'labels' => $quantidade['labels'],
+            'values' => $quantidade['values'],
+            'total_sum' => $totalSum,
+        ]);
     }
 }
