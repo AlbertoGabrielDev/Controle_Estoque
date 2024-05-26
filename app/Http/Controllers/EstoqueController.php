@@ -86,6 +86,12 @@ class EstoqueController extends Controller
         $endDate = $request->query('end_date');
 
         $quantidade = $this->estoqueRepository->graficoFiltro($startDate, $endDate);
-        return response()->json($quantidade);
+        $totalSum = $quantidade['values']->sum();
+       // dd($totalSum);
+        return response()->json([
+            'labels' => $quantidade['labels'],
+            'values' => $quantidade['values'],
+            'total_sum' => $totalSum,
+        ]);
     }
 }
