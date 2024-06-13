@@ -7,6 +7,11 @@ use Illuminate\Http\Request;
 use Illuminate\Pagination\Paginator;
 use App\Models\User;
 use App\Http\Requests\ValidacaoUsuario;
+use App\Models\Unidades;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\ValidationException;
 
 class UsuarioController extends Controller
 {
@@ -50,5 +55,39 @@ class UsuarioController extends Controller
         $status->status = ($status->status == 1) ? 0 : 1;
         $status->save();
         return response()->json(['status' => $status->status]);
+    }
+
+    // public function inserirusuario(){
+    //     create::Usua
+    // }
+
+    protected function login(Request $request)
+    {
+      
+    //     $request->validate([
+    //     'email' => 'required|email',
+    //     'password' => 'required|string',
+    //     'id_unidade' => 'required|integer',
+    // ]);
+
+    Log::info('Request Data', $request->all());
+
+        $credentials = $request->only('email', 'password');
+
+        if (Auth::attempt($credentials)) {
+          
+            $request->session()->put('id_unidade', $request->input('id_unidade'));
+        }
+            return back()->withErrors([
+            'email' => 'The provided credentials do not match our records.',
+        ]);
+    }
+    public function unidade(){
+        $units = Unidades::all();
+        return view('auth.login',compact('units'));
+    }
+    public function unidadeRegister(){
+        $units = Unidades::all();
+        return view('auth.register',compact('units'));
     }
  }
