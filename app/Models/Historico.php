@@ -15,7 +15,9 @@ class Historico extends Model
         'quantidade_diminuida',
         'id_estoque_fk',
         'quantidade_historico',
-        'venda'
+        'venda',
+        'status',
+        'id_unidade_fk'
     ];
 
     public function estoques(): BelongsTo

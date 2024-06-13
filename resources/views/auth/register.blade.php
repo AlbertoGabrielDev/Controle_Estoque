@@ -25,6 +25,14 @@
             <label for="password" value="{{ __('Confirm Password') }}" class="block mb-2 text-sm text-gray-600">Repetir Senha</label>
             <input type="password" id="password_confirmation" name="password_confirmation" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500" required autocomplete="new-password">
         </div>
+        <div class="mt-4">
+          <x-label for="id_unidade" :value="__('Unidade')"/>
+          <select id="id_unidade" name="id_unidade" class="block mt-1 w-full" required>
+            @foreach($units as $unit)
+                <option value="{{ $unit->id_unidade }}">{{ $unit->nome }}</option>
+            @endforeach
+          </select>
+        </div>
         <a href="{{ route('login') }}" class="block text-right text-xs text-cyan-600 mt-2">Já está registrado?</a>
         <button type="submit" class="w-32 bg-gradient-to-r from-cyan-400 to-cyan-600 text-white py-2 rounded-lg mx-auto block focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500 mt-4 mb-6">{{ __('Registrar') }}</button>
       </form>

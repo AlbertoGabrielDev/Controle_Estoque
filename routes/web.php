@@ -8,6 +8,8 @@ use App\Http\Controllers\EstoqueController;
 use App\Http\Controllers\FornecedorController;
 use App\Http\Controllers\UsuarioController;
 use App\Http\Controllers\MarcaController;
+use App\Http\Controllers\UnidadeController;
+use App\Providers\FortifyServiceProvider;
 
 Route::middleware([
     'auth:sanctum',
@@ -87,4 +89,17 @@ Route::middleware([
         Route::post('/editar/{userid}',[UsuarioController::class, 'salvarEditar'])->name('usuario.salvarEditar');
         Route::get('/buscar-usuario',[UsuarioController::class, 'Buscar'])->name('usuario.buscar');
     });
+    Route::prefix('/unidades')->middleware('can:permissao')->group(function() {
+        Route::get('/index', [UnidadeController::class , 'index'])->name('unidades.index');
+        Route::get('/cadastro',[UnidadeController::class, 'cadastro'])->name('unidades.cadastro');
+        Route::post('/cadastro',[UnidadeController::class, 'inserirUnidade'])->name('unidades.inserirUnidade');
+        Route::get('/buscar-unidade',[UnidadeController::class, 'Buscar'])->name('unidades.buscar');
+        Route::get('/editar/{unidadeId}',[UnidadeController::class, 'editar'])->name('unidades.editar');
+        Route::post('/editar/{unidadeId}',[UnidadeController::class, 'salvarEditar'])->name('unidades.salvarEditar');
+        Route::post('/status/{unidadeId}',[UnidadeController::class, 'status'])->name('unidades.status');
+    });
 });
+
+Route::get('login', [UsuarioController::class, 'unidade'])->name('login');
+Route::get('register', [UsuarioController::class, 'unidadeRegister'])->name('register');
+

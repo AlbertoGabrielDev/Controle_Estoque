@@ -6,6 +6,7 @@ use App\Actions\Fortify\CreateNewUser;
 use App\Actions\Fortify\ResetUserPassword;
 use App\Actions\Fortify\UpdateUserPassword;
 use App\Actions\Fortify\UpdateUserProfileInformation;
+use App\Models\Unidades;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
 use App\Models\User;
@@ -40,16 +41,22 @@ class FortifyServiceProvider extends ServiceProvider
         });
 
         Fortify::authenticateUsing(function (Request $request) {
+           
             $user = User::where('email', $request->email)->first();
+            $unidade= Unidades::where('id_unidade', $request->id_unidade)->first();
+      
             if ($user &&
-                Hash::check($request->password, $user->password) && $user->status === 1 ) {
-                return $user;
+                Hash::check($request->password, $user->password) && $user->status === 1 && $unidade->status === 1) {
+                    $request->session()->put('id_unidade', $request->input('id_unidade'));
+                    return $user;
             }else{
                 session()->flash('error', 'Senha ou email errado. Confira os dados.');
             }
             if($user->status === 0){
                 return session()->flash('error', 'Usuario desativado. Fale com o Administrador');
-                return $user;
+            }
+            if($unidade->status === 0){
+                return session()->flash('error', 'Unidade desativada. Fale com o Administrador');
             }
             if ($user == "") {
                 return session()->flash('error', 'Email não existe.');

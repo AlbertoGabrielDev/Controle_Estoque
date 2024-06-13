@@ -7,6 +7,11 @@ use Illuminate\Http\Request;
 use Illuminate\Pagination\Paginator;
 use App\Models\User;
 use App\Http\Requests\ValidacaoUsuario;
+use App\Models\Unidades;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\ValidationException;
 
 class UsuarioController extends Controller
 {
@@ -50,5 +55,14 @@ class UsuarioController extends Controller
         $status->status = ($status->status == 1) ? 0 : 1;
         $status->save();
         return response()->json(['status' => $status->status]);
+    }
+
+    public function unidade(){
+        $units = Unidades::all();
+        return view('auth.login',compact('units'));
+    }
+    public function unidadeRegister(){
+        $units = Unidades::all();
+        return view('auth.register',compact('units'));
     }
  }
