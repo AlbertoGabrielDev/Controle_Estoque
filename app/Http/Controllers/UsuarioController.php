@@ -57,31 +57,6 @@ class UsuarioController extends Controller
         return response()->json(['status' => $status->status]);
     }
 
-    // public function inserirusuario(){
-    //     create::Usua
-    // }
-
-    protected function login(Request $request)
-    {
-      
-    //     $request->validate([
-    //     'email' => 'required|email',
-    //     'password' => 'required|string',
-    //     'id_unidade' => 'required|integer',
-    // ]);
-
-    Log::info('Request Data', $request->all());
-
-        $credentials = $request->only('email', 'password');
-
-        if (Auth::attempt($credentials)) {
-          
-            $request->session()->put('id_unidade', $request->input('id_unidade'));
-        }
-            return back()->withErrors([
-            'email' => 'The provided credentials do not match our records.',
-        ]);
-    }
     public function unidade(){
         $units = Unidades::all();
         return view('auth.login',compact('units'));

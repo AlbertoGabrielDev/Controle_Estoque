@@ -175,7 +175,7 @@ class EstoqueRepositoryEloquent extends BaseRepository implements EstoqueReposit
             if ($produto->quantidade >= $quantidadeDiminuida) {
                 $produto->quantidade -= $quantidadeDiminuida;
                 $venda = $quantidadeDiminuida * $produto->preco_venda;
-                $unidadeId = $request->session()->get('unidade');
+                $unidadeId = $request->session()->get('id_unidade');
                 Historico::create([
                     'id_estoque_fk' => $estoqueId,
                     'quantidade_diminuida' => $quantidadeDiminuida,
