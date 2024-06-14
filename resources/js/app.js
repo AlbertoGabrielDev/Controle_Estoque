@@ -4,8 +4,8 @@ import { createApp } from 'vue/dist/vue.esm-bundler';
 
 // import {createApp} from 'vue'
 
-import Chart from './components/Chart.vue';
 
+import Chart from './components/OptionsCharts/Chart.vue';
 createApp({
     components: {
         Chart,
