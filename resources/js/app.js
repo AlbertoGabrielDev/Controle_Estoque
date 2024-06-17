@@ -1,13 +1,8 @@
-import './bootstrap';
-import '../css/app.css';
-import { createApp } from 'vue/dist/vue.esm-bundler';
 
-// import {createApp} from 'vue'
+import router from './router';
+import App from './components/App.vue';
 
 
-import Chart from './components/OptionsCharts/Chart.vue';
-createApp({
-    components: {
-        Chart,
-    }
-}).mount('#app');
+createApp(App)
+  .use(router)
+  .mount('#app');

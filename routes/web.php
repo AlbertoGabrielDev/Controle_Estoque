@@ -103,3 +103,6 @@ Route::middleware([
 Route::get('login', [UsuarioController::class, 'unidade'])->name('login');
 Route::get('register', [UsuarioController::class, 'unidadeRegister'])->name('register');
 
+Route::get('{any}', function () {
+    return view('welcome');
+})->where('any', '.*');

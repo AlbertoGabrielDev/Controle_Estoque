@@ -3,7 +3,7 @@
 
 @section('conteudo')
 <div id="app">
-    <chart></chart>
+    <!-- <chart></chart> -->
 </div>
 
 @vite('resources/js/app.js')
