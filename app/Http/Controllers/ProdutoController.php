@@ -22,10 +22,15 @@ class ProdutoController extends Controller
     {
         $this->produtoRepository = $produtoRepository;
     }
+    // public function Index()
+    // {
+    //     $produtos = $this->produtoRepository->getAll();
+    //     return view('produtos.index', compact('produtos'));
+    // }
     public function Index()
     {
         $produtos = $this->produtoRepository->getAll();
-        return view('produtos.index', compact('produtos'));
+        return response()->json($produtos);
     }
 
     public function cadastro() 

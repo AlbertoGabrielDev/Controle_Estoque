@@ -10,12 +10,12 @@ use App\Http\Controllers\UsuarioController;
 use App\Http\Controllers\MarcaController;
 use App\Http\Controllers\UnidadeController;
 use App\Providers\FortifyServiceProvider;
-
-Route::middleware([
-    'auth:sanctum',
-    config('jetstream.auth_session'),
-    'verified',
-])->prefix('/verdurao')->group(function() {
+// middleware([
+//     'auth:sanctum',
+//     config('jetstream.auth_session'),
+//     'verified',
+// ])->
+Route::prefix('/verdurao')->group(function() {
     
 // Route::get('/vue', function (){
 //    return view('welcome');
