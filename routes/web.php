@@ -10,18 +10,13 @@ use App\Http\Controllers\UsuarioController;
 use App\Http\Controllers\MarcaController;
 use App\Http\Controllers\UnidadeController;
 use App\Providers\FortifyServiceProvider;
-// middleware([
-//     'auth:sanctum',
-//     config('jetstream.auth_session'),
-//     'verified',
-// ])->
-Route::prefix('/verdurao')->group(function() {
-    
-// Route::get('/vue', function (){
-//    return view('welcome');
-// });
 
-    Route::prefix('/categoria')->group(function() {
+Route::prefix('/verdurao')->group(function() {
+    Route::prefix('/categoria')->middleware([
+        'auth:sanctum',
+        config('jetstream.auth_session'),
+        'verified',
+    ])->group(function() {
         Route::get('/',[CategoriaController::class, 'Inicio'])->name('categoria.inicio');
         Route::get('/index',[CategoriaController::class, 'Index'])->name('categoria.index');
         Route::get('/cadastro',[CategoriaController::class, 'cadastro'])->name('categoria.cadastro');
