@@ -15,7 +15,8 @@ class UnidadeController extends Controller
     public function index()
     {
         $unidades = $this->unidadeRepository->index();
-        return view('unidades.index',compact('unidades'));
+        // return view('unidades.index',compact('unidades'));
+        return response()->json($unidades);
         
     }
     public function cadastro()

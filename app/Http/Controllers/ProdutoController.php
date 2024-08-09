@@ -22,14 +22,11 @@ class ProdutoController extends Controller
     {
         $this->produtoRepository = $produtoRepository;
     }
-    // public function Index()
-    // {
-    //     $produtos = $this->produtoRepository->getAll();
-    //     return view('produtos.index', compact('produtos'));
-    // }
+ 
     public function Index()
     {
         $produtos = $this->produtoRepository->getAll();
+        // return view('produtos.index', compact('produtos'));
         return response()->json($produtos);
     }
 
@@ -48,7 +45,8 @@ class ProdutoController extends Controller
     public function buscarProduto(Request $request)
     {
         $produtos = $this->produtoRepository->buscar($request);
-        return view('produtos.index', compact('produtos'));
+        // return view('produtos.index', compact('produtos'));
+        return response()->json($produtos);
     }
 
     public function editar($produtoId) 
