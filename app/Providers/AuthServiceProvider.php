@@ -18,7 +18,7 @@ class AuthServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Gate::define('permissao',function(User $user){
-            return $user->id ===1;
+            return $user->id_roles_fk ===1;
         });
     }
 }

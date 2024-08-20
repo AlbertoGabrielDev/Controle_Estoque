@@ -6,7 +6,7 @@
     <a class=" text-gray-500 py-2.5 px-4 relative mx-5 my-4 w-1/12 rounded hover:bg-gradient-to-r hover:from-cyan-400 hover:to-cyan-300 hover:text-white" href="{{route('usuario.index')}}">
       <i class="fa fa-angle-left mr-2"></i>Voltar
     </a>
-<form action="{{route('usuario.inserirUsuario')}}" method="POST">
+<form action="#" method="POST">
     @csrf
     <div class="grid md:grid-cols-1 md:gap-6 py-4">
         <div class="relative z-0 w-full mb-6 group">

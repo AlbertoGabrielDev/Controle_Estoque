@@ -11,7 +11,7 @@
         {{ session('error') }}
     </div>
     @endif
-      <form method="POST" action="{{ route('login') }}">
+      <form method="POST" action="#">
       @csrf
         <div class="mb-6">
           <label for="email" value="{{ __('Email') }}" class="block mb-2 text-sm text-gray-600">Email</label>

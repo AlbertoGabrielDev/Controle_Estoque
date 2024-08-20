@@ -11,10 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('colunm_users_permission', function (Blueprint $table) {
-            $table->id();
-            $table->timestamps();
+        Schema::table('users', function (Blueprint $table) {
+            $table->unsignedSmallInteger('id_roles_fk')->nullable();
+            $table->foreign('id_roles_fk')->references('id_roles')->on('roles');
         });
+
     }
 
     /**
@@ -22,6 +23,9 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('colunm_users_permission');
+        Schema::table('users', function (Blueprint $table) {
+            $table->dropForeign(['id_roles_fk']);
+            $table->dropColumn('id_roles_fk');
+        });
     }
 };
