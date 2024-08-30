@@ -15,7 +15,7 @@ use App\Http\Controllers\UnidadeController;
 Route::middleware('api')->group(function () {
 Route::prefix('v1')->group(function() {
 
-    Route::prefix('/verdurao')->middleware(['auth:sanctum', 'verified'])->group(function() {
+    Route::prefix('/verdurao')->middleware(['auth:sanctum', 'verified' , 'guest:'.config('fortify.guard')])->group(function() {
         Route::prefix('/categoria')->group(function() {
             Route::get('/',[CategoriaController::class, 'Inicio'])->name('categoria.inicio');
             Route::get('/index',[CategoriaController::class, 'Index'])->name('categoria.index');
@@ -102,11 +102,6 @@ Route::prefix('v1')->group(function() {
     Route::get('login', [AuthController::class, 'login']);
     Route::post('register', [AuthController::class, 'register']);
     });
-
-    // Rotas de autenticação
-    // Route::get('login', [UsuarioController::class, 'unidade'])->name('login');
-    // Route::post('login', [UsuarioController::class, 'unidade'])->name('login');
-    // Route::get('register', [UsuarioController::class, 'unidadeRegister'])->name('register');
 });
 
 
