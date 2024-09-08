@@ -12,7 +12,9 @@ class Marca extends Model
 
     protected $fillable = [
         'nome_marca',
-        'id_users_fk'
+        'id_users_fk',
+        'status',
+   
     ];
 
     public function produto(): BelongsToMany{

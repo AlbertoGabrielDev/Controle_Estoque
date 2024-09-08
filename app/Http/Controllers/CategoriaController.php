@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
+
 class CategoriaController extends Controller
 {
 
@@ -17,46 +18,45 @@ class CategoriaController extends Controller
     {
         $this->categoriaRepository = $categoriaRepository;
     }
-    public function inicio()
-    {
-        $categorias = $this->categoriaRepository->getAll();
-        return view('categorias.categoria',compact('categorias'));
-    }
+    // public function inicio()
+    // {
+    //     $categorias = $this->categoriaRepository->getAll();
+    //     return response()->json($categorias);
+    // }
     public function index()
     {
         $categorias =$this->categoriaRepository->index();
-        return view('categorias.index',compact('categorias'));
+        return response()->json($categorias);
     }
 
-    public function cadastro()
-    {
-        return view('categorias.cadastro');
-    }
+    // public function cadastro()
+    // {
+    //     return view('categorias.cadastro');
+    // }
 
     public function inserirCategoria(Request $request)
     {
-        $this->categoriaRepository->inserirCategoria($request);
-        return redirect()->route('categoria.index')->with('success', 'Inserido com sucesso');
+        $inserir = $this->categoriaRepository->inserirCategoria($request);
+        return response()->json([$inserir, 'message' => 'Inserido com sucesso'], 200);
     }
 
     public function produto($categoriaId)
     {
         $categoria = Categoria::find($categoriaId)->nome_categoria; 
-        $produtos = Gate::allows('permissao') ? Categoria::find($categoriaId)->produtos()->paginate(2) : Categoria::find($categoriaId)->produtos()->where('status', 1)->paginate(2);
-        return view('categorias.produto',compact('categoria','produtos'));
-
+        $produto = Gate::allows('permissao') ? Categoria::find($categoriaId)->produtos()->paginate(2) : Categoria::find($categoriaId)->produtos()->where('status', 1)->paginate(2);
+        return response()->json([$categoria,$produto ,'message' => 'Inserido com sucesso'], 200);
     }
 
     public function editar($categoriaId)
     {
-        $categorias = $this->categoriaRepository->editar($categoriaId);
-        return view('categorias.editar', compact('categorias'));
+        $categoria = $this->categoriaRepository->editar($categoriaId);
+        return response()->json([$categoria ,'message' => 'Editado com sucesso'], 200);
     }
 
-    public function salvarEditar($categoriaId)
+    public function salvarEditar(Request $request,$categoriaId)
     {
-        $this->categoriaRepository->editar($categoriaId);
-        return redirect()->route('categoria.index')->with('success', 'Editado com sucesso');
+        $editar = $this->categoriaRepository->salvarEditar($request,$categoriaId);
+        return response()->json([$editar ,'message' => 'Editado com sucesso'], 200);
     }
 
     public function status($statusId)

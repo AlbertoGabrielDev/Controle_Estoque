@@ -29,7 +29,7 @@ class EstoqueController extends Controller
     public function index()
     {
         $estoques = $this->estoqueRepository->index();
-        return view('estoque.index', $estoques);
+        return response()->json($estoques);
     }
 
     public function historico()

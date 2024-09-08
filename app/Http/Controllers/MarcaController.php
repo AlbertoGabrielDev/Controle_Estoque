@@ -9,59 +9,50 @@ use Illuminate\Support\Facades\Gate;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Requests\ValidacaoMarca;
+use App\Repositories\MarcaRepository;
+
 class MarcaController extends Controller
 {
-    public function index()
-    {
-        $marcas = Gate::allows('permissao') ?  $marcas = Marca::paginate(15) : $marcas = Marca::where('status', 1)->paginate(15);
-        return view('marca.index', compact('marcas'));
+    protected $marcaRepository;
+
+    public function __construct(MarcaRepository $marcaRepository) {
+        $this->marcaRepository = $marcaRepository;
     }
 
-    public function cadastro()
-    {   
-        return view('marca.cadastro');
+    public function index()
+    {
+        $marcas = $this->marcaRepository->index();
+        return response()->json($marcas);
     }
 
     public function buscar(Request $request) 
     {
-        if (Gate::allows('permissao')) {
-            $marcas = Marca::where('nome_marca', 'like', '%' . $request->input('nome_marca') . '%')->paginate(15);
-        } else {
-            $marcas = Marca::where('nome_marca', 'like', '%' . $request->input('nome_marca') . '%')->where('status',1)->paginate(15);
-        }
-        
-        return view('marca.index', compact('marcas'));
+        $marcas = $this->marcaRepository->buscar($request);
+        return response()->json($marcas);
     } 
 
     public function editar(Request $request, $marcaId)
     {
-        $marcas = Marca::where('id_marca' , $marcaId)->get();
-        return view('marca.editar',compact('marcas'));
+        $editar = $this->marcaRepository->editar($request, $marcaId);
+        return response()->json([$editar], 200);
     }
 
     public function salvarEditar(ValidacaoMarca $request, $marcaId)
     {
-        $marcas = Marca::where('id_marca' , $marcaId)
-        ->update([
-           'nome_marca' => $request->nome_marca 
-        ]);
-        return redirect()->route('marca.index')->with('success', 'Editado com sucesso');
+        $editar = $this->marcaRepository->editar($request, $marcaId);
+        return response()->json([$editar, 'message' => 'Editado com sucesso'], 200);
     }
 
     public function inserirMarca(ValidacaoMarca $request)
     {
-        $marca = Marca::create([
-            'nome_marca' => $request->nome_marca,
-            'id_users_fk' => Auth::id()
-        ]);
-        return redirect()->route('marca.index')->with('success', 'Inserido com sucesso');
+        $inserir = $this->marcaRepository->cadastro($request);
+        return response()->json([$inserir, 'message' => 'Inserido com sucesso'], 200);
     }
 
     public function status($statusId)
     {
-        $status = Marca::findOrFail($statusId);
-        $status->status = ($status->status == 1) ? 0 : 1;
-        $status->save();
+      
+        $status = $this->marcaRepository->status($statusId);
         return response()->json(['status' => $status->status]);
     }
 

@@ -25,14 +25,7 @@
           @endif
         </div>
          <!-- Unidade -->
-         <div class="mt-4">
-          <x-label for="id_unidade" :value="__('Unidade')"/>
-          <select id="id_unidade" name="id_unidade" class="block mt-1 w-full" required>
-            @foreach($units as $unit)
-                <option value="{{ $unit->id_unidade }}">{{ $unit->nome }}</option>
-            @endforeach
-          </select>
-        </div>
+      
         <button type="submit" class="w-32 bg-gradient-to-r from-cyan-400 to-cyan-600 text-white py-2 rounded-lg mx-auto block focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500 mt-4 mb-6"> {{ __('Entrar') }}</button>
       </form>
       <div class="text-center">

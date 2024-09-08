@@ -46,6 +46,7 @@ class CategoriaRepositoryEloquent extends BaseRepository implements CategoriaRep
             $extension = $requestImage->extension();
             $imageName = md5($requestImage->getClientOriginalName() . strtotime("now")). "." . $extension;
             $requestImage->move(public_path('img/categorias'), $imageName);
+
             Categoria::create([
                 'nome_categoria' => $request->categoria,
                 'id_users_fk' => Auth::id(),
@@ -63,11 +64,12 @@ class CategoriaRepositoryEloquent extends BaseRepository implements CategoriaRep
 
     public function salvarEditar(Request $request, $categoriaId)
     {
-        $categorias = Categoria::where('id_categoria', $categoriaId)
-        ->update([
-            'nome_categoria' => $request->nome_categoria
-        ]);
-        return $categorias;
+        Categoria::where('id_categoria', $categoriaId)
+            ->update([
+                'nome_categoria' => $request->nome_categoria,
+                'id_users_fk' => $request->id_users_fk
+            ]);
+    
     }
     public function status($statusId)
     {   
