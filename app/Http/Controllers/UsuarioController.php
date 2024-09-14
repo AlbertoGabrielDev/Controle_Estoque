@@ -8,6 +8,7 @@ use Illuminate\Pagination\Paginator;
 use App\Models\User;
 use App\Http\Requests\ValidacaoUsuario;
 use App\Models\Unidades;
+use App\Repositories\UsuarioRepository;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
@@ -15,21 +16,32 @@ use Illuminate\Validation\ValidationException;
 
 class UsuarioController extends Controller
 {
+
+    protected $usuarioRepository;
+
+    public function __construct(UsuarioRepository $usuarioRepository)
+    {
+        $this->usuarioRepository = $usuarioRepository;
+    }
+
     public function Index(){
-        $usuarios = User::where('id', '!=', 1)->paginate(2);
-        return view('usuario.index', compact('usuarios'));
+        $usuarios =  $this->usuarioRepository->index();
+        return response()->json($usuarios);
     }
 
     public function Cadastro(){
         return view('usuario.cadastro')->with('success', 'Usuario inserido com sucesso');
     }
 
+    public function inserirUsuario(Request $request ){
+           $usuarios=  $this->usuarioRepository->inserir($request);
+            return response()->json($usuarios);
+    }
+
     public function buscar(Request $request)
     {   
-        $usuarios = User::where('name', 'like' , '%' . $request->input('name'). '%')
-        ->where('id' , '!=' , 1 )
-        ->paginate(2);
-        return view('usuario.index', compact('usuarios'));
+        $usuarios = $this->usuarioRepository->buscar($request);
+        return response()->json($usuarios);
     }
 
     public function editar($usuarioId){
@@ -39,13 +51,9 @@ class UsuarioController extends Controller
     
     public function salvarEditar(ValidacaoUsuario $request, $userId)
     {   
-        $users = User::where('id',$userId)
-        ->update([
-            'name'  =>$request->name,
-            'email' =>$request->email
-        ]);
-      
-        return redirect()->route('usuario.index')->with('success', 'Editado com sucesso');
+
+        $usuarios = $this->usuarioRepository->salvarEditar($request, $userId);
+        return response()->json($usuarios);
     }
 
     public function status($statusId)

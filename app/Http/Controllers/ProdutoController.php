@@ -18,6 +18,7 @@ use Illuminate\Support\Facades\Validator;
 class ProdutoController extends Controller
 {
     protected $produtoRepository;
+
     public function __construct(ProdutoRepository $produtoRepository)
     {
         $this->produtoRepository = $produtoRepository;
@@ -38,14 +39,14 @@ class ProdutoController extends Controller
 
     public function inserirCadastro(ValidacaoProduto $request)
     {
-        $this->produtoRepository->inserirCadastro($request);
-        return redirect()->route('produtos.index')->with('success', 'Inserido com sucesso');
+     
+        $produtos= $this->produtoRepository->inserirCadastro($request);
+        return response()->json($produtos);
     }
 
     public function buscarProduto(Request $request)
     {
         $produtos = $this->produtoRepository->buscar($request);
-        // return view('produtos.index', compact('produtos'));
         return response()->json($produtos);
     }
 
@@ -58,7 +59,8 @@ class ProdutoController extends Controller
 
     public function salvarEditar(ValidacaoProdutoEditar $request, $produtoId)
     {  
-        $this->produtoRepository->update($request,$produtoId);
+     
+        $this->produtoRepository->salvarEditar($request,$produtoId);
         return redirect()->route('produtos.index')->with('success', 'Editado com sucesso');
     }
     public function status($statusId)

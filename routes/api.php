@@ -28,20 +28,20 @@ Route::prefix('v1')->group(function() {
             Route::post('/produto/status/{produtoId}',[ProdutoController::class, 'status'])->name('produtos.status');
         });
 
-        Route::prefix('/produto')->middleware('can:permissao')->group(function() {
-            Route::get('/',[ProdutoController::class, 'produtos'])->name('produtos.inicio');
+        Route::prefix('/produto')->group(function() {
+            // Route::get('/',[ProdutoController::class, 'produtos'])->name('produtos.inicio');
             Route::get('/index',[ProdutoController::class, 'Index'])->name('produtos.index');
-            Route::get('/cadastro',[ProdutoController::class, 'cadastro'])->name('produtos.cadastro');
-            Route::post('/salvar-cadastro',[ProdutoController::class, 'inserirCadastro'])->name('produtos.salvarCadastro');
+            // Route::get('/cadastro',[ProdutoController::class, 'cadastro'])->name('produtos.cadastro');
+            Route::post('/cadastro',[ProdutoController::class, 'inserirCadastro']);
             Route::get('/buscar-produto',[ProdutoController::class, 'buscarProduto'])->name('produtos.buscar');
             Route::get('/editar/{produtoId}',[ProdutoController::class, 'editar'])->name('produtos.editar');
-            Route::post('/editar/{produtoId}',[ProdutoController::class, 'salvarEditar'])->name('produtos.salvarEditar');
+            Route::put('/editar/{produtoId}',[ProdutoController::class, 'salvarEditar'])->name('produtos.salvarEditar');
             Route::post('/status/{produtoId}',[ProdutoController::class, 'status'])->name('produtos.status');
         });
 
         Route::prefix('/estoque')->group(function() {
             Route::get('/index',[EstoqueController::class, 'Index'])->name('estoque.index');
-            Route::get('/cadastro',[EstoqueController::class, 'Cadastro'])->name('estoque.cadastro');
+            // Route::get('/cadastro',[EstoqueController::class, 'Cadastro'])->name('estoque.cadastro');
             Route::post('/cadastro',[EstoqueController::class, 'inserirEstoque'])->name('estoque.inserirEstoque');
             Route::get('/buscar-estoque',[EstoqueController::class, 'buscar'])->name('estoque.buscar');
             // Route::get('/editar/{estoqueId}',[EstoqueController::class, 'editar'])->name('estoque.editar');
@@ -80,22 +80,22 @@ Route::prefix('v1')->group(function() {
             Route::post('/cadastro',[UsuarioController::class, 'inserirusuario'])->name('usuario.inserirUsuario');
             Route::get('/editar/{userId}', [UsuarioController::class , 'editar'])->name('usuario.editar');
             Route::post('/status/{userId}',[UsuarioController::class, 'status'])->name('usuario.status');
-            Route::post('/editar/{userid}',[UsuarioController::class, 'salvarEditar'])->name('usuario.salvarEditar');
+            Route::put('/editar/{userid}',[UsuarioController::class, 'salvarEditar'])->name('usuario.salvarEditar');
             Route::get('/buscar-usuario',[UsuarioController::class, 'Buscar'])->name('usuario.buscar');
         });
 
-      
+        Route::prefix('/unidades')->group(function() {
+            Route::get('/index', [UnidadeController::class , 'index'])->name('unidades.index');
+            Route::get('/cadastro',[UnidadeController::class, 'cadastro'])->name('unidades.cadastro');
+            Route::post('/cadastro',[UnidadeController::class, 'inserirUnidade'])->name('unidades.inserirUnidade');
+            Route::get('/buscar-unidade',[UnidadeController::class, 'Buscar'])->name('unidades.buscar');
+            Route::get('/editar/{unidadeId}',[UnidadeController::class, 'editar'])->name('unidades.editar');
+            Route::post('/editar/{unidadeId}',[UnidadeController::class, 'salvarEditar'])->name('unidades.salvarEditar');
+            Route::post('/status/{unidadeId}',[UnidadeController::class, 'status'])->name('unidades.status');
+        });
     });
 
-    Route::prefix('/unidades')->group(function() {
-        Route::get('/index', [UnidadeController::class , 'index'])->name('unidades.index');
-        Route::get('/cadastro',[UnidadeController::class, 'cadastro'])->name('unidades.cadastro');
-        Route::post('/cadastro',[UnidadeController::class, 'inserirUnidade'])->name('unidades.inserirUnidade');
-        Route::get('/buscar-unidade',[UnidadeController::class, 'Buscar'])->name('unidades.buscar');
-        Route::get('/editar/{unidadeId}',[UnidadeController::class, 'editar'])->name('unidades.editar');
-        Route::post('/editar/{unidadeId}',[UnidadeController::class, 'salvarEditar'])->name('unidades.salvarEditar');
-        Route::post('/status/{unidadeId}',[UnidadeController::class, 'status'])->name('unidades.status');
-    });
+  
 
     Route::post('login', [AuthController::class, 'login']);
     Route::get('login', [AuthController::class, 'login']);

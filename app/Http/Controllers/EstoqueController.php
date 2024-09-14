@@ -35,37 +35,38 @@ class EstoqueController extends Controller
     public function historico()
     { 
         $historicos = $this->estoqueRepository->historico();
-        return view('estoque.historico', compact('historicos'));
+        return response()->json($historicos);
     }
 
-    public function cadastro()
-    {
-        $cadastro = $this->estoqueRepository->cadastro();
-        return view('estoque.cadastro',$cadastro);
-    }
+    // public function cadastro()
+    // {
+    //     $cadastro = $this->estoqueRepository->cadastro();
+    //     return response()->json($cadastro);
+    // }
 
     public function buscar(Request $request)
     {
         $buscar = $this->estoqueRepository->buscar($request);
-        return view('estoque.index',$buscar);
+        return response()->json($buscar);
+
     }
 
     public function inserirEstoque(ValidacaoEstoque $request)
     { 
-        $this->estoqueRepository->inserirEstoque($request);
-        return redirect()->route('estoque.index')->with('success', 'Inserido com sucesso');
+        $inserir = $this->estoqueRepository->inserirEstoque($request);
+        return response()->json($inserir);
     }
 
     public function editar($estoqueId)
     {
         $editar = $this->estoqueRepository->editar($estoqueId);
-        return view('estoque.editar', $editar);
+        return response()->json($editar);
     }
 
     public function salvarEditar(ValidacaoEstoque $request, $estoqueId)
     {
-        $this->estoqueRepository->salvarEditar($request,$estoqueId);
-        return redirect()->route('estoque.index')->with('success', 'Editado com sucesso');
+       $salvarEditar = $this->estoqueRepository->salvarEditar($request,$estoqueId);
+       return response()->json($salvarEditar);
     }
 
     public function status($statusId)
@@ -76,8 +77,9 @@ class EstoqueController extends Controller
 
     public function atualizarEstoque(Requests $request,$estoqueId, $operacao)
     {
-        $this->estoqueRepository->atualizarEstoque($request, $estoqueId , $operacao);
-        return redirect()->route('estoque.index')->with('success', 'Quantidade atualizada com sucesso');
+        $atualizar =  $this->estoqueRepository->atualizarEstoque($request, $estoqueId , $operacao);
+        return response()->json($atualizar);
+
     }
 
     public function graficoFiltro(Requests $request)

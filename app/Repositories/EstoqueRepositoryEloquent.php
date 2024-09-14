@@ -64,6 +64,7 @@ class EstoqueRepositoryEloquent extends BaseRepository implements EstoqueReposit
 
     public function inserirEstoque(ValidacaoEstoque $request)
     {
+      
          Estoque::create([
             'quantidade'        =>$request->quantidade,
             'localizacao'       =>$request->localizacao,
@@ -83,7 +84,6 @@ class EstoqueRepositoryEloquent extends BaseRepository implements EstoqueReposit
             'id_produto_fk'     =>$request->input('nome_produto'),
             'id_marca_fk'       =>$request->input('marca')
         ]);
-      //  return redirect()->route('estoque.index')->with('success', 'Inserido com sucesso');
       
     }
 
