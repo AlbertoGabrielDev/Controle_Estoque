@@ -84,21 +84,24 @@ Route::prefix('v1')->group(function() {
             Route::get('/buscar-usuario',[UsuarioController::class, 'Buscar'])->name('usuario.buscar');
         });
 
-        Route::prefix('/unidades')->group(function() {
-            Route::get('/index', [UnidadeController::class , 'index'])->name('unidades.index');
-            Route::get('/cadastro',[UnidadeController::class, 'cadastro'])->name('unidades.cadastro');
-            Route::post('/cadastro',[UnidadeController::class, 'inserirUnidade'])->name('unidades.inserirUnidade');
-            Route::get('/buscar-unidade',[UnidadeController::class, 'Buscar'])->name('unidades.buscar');
-            Route::get('/editar/{unidadeId}',[UnidadeController::class, 'editar'])->name('unidades.editar');
-            Route::post('/editar/{unidadeId}',[UnidadeController::class, 'salvarEditar'])->name('unidades.salvarEditar');
-            Route::post('/status/{unidadeId}',[UnidadeController::class, 'status'])->name('unidades.status');
-        });
+      
     });
 
   
-
+    Route::prefix('/unidades')->group(function() {
+        Route::get('/index', [UnidadeController::class , 'index'])->name('unidades.index');
+        Route::get('/cadastro',[UnidadeController::class, 'cadastro'])->name('unidades.cadastro');
+        Route::post('/cadastro',[UnidadeController::class, 'inserirUnidade'])->name('unidades.inserirUnidade');
+        Route::get('/buscar-unidade',[UnidadeController::class, 'Buscar'])->name('unidades.buscar');
+        Route::get('/editar/{unidadeId}',[UnidadeController::class, 'editar'])->name('unidades.editar');
+        Route::post('/editar/{unidadeId}',[UnidadeController::class, 'salvarEditar'])->name('unidades.salvarEditar');
+        Route::post('/status/{unidadeId}',[UnidadeController::class, 'status'])->name('unidades.status');
+    });
+    
     Route::post('login', [AuthController::class, 'login']);
     Route::get('login', [AuthController::class, 'login']);
+    Route::get('logout', [AuthController::class, 'logout']);
+    
     Route::post('register', [AuthController::class, 'register']);
     });
 });

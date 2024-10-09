@@ -39,6 +39,30 @@ class AuthController extends Controller
         return response()->json(['error' => 'Unauthorized'], 401);
     }
     
+    // public function logout(Request $request){
+    //     Auth::logout();
+    //     $request->session()->invalidate();
+    //     $request->session()->regenerateToken();
+    //     return response()->json('Deslogado');
+    // }
+
+    public function logout(Request $request)
+{
+    $user = $request->user();
+  
+    
+    if ($user) {
+        $request->user()->currentAccessToken()->delete();
+        
+        $request->session()->forget('id_unidade');
+
+        return response()->json(['message' => 'Logout realizado com sucesso']);
+    }
+
+    // Caso o usuário não esteja autenticado, retorna erro
+    return response()->json(['error' => 'Nenhum usuário autenticado'], 401);
+}
+
 
     public function register(Request $request)
     {
