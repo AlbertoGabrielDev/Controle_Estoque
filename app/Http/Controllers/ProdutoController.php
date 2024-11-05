@@ -14,6 +14,7 @@ use App\Http\Requests\ValidacaoProduto;
 use App\Http\Requests\ValidacaoProdutoEditar;
 use App\Repositories\ProdutoRepository;
 use Illuminate\Support\Facades\Validator;
+use Prettus\Repository\Criteria\RequestCriteria;
 
 class ProdutoController extends Controller
 {
@@ -24,7 +25,10 @@ class ProdutoController extends Controller
     }
     public function Index()
     {
+        // $this->produtoRepository->boot();
+    
         $produtos = $this->produtoRepository->getAll();
+
         return view('produtos.index', compact('produtos'));
     }
 
@@ -40,9 +44,12 @@ class ProdutoController extends Controller
         return redirect()->route('produtos.index')->with('success', 'Inserido com sucesso');
     }
 
-    public function buscarProduto(Request $request)
+    public function buscarProduto()
     {
-        $produtos = $this->produtoRepository->buscar($request);
+        // $search = $request->get('search','');
+        // dd($this->produtoRepository);
+        $produtos = $this->produtoRepository->paginate(15);
+        // dd($produtos);
         return view('produtos.index', compact('produtos'));
     }
 

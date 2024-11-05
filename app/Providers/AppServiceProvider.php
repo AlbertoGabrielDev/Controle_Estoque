@@ -8,6 +8,7 @@ use App\Repositories\CategoriaRepositoryEloquent;
 use App\Repositories\EstoqueRepository;
 use App\Repositories\EstoqueRepositoryEloquent;
 use App\Repositories\ProdutoRepository;
+use App\Repositories\ProdutoRepositoryEloquent;
 use App\Repositories\UnidadesRepository;
 use App\Repositories\UnidadesRepositoryEloquent;
 use Illuminate\Support\ServiceProvider;
@@ -19,10 +20,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        $this->app->bind(ProdutoRepository::class , function($app){
-            return new ProdutoRepository(new Produto());
-        });
+    
         $this->app->bind(CategoriaRepository::class, CategoriaRepositoryEloquent::class);
+        $this->app->bind(ProdutoRepository::class, ProdutoRepositoryEloquent::class);
         $this->app->bind(EstoqueRepository::class, EstoqueRepositoryEloquent::class);
         $this->app->bind(UnidadesRepository::class, UnidadesRepositoryEloquent::class);
     }
