@@ -19,7 +19,7 @@
             Filtrar
           </button>
         </h2>
-        <div id="flush-collapseOne" class="accordion-collapse collapse" aria-labelledby="flush-headingOne" data-bs-parent="#accordionFlushExample">
+      
           <div class="accordion-body">
               <input type="text" class="form-control form-control-lg w-50 m-1" name="nome_produto" placeholder="Nome do Produto">
               <input type="text" class="form-control form-control-lg w-50 m-1" name="lote" placeholder="Lote">
@@ -53,7 +53,7 @@
                 </select>
             </div>
             <button class="btn btn-primary m-1" type="submit">Pesquisar</button>
-        </div>
+     
       </div>
     </div>
 
@@ -81,38 +81,38 @@
         </tr>
       </thead>
       <tbody>
-        @foreach ($estoques as $estoque)
-      
+        @foreach ($estoquesCollection as $estoque)
+        {{dd($estoque)}}
         <tr class="hover:bg-grey-lighter">
-            <td class="p-4 border-b border-grey-light text-left">{{$estoque->pivotParent->nome_produto}}</td>
-            <td class="p-4 border-b border-grey-light text-left">R${{$estoque->preco_custo}}</td>
-            <td class="p-4 border-b border-grey-light text-left">R${{$estoque->preco_venda}}</td>
-            <td class="p-4 border-b border-grey-light text-left quantidade" data-quantidade="{{$estoque->quantidade}}">{{$estoque->quantidade}}</td>
-            <td class="p-4 border-b border-grey-light text-left">{{ \Carbon\Carbon::parse($estoque->data_chegada)->format('d/m/Y') }}</td> 
-            <td class="p-4 border-b border-grey-light text-left">{{$estoque->created_at}}</td>
-            <td class="p-4 border-b border-grey-light text-left">{{$estoque->lote}}</td>
-            <td class="p-4 border-b border-grey-light text-left">{{$estoque->localizacao}}</td>
-            <td class="p-4 border-b border-grey-light text-left aviso" data-aviso="{{$estoque->quantidade_aviso}}">{{$estoque->quantidade_aviso}}</td>
-            <td class="p-4 border-b border-grey-light text-left expiration-date" id="data">{{($estoque->validade)}}</td>
+            <td class="p-4 border-b border-grey-light text-left">{{$estoque->nome_produto}}</td>
+            <td class="p-4 border-b border-grey-light text-left">R${{$estoque->pivot->preco_custo}}</td>
+            <td class="p-4 border-b border-grey-light text-left">R${{$estoque->pivot->preco_venda}}</td>
+            <td class="p-4 border-b border-grey-light text-left quantidade" data-quantidade="{{$estoque->quantidade}}">{{$estoque->pivot->quantidade}}</td>
+            <td class="p-4 border-b border-grey-light text-left">{{ \Carbon\Carbon::parse($estoque->pivot->data_chegada)->format('d/m/Y') }}</td> 
+            <td class="p-4 border-b border-grey-light text-left">{{$estoque->pivot->created_at}}</td>
+            <td class="p-4 border-b border-grey-light text-left">{{$estoque->pivot->lote}}</td>
+            <td class="p-4 border-b border-grey-light text-left">{{$estoque->pivot->localizacao}}</td>
+            <td class="p-4 border-b border-grey-light text-left aviso" data-aviso="{{$estoque->quantidade_aviso}}">{{$estoque->pivot->quantidade_aviso}}</td>
+            <td class="p-4 border-b border-grey-light text-left expiration-date" id="data">{{($estoque->pivot->validade)}}</td>
             <td class="border-b border-grey-light">
-              <form method="GET" action="{{ route('estoque.quantidade', ['estoqueId' => $estoque->id_estoque, 'operacao' => 'aumentar']) }}">
+              <form method="GET" action="{{ route('estoque.quantidade', ['estoqueId' => $estoque->pivot->id_estoque, 'operacao' => 'aumentar']) }}">
                 @csrf
                 <input type="number" class="text-base placeholder-gray-500 border rounded-full focus:shadow-outline  border-b border-grey-light" name="quantidadeHistorico">
                 <button type="submit" class="btn btn-success m-1">Aumentar</button>
             </form>
             </td>
             <td class="border-b border-grey-light">
-              <form method="GET" action="{{ route('estoque.quantidade', ['estoqueId' => $estoque->id_estoque, 'operacao' => 'diminuir']) }}">
+              <form method="GET" action="{{ route('estoque.quantidade', ['estoqueId' => $estoque->pivot->id_estoque, 'operacao' => 'diminuir']) }}">
                 @csrf
                 <input type="number" class="text-base placeholder-gray-500 border rounded-full focus:shadow-outline " name="quantidadeHistorico">
                 <button type="submit" class="btn btn-success m-1">Diminuir</button>
             </form>
             </td>
-            <td class="p-4 border-b border-grey-light text-left"><a href="{{route('estoque.editar', $estoque->id_estoque)}}">Editar</a></td> 
+            <td class="p-4 border-b border-grey-light text-left"><a href="{{route('estoque.editar', $estoque->pivot->id_estoque)}}">Editar</a></td> 
             <td class="p-4 border-b border-grey-light text-left">
               @can('permissao')
                 <button class="toggle-ativacao m-2 @if($estoque->status === 1) btn-danger @elseif($estoque->status === 0) btn-success @else btn-primary @endif" 
-                  data-id="{{ $estoque->id_estoque }}">
+                  data-id="{{ $estoque->pivot->id_estoque }}">
                   {{ $estoque->status ? 'Inativar' : 'Ativar' }}
                 </button>
               @endcan

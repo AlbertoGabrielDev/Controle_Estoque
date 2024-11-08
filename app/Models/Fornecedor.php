@@ -31,8 +31,22 @@ class Fornecedor extends Model
         return $this->belongsToMany(Produto::class, 'estoque', 'id_fornecedor_fk', 'id_produto_fk');
     }
 
-    public function estoques(): BelongsToMany{
-        return $this->belongsToMany(Estoque::class, 'fornecedor' ,'id_fornecedor');
+    public function estoques(): BelongsToMany
+    {
+        return $this->belongsToMany(Produto::class, 'estoque', 'id_fornecedor_fk', 'id_produto_fk')
+            ->withPivot([  
+                'id_estoque',
+                'quantidade',
+                'localizacao',
+                'preco_custo',
+                'preco_venda',
+                'lote',
+                'data_chegada',
+                'validade',
+                'quantidade_aviso',
+                'created_at',
+                'status'
+            ]);
     }
 
     public function telefones(): HasMany

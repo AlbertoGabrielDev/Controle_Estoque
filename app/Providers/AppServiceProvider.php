@@ -7,6 +7,10 @@ use App\Repositories\CategoriaRepository;
 use App\Repositories\CategoriaRepositoryEloquent;
 use App\Repositories\EstoqueRepository;
 use App\Repositories\EstoqueRepositoryEloquent;
+use App\Repositories\FornecedoresRepository;
+use App\Repositories\FornecedoresRepositoryEloquent;
+use App\Repositories\MarcaRepository;
+use App\Repositories\MarcaRepositoryEloquent;
 use App\Repositories\ProdutoRepository;
 use App\Repositories\ProdutoRepositoryEloquent;
 use App\Repositories\UnidadesRepository;
@@ -20,8 +24,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-    
+        $this->app->bind(MarcaRepository::class, MarcaRepositoryEloquent::class);
         $this->app->bind(CategoriaRepository::class, CategoriaRepositoryEloquent::class);
+        $this->app->bind(FornecedoresRepository::class, FornecedoresRepositoryEloquent::class);
         $this->app->bind(ProdutoRepository::class, ProdutoRepositoryEloquent::class);
         $this->app->bind(EstoqueRepository::class, EstoqueRepositoryEloquent::class);
         $this->app->bind(UnidadesRepository::class, UnidadesRepositoryEloquent::class);

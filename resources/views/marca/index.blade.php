@@ -12,9 +12,9 @@
     </a>
   </div>
 
-<form action="{{ route('marca.buscar') }}" class="relative w-6/12" method="GET">
+<form action="{{ route('marca.index') }}" class="relative w-6/12" method="GET">
   <div class="relative w-full">
-    <input type="text" name="nome_marca" class="w-5/12 h-10 pl-10 text-base placeholder-gray-500 border rounded-full focus:shadow-outline" placeholder="Digite o nome da Marca">
+    <input type="text" name="searchLike" value="{{ request('searchLike') }}" class="w-5/12 h-10 pl-10 text-base placeholder-gray-500 border rounded-full focus:shadow-outline" placeholder="Digite o nome da Marca">
     <button class="w-2/12 h-10 text-base placeholder-gray-500 border rounded-full focus:shadow-outline" type="submit">Pesquisar</button>
   </div>
 </form>

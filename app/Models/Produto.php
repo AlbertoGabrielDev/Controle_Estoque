@@ -97,24 +97,24 @@ class Produto extends Model implements Transformable
             return $query;
     }
    
-    public function fornecedores() : BelongsToMany 
+    public function fornecedores() : BelongsToMany
     {
-        return $this->belongsToMany(Fornecedor::class ,'estoque', 'id_produto_fk', 'id_fornecedor_fk')
-        ->as('estoque')
-        ->withPivot([
-            'id_estoque',
-            'quantidade',
-            'localizacao',
-            'preco_custo',
-            'preco_venda',
-            'lote',
-            'data_chegada',
-            'validade',
-            'localizacao',
-            'quantidade_aviso',
-            'created_at',
-            'status'
-        ]);
+       
+        return $this->belongsToMany(Fornecedor::class, 'estoque', 'id_produto_fk', 'id_fornecedor_fk')
+            ->as('estoque') 
+            ->withPivot([
+                'id_estoque',
+                'quantidade',
+                'localizacao',
+                'preco_custo',
+                'preco_venda',
+                'lote',
+                'data_chegada',
+                'validade',
+                'quantidade_aviso',
+                'created_at',
+                'status'
+            ]);
     }
 
     public function categorias() : BelongsToMany

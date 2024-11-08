@@ -9,11 +9,20 @@ use Illuminate\Support\Facades\Gate;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Requests\ValidacaoMarca;
+use App\Repositories\MarcaRepository;
+
 class MarcaController extends Controller
 {
+    protected $marcaRepository;
+
+    public function __construct(MarcaRepository $marcaRepository)
+    {
+        $this->marcaRepository = $marcaRepository;
+    }
+
     public function index()
     {
-        $marcas = Gate::allows('permissao') ?  $marcas = Marca::paginate(15) : $marcas = Marca::where('status', 1)->paginate(15);
+        $marcas = $this->marcaRepository->index();
         return view('marca.index', compact('marcas'));
     }
 
@@ -22,38 +31,22 @@ class MarcaController extends Controller
         return view('marca.cadastro');
     }
 
-    public function buscar(Request $request) 
-    {
-        if (Gate::allows('permissao')) {
-            $marcas = Marca::where('nome_marca', 'like', '%' . $request->input('nome_marca') . '%')->paginate(15);
-        } else {
-            $marcas = Marca::where('nome_marca', 'like', '%' . $request->input('nome_marca') . '%')->where('status',1)->paginate(15);
-        }
-        
-        return view('marca.index', compact('marcas'));
-    } 
 
-    public function editar(Request $request, $marcaId)
+    public function editar($marcaId)
     {
-        $marcas = Marca::where('id_marca' , $marcaId)->get();
+        $marcas = $this->marcaRepository->editar($marcaId);
         return view('marca.editar',compact('marcas'));
     }
 
     public function salvarEditar(ValidacaoMarca $request, $marcaId)
     {
-        $marcas = Marca::where('id_marca' , $marcaId)
-        ->update([
-           'nome_marca' => $request->nome_marca 
-        ]);
+        $this->marcaRepository->salvarEditar($request,$marcaId);
         return redirect()->route('marca.index')->with('success', 'Editado com sucesso');
     }
 
     public function inserirMarca(ValidacaoMarca $request)
     {
-        $marca = Marca::create([
-            'nome_marca' => $request->nome_marca,
-            'id_users_fk' => Auth::id()
-        ]);
+        $this->marcaRepository->inserirMarca($request);
         return redirect()->route('marca.index')->with('success', 'Inserido com sucesso');
     }
 

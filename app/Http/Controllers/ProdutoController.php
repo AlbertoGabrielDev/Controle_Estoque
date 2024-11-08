@@ -25,10 +25,7 @@ class ProdutoController extends Controller
     }
     public function Index()
     {
-        // $this->produtoRepository->boot();
-    
         $produtos = $this->produtoRepository->getAll();
-
         return view('produtos.index', compact('produtos'));
     }
 
@@ -42,15 +39,6 @@ class ProdutoController extends Controller
     {
         $this->produtoRepository->inserirCadastro($request);
         return redirect()->route('produtos.index')->with('success', 'Inserido com sucesso');
-    }
-
-    public function buscarProduto()
-    {
-        // $search = $request->get('search','');
-        // dd($this->produtoRepository);
-        $produtos = $this->produtoRepository->paginate(15);
-        // dd($produtos);
-        return view('produtos.index', compact('produtos'));
     }
 
     public function editar($produtoId) 

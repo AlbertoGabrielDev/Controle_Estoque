@@ -26,7 +26,6 @@ class ProdutoRepositoryEloquent extends BaseRepository implements ProdutoReposit
     protected $fieldSearchable = [
         'nome_produto' => 'like',
         'descricao' => 'like',
-        'id_produto'
     ];
 
     public function model()
@@ -53,50 +52,18 @@ class ProdutoRepositoryEloquent extends BaseRepository implements ProdutoReposit
     {
         return Produto::findOrFail($id);
     }
-    public function getAll()
-{
-    $search = request()->get('search');
-    $searchLike = request()->get('searchLike'); 
 
-    if (Gate::allows('permissao')) {
-        $query = Produto::query();
+    public function getAll(){
 
-     
-        if ($searchLike) {
-            foreach ($this->fieldSearchable as $field => $operator) {
-                if ($operator === 'like') {
-                    $query->orWhere($field, 'LIKE', '%' . $searchLike . '%');
-                }
-            }
+        if (Gate::allows('permissao')) {
+            $query = Produto::query();
+            $this->applyLikeConditions($query, request()->get('searchLike'));
+            return $query->paginate(15);
         }
-      
-        if ($search) {
-            $searchArray = array_filter(explode(';', $search));
 
-            foreach ($searchArray as $condition) {
-                if (substr_count($condition, ':') === 2) {
-                    [$field, $operator, $value] = explode(':', $condition, 3);
-
-                    if (array_key_exists($field, $this->fieldSearchable)) {
-                        if (strtolower($operator) === 'like') {
-                            $value = '%' . $value . '%';
-                        }
-                        $query->where($field, $operator, $value);
-                    }
-                } elseif (substr_count($condition, ':') === 1) {
-                    [$field, $value] = explode(':', $condition);
-                    $query->where($field, '=', $value);
-                }
-            }
-        }
-       
-        $produtos = $query->paginate(15);
-    } else {
-        $produtos = Produto::where('status', 1)->paginate(15);
+        return Produto::where('status', 1)->paginate(15);
+    
     }
-
-    return $produtos;
-}
 
     public function cadastro()
     {
@@ -119,17 +86,6 @@ class ProdutoRepositoryEloquent extends BaseRepository implements ProdutoReposit
             'id_categoria_fk'      => $request->input('nome_categoria'),
             'id_produto_fk'        => $produtoId->id_produto
         ]);
-    }
-
-    public function buscar(Request $request)
-    {
-        if (Gate::allows('permissao')) {
-            $produtos = Produto::where('nome_produto', 'like', '%' . $request->input('nome_produto') . '%')->paginate(15);
-        } else {
-            $produtos = Produto::where('nome_produto', 'like', '%' . $request->input('nome_produto') . '%')->where('status', 1)->paginate(15);
-        }
-
-        return $produtos;
     }
 
     public function editarView($produtoId)
@@ -156,8 +112,4 @@ class ProdutoRepositoryEloquent extends BaseRepository implements ProdutoReposit
         return $status;
     }
 
-    public function buscarProduto()
-    {
-        return $this->model()::get();
-    }
 }
