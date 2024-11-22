@@ -84,8 +84,9 @@ class Produto extends Model implements Transformable
                         $subquery->where('m.nome_marca', request()->input('nome_marca'));
                     }
                 })->where(function ($subquery){
-                    if (request()->input('nome_fornecedor')) {
-                        $subquery->where('fornecedor.nome_fornecedor',  request()->input('nome_fornecedor'));
+                    if (request()->input('search')) {
+                      
+                        $subquery->where('fornecedor.nome_fornecedor','like' ,'%' .request()->input('search') . '%');
                     }
                 })->where(function ($subquery){
                     if (request()->input('nome_categoria')) {
@@ -93,7 +94,7 @@ class Produto extends Model implements Transformable
                     }
                 });
             });
-
+           
             return $query;
     }
    

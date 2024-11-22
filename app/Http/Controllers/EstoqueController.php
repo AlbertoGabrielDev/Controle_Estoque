@@ -44,12 +44,6 @@ class EstoqueController extends Controller
         return view('estoque.cadastro',$cadastro);
     }
 
-    public function buscar(Request $request)
-    {
-        $buscar = $this->estoqueRepository->buscar($request);
-        return view('estoque.index',$buscar);
-    }
-
     public function inserirEstoque(ValidacaoEstoque $request)
     { 
         $this->estoqueRepository->inserirEstoque($request);

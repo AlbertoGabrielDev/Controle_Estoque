@@ -11,7 +11,7 @@
     </a>
   </div>
   
-  <form action="{{ route('estoque.buscar') }}" method="GET">
+  <form action="{{ route('estoque.index') }}" method="GET">
     <div class="accordion accordion-flush" id="accordionFlushExample">
       <div class="accordion-item">
         <h2 class="accordion-header" id="flush-headingOne">
@@ -21,31 +21,31 @@
         </h2>
       
           <div class="accordion-body">
-              <input type="text" class="form-control form-control-lg w-50 m-1" name="nome_produto" placeholder="Nome do Produto">
-              <input type="text" class="form-control form-control-lg w-50 m-1" name="lote" placeholder="Lote">
-              <input type="text" class="form-control form-control-lg w-50 m-1" name="localizacao" placeholder="Localização">
-              <input type="text" class="form-control form-control-lg w-50 m-1" name="preco_custo" placeholder="Preço Custo">
-              <input type="text" class="form-control form-control-lg w-50 m-1" name="preco_venda" placeholder="Preço Venda">
-              <input type="text" class="form-control form-control-lg w-50 m-1" name="quantidade" placeholder="Quantidade">
+              <input type="text" class="form-control form-control-lg w-50 m-1" value="{{ request('nome_produto') }}" name="nome_produto" placeholder="Nome do Produto">
+              <input type="text" class="form-control form-control-lg w-50 m-1" value="{{request('lote')}}" name="lote" placeholder="Lote">
+              <input type="text" class="form-control form-control-lg w-50 m-1" value="{{request('localizacao')}}" name="localizacao" placeholder="Localização">
+              <input type="text" class="form-control form-control-lg w-50 m-1" value="{{request('preco_custo')}}" name="preco_custo" placeholder="Preço Custo">
+              <input type="text" class="form-control form-control-lg w-50 m-1" value="{{request('preco_venda')}}" name="preco_venda" placeholder="Preço Venda">
+              <input type="text" class="form-control form-control-lg w-50 m-1" value="{{request('quantidade')}}" name="quantidade" placeholder="Quantidade">
               <div class="input-group input-group-lg w-50">
               <span class="input-group-text" id="inputGroup-sizing-lg">Data Vencimento</span>
               <input type="date" name="validade" class="form-control form-control-lg " aria-label="Sizing example input">
               </div>
           </div>
             <div class="col-md-4">
-              <select class="form-control form-control-lg w-75 m-1" name="nome_fornecedor" >
+              <select class="form-control form-control-lg w-75 m-1" name="nome_fornecedor" value="{{ request('nome_fornecedor') }}">
                   <option value="">Selecione um Fornecedor</option>
                 @foreach ($fornecedores as $fornecedor)
                     <option value="{{ $fornecedor->nome_fornecedor }}">{{ $fornecedor->nome_fornecedor}}</option>
                 @endforeach
                 </select> 
-                <select class="form-control form-control-lg w-75 m-1" name="nome_marca" >
+                <select class="form-control form-control-lg w-75 m-1" name="nome_marca" value="{{request('nome_marca')}}">
                 <option value="">Selecione uma Marca</option>
                 @foreach ($marcas as $marca)
                     <option value="{{ $marca->nome_marca}}">{{ $marca->nome_marca}}</option>
                 @endforeach
                 </select>
-                <select class="form-control form-control-lg w-75 m-1" name="nome_categoria" >
+                <select class="form-control form-control-lg w-75 m-1" value="{{request('nome_categoria')}}" name="nome_categoria">
                 <option value="">Selecione uma Categoria</option>
                 @foreach ($categorias as $categoria)
                     <option value="{{ $categoria->nome_categoria}}">{{ $categoria->nome_categoria}}</option>
@@ -82,7 +82,7 @@
       </thead>
       <tbody>
         @foreach ($estoquesCollection as $estoque)
-        {{dd($estoque)}}
+        
         <tr class="hover:bg-grey-lighter">
             <td class="p-4 border-b border-grey-light text-left">{{$estoque->nome_produto}}</td>
             <td class="p-4 border-b border-grey-light text-left">R${{$estoque->pivot->preco_custo}}</td>

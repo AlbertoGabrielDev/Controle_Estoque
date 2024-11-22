@@ -32,6 +32,11 @@ class MarcaRepositoryEloquent extends BaseRepository implements MarcaRepository
         $this->pushCriteria(app(RequestCriteria::class));
     }
     
+    public function getFieldsSearchable()
+    {
+        return $this->fieldSearchable;
+    }
+    
     public function index()
     {
         if (Gate::allows('permissao')) {

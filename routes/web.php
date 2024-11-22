@@ -47,7 +47,7 @@ Route::middleware([
         Route::get('/',[EstoqueController::class, 'Index'])->name('estoque.index');
         Route::get('/cadastro',[EstoqueController::class, 'Cadastro'])->name('estoque.cadastro');
         Route::post('/cadastro',[EstoqueController::class, 'inserirEstoque'])->name('estoque.inserirEstoque');
-        Route::get('/buscar-estoque',[EstoqueController::class, 'buscar'])->name('estoque.buscar');
+        // Route::get('/buscar-estoque',[EstoqueController::class, 'buscar'])->name('estoque.buscar');
         Route::get('/editar/{estoqueId}',[EstoqueController::class, 'editar'])->name('estoque.editar');
         Route::post('/editar/{estoqueId}',[EstoqueController::class, 'salvarEditar'])->name('estoque.salvarEditar');
         Route::post('/status/{estoqueId}',[EstoqueController::class, 'status'])->name('estoque.status');

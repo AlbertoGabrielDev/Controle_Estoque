@@ -18,6 +18,12 @@ use Illuminate\Http\Request;
  */
 class CategoriaRepositoryEloquent extends BaseRepository implements CategoriaRepository
 {
+
+    protected $fieldSearchable = [
+        'nome_categoria' => 'like',
+       
+    ];
+
     /**
      * Specify Model class name
      *

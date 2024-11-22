@@ -39,6 +39,10 @@ class FornecedoresRepositoryEloquent extends BaseRepository implements Fornecedo
         return Fornecedor::class;
     }
     
+    public function getFieldsSearchable()
+    {
+        return $this->fieldSearchable;
+    }
 
     public function boot()
     {

@@ -28,71 +28,99 @@ use Illuminate\Http\Request as Requests;
  */
 class EstoqueRepositoryEloquent extends BaseRepository implements EstoqueRepository
 {
+   
     protected $fieldSearchable = [
-        'nome_marca' => 'like',
+        'quantidade' => 'like',
+        'localizacao' => 'like',
+        'data_entrega' => 'like',
+        'data_cadastro' => 'like',
+        'preco_custo' => 'like',
+        'preco_venda' => 'like',
+        'lote' => 'like',
+        'validade' => 'like',
+        'data_chegada' => 'like',
+        'id_produto_fk' => 'like',
+        'id_fornecedor_fk' => 'like',
+        'lote' => 'like',
+        'id_marca_fk' => 'like',
+        'localizacao' => 'like',
+        'created_at' => 'like',
+        'quantidade_aviso' => 'like',
+        'id_users_fk' => 'like',
+        'status' => 'like',
     ];
 
+
     public function model()
-    {
+{
         return Estoque::class;
+    }
+
+    public function getAllWithFilters()
+    {
+        return $this->applyFilters()->paginate(15);
+    }
+    
+    public function getFieldsSearchable()
+    {
+        return $this->fieldSearchable;
     }
 
     public function index()
     {
-      
-        $fornecedores = Fornecedor::all();
-        $marcas = Marca::all();
-        $categorias = Categoria::all();
+        $fornecedores = app(FornecedoresRepository::class)->all();
+        $marcas = app(MarcaRepository::class)->all();
+        $categorias = app(CategoriaRepository::class)->all();
+
         $produtos = Produto::with('fornecedores.estoques')->paginate(5);
 
         $estoquesCollection = collect();
-     
+
         if (Gate::allows('permissao')) {
-           
+
             $estoquesCollection = $produtos->flatMap(function ($produto) {
                 return $produto->fornecedores->flatMap(function ($fornecedor) {
-                    return $fornecedor->estoques; 
+                    return $fornecedor->estoques;
                 });
             });
         } else {
             $estoquesCollection = $produtos->flatMap(function ($produto) {
                 return $produto->fornecedores->flatMap(function ($fornecedor) {
-                    return $fornecedor->estoques->where('status', 1); 
+                    return $fornecedor->estoques->where('status', 1);
                 });
             });
         }
-    
-    
+        $this->getAllWithFilters();
         return compact('estoquesCollection', 'produtos', 'fornecedores', 'marcas', 'categorias');
     }
 
     public function inserirEstoque(ValidacaoEstoque $request)
     {
-         Estoque::create([
-            'quantidade'        =>$request->quantidade,
-            'localizacao'       =>$request->localizacao,
-            'preco_custo'       =>$request->preco_custo,
-            'preco_venda'       =>$request->preco_venda,
-            'data_chegada'      =>$request->data_chegada,
-            'lote'              =>$request->lote,
-            'id_produto_fk'     =>$request->input('nome_produto'),
-            'id_fornecedor_fk'  =>$request->input('fornecedor'),
-            'id_marca_fk'       =>$request->input('marca'),
-            'quantidade_aviso'  =>$request->quantidade_aviso,
-            'validade'          =>$request->validade,
-            'id_users_fk'       =>Auth::id()
+        Estoque::create([
+            'quantidade'        => $request->quantidade,
+            'localizacao'       => $request->localizacao,
+            'preco_custo'       => $request->preco_custo,
+            'preco_venda'       => $request->preco_venda,
+            'data_chegada'      => $request->data_chegada,
+            'lote'              => $request->lote,
+            'id_produto_fk'     => $request->input('nome_produto'),
+            'id_fornecedor_fk'  => $request->input('fornecedor'),
+            'id_marca_fk'       => $request->input('marca'),
+            'quantidade_aviso'  => $request->quantidade_aviso,
+            'validade'          => $request->validade,
+            'id_users_fk'       => Auth::id()
         ]);
 
-       MarcaProduto::create([
-            'id_produto_fk'     =>$request->input('nome_produto'),
-            'id_marca_fk'       =>$request->input('marca')
+        MarcaProduto::create([
+            'id_produto_fk'     => $request->input('nome_produto'),
+            'id_marca_fk'       => $request->input('marca')
         ]);
-      //  return redirect()->route('estoque.index')->with('success', 'Inserido com sucesso');
-      
+        //  return redirect()->route('estoque.index')->with('success', 'Inserido com sucesso');
+
     }
 
     public function historico()
-    { 
+    {
         $historicos = Historico::with('estoques')->get();
 
         return $historicos;
@@ -103,34 +131,34 @@ class EstoqueRepositoryEloquent extends BaseRepository implements EstoqueReposit
         $produtos = Produto::all(); // resolver isso 
         $marcas = Marca::all();
         $fornecedores = Fornecedor::all();
-        return compact('fornecedores','marcas','produtos');
+        return compact('fornecedores', 'marcas', 'produtos');
     }
 
-    public function buscar()
-    {
-     
-        $fornecedores = Fornecedor::all();
-        $marcas = Marca::all();
-        $categorias = Categoria::all();
-        $produtos = Produto::paginate(2);
-        if (Gate::allows('permissao')) {
-            $estoquesCollection = [];
-            foreach ($produtos as $produto) 
-            {
-                $estoquesProduto = $produto->search->pluck('estoque')->all();
-                $estoquesCollection = array_merge($estoquesCollection, $estoquesProduto);
-            }
-        } else {
-            $estoquesCollection = [];
-            foreach ($produtos as $produto) 
-            {
-                $estoquesProduto = $produto->search->pluck('estoque')->where('status', 1)->all();
-                $estoquesCollection = array_merge($estoquesCollection, $estoquesProduto); 
-            }
-        }
-        
-        return compact('estoquesCollection', 'produtos','fornecedores','marcas','categorias');
-    }
+    // public function buscar()
+    // {
+
+    //     $fornecedores = Fornecedor::all();
+    //     $marcas = Marca::all();
+    //     $categorias = Categoria::all();
+    //     $produtos = Produto::paginate(2);
+    //     if (Gate::allows('permissao')) {
+    //         $estoquesCollection = [];
+    //         foreach ($produtos as $produto) 
+    //         {
+    //             $estoquesProduto = $produto->search->pluck('estoque')->all();
+    //             $estoquesCollection = array_merge($estoquesCollection, $estoquesProduto);
+    //         }
+    //     } else {
+    //         $estoquesCollection = [];
+    //         foreach ($produtos as $produto) 
+    //         {
+    //             $estoquesProduto = $produto->search->pluck('estoque')->where('status', 1)->all();
+    //             $estoquesCollection = array_merge($estoquesCollection, $estoquesProduto); 
+    //         }
+    //     }
+
+    //     return compact('estoquesCollection', 'produtos','fornecedores','marcas','categorias');
+    // }
 
     public function editar($estoqueId)
     {
@@ -139,26 +167,26 @@ class EstoqueRepositoryEloquent extends BaseRepository implements EstoqueReposit
         $marcas = Estoque::find($estoqueId)->marcas->merge(Marca::all());
         $estoques = Estoque::where('id_estoque', $estoqueId)->get();
 
-        return compact('estoques','produtos','fornecedores','marcas');
+        return compact('estoques', 'produtos', 'fornecedores', 'marcas');
     }
 
     public function salvarEditar(ValidacaoEstoque $request, $estoqueId)
     {
-        $estoques = Estoque::where('id_estoque' , $estoqueId)
-        ->update([
-            'localizacao'       =>$request->localizacao,
-            'preco_custo'       =>$request->preco_custo,
-            'preco_venda'       =>$request->preco_venda,
-            'id_fornecedor_fk'  =>$request->input('fornecedor'),
-            'quantidade_aviso'  =>$request->quantidade_aviso
-        ]);
+        $estoques = Estoque::where('id_estoque', $estoqueId)
+            ->update([
+                'localizacao'       => $request->localizacao,
+                'preco_custo'       => $request->preco_custo,
+                'preco_venda'       => $request->preco_venda,
+                'id_fornecedor_fk'  => $request->input('fornecedor'),
+                'quantidade_aviso'  => $request->quantidade_aviso
+            ]);
 
         MarcaProduto::where('id_produto_fk', $request->input('nome_produto'))
-        ->update([
-            'id_produto_fk' => $request->input('nome_produto'),
-            'id_marca_fk'   => $request->input('marca')
-        ]);
-     //   return redirect()->route('estoque.index')->with('success', 'Editado com sucesso');
+            ->update([
+                'id_produto_fk' => $request->input('nome_produto'),
+                'id_marca_fk'   => $request->input('marca')
+            ]);
+        //   return redirect()->route('estoque.index')->with('success', 'Editado com sucesso');
     }
 
     public function status($statusId)
@@ -194,12 +222,12 @@ class EstoqueRepositoryEloquent extends BaseRepository implements EstoqueReposit
             }
         }
     }
-    
 
-    public function graficoFiltro($startDate, $endDate):array
+
+    public function graficoFiltro($startDate, $endDate): array
     {
         if ($startDate && $endDate) {
-            
+
             $startDate = Carbon::parse($startDate)->startOfDay();
             $endDate = Carbon::parse($endDate)->endOfDay();
 
@@ -216,20 +244,20 @@ class EstoqueRepositoryEloquent extends BaseRepository implements EstoqueReposit
             $values = $vendas->map(function ($order) {
                 return number_format($order->venda, 0, '', '');
             });
-        }else{
+        } else {
             $vendas = Historico::selectRaw('MONTH(created_at) as mes, SUM(venda) as venda')
-            ->groupBy('mes')
-            ->orderBy('mes')
-            ->get();
+                ->groupBy('mes')
+                ->orderBy('mes')
+                ->get();
 
-             $labels = $vendas->pluck('mes')->map(function ($mes) {
+            $labels = $vendas->pluck('mes')->map(function ($mes) {
                 return Carbon::create()->month($mes)->format('F'); // Nome do mês
             });
             // $backgrounds = $precos->map(function ($value, $key){
             //     return '#' . dechex(rand(0x000000 , 0xFFFFFF));
             // });
-            $values = $vendas->map(function($order, $key){
-                return number_format($order->venda, 0,'','');
+            $values = $vendas->map(function ($order, $key) {
+                return number_format($order->venda, 0, '', '');
             });
         }
 
@@ -246,5 +274,4 @@ class EstoqueRepositoryEloquent extends BaseRepository implements EstoqueReposit
     {
         $this->pushCriteria(app(RequestCriteria::class));
     }
-    
 }
