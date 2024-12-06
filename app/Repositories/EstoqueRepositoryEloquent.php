@@ -6,6 +6,7 @@ use App\Http\Requests\ValidacaoEstoque;
 use App\Models\Categoria;
 use App\Models\Estoque;
 use App\Models\Fornecedor;
+use Illuminate\Pagination\Paginator;
 use App\Models\Historico;
 use App\Models\Marca;
 use App\Models\MarcaProduto;
@@ -48,19 +49,14 @@ class EstoqueRepositoryEloquent extends BaseRepository implements EstoqueReposit
         'quantidade_aviso' => 'like',
         'id_users_fk' => 'like',
         'status' => 'like',
+        'produto.categorias.nome_categoria' => 'like'
     ];
 
 
     public function model()
-{
+    {
         return Estoque::class;
     }
-
-    public function getAllWithFilters()
-    {
-        return $this->applyFilters()->paginate(15);
-    }
-    
     public function getFieldsSearchable()
     {
         return $this->fieldSearchable;
@@ -68,30 +64,22 @@ class EstoqueRepositoryEloquent extends BaseRepository implements EstoqueReposit
 
     public function index()
     {
-        $fornecedores = app(FornecedoresRepository::class)->all();
-        $marcas = app(MarcaRepository::class)->all();
-        $categorias = app(CategoriaRepository::class)->all();
-
-        $produtos = Produto::with('fornecedores.estoques')->paginate(5);
-
-        $estoquesCollection = collect();
-
-        if (Gate::allows('permissao')) {
-
-            $estoquesCollection = $produtos->flatMap(function ($produto) {
-                return $produto->fornecedores->flatMap(function ($fornecedor) {
-                    return $fornecedor->estoques;
-                });
-            });
-        } else {
-            $estoquesCollection = $produtos->flatMap(function ($produto) {
-                return $produto->fornecedores->flatMap(function ($fornecedor) {
-                    return $fornecedor->estoques->where('status', 1);
-                });
-            });
+        $fornecedores = Fornecedor::all();
+        $marcas = Marca::all();
+        $categorias = Categoria::all();
+        
+        $query = $this->applyFilters();
+        
+        if (!Gate::allows('permissao')) {
+            $query->where('status', 1);
         }
-        $this->getAllWithFilters();
-        return compact('estoquesCollection', 'produtos', 'fornecedores', 'marcas', 'categorias');
+
+        // $queryParams = $this->getQueryStringParams();
+        
+        $estoques = $query->with(['produto', 'fornecedor', 'marcas'])
+            ->paginate(5); 
+
+        return compact('estoques', 'fornecedores', 'marcas', 'categorias');
     }
 
     public function inserirEstoque(ValidacaoEstoque $request)
@@ -133,32 +121,6 @@ class EstoqueRepositoryEloquent extends BaseRepository implements EstoqueReposit
         $fornecedores = Fornecedor::all();
         return compact('fornecedores', 'marcas', 'produtos');
     }
-
-    // public function buscar()
-    // {
-
-    //     $fornecedores = Fornecedor::all();
-    //     $marcas = Marca::all();
-    //     $categorias = Categoria::all();
-    //     $produtos = Produto::paginate(2);
-    //     if (Gate::allows('permissao')) {
-    //         $estoquesCollection = [];
-    //         foreach ($produtos as $produto) 
-    //         {
-    //             $estoquesProduto = $produto->search->pluck('estoque')->all();
-    //             $estoquesCollection = array_merge($estoquesCollection, $estoquesProduto);
-    //         }
-    //     } else {
-    //         $estoquesCollection = [];
-    //         foreach ($produtos as $produto) 
-    //         {
-    //             $estoquesProduto = $produto->search->pluck('estoque')->where('status', 1)->all();
-    //             $estoquesCollection = array_merge($estoquesCollection, $estoquesProduto); 
-    //         }
-    //     }
-
-    //     return compact('estoquesCollection', 'produtos','fornecedores','marcas','categorias');
-    // }
 
     public function editar($estoqueId)
     {
@@ -272,6 +234,7 @@ class EstoqueRepositoryEloquent extends BaseRepository implements EstoqueReposit
      */
     public function boot()
     {
+        Paginator::defaultView('pagination::tailwind');
         $this->pushCriteria(app(RequestCriteria::class));
     }
 }

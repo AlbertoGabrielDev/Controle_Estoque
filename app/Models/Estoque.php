@@ -55,6 +55,10 @@ class Estoque extends Model
         return $this->belongsToMany(Marca::class, 'estoque', 'id_estoque' , 'id_marca_fk');
     }
 
+    public function caterogia() : BelongsToMany{
+        return $this->belongsToMany(Categoria::class, 'categoria', 'id_estoque' , 'id_categoria_fk');
+    }
+
 
     use HasFactory;
 }

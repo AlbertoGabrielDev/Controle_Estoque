@@ -12,6 +12,7 @@
   </div>
   
   <form action="{{ route('estoque.index') }}" method="GET">
+  <input type="hidden" name="page" value="{{ request('page') }}">
     <div class="accordion accordion-flush" id="accordionFlushExample">
       <div class="accordion-item">
         <h2 class="accordion-header" id="flush-headingOne">
@@ -45,7 +46,7 @@
                     <option value="{{ $marca->nome_marca}}">{{ $marca->nome_marca}}</option>
                 @endforeach
                 </select>
-                <select class="form-control form-control-lg w-75 m-1" value="{{request('nome_categoria')}}" name="nome_categoria">
+                <select class="form-control form-control-lg w-75 m-1"  value="{{ request('produtos.categorias.nome_categoria') }}"  name="produtos.categorias.nome_categoria">
                 <option value="">Selecione uma Categoria</option>
                 @foreach ($categorias as $categoria)
                     <option value="{{ $categoria->nome_categoria}}">{{ $categoria->nome_categoria}}</option>
@@ -81,38 +82,37 @@
         </tr>
       </thead>
       <tbody>
-        @foreach ($estoquesCollection as $estoque)
-        
+        @foreach ($estoques as $estoque)
         <tr class="hover:bg-grey-lighter">
-            <td class="p-4 border-b border-grey-light text-left">{{$estoque->nome_produto}}</td>
-            <td class="p-4 border-b border-grey-light text-left">R${{$estoque->pivot->preco_custo}}</td>
-            <td class="p-4 border-b border-grey-light text-left">R${{$estoque->pivot->preco_venda}}</td>
-            <td class="p-4 border-b border-grey-light text-left quantidade" data-quantidade="{{$estoque->quantidade}}">{{$estoque->pivot->quantidade}}</td>
-            <td class="p-4 border-b border-grey-light text-left">{{ \Carbon\Carbon::parse($estoque->pivot->data_chegada)->format('d/m/Y') }}</td> 
-            <td class="p-4 border-b border-grey-light text-left">{{$estoque->pivot->created_at}}</td>
-            <td class="p-4 border-b border-grey-light text-left">{{$estoque->pivot->lote}}</td>
-            <td class="p-4 border-b border-grey-light text-left">{{$estoque->pivot->localizacao}}</td>
-            <td class="p-4 border-b border-grey-light text-left aviso" data-aviso="{{$estoque->quantidade_aviso}}">{{$estoque->pivot->quantidade_aviso}}</td>
-            <td class="p-4 border-b border-grey-light text-left expiration-date" id="data">{{($estoque->pivot->validade)}}</td>
+            <td class="p-4 border-b border-grey-light text-left">{{$estoque->produto->nome_produto}}</td>
+            <td class="p-4 border-b border-grey-light text-left">R${{$estoque->preco_custo}}</td>
+            <td class="p-4 border-b border-grey-light text-left">R${{$estoque->preco_venda}}</td>
+            <td class="p-4 border-b border-grey-light text-left quantidade" data-quantidade="{{$estoque->quantidade}}">{{$estoque->quantidade}}</td>
+            <td class="p-4 border-b border-grey-light text-left">{{ \Carbon\Carbon::parse($estoque->data_chegada)->format('d/m/Y') }}</td> 
+            <td class="p-4 border-b border-grey-light text-left">{{$estoque->created_at}}</td>
+            <td class="p-4 border-b border-grey-light text-left">{{$estoque->lote}}</td>
+            <td class="p-4 border-b border-grey-light text-left">{{$estoque->localizacao}}</td>
+            <td class="p-4 border-b border-grey-light text-left aviso" data-aviso="{{$estoque->quantidade_aviso}}">{{$estoque->quantidade_aviso}}</td>
+            <td class="p-4 border-b border-grey-light text-left expiration-date" id="data">{{($estoque->validade)}}</td>
             <td class="border-b border-grey-light">
-              <form method="GET" action="{{ route('estoque.quantidade', ['estoqueId' => $estoque->pivot->id_estoque, 'operacao' => 'aumentar']) }}">
+              <form method="GET" action="{{ route('estoque.quantidade', ['estoqueId' => $estoque->id_estoque, 'operacao' => 'aumentar']) }}">
                 @csrf
                 <input type="number" class="text-base placeholder-gray-500 border rounded-full focus:shadow-outline  border-b border-grey-light" name="quantidadeHistorico">
                 <button type="submit" class="btn btn-success m-1">Aumentar</button>
             </form>
             </td>
             <td class="border-b border-grey-light">
-              <form method="GET" action="{{ route('estoque.quantidade', ['estoqueId' => $estoque->pivot->id_estoque, 'operacao' => 'diminuir']) }}">
+              <form method="GET" action="{{ route('estoque.quantidade', ['estoqueId' => $estoque->id_estoque, 'operacao' => 'diminuir']) }}">
                 @csrf
                 <input type="number" class="text-base placeholder-gray-500 border rounded-full focus:shadow-outline " name="quantidadeHistorico">
                 <button type="submit" class="btn btn-success m-1">Diminuir</button>
             </form>
             </td>
-            <td class="p-4 border-b border-grey-light text-left"><a href="{{route('estoque.editar', $estoque->pivot->id_estoque)}}">Editar</a></td> 
+            <td class="p-4 border-b border-grey-light text-left"><a href="{{route('estoque.editar', $estoque->id_estoque)}}">Editar</a></td> 
             <td class="p-4 border-b border-grey-light text-left">
               @can('permissao')
                 <button class="toggle-ativacao m-2 @if($estoque->status === 1) btn-danger @elseif($estoque->status === 0) btn-success @else btn-primary @endif" 
-                  data-id="{{ $estoque->pivot->id_estoque }}">
+                  data-id="{{ $estoque->id_estoque }}">
                   {{ $estoque->status ? 'Inativar' : 'Ativar' }}
                 </button>
               @endcan
@@ -121,26 +121,8 @@
         @endforeach
       </tbody>
   </table>
-  <div class="mx-auto">
-	<nav aria-label="Page navigation example">
-    <ul class="inline-flex items-center -space-x-px">
-      <li>
-        <a href="{{$produtos->previousPageUrl()}}" class="block py-2 px-3 ml-0 leading-tight text-gray-500 bg-white rounded-l-lg border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:text-gray-400 ">
-          <span class="sr-only">Previous</span>
-          <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg>
-        </a>
-      </li>
-      <li>
-        <a href="#" class="py-2 px-3 leading-tight text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700  dark:text-gray-400">{{$produtos->currentPage()}}</a>
-      </li>
-      <li>
-        <a href="{{$produtos->nextPageUrl()}}" class="block py-2 px-3 leading-tight text-gray-500 bg-white rounded-r-lg border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:text-gray-400">
-          <span class="sr-only">Next</span>
-          <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg>
-        </a>
-      </li>
-    </ul>
-  </nav>
-  </div>
+  <div class="mt-4 flex justify-center">
+    {{ $estoques->links() }}
+</div>
 </div>
 @endsection
