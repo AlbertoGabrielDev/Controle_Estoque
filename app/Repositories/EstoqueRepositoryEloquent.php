@@ -14,6 +14,7 @@ use App\Models\Produto;
 use Prettus\Repository\Eloquent\BaseRepository;
 use Prettus\Repository\Criteria\RequestCriteria;
 use App\Repositories\EstoqueRepository;
+use App\Repositories\Traits\FilterTrait;
 use Illuminate\Support\Facades\Auth;
 use App\Validators\EstoqueValidator;
 use Carbon\Carbon;
@@ -29,8 +30,9 @@ use Illuminate\Http\Request as Requests;
  */
 class EstoqueRepositoryEloquent extends BaseRepository implements EstoqueRepository
 {
-   
-    protected $fieldSearchable = [
+    use FilterTrait;
+
+    public $fieldSearchable = [
         'quantidade' => 'like',
         'localizacao' => 'like',
         'data_entrega' => 'like',
@@ -49,7 +51,7 @@ class EstoqueRepositoryEloquent extends BaseRepository implements EstoqueReposit
         'quantidade_aviso' => 'like',
         'id_users_fk' => 'like',
         'status' => 'like',
-        'produto.categorias.nome_categoria' => 'like'
+        'produto.categoria.nome' => 'like'
     ];
 
 
@@ -69,15 +71,14 @@ class EstoqueRepositoryEloquent extends BaseRepository implements EstoqueReposit
         $categorias = Categoria::all();
         
         $query = $this->applyFilters();
+        dd($query->toSql());
         
         if (!Gate::allows('permissao')) {
             $query->where('status', 1);
         }
 
-        // $queryParams = $this->getQueryStringParams();
-        
-        $estoques = $query->with(['produto', 'fornecedor', 'marcas'])
-            ->paginate(5); 
+        $estoques = $query->with(['produto.categoria', 'fornecedor', 'marcas'])
+            ->paginate(5);
 
         return compact('estoques', 'fornecedores', 'marcas', 'categorias');
     }

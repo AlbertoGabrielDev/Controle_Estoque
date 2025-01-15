@@ -23,7 +23,7 @@ use App\Http\Requests\ValidacaoFornecedor;
 class FornecedoresRepositoryEloquent extends BaseRepository implements FornecedoresRepository
 {
 
-    protected $fieldSearchable = [
+    public $fieldSearchable = [
         'email' => 'like',
         'nome_fornecedor' => 'like',
         'cnpj' => 'like',

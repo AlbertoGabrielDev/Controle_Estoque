@@ -25,7 +25,7 @@
         <tbody>
           @foreach ($categorias as $categoria)
             <tr class="hover:bg-grey-lighter">
-                <td class="py-4 px-6 border-b border-grey-light">{{$categoria->nome_categoria}}</td>
+                <td class="py-4 px-6 border-b border-grey-light">{{$categoria->nome}}</td>
                 <td class="py-4 px-6 border-b border-grey-light"><a href="{{route('categorias.editar', $categoria->id_categoria)}}" class="btn btn-primary">Editar</a></td>
                 <td class="py-4 px-6 border-b border-grey-light text-right">
                 @can('permissao')

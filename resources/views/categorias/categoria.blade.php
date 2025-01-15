@@ -10,11 +10,11 @@
     @foreach ($categorias as $categoria) 
     <div class="row-span-2 col-span-2 flex w-96 flex-col m-5 rounded-xl bg-white bg-clip-border text-gray-700 shadow-md">
       <div class="relative mx-4 mt-2 h-56 overflow-hidden rounded-xl bg-blue-gray-500 bg-clip-border text-white shadow-lg shadow-blue-gray-500/40">
-        <img src="/img/categorias/{{$categoria->imagem}}" alt="{{$categoria->nome_categoria}}" layout="fill"/>
+        <img src="/img/categorias/{{$categoria->imagem}}" alt="{{$categoria->nome}}" layout="fill"/>
       </div>
       <div class="p-6">
         <h5 class="mb-2 block font-sans text-xl font-semibold leading-snug tracking-normal text-blue-gray-900 antialiased">
-          {{ $categoria->nome_categoria }}
+          {{ $categoria->nome }}
         </h5>
       </div>
       <div class="p-6 pt-0">

@@ -2,7 +2,7 @@
 @section('conteudo')
 <div class="bg-white p-4 rounded-md w-full">
   <h5 class="mx-auto m-5 text-4xl font-medium text-slate-700 flex justify-center">Index</h5>
-  <div class= "bg-white p-4 rounded-md w-full flex justify-between">
+  <div class="bg-white p-4 rounded-md w-full flex justify-between">
     <a class=" text-gray-500 py-2.5 px-4 relative mx-5 my-4 w-1/12 rounded hover:bg-gradient-to-r hover:from-cyan-400 hover:to-cyan-300 hover:text-white" href="{{route('categoria.inicio')}}">
       <i class="fa fa-angle-left mr-2"></i>Voltar
     </a>
@@ -10,9 +10,9 @@
       <i class="fas fa-plus mr-2"></i>Cadastrar
     </a>
   </div>
-  
+
   <form action="{{ route('estoque.index') }}" method="GET">
-  <input type="hidden" name="page" value="{{ request('page') }}">
+    <input type="hidden" name="page" value="{{ request('page') }}">
     <div class="accordion accordion-flush" id="accordionFlushExample">
       <div class="accordion-item">
         <h2 class="accordion-header" id="flush-headingOne">
@@ -20,109 +20,114 @@
             Filtrar
           </button>
         </h2>
-      
-          <div class="accordion-body">
-              <input type="text" class="form-control form-control-lg w-50 m-1" value="{{ request('nome_produto') }}" name="nome_produto" placeholder="Nome do Produto">
-              <input type="text" class="form-control form-control-lg w-50 m-1" value="{{request('lote')}}" name="lote" placeholder="Lote">
-              <input type="text" class="form-control form-control-lg w-50 m-1" value="{{request('localizacao')}}" name="localizacao" placeholder="Localização">
-              <input type="text" class="form-control form-control-lg w-50 m-1" value="{{request('preco_custo')}}" name="preco_custo" placeholder="Preço Custo">
-              <input type="text" class="form-control form-control-lg w-50 m-1" value="{{request('preco_venda')}}" name="preco_venda" placeholder="Preço Venda">
-              <input type="text" class="form-control form-control-lg w-50 m-1" value="{{request('quantidade')}}" name="quantidade" placeholder="Quantidade">
-              <div class="input-group input-group-lg w-50">
-              <span class="input-group-text" id="inputGroup-sizing-lg">Data Vencimento</span>
-              <input type="date" name="validade" class="form-control form-control-lg " aria-label="Sizing example input">
-              </div>
+
+        <div class="accordion-body">
+          <input type="text" class="form-control form-control-lg w-50 m-1" value="{{ request('nome_produto') }}" name="nome_produto" placeholder="Nome do Produto">
+          <input type="text" class="form-control form-control-lg w-50 m-1" value="{{request('lote')}}" name="lote" placeholder="Lote">
+          <input type="text" class="form-control form-control-lg w-50 m-1" value="{{request('localizacao')}}" name="localizacao" placeholder="Localização">
+          <input type="text" class="form-control form-control-lg w-50 m-1" value="{{request('preco_custo')}}" name="preco_custo" placeholder="Preço Custo">
+          <input type="text" class="form-control form-control-lg w-50 m-1" value="{{request('preco_venda')}}" name="preco_venda" placeholder="Preço Venda">
+          <input type="text" class="form-control form-control-lg w-50 m-1" value="{{request('quantidade')}}" name="quantidade" placeholder="Quantidade">
+          <div class="input-group input-group-lg w-50">
+            <span class="input-group-text" id="inputGroup-sizing-lg">Data Vencimento</span>
+            <input type="date" name="validade" class="form-control form-control-lg " aria-label="Sizing example input">
           </div>
-            <div class="col-md-4">
-              <select class="form-control form-control-lg w-75 m-1" name="nome_fornecedor" value="{{ request('nome_fornecedor') }}">
-                  <option value="">Selecione um Fornecedor</option>
-                @foreach ($fornecedores as $fornecedor)
-                    <option value="{{ $fornecedor->nome_fornecedor }}">{{ $fornecedor->nome_fornecedor}}</option>
-                @endforeach
-                </select> 
-                <select class="form-control form-control-lg w-75 m-1" name="nome_marca" value="{{request('nome_marca')}}">
-                <option value="">Selecione uma Marca</option>
-                @foreach ($marcas as $marca)
-                    <option value="{{ $marca->nome_marca}}">{{ $marca->nome_marca}}</option>
-                @endforeach
-                </select>
-                <select class="form-control form-control-lg w-75 m-1"  value="{{ request('produtos.categorias.nome_categoria') }}"  name="produtos.categorias.nome_categoria">
-                <option value="">Selecione uma Categoria</option>
-                @foreach ($categorias as $categoria)
-                    <option value="{{ $categoria->nome_categoria}}">{{ $categoria->nome_categoria}}</option>
-                @endforeach
-                </select>
-            </div>
-            <button class="btn btn-primary m-1" type="submit">Pesquisar</button>
-     
+        </div>
+        <div class="col-md-4">
+          <select class="form-control form-control-lg w-75 m-1" name="nome_fornecedor" value="{{ request('nome_fornecedor') }}">
+            <option value="">Selecione um Fornecedor</option>
+            @foreach ($fornecedores as $fornecedor)
+            <option value="{{ $fornecedor->nome_fornecedor }}">{{ $fornecedor->nome_fornecedor}}</option>
+            @endforeach
+          </select>
+          <select class="form-control form-control-lg w-75 m-1" name="nome_marca" value="{{request('nome_marca')}}">
+            <option value="">Selecione uma Marca</option>
+            @foreach ($marcas as $marca)
+            <option value="{{ $marca->nome_marca}}">{{ $marca->nome_marca}}</option>
+            @endforeach
+          </select>
+          <select class="form-control form-control-lg w-75 m-1"
+            name="nome"
+            value="{{ request('produto_categoria_nome') }}">
+            <option value="">Selecione uma Categoria</option>
+            @foreach ($categorias as $categoria)
+            <option value="{{ $categoria->nome }}"
+              {{ request('produto_categoria_nome') == $categoria->nome ? 'selected' : '' }}>
+              {{ $categoria->nome }}
+            </option>
+            @endforeach
+          </select>
+        </div>
+        <button class="btn btn-primary m-1" type="submit">Pesquisar</button>
+
       </div>
     </div>
 
   </form>
 
   <table class="w-full table-auto">
-      <thead>
-        <tr class="text-sm leading-normal">
-          <th class="p-4 uppercase text-sm text-grey-dark border-b border-grey-light text-left">Nome Produto</th>
-          <th class="p-4 uppercase text-sm text-grey-dark border-b border-grey-light text-left">Preço Custo</th>
-          <th class="p-4 uppercase text-sm text-grey-dark border-b border-grey-light text-left">Preço Venda</th>
-          <th class="p-4 uppercase text-sm text-grey-dark border-b border-grey-light text-left">Quantidade</th>
-          <th class="p-4 uppercase text-sm text-grey-dark border-b border-grey-light text-left">Data de Chegada</th>
-          <th class="p-4 uppercase text-sm text-grey-dark border-b border-grey-light text-left">Data de Cadastro</th>
-          <th class="p-4 uppercase text-sm text-grey-dark border-b border-grey-light text-left">Lote</th>
-          <th class="p-4 uppercase text-sm text-grey-dark border-b border-grey-light text-left">localização</th>
-          <th class="aviso p-4 uppercase text-sm text-grey-dark border-b border-grey-light text-left">Quantidade para aviso</th>  
-          <th data-order="asc" data-col="data_validade" class="p-4 uppercase text-sm text-grey-dark border-b border-grey-light text-left">Data de Validade</th>
-          <th class="p-4 uppercase text-sm text-grey-dark border-b border-grey-light text-left">Aumentar</th>
-          <th class="p-4 uppercase text-sm text-grey-dark border-b border-grey-light text-left">Diminuir</th>
-          <th class="p-4 uppercase text-sm text-grey-dark border-b border-grey-light text-left">Editar</th>
+    <thead>
+      <tr class="text-sm leading-normal">
+        <th class="p-4 uppercase text-sm text-grey-dark border-b border-grey-light text-left">Nome Produto</th>
+        <th class="p-4 uppercase text-sm text-grey-dark border-b border-grey-light text-left">Preço Custo</th>
+        <th class="p-4 uppercase text-sm text-grey-dark border-b border-grey-light text-left">Preço Venda</th>
+        <th class="p-4 uppercase text-sm text-grey-dark border-b border-grey-light text-left">Quantidade</th>
+        <th class="p-4 uppercase text-sm text-grey-dark border-b border-grey-light text-left">Data de Chegada</th>
+        <th class="p-4 uppercase text-sm text-grey-dark border-b border-grey-light text-left">Data de Cadastro</th>
+        <th class="p-4 uppercase text-sm text-grey-dark border-b border-grey-light text-left">Lote</th>
+        <th class="p-4 uppercase text-sm text-grey-dark border-b border-grey-light text-left">localização</th>
+        <th class="aviso p-4 uppercase text-sm text-grey-dark border-b border-grey-light text-left">Quantidade para aviso</th>
+        <th data-order="asc" data-col="data_validade" class="p-4 uppercase text-sm text-grey-dark border-b border-grey-light text-left">Data de Validade</th>
+        <th class="p-4 uppercase text-sm text-grey-dark border-b border-grey-light text-left">Aumentar</th>
+        <th class="p-4 uppercase text-sm text-grey-dark border-b border-grey-light text-left">Diminuir</th>
+        <th class="p-4 uppercase text-sm text-grey-dark border-b border-grey-light text-left">Editar</th>
+        @can('permissao')
+        <th class="p-4 uppercase text-sm text-grey-dark border-b border-grey-light text-left">Inativar</th>
+        @endcan
+      </tr>
+    </thead>
+    <tbody>
+      @foreach ($estoques as $estoque)
+      <tr class="hover:bg-grey-lighter">
+        <td class="p-4 border-b border-grey-light text-left">{{$estoque->produto->nome_produto}}</td>
+        <td class="p-4 border-b border-grey-light text-left">R${{$estoque->preco_custo}}</td>
+        <td class="p-4 border-b border-grey-light text-left">R${{$estoque->preco_venda}}</td>
+        <td class="p-4 border-b border-grey-light text-left quantidade" data-quantidade="{{$estoque->quantidade}}">{{$estoque->quantidade}}</td>
+        <td class="p-4 border-b border-grey-light text-left">{{ \Carbon\Carbon::parse($estoque->data_chegada)->format('d/m/Y') }}</td>
+        <td class="p-4 border-b border-grey-light text-left">{{$estoque->created_at}}</td>
+        <td class="p-4 border-b border-grey-light text-left">{{$estoque->lote}}</td>
+        <td class="p-4 border-b border-grey-light text-left">{{$estoque->localizacao}}</td>
+        <td class="p-4 border-b border-grey-light text-left aviso" data-aviso="{{$estoque->quantidade_aviso}}">{{$estoque->quantidade_aviso}}</td>
+        <td class="p-4 border-b border-grey-light text-left expiration-date" id="data">{{($estoque->validade)}}</td>
+        <td class="border-b border-grey-light">
+          <form method="GET" action="{{ route('estoque.quantidade', ['estoqueId' => $estoque->id_estoque, 'operacao' => 'aumentar']) }}">
+            @csrf
+            <input type="number" class="text-base placeholder-gray-500 border rounded-full focus:shadow-outline  border-b border-grey-light" name="quantidadeHistorico">
+            <button type="submit" class="btn btn-success m-1">Aumentar</button>
+          </form>
+        </td>
+        <td class="border-b border-grey-light">
+          <form method="GET" action="{{ route('estoque.quantidade', ['estoqueId' => $estoque->id_estoque, 'operacao' => 'diminuir']) }}">
+            @csrf
+            <input type="number" class="text-base placeholder-gray-500 border rounded-full focus:shadow-outline " name="quantidadeHistorico">
+            <button type="submit" class="btn btn-success m-1">Diminuir</button>
+          </form>
+        </td>
+        <td class="p-4 border-b border-grey-light text-left"><a href="{{route('estoque.editar', $estoque->id_estoque)}}">Editar</a></td>
+        <td class="p-4 border-b border-grey-light text-left">
           @can('permissao')
-            <th class="p-4 uppercase text-sm text-grey-dark border-b border-grey-light text-left">Inativar</th>
+          <button class="toggle-ativacao m-2 @if($estoque->status === 1) btn-danger @elseif($estoque->status === 0) btn-success @else btn-primary @endif"
+            data-id="{{ $estoque->id_estoque }}">
+            {{ $estoque->status ? 'Inativar' : 'Ativar' }}
+          </button>
           @endcan
-        </tr>
-      </thead>
-      <tbody>
-        @foreach ($estoques as $estoque)
-        <tr class="hover:bg-grey-lighter">
-            <td class="p-4 border-b border-grey-light text-left">{{$estoque->produto->nome_produto}}</td>
-            <td class="p-4 border-b border-grey-light text-left">R${{$estoque->preco_custo}}</td>
-            <td class="p-4 border-b border-grey-light text-left">R${{$estoque->preco_venda}}</td>
-            <td class="p-4 border-b border-grey-light text-left quantidade" data-quantidade="{{$estoque->quantidade}}">{{$estoque->quantidade}}</td>
-            <td class="p-4 border-b border-grey-light text-left">{{ \Carbon\Carbon::parse($estoque->data_chegada)->format('d/m/Y') }}</td> 
-            <td class="p-4 border-b border-grey-light text-left">{{$estoque->created_at}}</td>
-            <td class="p-4 border-b border-grey-light text-left">{{$estoque->lote}}</td>
-            <td class="p-4 border-b border-grey-light text-left">{{$estoque->localizacao}}</td>
-            <td class="p-4 border-b border-grey-light text-left aviso" data-aviso="{{$estoque->quantidade_aviso}}">{{$estoque->quantidade_aviso}}</td>
-            <td class="p-4 border-b border-grey-light text-left expiration-date" id="data">{{($estoque->validade)}}</td>
-            <td class="border-b border-grey-light">
-              <form method="GET" action="{{ route('estoque.quantidade', ['estoqueId' => $estoque->id_estoque, 'operacao' => 'aumentar']) }}">
-                @csrf
-                <input type="number" class="text-base placeholder-gray-500 border rounded-full focus:shadow-outline  border-b border-grey-light" name="quantidadeHistorico">
-                <button type="submit" class="btn btn-success m-1">Aumentar</button>
-            </form>
-            </td>
-            <td class="border-b border-grey-light">
-              <form method="GET" action="{{ route('estoque.quantidade', ['estoqueId' => $estoque->id_estoque, 'operacao' => 'diminuir']) }}">
-                @csrf
-                <input type="number" class="text-base placeholder-gray-500 border rounded-full focus:shadow-outline " name="quantidadeHistorico">
-                <button type="submit" class="btn btn-success m-1">Diminuir</button>
-            </form>
-            </td>
-            <td class="p-4 border-b border-grey-light text-left"><a href="{{route('estoque.editar', $estoque->id_estoque)}}">Editar</a></td> 
-            <td class="p-4 border-b border-grey-light text-left">
-              @can('permissao')
-                <button class="toggle-ativacao m-2 @if($estoque->status === 1) btn-danger @elseif($estoque->status === 0) btn-success @else btn-primary @endif" 
-                  data-id="{{ $estoque->id_estoque }}">
-                  {{ $estoque->status ? 'Inativar' : 'Ativar' }}
-                </button>
-              @endcan
-            </td>
-        </tr>
-        @endforeach
-      </tbody>
+        </td>
+      </tr>
+      @endforeach
+    </tbody>
   </table>
   <div class="mt-4 flex justify-center">
     {{ $estoques->links() }}
-</div>
+  </div>
 </div>
 @endsection

@@ -10,7 +10,7 @@
     <div class="row">
         @foreach ($categorias as $categoria)
         <div class="col-md-4">
-            <input type="text" required class="form-control form-control-lg w-75" name="nome_categoria" value="{{$categoria->nome_categoria}}" placeholder="Nome da Marca">
+            <input type="text" required class="form-control form-control-lg w-75" name="nome" value="{{$categoria->nome}}" placeholder="Nome da Marca">
         </div>
         @endforeach
     </div>   

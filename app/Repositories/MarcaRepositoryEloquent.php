@@ -18,7 +18,7 @@ use App\Http\Requests\ValidacaoMarca;
  */
 class MarcaRepositoryEloquent extends BaseRepository implements MarcaRepository
 {
-    protected $fieldSearchable = [
+    public $fieldSearchable = [
         'nome_marca' => 'like',
     ];
 

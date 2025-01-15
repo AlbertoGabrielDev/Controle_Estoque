@@ -23,7 +23,7 @@ use Illuminate\Http\Request;
 class ProdutoRepositoryEloquent extends BaseRepository implements ProdutoRepository
 {
 
-    protected $fieldSearchable = [
+    public $fieldSearchable = [
         'nome_produto' => 'like',
         'descricao' => 'like',
     ];
@@ -83,7 +83,7 @@ class ProdutoRepositoryEloquent extends BaseRepository implements ProdutoReposit
         ]);
         $produtoId = Produto::latest('id_produto')->first();
         CategoriaProduto::create([
-            'id_categoria_fk'      => $request->input('nome_categoria'),
+            'id_categoria_fk'      => $request->input('nome'),
             'id_produto_fk'        => $produtoId->id_produto
         ]);
     }

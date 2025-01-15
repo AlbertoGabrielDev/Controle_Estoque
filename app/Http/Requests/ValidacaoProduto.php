@@ -19,7 +19,7 @@ class ValidacaoProduto extends FormRequest
             'unidade_medida'  => 'required',
             'cod_produto'  => 'required|unique:produto,cod_produto|max:60',
             'inf_nutrientes'  => 'required|max:255',
-            'nome_categoria'  => 'required',
+            'nome'  => 'required',
         ];
     }
 

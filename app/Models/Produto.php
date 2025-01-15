@@ -89,8 +89,8 @@ class Produto extends Model implements Transformable
                         $subquery->where('fornecedor.nome_fornecedor','like' ,'%' .request()->input('search') . '%');
                     }
                 })->where(function ($subquery){
-                    if (request()->input('nome_categoria')) {
-                        $subquery->where('c.nome_categoria', request()->input('nome_categoria'));
+                    if (request()->input('nome')) {
+                        $subquery->where('c.nome', request()->input('nome'));
                     }
                 });
             });
@@ -118,7 +118,7 @@ class Produto extends Model implements Transformable
             ]);
     }
 
-    public function categorias() : BelongsToMany
+    public function categoria() : BelongsToMany
     {
         return $this->belongsToMany(Categoria::class,  'categoria_produto', 'id_produto_fk', 'id_categoria_fk');
     }

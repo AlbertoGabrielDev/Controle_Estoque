@@ -19,8 +19,8 @@ use Illuminate\Http\Request;
 class CategoriaRepositoryEloquent extends BaseRepository implements CategoriaRepository
 {
 
-    protected $fieldSearchable = [
-        'nome_categoria' => 'like',
+    public $fieldSearchable = [
+        'nome' => 'like',
        
     ];
 
@@ -53,7 +53,7 @@ class CategoriaRepositoryEloquent extends BaseRepository implements CategoriaRep
             $imageName = md5($requestImage->getClientOriginalName() . strtotime("now")). "." . $extension;
             $requestImage->move(public_path('img/categorias'), $imageName);
             Categoria::create([
-                'nome_categoria' => $request->categoria,
+                'nome' => $request->categoria,
                 'id_users_fk' => Auth::id(),
                 'imagem' => $imageName
             ]);
@@ -71,7 +71,7 @@ class CategoriaRepositoryEloquent extends BaseRepository implements CategoriaRep
     {
         $categorias = Categoria::where('id_categoria', $categoriaId)
         ->update([
-            'nome_categoria' => $request->nome_categoria
+            'nome' => $request->nome
         ]);
         return $categorias;
     }
