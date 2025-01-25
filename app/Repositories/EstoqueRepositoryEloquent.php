@@ -66,12 +66,13 @@ class EstoqueRepositoryEloquent extends BaseRepository implements EstoqueReposit
 
     public function index()
     {
+
         $fornecedores = Fornecedor::all();
         $marcas = Marca::all();
         $categorias = Categoria::all();
         
         $query = $this->applyFilters();
-        dd($query->toSql());
+        // dd($query->toSql());
         
         if (!Gate::allows('permissao')) {
             $query->where('status', 1);

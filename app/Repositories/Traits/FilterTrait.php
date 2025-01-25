@@ -11,7 +11,7 @@ use ReflectionClass;
 
 trait FilterTrait
 {
-
+    public $hasNestedFilters = false;
     protected function applyLikeConditions($query, $searchLike)
     {
 
@@ -64,95 +64,85 @@ trait FilterTrait
         $query = $modelClass::query();
         $tableName = (new $modelClass)->getTable();
         $fieldSearchable = $this->getCombinedFieldSearchable();
+        
         $filters = array_filter(request()->all(), function ($value) {
             return !is_null($value) && $value !== '';
         });
         $joinedTables = [];
 
-
         foreach ($filters as $field => $value) {
-
-            foreach ($fieldSearchable as $key => $values) {
-          
-                if (strpos($key, '.') !== false) {
-                    
-                    $segments = explode('.', $key);  // Exemplo: ['produto', 'categoria', 'nome']
-                    $column = array_pop($segments);    // A coluna final (nome)
-
-                    // Realiza joins encadeados
-                    $lastRelatedTable = $this->buildNestedJoins($query, $segments, $tableName);
-                    $qualifiedField = "$lastRelatedTable.$column";
-                    // dd($lastRelatedTable,$qualifiedField);
-                } else {
-                    $qualifiedField = "$tableName.$field";
-                }
-            }
-
-            if (!isset($fieldSearchable[$field])) {
-                continue;
-            }
-
             $operator = $fieldSearchable[$field]['operator'];
             $relatedModelClass = $fieldSearchable[$field]['model'];
             $relatedModelInstance = new $relatedModelClass;
             $relatedTable = $relatedModelInstance->getTable();
             $qualifiedField = "$relatedTable.$field";
-
-
-
-            //  dd($tableName,$relatedTable, $joinedTables);
-            if ($relatedTable !== $tableName && !in_array($relatedTable, $joinedTables)) {
-
-                $query->leftJoin(
-                    $relatedTable,
-                    "$relatedTable.id_{$relatedTable}",
-                    '=',
-                    "$tableName.id_{$relatedTable}_fk"
-                );
-                $joinedTables[] = $relatedTable;
+            if ($this->isRelatedField($field)) {
+                list($column, $segments) = $this->segments($fieldSearchable);
+           
+            
+                $lastRelatedTable = $this->buildNestedJoins($query, $segments, $tableName);
+                $qualifiedField = "$lastRelatedTable.$column";
+    
+                $query->where($qualifiedField, $operator, $value);
+                return $query;
             }
+          
+            // /-------------------------------------------
+            $query->leftJoin(
+                $relatedTable,
+                "$relatedTable.id_{$relatedTable}",
+                '=',
+                "$tableName.id_{$relatedTable}_fk"
+            );
+            $joinedTables[] = $relatedTable;
 
             if ($operator === 'like') {
                 $value = '%' . $value . '%';
             }
-            // dd('f',$joinedTables,$query->toSql(),$qualifiedField, $operator, $value);
+
             $query->where($qualifiedField, $operator, $value);
-
-            \Log::info('Applying filter', [
-                'field' => $qualifiedField,
-                'operator' => $operator,
-                'value' => $value,
-            ]);
         }
-
-        $querySql = $query->toSql();
-        $queryBindings = $query->getBindings();
-
-        \Log::info('Query gerada:', [
-            'sql' => $querySql,
-            'bindings' => $queryBindings,
-            'filters' => $filters,
-        ]);
 
         return $query;
     }
 
+    protected function isRelatedField($field)
+{
+  
+    $relatedField = 'related_' . $field;
+    return request()->has($relatedField) && request()->get($relatedField) === 'true';
+}
+
+    public function segments($fieldSearchable)
+    {
+        foreach ($fieldSearchable as $key => $values) {
+            if (strpos($key, '.') !== false) {
+                $segments = explode('.', $key);
+                $column = array_pop($segments);
+                return [$column, $segments];
+            }
+        }
+    }
+
     protected function buildNestedJoins($query, $relations, $baseTable)
     {
+
         $currentTable = $baseTable;
         $currentModel = $this->model();
         foreach ($relations as $relation) {
-            // Identifica a model relacionada
+
             $relatedModelClass = $this->getModelForRelation($currentTable, $relation, $currentModel);
+
             $relationInstance = (new $currentModel)->$relation();
+
             if ($relationInstance instanceof \Illuminate\Database\Eloquent\Relations\BelongsToMany) {
-    
+
                 $pivotTable = $relationInstance->getTable();
                 $foreignPivotKey = $relationInstance->getForeignPivotKeyName();
                 $relatedPivotKey = $relationInstance->getRelatedPivotKeyName();
                 $relatedTable = $relationInstance->getRelated()->getTable();
                 $ownerKey = $relationInstance->getRelated()->getKeyName();
-    
+
                 // Adiciona join com a tabela pivot
                 if (!in_array($pivotTable, $query->getQuery()->joins ?? [])) {
                     $query->leftJoin(
@@ -162,7 +152,7 @@ trait FilterTrait
                         "$pivotTable.$foreignPivotKey"
                     );
                 }
-    
+
                 // Adiciona join com a tabela relacionada
                 if (!in_array($relatedTable, $query->getQuery()->joins ?? [])) {
                     $query->leftJoin(
@@ -172,15 +162,15 @@ trait FilterTrait
                         "$relatedTable.$ownerKey"
                     );
                 }
-    
-                $currentTable = $relatedTable; 
+
+                $currentTable = $relatedTable;
             } else {
-              
+
                 $relatedInstance = new $relatedModelClass;
                 $relatedTable = $relatedInstance->getTable();
                 $foreignKey = $relationInstance->getForeignKeyName();
                 $ownerKey = $relationInstance->getOwnerKeyName();
-    
+
                 if (!in_array($relatedTable, $query->getQuery()->joins ?? [])) {
                     $query->leftJoin(
                         $relatedTable,
@@ -189,30 +179,29 @@ trait FilterTrait
                         "$relatedTable.$ownerKey"
                     );
                 }
-    
+
                 $currentTable = $relatedTable;
             }
-    
+
             $currentModel = $relatedModelClass;
         }
-    
+
         return $currentTable;  // Retorna a última tabela (categoria, por exemplo)
     }
     protected function getModelForRelation($currentTable, $relation, $currentModel = null)
     {
         $modelInstance = $currentModel ? new $currentModel : new $this->model();
-    
+
         if (!method_exists($modelInstance, $relation)) {
             throw new \Exception("Relacionamento desconhecido: $relation em $currentTable");
         }
-    
+
         $relationInstance = $modelInstance->$relation();
-    
+
         if (!($relationInstance instanceof \Illuminate\Database\Eloquent\Relations\Relation)) {
             throw new \Exception("O método $relation não é um relacionamento válido.");
         }
-    
+
         return get_class($relationInstance->getRelated());
     }
-
 }
