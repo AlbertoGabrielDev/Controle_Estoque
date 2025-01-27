@@ -1,71 +1,74 @@
 @extends('layouts.principal')
 
 @section('conteudo')
-<div class="bg-white p-4 rounded-md w-full">
-  <h5 class="mx-auto m-5 text-4xl font-medium text-slate-700 flex justify-center">Index</h5>
-  <div class= "bg-white p-4 rounded-md w-full flex justify-between">
-    <a class=" text-gray-500 py-2.5 px-4 relative mx-5 my-4 w-1/12 rounded hover:bg-gradient-to-r hover:from-cyan-400 hover:to-cyan-300 hover:text-white" href="{{route('categoria.inicio')}}">
+<div class="bg-white p-6 rounded-md shadow-md w-full">
+  <h5 class="text-center text-2xl font-semibold text-gray-700 mb-6">Authors Table</h5>
+  <div class="flex justify-between mb-4">
+    <a class="text-gray-600 py-2 px-4 rounded-lg bg-gray-100 hover:bg-cyan-400 hover:text-white transition" href="{{route('categoria.inicio')}}">
       <i class="fa fa-angle-left mr-2"></i>Voltar
     </a>
-    <a class=" text-gray-500 py-2.5 px-4 relative mx-5 my-4 w-1/12 rounded hover:bg-gradient-to-r hover:from-cyan-400 hover:to-cyan-300 hover:text-white" href="{{route('usuario.cadastro')}}">
+    <a class="text-gray-600 py-2 px-4 rounded-lg bg-gray-100 hover:bg-cyan-400 hover:text-white transition" href="{{route('usuario.cadastro')}}">
       <i class="fas fa-plus mr-2"></i>Cadastrar
     </a>
-  </div>  
+  </div>
 
-  <form action="{{ route('usuario.buscar') }}" class="relative w-6/12" method="GET">
-    <div class="relative w-full">
-      <input type="text" name="name" class="w-5/12 h-10 pl-10 text-base placeholder-gray-500 border rounded-full focus:shadow-outline" placeholder="Digite o nome do Usuario">
-      <button class="w-2/12 h-10 text-base placeholder-gray-500 border rounded-full focus:shadow-outline" type="submit">Pesquisar</button>
-    </div>
-  </form>
-
-  <table class="w-full table-auto">
-      <thead>
-        <tr class="text-sm leading-normal">
-          <th class="p-4 uppercase text-sm text-grey-dark border-b border-grey-light text-left">ID Usuario</th>
-          <th class="p-4 uppercase text-sm text-grey-dark border-b border-grey-light text-left">Nome</th>
-          <th class="p-4 uppercase text-sm text-grey-dark border-b border-grey-light text-left">Email</th>
-          <th class="p-4 uppercase text-sm text-grey-dark border-b border-grey-light text-left">Editar</th>
-          <th class="p-4 uppercase text-sm text-grey-dark border-b border-grey-light text-left">Ativar/Inativar</th>
-        </tr>
-      </thead>
-      <tbody>
-        @foreach ($usuarios as $usuario)
-        <tr class="hover:bg-grey-lighter">
-          <td class="p-4 border-b border-grey-light text-left">{{$usuario->id}}</td>
-          <td class="p-4 border-b border-grey-light text-left">{{$usuario->name}}</td>
-          <td class="p-4 border-b border-grey-light text-left">{{$usuario->email}}</td>
-          <td class="p-4 border-b border-grey-light text-left"><a href="{{route('usuario.editar', $usuario->id)}}" class="btn btn-primary">Editar</a></td>
-          <td class="p-4 border-b border-grey-light text-left">
-            <button class="toggle-ativacao @if($usuario->status === 1) btn-danger @elseif($usuario->status === 0) btn-success @else btn-primary @endif" data-id="{{ $usuario->id}}">
-              {{ $usuario->status ? 'Inativar' : 'Ativar' }}
-            </button>
-          </td>
-          </tr>
-        @endforeach
-      </tbody>
+  <table class="table-auto w-full border-collapse border border-gray-200 rounded-md shadow-sm">
+    <thead class="bg-gray-100">
+      <tr class="text-sm text-gray-600">
+        <th class="py-3 px-6 text-left font-medium">Usuario</th>
+        <th class="py-3 px-6 text-left font-medium">Permissões</th>
+        <th class="py-3 px-6 text-left font-medium">Status</th>
+        <th class="py-3 px-6 text-left font-medium">Ativo desde</th>
+        <th class="py-3 px-6 text-left font-medium">Editar</th>
+        <th class="py-3 px-6 text-left font-medium">Ativar/Inativar</th>
+      </tr>
+    </thead>
+    <tbody>
+      @foreach ($usuarios as $usuario)
+      <tr class="border-b border-gray-200 hover:bg-gray-50">
+        <td class="py-4 px-6 flex items-center">
+          <img src="{{ $usuario->profile_photo_path ? '/img/usuario/'.$usuario->profile_photo_path : '/img/default-avatar.png' }}"
+            alt="{{$usuario->name}}"
+            class="w-10 h-10 mr-4 rounded-lg">
+          <div>
+            <p class="text-gray-800 font-semibold">{{$usuario->name}}</p>
+            <p class="text-gray-500 text-sm">{{$usuario->email}}</p>
+          </div>
+        </td>
+        <td class="py-4 px-6 text-gray-600">{{$usuario->role}}</td>
+        <td class="py-4 px-6">
+          <span class="px-3 py-1 text-sm rounded-full {{ $usuario->status ? 'bg-green-200 text-green-700' : 'bg-gray-200 text-gray-700' }}">
+            {{ $usuario->status ? 'Online' : 'Offline' }}
+          </span>
+        </td>
+        <td class="py-4 px-6 text-gray-600">{{ \Carbon\Carbon::parse($usuario->created_at)->format('d/m/Y') }}</td>
+        <td class="py-4 px-6">
+          <a href="{{route('usuario.editar', $usuario->id)}}" class="text-cyan-600 hover:underline">Editar</a>
+        </td>
+        <td class="py-4 px-6">
+          <button class="toggle-ativacao @if($usuario->status === 1) btn-danger @elseif($usuario->status === 0) btn-success @else btn-primary @endif" data-id="{{ $usuario->id}}">
+            {{ $usuario->status ? 'Inativar' : 'Ativar' }}
+          </button>
+        </td>
+      </tr>
+      @endforeach
+    </tbody>
   </table>
-  <div class="mx-auto">
-	<nav aria-label="Page navigation example">
-    <ul class="inline-flex items-center -space-x-px">
-      <li>
-        <a href="{{$usuarios->previousPageUrl()}}" class="block py-2 px-3 ml-0 leading-tight text-gray-500 bg-white rounded-l-lg border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:text-gray-400 ">
-          <span class="sr-only">Previous</span>
-          <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg>
-        </a>
-      </li>
-      <li>
-        <a href="#" class="py-2 px-3 leading-tight text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700  dark:text-gray-400">{{$usuarios->currentPage()}}</a>
-      </li>
-      <li>
-        <a href="{{$usuarios->nextPageUrl()}}" class="block py-2 px-3 leading-tight text-gray-500 bg-white rounded-r-lg border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:text-gray-400">
-          <span class="sr-only">Next</span>
-          <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg>
-        </a>
-      </li>
-    </ul>
-  </nav>
+
+  <div class="mt-4 flex justify-center">
+    <nav class="flex items-center space-x-2">
+      <a href="{{$usuarios->previousPageUrl()}}" class="py-2 px-3 bg-gray-100 border rounded-l-lg hover:bg-gray-200 text-gray-600">
+        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+          <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+        </svg>
+      </a>
+      <span class="py-2 px-3 bg-gray-100 text-gray-600">{{$usuarios->currentPage()}}</span>
+      <a href="{{$usuarios->nextPageUrl()}}" class="py-2 px-3 bg-gray-100 border rounded-r-lg hover:bg-gray-200 text-gray-600">
+        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+          <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
+        </svg>
+      </a>
+    </nav>
   </div>
 </div>
-
 @endsection

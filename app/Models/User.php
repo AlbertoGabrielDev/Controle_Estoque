@@ -29,7 +29,8 @@ class User extends Authenticatable
         'email',
         'password',
         'id_unidade_fk',
-        'status'
+        'status',
+        'profile_photo_path'
     ];
 
     /**
@@ -61,4 +62,19 @@ class User extends Authenticatable
     protected $appends = [
         'profile_photo_url',
     ];
+
+    public function roles()
+    {
+        return $this->belongsToMany(Role::class, 'user_role');
+    }
+
+    public function hasPermission($permissionName)
+    {
+        foreach ($this->roles as $role) {
+            if ($role->permissions->contains('name', $permissionName)) {
+                return true;
+            }
+        }
+        return false;
+    }
 }
