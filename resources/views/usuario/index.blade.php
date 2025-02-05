@@ -35,7 +35,19 @@
             <p class="text-gray-500 text-sm">{{$usuario->email}}</p>
           </div>
         </td>
-        <td class="py-4 px-6 text-gray-600">{{$usuario->role}}</td>
+        <td class="py-4 px-6 text-gray-600">
+          @php
+          $roles = explode(', ', $usuario->role_names);
+          @endphp
+          <div>
+            @foreach ($roles as $index => $role)
+            @if ($index > 0 && $index % 2 == 0)
+            <br>
+            @endif
+            {{ ucfirst($role) }}@if($index < count($roles) - 1),@endif
+              @endforeach
+              </div>
+        </td>
         <td class="py-4 px-6">
           <span class="px-3 py-1 text-sm rounded-full {{ $usuario->status ? 'bg-green-200 text-green-700' : 'bg-gray-200 text-gray-700' }}">
             {{ $usuario->status ? 'Online' : 'Offline' }}

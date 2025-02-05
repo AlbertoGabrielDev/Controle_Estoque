@@ -7,15 +7,17 @@
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <meta name="csrf-token" content="{{ csrf_token() }}">
   <title>Principal</title>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <!-- <link rel="stylesheet" href="/dist/output.css"> -->
   <!-- <link rel="stylesheet" href="{{asset('js/app.js')}}">  -->
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
-  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
   <script src="{{ asset('js/app.js') }}"></script>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/alpinejs" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
   <!-- <script src="{{ asset('./resources/js/app.js') }}"></script> -->
 </head>
 
@@ -76,7 +78,9 @@
     </div>
 
   </nav>
-
+  @if(session('success'))
+  @include('componentes.toast')
+  @endif
 
   <div class="flex-1 flex">
     <div class="p-2 bg-white w-60 flex flex-col hidden md:flex" id="sideNav">
@@ -101,11 +105,11 @@
         <a class="block text-gray-500 py-2.5 px-4 my-4 rounded transition duration-200 hover:bg-gradient-to-r hover:from-cyan-400 hover:to-cyan-300 hover:text-white" href="{{route('estoque.index')}}">
           <i class="fas fa-server mr-2"></i>Estoque
         </a>
-        @can('permissao')
+        @if(auth()->user() && auth()->user()->hasPermission('view_post'))
         <a class="block text-gray-500 py-2.5 px-4 my-4 rounded transition duration-200 hover:bg-gradient-to-r hover:from-cyan-400 hover:to-cyan-300 hover:text-white" href="{{route('usuario.index')}}">
           <i class="fas fa-users mr-2"></i>Usuarios
         </a>
-        @endcan
+        @endif
         @can('permissao')
         <a class="block text-gray-500 py-2.5 px-4 my-4 rounded transition duration-200 hover:bg-gradient-to-r hover:from-cyan-400 hover:to-cyan-300 hover:text-white" href="{{route('unidades.index')}}">
           <i class="fa-solid fa-suitcase"></i> Unidades
@@ -114,6 +118,11 @@
         @can('permissao')
         <a class="block text-gray-500 py-2.5 px-4 my-4 rounded transition duration-200 hover:bg-gradient-to-r hover:from-cyan-400 hover:to-cyan-300 hover:text-white" href="{{route('estoque.historico')}}">
           <i class="fas fa-history mr-2"></i>Historico
+        </a>
+        @endcan
+        @can('create_post')
+        <a class="block text-gray-500 py-2.5 px-4 my-4 rounded transition duration-200 hover:bg-gradient-to-r hover:from-cyan-400 hover:to-cyan-300 hover:text-white" href="{{route('roles.index')}}">
+          <i class="fa-solid fa-suitcase"></i> Permissões
         </a>
         @endcan
       </nav>
@@ -127,11 +136,7 @@
     @yield('conteudo')
   </div>
   </div>
-  @if(session('success'))
-  <div class="alert alert-success">
-    {{ session('success') }}
-  </div>
-  @endif
+
   @if ($errors->any())
   <div class="alert alert-danger">
     <ul>
@@ -141,17 +146,30 @@
     </ul>
   </div>
   @endif
-  <div class="alert alert-danger" id="error-message" style="display: none;">
-    EROUUUU!!!!
-  </div>
+ 
+  @stack('scripts')
 </body>
 
 </html>
 
 <script>
-  document.getElementById('user-menu-button').addEventListener('click', function() {
-    const menu = document.getElementById('user-menu');
-    // Alterna a classe 'hidden' para mostrar/ocultar o menu
-    menu.classList.toggle('hidden');
+ 
+  document.addEventListener('click', function(event) {
+    const userMenu = document.getElementById('user-menu');
+    const userButton = document.getElementById('user-menu-button');
+    
+    if (!userButton.contains(event.target) && !userMenu.contains(event.target)) {
+      userMenu.classList.add('hidden');
+    }
+  });
+
+  $(document).ready(function() {
+    $.fn.select2.defaults.set('language', 'pt-BR');
+    
+    $('.select2-multiple').select2({
+      placeholder: "Selecione as permissões",
+      allowClear: true,
+      width: '100%'
+    });
   });
 </script>

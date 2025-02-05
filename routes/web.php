@@ -8,6 +8,7 @@ use App\Http\Controllers\EstoqueController;
 use App\Http\Controllers\FornecedorController;
 use App\Http\Controllers\UsuarioController;
 use App\Http\Controllers\MarcaController;
+use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UnidadeController;
 use App\Providers\FortifyServiceProvider;
 
@@ -80,13 +81,13 @@ Route::middleware([
         Route::post('/status/{marcaId}',[MarcaController::class, 'status'])->name('marca.status');
     });
 
-    Route::prefix('/usuario')->middleware('permission:view_post')->group(function() {
+    Route::prefix('/usuario')->middleware('can:view_post')->group(function() {
         Route::get('/index', [UsuarioController::class , 'index'])->name('usuario.index');
-        Route::get('/cadastro', [UsuarioController::class , 'cadastro'])->name('usuario.cadastro');
-        Route::post('/cadastro',[UsuarioController::class, 'inserirUsuario'])->name('usuario.inserirUsuario');
-        Route::get('/editar/{userId}', [UsuarioController::class , 'editar'])->name('usuario.editar');
+        Route::get('/cadastro', [UsuarioController::class , 'cadastro'])->name('usuario.cadastro')->middleware('can:create_post');
+        Route::post('/cadastro',[UsuarioController::class, 'inserirUsuario'])->name('usuario.inserirUsuario')->middleware('can:create_post');
+        Route::get('/editar/{userId}', [UsuarioController::class , 'editar'])->name('usuario.editar')->middleware('can:edit_post');
         Route::post('/status/{userId}',[UsuarioController::class, 'status'])->name('usuario.status');
-        Route::post('/editar/{userid}',[UsuarioController::class, 'salvarEditar'])->name('usuario.salvarEditar');
+        Route::put('/editar/{userid}',[UsuarioController::class, 'salvarEditar'])->name('usuario.salvarEditar')->middleware('can:edit_post');
         Route::get('/buscar-usuario',[UsuarioController::class, 'Buscar'])->name('usuario.buscar');
     });
     Route::prefix('/unidades')->middleware('can:permissao')->group(function() {
@@ -97,6 +98,16 @@ Route::middleware([
         Route::get('/editar/{unidadeId}',[UnidadeController::class, 'editar'])->name('unidades.editar');
         Route::post('/editar/{unidadeId}',[UnidadeController::class, 'salvarEditar'])->name('unidades.salvarEditar');
         Route::post('/status/{unidadeId}',[UnidadeController::class, 'status'])->name('unidades.status');
+    });
+
+    Route::prefix('/roles')->group(function() {
+        Route::get('/index', [RoleController::class , 'index'])->name('roles.index');
+        Route::get('/cadastro',[RoleController::class, 'cadastro'])->name('roles.cadastro');
+        Route::post('/cadastro',[RoleController::class, 'inserirRole'])->name('roles.inserirRole');
+        Route::get('/buscar-unidade',[RoleController::class, 'Buscar'])->name('roles.buscar');
+        Route::get('/editar/{roleId}',[RoleController::class, 'editar'])->name('roles.editar');
+        Route::post('/editar/{rolesId}',[RoleController::class, 'salvarEditar'])->name('roles.salvarEditar');
+        Route::post('/status/{rolesId}',[RoleController::class, 'status'])->name('roles.status');
     });
 });
 

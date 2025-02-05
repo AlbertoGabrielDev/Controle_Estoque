@@ -19,10 +19,7 @@ use Laravel\Fortify\Fortify;
 class FortifyServiceProvider extends ServiceProvider
 {
 
-    public function register(): void
-    {
-     
-    }
+    public function register(): void {}
 
     public function boot(): void
     {
@@ -32,7 +29,7 @@ class FortifyServiceProvider extends ServiceProvider
         Fortify::resetUserPasswordsUsing(ResetUserPassword::class);
 
         RateLimiter::for('login', function (Request $request) {
-            $throttleKey = Str::transliterate(Str::lower($request->input(Fortify::username())).'|'.$request->ip());
+            $throttleKey = Str::transliterate(Str::lower($request->input(Fortify::username())) . '|' . $request->ip());
             return Limit::perMinute(5)->by($throttleKey);
         });
 
@@ -41,27 +38,26 @@ class FortifyServiceProvider extends ServiceProvider
         });
 
         Fortify::authenticateUsing(function (Request $request) {
-           
             $user = User::where('email', $request->email)->first();
-            $unidade= Unidades::where('id_unidade', $request->id_unidade)->first();
-      
-            if ($user &&
-                Hash::check($request->password, $user->password) && $user->status === 1 && $unidade->status === 1) {
-                    $request->session()->put('id_unidade', $request->input('id_unidade'));
-                    return $user;
-            }else{
+            $unidade = Unidades::where('id_unidade', $request->id_unidade)->first();
+
+            if ($user && Hash::check($request->password, $user->password)) {
+                if ($user->status === 0) {
+                    session()->flash('error', 'Usuário desativado. Fale com o Administrador');
+                    return null;
+                }
+
+                if ($unidade && $unidade->status === 0) {
+                    session()->flash('error', 'Unidade desativada. Fale com o Administrador');
+                    return null;
+                }
+
+                $request->session()->put('id_unidade', $request->input('id_unidade'));
+                return $user;
+            } else {
                 session()->flash('error', 'Senha ou email errado. Confira os dados.');
-            }
-            if($user->status === 0){
-                return session()->flash('error', 'Usuario desativado. Fale com o Administrador');
-            }
-            if($unidade->status === 0){
-                return session()->flash('error', 'Unidade desativada. Fale com o Administrador');
-            }
-            if ($user == "") {
-                return session()->flash('error', 'Email não existe.');
+                return null;
             }
         });
-
     }
 }

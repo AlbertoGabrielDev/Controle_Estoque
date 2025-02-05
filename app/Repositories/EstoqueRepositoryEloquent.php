@@ -62,29 +62,16 @@ class EstoqueRepositoryEloquent extends BaseRepository implements EstoqueReposit
         return compact('estoques','produtos','fornecedores','marcas','categorias');
     }
 
-    public function inserirEstoque(ValidacaoEstoque $request)
+    public function inserirEstoque(array $data)
     {
-         Estoque::create([
-            'quantidade'        =>$request->quantidade,
-            'localizacao'       =>$request->localizacao,
-            'preco_custo'       =>$request->preco_custo,
-            'preco_venda'       =>$request->preco_venda,
-            'data_chegada'      =>$request->data_chegada,
-            'lote'              =>$request->lote,
-            'id_produto_fk'     =>$request->input('nome_produto'),
-            'id_fornecedor_fk'  =>$request->input('fornecedor'),
-            'id_marca_fk'       =>$request->input('marca'),
-            'quantidade_aviso'  =>$request->quantidade_aviso,
-            'validade'          =>$request->validade,
-            'id_users_fk'       =>Auth::id()
+        $estoque = $this->create($data);
+
+        MarcaProduto::create([
+            'id_produto_fk' => $data['id_produto_fk'],
+            'id_marca_fk'   => $data['id_marca_fk'],
         ]);
 
-       MarcaProduto::create([
-            'id_produto_fk'     =>$request->input('nome_produto'),
-            'id_marca_fk'       =>$request->input('marca')
-        ]);
-      //  return redirect()->route('estoque.index')->with('success', 'Inserido com sucesso');
-      
+        return $estoque;
     }
 
     public function historico()

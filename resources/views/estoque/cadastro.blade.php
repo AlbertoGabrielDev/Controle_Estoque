@@ -48,7 +48,7 @@
       </div>
     <div class="grid md:grid-cols-3 md:gap-6 py-4">
       <div class="col-md-4">
-        <select class="block py-2.5 px-0 w-full text-sm bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer" name="marca" required>
+        <select class="block py-2.5 px-0 w-full text-sm bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer" name="id_marca_fk" required>
           <option value="">Selecione uma Marca</option>
           @foreach ($marcas as $marca)
             <option value="{{ $marca->id_marca }}">{{ $marca->nome_marca }}</option>
@@ -56,7 +56,7 @@
         </select>
       </div>
       <div class="col-md-4">
-        <select class="block py-2.5 px-0 w-full text-sm bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer" name="nome_produto" required>
+        <select class="block py-2.5 px-0 w-full text-sm bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer" name="id_produto_fk" required>
           <option>Selecione um Produto</option>
           @foreach ($produtos as $produto)
             <option value="{{ $produto->id_produto }}">{{ $produto->nome_produto }}</option>
@@ -64,7 +64,7 @@
         </select>
       </div>
       <div class="col-md-4">
-        <select class="block py-2.5 px-0 w-full text-sm bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer" name="fornecedor" required>
+        <select class="block py-2.5 px-0 w-full text-sm bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer" name="id_fornecedor_fk" required>
           <option>Selecione um Fornecedor</option>
           @foreach ($fornecedores as $fornecedor)
             <option value="{{ $fornecedor->id_fornecedor }}">{{ $fornecedor->nome_fornecedor }}</option>

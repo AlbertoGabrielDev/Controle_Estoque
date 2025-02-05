@@ -70,11 +70,22 @@ class User extends Authenticatable
 
     public function hasPermission($permissionName)
     {
-        foreach ($this->roles as $role) {
-            if ($role->permissions->contains('name', $permissionName)) {
-                return true;
-            }
+        if ($this->roles->where('name', 'admin')->isNotEmpty()) {
+            return true;
         }
-        return false;
+
+        return $this->roles->flatMap(function ($role) {
+            return $role->permissions;
+        })->pluck('name')->contains($permissionName);
+    }
+
+    public function hasRole($roleName)
+    {
+        return $this->roles->where('name', $roleName)->isNotEmpty();
+    }
+
+    public function unidade()
+    {
+        return $this->belongsTo(Unidades::class, 'id_unidade_fk');
     }
 }

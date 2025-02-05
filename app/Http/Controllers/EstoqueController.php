@@ -51,8 +51,9 @@ class EstoqueController extends Controller
     }
 
     public function inserirEstoque(ValidacaoEstoque $request)
-    { 
-        $this->estoqueRepository->inserirEstoque($request);
+    {
+        $data = $request->merge(['id_users_fk' => Auth::id()])->all();
+        $this->estoqueRepository->inserirEstoque($data);
         return redirect()->route('estoque.index')->with('success', 'Inserido com sucesso');
     }
 

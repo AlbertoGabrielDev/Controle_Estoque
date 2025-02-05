@@ -8,6 +8,8 @@ use App\Repositories\CategoriaRepositoryEloquent;
 use App\Repositories\EstoqueRepository;
 use App\Repositories\EstoqueRepositoryEloquent;
 use App\Repositories\ProdutoRepository;
+use App\Repositories\RoleRepository;
+use App\Repositories\RoleRepositoryEloquent;
 use App\Repositories\UnidadesRepository;
 use App\Repositories\UnidadesRepositoryEloquent;
 use Illuminate\Support\ServiceProvider;
@@ -25,6 +27,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(CategoriaRepository::class, CategoriaRepositoryEloquent::class);
         $this->app->bind(EstoqueRepository::class, EstoqueRepositoryEloquent::class);
         $this->app->bind(UnidadesRepository::class, UnidadesRepositoryEloquent::class);
+        $this->app->bind(RoleRepository::class, RoleRepositoryEloquent::class);
     }
 
     /**
