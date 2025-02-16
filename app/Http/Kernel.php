@@ -70,4 +70,8 @@ class Kernel extends HttpKernel
     protected $routeMiddleware = [
         'permission' => \App\Http\Middleware\CheckPermission::class,
     ];
+
+    protected $commands = [
+        \App\Console\Commands\ProcessVideo::class, // Adicione esta linha
+    ];
 }
