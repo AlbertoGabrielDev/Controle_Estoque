@@ -31,7 +31,12 @@ class ProcessVideo extends Command
         }
 
         $pythonPath = env('PYTHON_PATH') ?: 'C:\Users\alber\AppData\Local\Programs\Python\Python312\python.exe';
-
+        // dd(
+        //     $pythonPath,
+        //     base_path('python/video.py'),
+        //     $videoPath,
+        //     $outputFolder
+        // );
         $process = new Process([
             $pythonPath,
             base_path('python/video.py'),

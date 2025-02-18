@@ -23,7 +23,7 @@ Route::middleware([
     //    return view('welcome');
     // });
     Route::get('/videos', [VideoController::class, 'index']);
-    Route::post('/videos/upload', [VideoController::class, 'upload']);
+    Route::post('/videos/upload', [VideoController::class, 'upload'])->name('video.upload');
     Route::prefix('/categoria')->group(function () {
         Route::get('/', [CategoriaController::class, 'Inicio'])->name('categoria.inicio');
         Route::get('/index', [CategoriaController::class, 'Index'])->name('categoria.index');
