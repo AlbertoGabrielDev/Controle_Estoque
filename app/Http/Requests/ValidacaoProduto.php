@@ -13,6 +13,7 @@ class ValidacaoProduto extends FormRequest
     }
     public function rules(): array
     {
+      
         return [
             'nome_produto' => 'required|unique:produto,nome_produto|max:60',
             'descricao'  => 'required|max:255',

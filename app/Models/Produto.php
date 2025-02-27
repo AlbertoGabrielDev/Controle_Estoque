@@ -24,6 +24,7 @@ class Produto extends Model implements Transformable
         'id_categoria_fk',
         'inf_nutrientes',
         'id_users_fk',
+        'qrcode',
         'status'
     ];
 

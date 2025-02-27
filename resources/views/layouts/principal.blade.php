@@ -78,10 +78,9 @@
     </div>
 
   </nav>
-  @if(session('success'))
-  @include('componentes.toast')
+  @if(session()->has('success') || session()->has('error') || session()->has('warning') || session()->has('info') || $errors->any())
+    @include('componentes.toast')
   @endif
-
   <div class="flex-1 flex">
     <div class="p-2 bg-white w-60 flex flex-col hidden md:flex" id="sideNav">
       <nav class="list-group list-group-horizontal">
@@ -137,27 +136,16 @@
   </div>
   </div>
 
-  @if ($errors->any())
-  <div class="alert alert-danger">
-    <ul>
-      @foreach ($errors->all() as $error)
-      <li>{{ $error }}</li>
-      @endforeach
-    </ul>
-  </div>
-  @endif
- 
   @stack('scripts')
 </body>
 
 </html>
 
 <script>
- 
   document.addEventListener('click', function(event) {
     const userMenu = document.getElementById('user-menu');
     const userButton = document.getElementById('user-menu-button');
-    
+
     if (!userButton.contains(event.target) && !userMenu.contains(event.target)) {
       userMenu.classList.add('hidden');
     }
@@ -165,7 +153,7 @@
 
   $(document).ready(function() {
     $.fn.select2.defaults.set('language', 'pt-BR');
-    
+
     $('.select2-multiple').select2({
       placeholder: "Selecione as permissões",
       allowClear: true,

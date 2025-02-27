@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -37,6 +38,18 @@
         .fade-out {
             animation: fadeOut 0.5s ease-out forwards;
         }
+
+        .bg-green-100 {
+            background-color: #d1fae5;
+        }
+
+        .bg-red-100 {
+            background-color: #fee2e2;
+        }
+
+        .bg-yellow-100 {
+            background-color: #fef3c7;
+        }
     </style>
 </head>
 
@@ -67,34 +80,42 @@
             const toast = document.getElementById('toast-default');
             const toastIcon = document.getElementById('toast-icon');
 
+            // Captura mensagens da sessão
             const successMessage = "{{ session('success') }}";
             const errorMessage = "{{ session('error') }}";
             const warningMessage = "{{ session('warning') }}";
             const infoMessage = "{{ session('info') }}";
 
-            let message = successMessage || errorMessage || warningMessage || infoMessage;
-            if (message) {
+            // Captura erros de validação
+            const validationErrors = @json($errors->all());
+            let message = '';
+            let isError = false;
 
+            if (validationErrors.length > 0) {
+                message = validationErrors.join('\n');
+                isError = true;
+            } else {
+                message = successMessage || errorMessage || warningMessage || infoMessage;
+            }
+
+            if (message) {
                 toastMessage.textContent = message;
 
                 let iconColor = 'text-blue-500 bg-blue-100';
-                let iconPath = 'M15.147 15.085a7.159 7.159 0 0 1-6.189 3.307A6.713 6.713 0 0 1 3.1 15.444c-2.679-4.513.287-8.737.888-9.548A4.373 4.373 0 0 0 5 1.608c1.287.953 6.445 3.218 5.537 10.5 1.5-1.122 2.706-3.01 2.853-6.14 1.433 1.049 3.993 5.395 1.757 9.117Z';
+                let iconPath = 'M15.147...';
 
                 if (successMessage) {
                     iconColor = 'text-green-500 bg-green-100';
-                    iconPath = 'M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5Zm3.707 8.207-4 4a1 1 0 0 1-1.414 0l-2-2a1 1 0 0 1 1.414-1.414L9 10.586l3.293-3.293a1 1 0 0 1 1.414 1.414Z';
-                    toast.classList.remove('bg-white');
-                    toast.classList.add('bg-green-600');
-                } else if (errorMessage) {
+                    iconPath = 'M10 .5a9.5...';
+                    toast.classList.add('bg-green-100');
+                } else if (errorMessage || isError) {
                     iconColor = 'text-red-500 bg-red-100';
-                    iconPath = 'M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5Zm3.707 11.793a1 1 0 1 1-1.414 1.414L10 11.414l-2.293 2.293a1 1 0 0 1-1.414-1.414L8.586 10 6.293 7.707a1 1 0 0 1 1.414-1.414L10 8.586l2.293-2.293a1 1 0 0 1 1.414 1.414L11.414 10l2.293 2.293Z';
-                    toast.classList.remove('bg-white');
-                    toast.classList.add('bg-red-600');
+                    iconPath = 'M10 .5a9.5...';
+                    toast.classList.add('bg-red-100');
                 } else if (warningMessage) {
                     iconColor = 'text-yellow-500 bg-yellow-100';
-                    iconPath = 'M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM10 15a1 1 0 1 1 0-2 1 1 0 0 1 0 2Zm1-4a1 1 0 0 1-2 0V6a1 1 0 0 1 2 0v5Z';
-                    toast.classList.remove('bg-white');
-                    toast.classList.add('bg-yellow-600');
+                    iconPath = 'M10 .5a9.5...';
+                    toast.classList.add('bg-yellow-100');
                 }
 
                 toastIcon.innerHTML = `
@@ -102,31 +123,26 @@
                     <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="${iconPath}"/>
                 </svg>
             `;
+
                 toastIcon.className = `inline-flex items-center justify-center shrink-0 w-8 h-8 rounded-lg ${iconColor}`;
 
-                toast.classList.remove('hidden');
+                toast.classList.remove('hidden', 'bg-white');
                 setTimeout(() => {
                     toast.classList.remove('opacity-0');
                     toast.classList.add('fade-in');
                 }, 10);
 
-                setTimeout(function() {
+                setTimeout(() => {
                     toast.classList.remove('fade-in');
                     toast.classList.add('fade-out');
-
-                    setTimeout(() => {
-                        toast.classList.add('hidden');
-                    }, 500);
-                }, 3000);
+                    setTimeout(() => toast.classList.add('hidden'), 500);
+                }, 5000);
             }
 
             const closeButton = toast.querySelector('[data-dismiss-target="#toast-default"]');
-            closeButton.addEventListener('click', function() {
-                toast.classList.remove('fade-in');
+            closeButton.addEventListener('click', () => {
                 toast.classList.add('fade-out');
-                setTimeout(() => {
-                    toast.classList.add('hidden');
-                }, 500);
+                setTimeout(() => toast.classList.add('hidden'), 500);
             });
         });
     </script>

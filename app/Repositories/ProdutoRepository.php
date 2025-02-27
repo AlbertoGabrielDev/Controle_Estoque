@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Auth;
 use Prettus\Repository\Contracts\RepositoryInterface;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 /**
  * Interface ProdutoRepository.
@@ -53,6 +54,7 @@ class ProdutoRepository
         'descricao'         =>$request->descricao,
         'unidade_medida'    =>$request->unidade_medida,
         'inf_nutrientes'    =>json_encode($request->inf_nutrientes),
+        'qrcode'            =>Str::uuid(),
         'id_users_fk'       =>Auth::id()
     ]);
     $produtoId = Produto::latest('id_produto')->first();
