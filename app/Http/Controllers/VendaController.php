@@ -14,14 +14,21 @@ class VendaController extends Controller
     }
     public function registrar(Request $request)
     {
-        $request->validate(['codigo' => 'required|string']);
+       
+        $request->validate(['codigo_qr' => 'required|string']);
         
-        $produto = Produto::where('qrcode', $request->codigo)->firstOrFail();
-        
-        $produto->decrement('estoque');
-        
+        $produto = Produto::where('qrcode', $request->codigo_qr)->firstOrFail();
+       
+        foreach ($produto->fornecedores as $fornecedor) {
+          dd('ff', $fornecedor->estoque);
+        }
+       
+        // $produto->decrement('estoque');
+       
         broadcast(new VendaRegistrada($produto));
         
         return response()->json(['success' => true]);
     }
+
+    
 }
