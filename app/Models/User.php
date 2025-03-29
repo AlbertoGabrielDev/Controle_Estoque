@@ -88,4 +88,9 @@ class User extends Authenticatable
     {
         return $this->belongsTo(Unidades::class, 'id_unidade_fk');
     }
+
+    public function vendas()
+{
+    return $this->hasMany(Venda::class, 'id_usuario_fk');
+}
 }

@@ -115,6 +115,8 @@ Route::middleware([
     Route::prefix('/vendas')->group(function () {
         Route::post('/registrar-venda', [VendaController::class, 'registrar'])->name('venda.registrar');
         Route::get('/', [VendaController::class, 'vendas'])->name('vendas.venda');
+        Route::get('/listar', [VendaController::class, 'listar']);
+        Route::get('/vendas', [VendaController::class, 'historicoVendas'])->name('vendas.historico_vendas');
     });
 
     Route::prefix('/spreadsheet')->group(function () {

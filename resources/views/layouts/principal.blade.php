@@ -19,6 +19,10 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/alpinejs" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+  <!-- Toastr CSS -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
+  <!-- Toastr JS -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
   <!-- <script src="{{ asset('./resources/js/app.js') }}"></script> -->
 </head>
 
@@ -80,7 +84,7 @@
 
   </nav>
   @if(session()->has('success') || session()->has('error') || session()->has('warning') || session()->has('info') || $errors->any())
-    @include('componentes.toast')
+  @include('componentes.toast')
   @endif
   <div class="flex-1 flex">
     <div class="p-2 bg-white w-60 flex flex-col hidden md:flex" id="sideNav">
@@ -125,6 +129,16 @@
           <i class="fa-solid fa-suitcase"></i> Permissões
         </a>
         @endcan
+        @if(auth()->user() && auth()->user()->hasPermission('view_post'))
+        <a class="block text-gray-500 py-2.5 px-4 my-4 rounded transition duration-200 hover:bg-gradient-to-r hover:from-cyan-400 hover:to-cyan-300 hover:text-white" href="{{route('vendas.historico_vendas')}}">
+          <i class="fas fa-users mr-2"></i>Historico de vendas
+        </a>
+        @endif
+        @if(auth()->user() && auth()->user()->hasPermission('view_post'))
+        <a class="block text-gray-500 py-2.5 px-4 my-4 rounded transition duration-200 hover:bg-gradient-to-r hover:from-cyan-400 hover:to-cyan-300 hover:text-white" href="{{route('vendas.venda')}}">
+          <i class="fas fa-users mr-2"></i>Vendas
+        </a>
+        @endif
       </nav>
       <form action="/logout" method="POST">
         @csrf

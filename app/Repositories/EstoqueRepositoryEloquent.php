@@ -151,31 +151,31 @@ class EstoqueRepositoryEloquent extends BaseRepository implements EstoqueReposit
         return $status;
     }
 
-    public function atualizarEstoque(Requests $request, $estoqueId, $operacao)
-    {
-        $produto = Estoque::find($estoqueId);
-        if ($operacao === 'aumentar') {
-            $produto->quantidade += $request->input('quantidadeHistorico');
-            $produto->save();
-        } elseif ($operacao === 'diminuir') {
-            $quantidadeDiminuida = $request->input('quantidadeHistorico');
-            if ($produto->quantidade >= $quantidadeDiminuida) {
-                $produto->quantidade -= $quantidadeDiminuida;
-                $venda = $quantidadeDiminuida * $produto->preco_venda;
-                $unidadeId = $request->session()->get('id_unidade');
-                Historico::create([
-                    'id_estoque_fk' => $estoqueId,
-                    'quantidade_diminuida' => $quantidadeDiminuida,
-                    'quantidade_historico' => $produto->quantidade,
-                    'venda' => $venda,
-                    'id_unidade_fk' => $unidadeId
-                ]);
-                $produto->save();
-            } else {
-                return response()->json(['error' => 'Quantidade insuficiente no estoque'], 400);
-            }
-        }
-    }
+    // public function atualizarEstoque(Requests $request, $estoqueId, $operacao)
+    // {
+    //     $produto = Estoque::find($estoqueId);
+    //     if ($operacao === 'aumentar') {
+    //         $produto->quantidade += $request->input('quantidadeHistorico');
+    //         $produto->save();
+    //     } elseif ($operacao === 'diminuir') {
+    //         $quantidadeDiminuida = $request->input('quantidadeHistorico');
+    //         if ($produto->quantidade >= $quantidadeDiminuida) {
+    //             $produto->quantidade -= $quantidadeDiminuida;
+    //             $venda = $quantidadeDiminuida * $produto->preco_venda;
+    //             $unidadeId = $request->session()->get('id_unidade');
+    //             Historico::create([
+    //                 'id_estoque_fk' => $estoqueId,
+    //                 'quantidade_diminuida' => $quantidadeDiminuida,
+    //                 'quantidade_historico' => $produto->quantidade,
+    //                 'venda' => $venda,
+    //                 'id_unidade_fk' => $unidadeId
+    //             ]);
+    //             $produto->save();
+    //         } else {
+    //             return response()->json(['error' => 'Quantidade insuficiente no estoque'], 400);
+    //         }
+    //     }
+    // }
     
 
     public function graficoFiltro($startDate, $endDate):array

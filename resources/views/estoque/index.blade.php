@@ -72,8 +72,7 @@
           <th class="p-4 uppercase text-sm text-grey-dark border-b border-grey-light text-left">localização</th>
           <th class="aviso p-4 uppercase text-sm text-grey-dark border-b border-grey-light text-left">Quantidade para aviso</th>  
           <th data-order="asc" data-col="data_validade" class="p-4 uppercase text-sm text-grey-dark border-b border-grey-light text-left">Data de Validade</th>
-          <th class="p-4 uppercase text-sm text-grey-dark border-b border-grey-light text-left">Aumentar</th>
-          <th class="p-4 uppercase text-sm text-grey-dark border-b border-grey-light text-left">Diminuir</th>
+       
           <th class="p-4 uppercase text-sm text-grey-dark border-b border-grey-light text-left">Editar</th>
           @can('permissao')
             <th class="p-4 uppercase text-sm text-grey-dark border-b border-grey-light text-left">Inativar</th>
@@ -94,20 +93,6 @@
             <td class="p-4 border-b border-grey-light text-left">{{$estoque->localizacao}}</td>
             <td class="p-4 border-b border-grey-light text-left aviso" data-aviso="{{$estoque->quantidade_aviso}}">{{$estoque->quantidade_aviso}}</td>
             <td class="p-4 border-b border-grey-light text-left expiration-date" id="data">{{($estoque->validade)}}</td>
-            <td class="border-b border-grey-light">
-              <form method="GET" action="{{ route('estoque.quantidade', ['estoqueId' => $estoque->id_estoque, 'operacao' => 'aumentar']) }}">
-                @csrf
-                <input type="number" class="text-base placeholder-gray-500 border rounded-full focus:shadow-outline  border-b border-grey-light" name="quantidadeHistorico">
-                <button type="submit" class="btn btn-success m-1">Aumentar</button>
-            </form>
-            </td>
-            <td class="border-b border-grey-light">
-              <form method="GET" action="{{ route('estoque.quantidade', ['estoqueId' => $estoque->id_estoque, 'operacao' => 'diminuir']) }}">
-                @csrf
-                <input type="number" class="text-base placeholder-gray-500 border rounded-full focus:shadow-outline " name="quantidadeHistorico">
-                <button type="submit" class="btn btn-success m-1">Diminuir</button>
-            </form>
-            </td>
             <td class="p-4 border-b border-grey-light text-left"><a href="{{route('estoque.editar', $estoque->id_estoque)}}">Editar</a></td> 
             <td class="p-4 border-b border-grey-light text-left">
               @can('permissao')

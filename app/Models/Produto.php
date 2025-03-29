@@ -128,4 +128,9 @@ class Produto extends Model implements Transformable
         return $this->belongsToMany(Marca::class, 'marca_produto' ,'id_marca_fk', 'id_marca')
         ->as('marca_produto');
     }
+
+    public function vendas()
+{
+    return $this->hasMany(Venda::class, 'id_produto_fk', 'id_produto');
+}
 }
