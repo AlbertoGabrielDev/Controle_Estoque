@@ -14,7 +14,7 @@ class VendaController extends Controller
 
     public function vendas()
     {
-        $vendas = Venda::with('usuario')->get();
+        $vendas = Venda::with('usuario')->paginate(10);
         return view('vendas.venda', compact('vendas'));
     }
     public function registrar(Request $request)
@@ -54,7 +54,8 @@ class VendaController extends Controller
                 'message' => 'Venda registrada com sucesso!',
                 'produto' => [
                     'nome' => $produto->nome_produto,
-                    'preco_venda' => $estoque->preco_venda
+                    'preco_venda' => $estoque->preco_venda,
+                    'cod_produto' => $produto->cod_produto
                 ]
             ]);
         } catch (\Exception $e) {
