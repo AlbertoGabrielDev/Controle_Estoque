@@ -94,262 +94,253 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.4/html5-qrcode.min.js"></script>
     <script>
-        let html5QrCode;
-        let carrinho = [];
-        let produtosData = {}; // Armazenará dados dos produtos para referência
+        (function() {
+            'use strict';
 
-        function startQRCodeScanner() {
-            html5QrCode = new Html5Qrcode("qr-reader");
-            const config = {
-                fps: 10,
-                qrbox: {
-                    width: 300,
-                    height: 300
+            const QrScanner = {
+                scanner: null,
+                startButton: $('#start-button'),
+                stopButton: $('#stop-button'),
+                qrReader: $('#qr-reader'),
+
+                init() {
+                    this.startButton.on('click', () => this.start());
+                    this.stopButton.on('click', () => this.stop());
+                },
+
+                start() {
+                    this.scanner = new Html5Qrcode("qr-reader");
+                    const config = {
+                        fps: 10,
+                        qrbox: {
+                            width: 300,
+                            height: 300
+                        }
+                    };
+
+                    this.scanner.start({
+                            facingMode: "environment"
+                        },
+                        config,
+                        this.handleScanSuccess,
+                        this.handleScanError
+                    ).catch(error => console.error("Erro ao iniciar scanner:", error));
+
+                    this.toggleUI(true);
+                },
+
+                stop() {
+                    if (this.scanner) {
+                        this.scanner.stop().then(() => this.toggleUI(false)).catch(console.error);
+                    }
+                },
+
+                toggleUI(starting) {
+                    this.qrReader.toggleClass('hidden', !starting);
+                    this.startButton.toggleClass('hidden', starting);
+                    this.stopButton.toggleClass('hidden', !starting);
+                },
+
+                handleScanSuccess: (decodedText) => {
+                    CartManager.addProduct(decodedText);
+                    QrScanner.stop();
+                },
+
+                handleScanError: (errorMessage) => {
+                    console.warn("Erro no scanner:", errorMessage);
                 }
             };
 
-            html5QrCode.start({
-                    facingMode: "environment"
+            const CartManager = {
+                cart: [],
+                productsData: {},
+                domElements: {
+                    list: $('#lista-produtos'),
+                    empty: $('#carrinho-vazio'),
+                    items: $('#carrinho-itens')
                 },
-                config,
-                (decodedText) => {
-                    adicionarProdutoAoCarrinho(decodedText);
-                    stopQRCodeScanner();
+
+                init() {
+                    this.domElements.list.on('click', '.quantity-btn', this.handleQuantityChange.bind(this));
+                    this.domElements.list.on('click', '.remover-btn', this.handleRemoveItem.bind(this));
                 },
-                (errorMessage) => {
-                    console.log(errorMessage);
-                }
-            ).catch((err) => {
-                console.log("Erro ao iniciar o scanner: ", err);
-            });
 
-            $('#qr-reader').removeClass('hidden');
-            $('#stop-button').removeClass('hidden');
-            $('#start-button').addClass('hidden');
-        }
+                async addProduct(qrCode) {
+                    if (this.productsData[qrCode]) {
+                        this.updateQuantity(qrCode, 1);
+                        return;
+                    }
 
-        function stopQRCodeScanner() {
-            if (html5QrCode) {
-                html5QrCode.stop().then(() => {
-                    $('#qr-reader').addClass('hidden');
-                    $('#start-button').removeClass('hidden');
-                    $('#stop-button').addClass('hidden');
-                }).catch((err) => {
-                    console.log("Erro ao parar a câmera: ", err);
-                });
-            }
-        }
-
-        function adicionarProdutoAoCarrinho(qrCode) {
-            // Verifica se já temos os dados do produto
-            if (produtosData[qrCode]) {
-                incrementarQuantidade(qrCode);
-                return;
-            }
-
-            // Busca os dados do produto
-            $.ajax({
-                url: "/verdurao/vendas/buscar-produto",
-                method: "POST",
-                data: {
-                    codigo_qr: qrCode,
-                    _token: "{{ csrf_token() }}"
-                },
-                success: function(response) {
-                    if (response.success) {
-                        produtosData[qrCode] = response.produto;
-                        adicionarItemAoCarrinho(response.produto);
-                        toastr.success("Produto adicionado ao carrinho!", "Sucesso");
-                    } else {
-                        toastr.error(response.message, "Erro");
+                    try {
+                        const response = await this.fetchProductData(qrCode);
+                        if (response.success) {
+                            this.productsData[qrCode] = response.produto;
+                            this.addToCart(response.produto);
+                            toastr.success("Produto adicionado ao carrinho!", "Sucesso");
+                        }
+                    } catch (error) {
+                        toastr.error("Erro ao buscar produto!", "Erro");
+                        console.error("Erro:", error);
                     }
                 },
-                error: function(xhr) {
-                    toastr.error("Erro ao buscar produto!", "Erro");
-                    console.error("Erro ao buscar produto:", xhr.responseText);
-                }
-            });
-        }
 
-        function adicionarItemAoCarrinho(produto) {
-            // Verifica se o produto já está no carrinho
-            const itemExistente = carrinho.find(item => item.codigo_qr === produto.qrcode);
-
-            if (itemExistente) {
-                incrementarQuantidade(produto.qrcode);
-                return;
-            }
-
-            // Adiciona novo item ao carrinho
-            carrinho.push({
-                codigo_qr: produto.qrcode,
-                id_produto: produto.id_produto,
-                nome: produto.nome_produto,
-                preco: produto.preco_venda,
-                quantidade: 1,
-                cod_produto: produto.cod_produto,
-                unidade_medida: produto.unidade_medida,
-                estoque_disponivel: produto.estoque_atual
-            });
-
-            atualizarCarrinho();
-        }
-
-        function incrementarQuantidade(qrCode) {
-            const itemIndex = carrinho.findIndex(item => item.codigo_qr === qrCode);
-
-            if (itemIndex !== -1) {
-                // Verifica se há estoque disponível
-                if (carrinho[itemIndex].quantidade < carrinho[itemIndex].estoque_disponivel) {
-                    carrinho[itemIndex].quantidade++;
-                    atualizarCarrinho();
-                    toastr.success("Quantidade atualizada!", "Sucesso");
-                } else {
-                    toastr.warning("Quantidade máxima em estoque atingida!", "Aviso");
-                }
-            }
-        }
-
-        function decrementarQuantidade(qrCode) {
-            const itemIndex = carrinho.findIndex(item => item.codigo_qr === qrCode);
-
-            if (itemIndex !== -1) {
-                if (carrinho[itemIndex].quantidade > 1) {
-                    carrinho[itemIndex].quantidade--;
-                } else {
-                    removerItemDoCarrinho(qrCode);
-                    return;
-                }
-                atualizarCarrinho();
-            }
-        }
-
-        function removerItemDoCarrinho(qrCode) {
-            carrinho = carrinho.filter(item => item.codigo_qr !== qrCode);
-            atualizarCarrinho();
-            toastr.info("Produto removido do carrinho", "Info");
-        }
-
-        function atualizarCarrinho() {
-            const $listaProdutos = $('#lista-produtos');
-            $listaProdutos.empty();
-
-            if (carrinho.length === 0) {
-                $('#carrinho-vazio').removeClass('hidden');
-                $('#carrinho-itens').addClass('hidden');
-                return;
-            }
-
-            $('#carrinho-vazio').addClass('hidden');
-            $('#carrinho-itens').removeClass('hidden');
-
-            carrinho.forEach(item => {
-                const totalItem = (item.preco * item.quantidade).toFixed(2);
-
-                $listaProdutos.append(`
-                <tr class="produto-item" data-qrcode="${item.codigo_qr}">
-                    <td class="px-6 py-4 whitespace-nowrap">${item.nome}</td>
-                    <td class="px-6 py-4 whitespace-nowrap">R$ ${item.preco.toFixed(2)}</td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        <div class="flex items-center">
-                            <button class="decrementar-btn bg-gray-200 px-2 py-1 rounded-l" data-qrcode="${item.codigo_qr}">-</button>
-                            <span class="quantidade bg-gray-100 px-4 py-1">${item.quantidade}</span>
-                            <button class="incrementar-btn bg-gray-200 px-2 py-1 rounded-r" data-qrcode="${item.codigo_qr}">+</button>
-                        </div>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap">R$ ${totalItem}</td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        <button class="remover-btn text-red-500 hover:text-red-700" data-qrcode="${item.codigo_qr}">
-                            Remover
-                        </button>
-                    </td>
-                </tr>
-            `);
-            });
-
-            // Atualiza eventos dos botões
-            $('.incrementar-btn').on('click', function() {
-                incrementarQuantidade($(this).data('qrcode'));
-            });
-
-            $('.decrementar-btn').on('click', function() {
-                decrementarQuantidade($(this).data('qrcode'));
-            });
-
-            $('.remover-btn').on('click', function() {
-                removerItemDoCarrinho($(this).data('qrcode'));
-            });
-        }
-
-        function finalizarVenda() {
-            if (carrinho.length === 0) {
-                toastr.warning("Adicione produtos ao carrinho antes de finalizar", "Aviso");
-                return;
-            }
-
-            // Verifica estoque antes de enviar
-            $.ajax({
-                url: "/verdurao/vendas/verificar-estoque",
-                method: "POST",
-                data: {
-                    itens: carrinho,
-                    _token: "{{ csrf_token() }}"
+                async fetchProductData(qrCode) {
+                    return $.ajax({
+                        url: "/verdurao/vendas/buscar-produto",
+                        method: "POST",
+                        data: {
+                            codigo_qr: qrCode,
+                            _token: "{{ csrf_token() }}"
+                        }
+                    });
                 },
-                success: function(response) {
-                    if (response.success) {
-                        enviarVenda();
+
+                addToCart(produto) {
+                    const existingItem = this.cart.find(item => item.codigo_qr === produto.qrcode);
+
+                    if (existingItem) {
+                        this.updateQuantity(produto.qrcode, 1);
+                        return;
+                    }
+
+                    this.cart.push({
+                        codigo_qr: produto.qrcode,
+                        id_produto: produto.id_produto,
+                        nome: produto.nome_produto,
+                        preco: produto.preco_venda,
+                        quantidade: 1,
+                        cod_produto: produto.cod_produto,
+                        unidade_medida: produto.unidade_medida,
+                        estoque_disponivel: produto.estoque_atual
+                    });
+
+                    this.updateCartUI();
+                },
+
+                handleQuantityChange(event) {
+                    const qrCode = $(event.target).data('qrcode');
+                    const action = $(event.target).data('action');
+                    this.updateQuantity(qrCode, action === 'increment' ? 1 : -1);
+                },
+
+                handleRemoveItem(event) {
+                    const qrCode = $(event.target).data('qrcode');
+                    this.removeItem(qrCode);
+                },
+
+                updateQuantity(qrCode, delta) {
+                    const item = this.cart.find(item => item.codigo_qr === qrCode);
+                    if (!item) return;
+
+                    if (delta > 0 && item.quantidade >= item.estoque_disponivel) {
+                        toastr.warning("Estoque insuficiente!", "Aviso");
+                        return;
+                    }
+
+                    item.quantidade += delta;
+
+                    if (item.quantidade < 1) {
+                        this.removeItem(qrCode);
                     } else {
-                        toastr.error(response.message, "Erro no estoque");
-                        // Atualiza estoque disponível nos itens
-                        response.produtos_sem_estoque.forEach(produto => {
-                            const itemIndex = carrinho.findIndex(item => item.id_produto === produto.id_produto);
-                            if (itemIndex !== -1) {
-                                carrinho[itemIndex].estoque_disponivel = produto.estoque_atual;
-                                if (carrinho[itemIndex].quantidade > produto.estoque_atual) {
-                                    carrinho[itemIndex].quantidade = produto.estoque_atual;
-                                    toastr.warning(`Ajustada quantidade de ${carrinho[itemIndex].nome} para o disponível em estoque`, "Ajuste Automático");
-                                }
-                            }
-                        });
-                        atualizarCarrinho();
+                        this.updateCartUI();
+                        toastr.success("Quantidade atualizada!", "Sucesso");
                     }
                 },
-                error: function(xhr) {
-                    toastr.error("Erro ao verificar estoque", "Erro");
-                    console.error("Erro ao verificar estoque:", xhr.responseText);
-                }
-            });
-        }
 
-        function enviarVenda() {
-            $.ajax({
-                url: "/verdurao/vendas/registrar-venda",
-                method: "POST",
-                data: {
-                    itens: carrinho,
-                    _token: "{{ csrf_token() }}"
+                removeItem(qrCode) {
+                    this.cart = this.cart.filter(item => item.codigo_qr !== qrCode);
+                    delete this.productsData[qrCode];
+                    this.updateCartUI();
+                    toastr.info("Produto removido do carrinho", "Info");
                 },
-                success: function(response) {
-                    if (response.success) {
-                        toastr.success("Venda registrada com sucesso!", "Sucesso");
-                        carrinho = [];
-                        atualizarCarrinho();
-                        // Atualiza o histórico de vendas (se necessário)
-                        location.reload();
-                    } else {
-                        toastr.error(response.message, "Erro");
+
+                updateCartUI() {
+                    this.domElements.empty.toggleClass('hidden', this.cart.length > 0);
+                    this.domElements.items.toggleClass('hidden', this.cart.length === 0);
+
+                    this.domElements.list.html(this.generateCartHTML());
+                },
+
+                generateCartHTML() {
+                    return this.cart.map(item => `
+                    <tr class="produto-item" data-qrcode="${item.codigo_qr}">
+                        <td class="px-6 py-4 whitespace-nowrap">${item.nome}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">R$ ${item.preco.toFixed(2)}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="flex items-center">
+                                <button class="quantity-btn bg-gray-200 px-2 py-1 rounded-l" 
+                                    data-action="decrement" data-qrcode="${item.codigo_qr}">-</button>
+                                <span class="quantidade bg-gray-100 px-4 py-1">${item.quantidade}</span>
+                                <button class="quantity-btn bg-gray-200 px-2 py-1 rounded-r" 
+                                    data-action="increment" data-qrcode="${item.codigo_qr}">+</button>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">R$ ${(item.preco * item.quantidade).toFixed(2)}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <button class="remover-btn text-red-500 hover:text-red-700" 
+                                data-qrcode="${item.codigo_qr}">Remover</button>
+                        </td>
+                    </tr>
+                `).join('');
+                },
+
+                async finalizeSale() {
+                    if (this.cart.length === 0) {
+                        toastr.warning("Adicione produtos ao carrinho", "Aviso");
+                        return;
+                    }
+
+                    try {
+                        const stockCheck = await this.checkStock();
+                        if (!stockCheck.success) throw new Error(stockCheck.message);
+
+                        const saleResult = await this.registerSale();
+                        if (saleResult.success) {
+                            this.clearCart();
+                            toastr.success("Venda registrada com sucesso!", "Sucesso");
+                            location.reload();
+                        }
+                    } catch (error) {
+                        toastr.error(error.message, "Erro");
                     }
                 },
-                error: function(xhr) {
-                    toastr.error("Erro ao registrar venda", "Erro");
-                    console.error("Erro ao registrar venda:", xhr.responseText);
-                }
-            });
-        }
 
-        // Event Listeners
-        $('#start-button').on('click', startQRCodeScanner);
-        $('#stop-button').on('click', stopQRCodeScanner);
-        $('#finalizar-venda').on('click', finalizarVenda);
+                async checkStock() {
+                    return $.ajax({
+                        url: "/verdurao/vendas/verificar-estoque",
+                        method: "POST",
+                        data: {
+                            itens: this.cart,
+                            _token: "{{ csrf_token() }}"
+                        }
+                    });
+                },
+
+                async registerSale() {
+                    return $.ajax({
+                        url: "/verdurao/vendas/registrar-venda",
+                        method: "POST",
+                        data: {
+                            itens: this.cart,
+                            _token: "{{ csrf_token() }}"
+                        }
+                    });
+                },
+
+                clearCart() {
+                    this.cart = [];
+                    this.productsData = {};
+                    this.updateCartUI();
+                }
+            };
+
+            // Inicialização
+            $(document).ready(() => {
+                QrScanner.init();
+                CartManager.init();
+                $('#finalizar-venda').on('click', () => CartManager.finalizeSale());
+            });
+
+        })();
     </script>
     @endsection
