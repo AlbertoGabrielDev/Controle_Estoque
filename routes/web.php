@@ -113,7 +113,9 @@ Route::middleware([
     });
 
     Route::prefix('/vendas')->group(function () {
-        Route::post('/registrar-venda', [VendaController::class, 'registrar'])->name('venda.registrar');
+        Route::post('/buscar-produto', [VendaController::class, 'buscarProduto'])->name('buscar.produto');
+        Route::post('/verificar-estoque', [VendaController::class, 'verificarEstoque'])->name('verificar.estoque');
+        Route::post('/registrar-venda', [VendaController::class, 'registrarVenda'])->name('registrar.venda');
         Route::get('/', [VendaController::class, 'vendas'])->name('vendas.venda');
         Route::get('/listar', [VendaController::class, 'listar']);
         Route::get('/vendas', [VendaController::class, 'historicoVendas'])->name('vendas.historico_vendas');
