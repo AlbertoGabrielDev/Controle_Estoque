@@ -102,7 +102,7 @@ Route::middleware([
         Route::post('/status/{unidadeId}', [UnidadeController::class, 'status'])->name('unidades.status');
     });
 
-    Route::prefix('/roles')->group(function () {
+    Route::prefix('/roles')->middleware('can:create_post')->group(function () {
         Route::get('/index', [RoleController::class, 'index'])->name('roles.index');
         Route::get('/cadastro', [RoleController::class, 'cadastro'])->name('roles.cadastro');
         Route::post('/cadastro', [RoleController::class, 'inserirRole'])->name('roles.inserirRole');

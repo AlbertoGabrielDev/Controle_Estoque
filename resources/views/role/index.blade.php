@@ -26,6 +26,9 @@
                         <p class="text-gray-800 font-semibold">{{ucfirst($role->name)}}</p>
                     </div>
                 </td>
+                <td class="py-4 px-6">
+                    <a href="{{route('roles.editar', $role->id)}}" class="text-cyan-600 hover:underline">Editar</a>
+                </td>
             </tr>
             @endforeach
         </tbody>

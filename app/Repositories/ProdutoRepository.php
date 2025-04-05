@@ -82,6 +82,9 @@ public function update(ValidacaoProdutoEditar $request, $produtoId)
 {
     $produtos = Produto::where('id_produto',$produtoId)
     ->update([
+        'cod_produto'       =>$request->cod_produto,
+        'nome_produto'      =>$request->nome_produto,
+        'qrcode'            =>$request->qrcode,
         'descricao'         =>$request->descricao,
         'inf_nutrientes'    =>json_encode($request->inf_nutrientes)
     ]);

@@ -35,10 +35,13 @@ class RoleController extends Controller
         return redirect()->route('roles.index')->with('success', 'Inserido com sucesso');
     }
 
-    public function edit(Role $role)
+    public function editar(Request $request, $id)
 {
+    $roles = Role::find($id); 
+   
     $permissions = Permission::all();
-    return view('roles.edit', compact('role', 'permissions'));
+
+    return view('role.editar', compact('roles','permissions'));
 }
 
 public function update(Request $request, Role $role)
