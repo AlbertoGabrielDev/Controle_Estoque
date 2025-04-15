@@ -2,7 +2,9 @@
 
 namespace App\Providers;
 
+use App\Models\Menu;
 use App\Models\Permission;
+use App\Models\Role;
 use Illuminate\Support\Facades\Gate;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
@@ -17,74 +19,27 @@ class AuthServiceProvider extends ServiceProvider
         //
     ];
 
-     public function boot(): void
+    public function boot()
     {
-        // Gate::define('permissao',function(User $user){
-        //     $role = $user->roles->first();
-           
-        //     if ($role && $role->name === 'admin') {
-        //         return true;
-        //     }
-    
-        //     return false;
-        // });
-
-        // Gate::define('view_post', function(User $user) {
-        //     $role = $user->roles->first();
-        
-        //     if ($role && in_array($role->name, ['admin', 'gerente', 'marketing', 'atendente','Vendedor'])) {
-        //         return true;
-        //     }
-        
-        //     return false;
-        // });
-
-        // Gate::define('edit_post', function(User $user) {
-        //     $role = $user->roles->first();
-        
-        //     if ($role && in_array($role->name, ['admin', 'gerente', 'marketing'])) {
-        //         return true;
-        //     }
-        
-        //     return false;
-        // });
-
-        // Gate::define('create_post', function(User $user) {
-        //     $role = $user->roles->first();
-        
-        //     if ($role && in_array($role->name, ['admin', 'gerente', 'marketing','Vendedor'])) {
-        //         return true;
-        //     }
-        
-        //     return false;
-        // });
-
-        // Gate::define('create_user','delete_user', function(User $user) {
-        //     $role = $user->roles->first();
-        
-        //     if ($role && in_array($role->name, ['admin', 'gerente'])) {
-        //         return true;
-        //     }
-        
-        //     return false;
-        // });
-
         $this->registerPolicies();
-        
-        Gate::before(function ($user, $ability) {
+
+        // Verifica se o usuário tem uma permissão específica em um menu
+        Gate::define('has-permission', function (User $user, $menuSlug, $permissionName) {
+            // Admin tem acesso total
             if ($user->hasRole('admin')) {
                 return true;
             }
+
+            $permission = Permission::where('name', $permissionName)->first();
+            $menu = Menu::where('slug', $menuSlug)->first();
+
+            if (!$permission || !$menu) return false;
+
+            return $user->roles()
+                ->whereHas('roleMenuPermissions', function ($query) use ($menu, $permission) {
+                    $query->where('menu_id', $menu->id)
+                        ->where('permission_id', $permission->id);
+                })->exists();
         });
-    
-        try {
-            Permission::all()->each(function ($permission) {
-                Gate::define($permission->name, function ($user) use ($permission) {
-                    return $user->hasPermission($permission->name);
-                });
-            });
-        } catch (\Exception $e) {
-            // Tratar exceção se a tabela não existir
-        }
     }
 }

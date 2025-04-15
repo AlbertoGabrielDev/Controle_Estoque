@@ -17,9 +17,9 @@
             <tr class="text-sm leading-normal">
                 <th class="py-4 px-6 uppercase text-sm text-grey-dark border-b border-grey-light">Categoria</th>
                 <!-- <th class="py-4 px-6 bg-grey-lightest font-bold uppercase text-sm text-grey-dark border-b border-grey-light">Editar</th>
-                @can('permissao')
+               
                 <th class="py-4 px-6 bg-grey-lightest font-bold uppercase text-sm text-grey-dark border-b border-grey-light text-right">Inativar</th>
-                @endcan -->
+                 -->
             </tr>
         </thead>
         <tbody>
@@ -28,11 +28,9 @@
                 <td class="py-4 px-6 border-b border-grey-light">{{$categoria->nome_categoria}}</td>
                 <td class="py-4 px-6 border-b border-grey-light"><a href="{{route('categorias.editar', $categoria->id_categoria)}}" class="btn btn-primary">Editar</a></td>
                 <td class="py-4 px-6 border-b border-grey-light text-right">
-                @can('permissao')
                   <button class="btn btn-primary toggle-ativacao @if($categoria->status === 1) btn-danger @elseif($categoria->status === 0) btn-success @else btn-primary @endif" data-id="{{ $categoria->id_categoria }}">
                     {{ $categoria->status ? 'Inativar' : 'Ativar' }}
                   </button>
-                @endcan
                 </td>
             </tr>
           @endforeach

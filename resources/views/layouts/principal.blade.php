@@ -89,52 +89,60 @@
   <div class="flex-1 flex">
     <div class="p-2 bg-white w-60 flex flex-col hidden md:flex" id="sideNav">
       <nav class="list-group list-group-horizontal">
-        @can('permissao')
+   
         <a class="block text-gray-500 py-2.5 px-4 my-4 rounded transition duration-200 hover:bg-gradient-to-r hover:from-cyan-400 hover:to-cyan-300 hover:text-white" href="{{route('months')}}">
           <i class="fas fa-history mr-2"></i>Grafico de vendas
         </a>
-        @endcan
+        
         <a class="block text-gray-500 py-2.5 px-4 my-4 rounded transition duration-200 hover:bg-gradient-to-r hover:from-cyan-400 hover:to-cyan-300 hover:text-white" href="{{route('categoria.inicio')}}">
           <i class="fas fa-home mr-2"></i>Inicio
         </a>
+        @if(auth()->user() && auth()->user()->hasPermission('produtos','view_post'))
         <a class="block text-gray-500 py-2.5 px-4 my-4 rounded transition duration-200 hover:bg-gradient-to-r hover:from-cyan-400 hover:to-cyan-300 hover:text-white" href="{{route('produtos.index')}}">
           <i class="fas fa-file-alt mr-2"></i>Produtos
         </a>
+        @endif
+         @if(auth()->user() && auth()->user()->hasPermission('fornecedores','view_post'))
         <a class="block text-gray-500 py-2.5 px-4 my-4 rounded transition duration-200 hover:bg-gradient-to-r hover:from-cyan-400 hover:to-cyan-300 hover:text-white" href="{{route('fornecedor.index')}}">
           <i class="fas fa-address-book mr-2"></i>Fornecedores
         </a>
+        @endif
+        @if(auth()->user() && auth()->user()->hasPermission('marcas','view_post'))
         <a class="block text-gray-500 py-2.5 px-4 my-4 rounded transition duration-200 hover:bg-gradient-to-r hover:from-cyan-400 hover:to-cyan-300 hover:text-white" href="{{route('marca.index')}}">
           <i class="fas fa-hashtag mr-2"></i>Marca
         </a>
+        @endif
+        @if(auth()->user() && auth()->user()->hasPermission('estoque','view_post'))
         <a class="block text-gray-500 py-2.5 px-4 my-4 rounded transition duration-200 hover:bg-gradient-to-r hover:from-cyan-400 hover:to-cyan-300 hover:text-white" href="{{route('estoque.index')}}">
           <i class="fas fa-server mr-2"></i>Estoque
         </a>
-        @if(auth()->user() && auth()->user()->hasPermission('view_post'))
+        @endif
+        @if(auth()->user() && auth()->user()->hasPermission('usuarios','view_post'))
         <a class="block text-gray-500 py-2.5 px-4 my-4 rounded transition duration-200 hover:bg-gradient-to-r hover:from-cyan-400 hover:to-cyan-300 hover:text-white" href="{{route('usuario.index')}}">
           <i class="fas fa-users mr-2"></i>Usuarios
         </a>
         @endif
-        @can('permissao')
+        @if(auth()->user() && auth()->user()->hasPermission('unidades','view_post'))
         <a class="block text-gray-500 py-2.5 px-4 my-4 rounded transition duration-200 hover:bg-gradient-to-r hover:from-cyan-400 hover:to-cyan-300 hover:text-white" href="{{route('unidades.index')}}">
           <i class="fa-solid fa-suitcase"></i> Unidades
         </a>
-        @endcan
-        @can('permissao')
+        @endif
+        @if(auth()->user() && auth()->user()->hasPermission('historico','view_post'))
         <a class="block text-gray-500 py-2.5 px-4 my-4 rounded transition duration-200 hover:bg-gradient-to-r hover:from-cyan-400 hover:to-cyan-300 hover:text-white" href="{{route('estoque.historico')}}">
           <i class="fas fa-history mr-2"></i>Historico
         </a>
-        @endcan
-        @if(auth()->user() && auth()->user()->hasPermission('create_post'))
+        @endif
+        @if(auth()->user() && auth()->user()->hasPermission('roles','create_post'))
         <a class="block text-gray-500 py-2.5 px-4 my-4 rounded transition duration-200 hover:bg-gradient-to-r hover:from-cyan-400 hover:to-cyan-300 hover:text-white" href="{{route('roles.index')}}">
           <i class="fa-solid fa-suitcase"></i> Permissões
         </a>
-        @endcan
-        @if(auth()->user() && auth()->user()->hasPermission('view_post'))
+        @endif
+        @if(auth()->user() && auth()->user()->hasPermission('historico_vendas','view_post'))
         <a class="block text-gray-500 py-2.5 px-4 my-4 rounded transition duration-200 hover:bg-gradient-to-r hover:from-cyan-400 hover:to-cyan-300 hover:text-white" href="{{route('vendas.historico_vendas')}}">
           <i class="fas fa-users mr-2"></i>Historico de vendas
         </a>
         @endif
-        @if(auth()->user() && auth()->user()->hasPermission('view_post'))
+        @if(auth()->user() && auth()->user()->hasPermission('vendas','view_post'))
         <a class="block text-gray-500 py-2.5 px-4 my-4 rounded transition duration-200 hover:bg-gradient-to-r hover:from-cyan-400 hover:to-cyan-300 hover:text-white" href="{{route('vendas.venda')}}">
           <i class="fas fa-users mr-2"></i>Vendas
         </a>

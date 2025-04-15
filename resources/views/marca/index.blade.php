@@ -24,9 +24,8 @@
       <tr class="text-sm leading-normal">
         <th class="p-4 uppercase text-sm text-grey-dark border-b border-grey-light text-left">Marca</th>
         <th class="p-4 uppercase text-sm text-grey-dark border-b border-grey-light text-left">Editar</th>
-        @can('permissao')
           <th class="p-4 uppercase text-sm text-grey-dark border-b border-grey-light text-left">Inativar</th> 
-        @endcan
+        
       </tr>
     </thead>
     <tbody>
@@ -35,11 +34,10 @@
         <td class="p-4 border-b border-grey-light text-left">{{$marca->nome_marca}}</td>
         <td class="p-4 border-b border-grey-light text-left"><a href="{{route('marca.editar', $marca->id_marca)}}">Editar</a></td> 
         <td class="p-4 border-b border-grey-light text-left">
-          @can('permissao')
             <button class="toggle-ativacao  @if($marca->status === 1) btn-danger @elseif($marca->status === 0) btn-success @else btn-primary @endif"" data-id="{{ $marca->id_marca }}" >
               {{ $marca->status ? 'Inativar' : 'Ativar' }}
             </button>
-          @endcan
+          
         </td>
       </tr>
       @endforeach

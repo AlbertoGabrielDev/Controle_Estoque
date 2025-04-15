@@ -74,9 +74,9 @@
           <th data-order="asc" data-col="data_validade" class="p-4 uppercase text-sm text-grey-dark border-b border-grey-light text-left">Data de Validade</th>
        
           <th class="p-4 uppercase text-sm text-grey-dark border-b border-grey-light text-left">Editar</th>
-          @can('permissao')
+         
             <th class="p-4 uppercase text-sm text-grey-dark border-b border-grey-light text-left">Inativar</th>
-          @endcan
+         
         </tr>
       </thead>
       <tbody>
@@ -95,12 +95,12 @@
             <td class="p-4 border-b border-grey-light text-left expiration-date" id="data">{{($estoque->validade)}}</td>
             <td class="p-4 border-b border-grey-light text-left"><a href="{{route('estoque.editar', $estoque->id_estoque)}}">Editar</a></td> 
             <td class="p-4 border-b border-grey-light text-left">
-              @can('permissao')
+              
                 <button class="toggle-ativacao m-2 @if($estoque->status === 1) btn-danger @elseif($estoque->status === 0) btn-success @else btn-primary @endif" 
                   data-id="{{ $estoque->id_estoque }}">
                   {{ $estoque->status ? 'Inativar' : 'Ativar' }}
                 </button>
-              @endcan
+              @
             </td>
         </tr>
         @endforeach

@@ -6,11 +6,12 @@ use Illuminate\Support\Facades\Auth;
 
 class CheckPermission
 {
-    public function handle($request, Closure $next, $permission)
+    public function handle($request, Closure $next, $permission, $menu)
     {
-        if (!Auth::user() || !Auth::user()->hasPermission($permission)) {
-            abort(403, 'Unauthorized');
+        if (Auth::check() && Auth::user()->hasPermission($menu, $permission)) {
+            return $next($request);
         }
-        return $next($request);
+
+        abort(403, 'Acesso não autorizado');
     }
 }

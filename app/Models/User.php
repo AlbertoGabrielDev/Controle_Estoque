@@ -6,8 +6,10 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Gate;
 use Laravel\Fortify\TwoFactorAuthenticatable;
 use Laravel\Jetstream\HasProfilePhoto;
+
 use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
@@ -64,25 +66,20 @@ class User extends Authenticatable
     ];
 
     public function roles()
-    {
-        return $this->belongsToMany(Role::class, 'user_role');
-    }
-
-    public function hasPermission($permissionName)
-    {
-        if ($this->roles->where('name', 'admin')->isNotEmpty()) {
-            return true;
-        }
-
-        return $this->roles->flatMap(function ($role) {
-            return $role->permissions;
-        })->pluck('name')->contains($permissionName);
-    }
+{
+    return $this->belongsToMany(Role::class, 'user_role'); // Nome personalizado
+}
 
     public function hasRole($roleName)
     {
-        return $this->roles->where('name', $roleName)->isNotEmpty();
+        return $this->roles()->where('name', $roleName)->exists();
     }
+
+    public function hasPermission($menuSlug, $permissionName)
+    {
+        return Gate::allows('has-permission', [$menuSlug, $permissionName]);
+    }
+
 
     public function unidade()
     {
@@ -90,7 +87,7 @@ class User extends Authenticatable
     }
 
     public function vendas()
-{
-    return $this->hasMany(Venda::class, 'id_usuario_fk');
-}
+    {
+        return $this->hasMany(Venda::class, 'id_usuario_fk');
+    }
 }

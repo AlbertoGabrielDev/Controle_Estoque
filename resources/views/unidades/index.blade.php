@@ -24,9 +24,9 @@
       <tr class="text-sm leading-normal">
         <th class="p-4 uppercase text-sm text-grey-dark border-b border-grey-light text-left">Unidade</th>
         <th class="p-4 uppercase text-sm text-grey-dark border-b border-grey-light text-left">Editar</th>
-        @can('permissao')
+      
           <th class="p-4 uppercase text-sm text-grey-dark border-b border-grey-light text-left">Inativar</th> 
-        @endcan
+        
       </tr>
     </thead>
     <tbody>
@@ -35,12 +35,11 @@
         <td class="p-4 border-b border-grey-light text-left">{{$unidade->nome}}</td>
         <td class="p-4 border-b border-grey-light text-left"><a href="{{route('unidades.editar', $unidade->id_unidade)}}">Editar</a></td> 
         <td class="p-4 border-b border-grey-light text-left">
-              @can('permissao')
                 <button class="toggle-ativacao m-2 @if($unidade->status === 1) btn-danger @elseif($unidade->status === 0) btn-success @else btn-primary @endif" 
                   data-id="{{ $unidade->id_unidade }}">
                   {{ $unidade->status ? 'Inativar' : 'Ativar' }}
                 </button>
-              @endcan
+              
             </td>
       </tr>
       @endforeach

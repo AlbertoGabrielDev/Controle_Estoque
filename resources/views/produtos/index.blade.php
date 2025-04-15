@@ -28,9 +28,8 @@
           <th class="p-4 uppercase text-sm text-grey-dark border-b border-grey-light text-left">Infor. Nutricional</th>
           <!-- <th data-order="asc" data-col="data_validade">Data de Validade</th> -->
           <th class="p-4 uppercase text-sm text-grey-dark border-b border-grey-light text-left">Editar</th>
-          @can('permissao')
             <th class="p-4 uppercase text-sm text-grey-dark border-b border-grey-light text-left">Inativar</th>
-          @endcan
+          @
         </tr>
       </thead>
       <tbody>
@@ -57,12 +56,11 @@
               <!-- <td class= "expiration-date" id="data">{{($produto->validade)}}</td> -->
               <td class="p-4 border-b border-grey-light text-left"><a href="{{route('produtos.editar', $produto->id_produto)}}">Editar</a></td>
               <td class="p-4 border-b border-grey-light text-left">
-                @can('permissao')
                   <button class="toggle-ativacao @if($produto->status === 1) btn-danger @elseif($produto->status === 0) btn-success @else btn-primary @endif"
                     data-id="{{ $produto->id_produto }}">
                       {{ $produto->status ? 'Inativar' : 'Ativar' }}
                   </button>
-                @endcan
+                
               </td>
             </tr>
           @endforeach

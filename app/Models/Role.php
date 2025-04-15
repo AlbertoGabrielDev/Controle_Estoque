@@ -13,11 +13,31 @@ class Role extends Model
 
     public function permissions()
     {
-        return $this->belongsToMany(Permission::class, 'role_permission');
+        return $this->belongsToMany(Permission::class, 'role_menu_permission')
+            ->withPivot('menu_id');
+    }
+
+    public function roleMenuPermissions()
+    {
+        return $this->hasMany(RoleMenuPermission::class);
+    }
+
+    public function hasMenuPermission($menuId, $permissionId)
+    {
+        return $this->roleMenuPermissions()
+            ->where('menu_id', $menuId)
+            ->where('permission_id', $permissionId)
+            ->exists();
     }
 
     public function users()
     {
         return $this->belongsToMany(User::class, 'user_role');
+    }
+
+    public function menus()
+    {
+        return $this->belongsToMany(Menu::class, 'role_menu_permission')
+            ->withPivot('permission_id');
     }
 }
