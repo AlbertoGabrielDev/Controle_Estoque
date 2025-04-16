@@ -1,19 +1,11 @@
-<!DOCTYPE html>
-<html lang="en">
+@extends('layouts.principal')
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Permissions UI</title>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.tailwindcss.com"></script>
-</head>
+@section('conteudo')
 
-<body class="p-6 bg-gray-100">
+
     <div class="max-w-5xl mx-auto bg-white p-6 rounded-lg shadow-md">
-        <!-- Restrict Access -->
-        <div class="border p-4 rounded-lg mb-6">
-            <h3 class="font-semibold mb-3">Restrict Access</h3>
+    <h3 class="font-semibold mb-3">{{ ucfirst($role->name) }}</h3>
+        <div class="border p-4 rounded-lg mb-6">  
             <div class="grid grid-cols-4 gap-4">
                 <div class="flex flex-col items-center">
                     <label class="flex items-center space-x-2">
@@ -89,8 +81,8 @@
         </div>
     </div>
 
-</body>
 
+@endsection
 <style>
     .toggle-switch {
         width: 40px;

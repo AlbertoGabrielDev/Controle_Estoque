@@ -27,10 +27,10 @@ Route::middleware([
     Route::prefix('/categoria')->group(function () {
         Route::get('/', [CategoriaController::class, 'Inicio'])->name('categoria.inicio')->middleware('check.permission:view_post,categoria');
         Route::get('/index', [CategoriaController::class, 'Index'])->name('categoria.index')->middleware('check.permission:view_post,categoria');
-        Route::get('/cadastro', [CategoriaController::class, 'cadastro'])->name('categoria.cadastro');
+        Route::get('/cadastro', [CategoriaController::class, 'cadastro'])->name('categoria.cadastro')->middleware('check.permission:create_post,categoria');
         Route::post('/cadastro', [CategoriaController::class, 'inserirCategoria'])->name('categoria.inserirCategoria');
         Route::get('/produto/{categoria}', [CategoriaController::class, 'produto'])->name('categorias.produto');
-        Route::get('/editar/{categoriaId}', [CategoriaController::class, 'editar'])->name('categorias.editar');
+        Route::get('/editar/{categoriaId}', [CategoriaController::class, 'editar'])->name('categorias.editar')->middleware('check.permission:edit_post,categoria');
         Route::post('/editar/{categoriaId}', [CategoriaController::class, 'salvarEditar'])->name('categorias.salvarEditar');
         Route::post('/status/{categoriaId}', [CategoriaController::class, 'status'])->name('categorias.status');
         Route::post('/produto/status/{produtoId}', [ProdutoController::class, 'status'])->name('produtos.status');
@@ -38,85 +38,85 @@ Route::middleware([
 
     Route::prefix('/produtos')->group(function () {
         Route::get('/index', [ProdutoController::class, 'Index'])->name('produtos.index')->middleware('check.permission:view_post,Produtos');
-        Route::get('/cadastro', [ProdutoController::class, 'cadastro'])->name('produtos.cadastro');
+        Route::get('/cadastro', [ProdutoController::class, 'cadastro'])->name('produtos.cadastro')->middleware('check.permission:create_post,Produtos');
         Route::post('/salvar-cadastro', [ProdutoController::class, 'inserirCadastro'])->name('produtos.salvarCadastro');
         Route::get('/buscar-produto', [ProdutoController::class, 'buscarProduto'])->name('produtos.buscar');
-        Route::get('/editar/{produtoId}', [ProdutoController::class, 'editar'])->name('produtos.editar');
+        Route::get('/editar/{produtoId}', [ProdutoController::class, 'editar'])->name('produtos.editar')->middleware('check.permission:edit_post,Produtos');
         Route::post('/editar/{produtoId}', [ProdutoController::class, 'salvarEditar'])->name('produtos.salvarEditar');
         Route::post('/status/{produtoId}', [ProdutoController::class, 'status'])->name('produtos.status');
     });
 
     Route::prefix('/estoque')->group(function () {
-        Route::get('/', [EstoqueController::class, 'Index'])->name('estoque.index')->middleware('can:view_post');
-        Route::get('/cadastro', [EstoqueController::class, 'Cadastro'])->name('estoque.cadastro');
+        Route::get('/', [EstoqueController::class, 'Index'])->name('estoque.index')->middleware('check.permission:view_post,estoque');
+        Route::get('/cadastro', [EstoqueController::class, 'Cadastro'])->name('estoque.cadastro')->middleware('check.permission:create_post,estoque');
         Route::post('/cadastro', [EstoqueController::class, 'inserirEstoque'])->name('estoque.inserirEstoque');
         Route::get('/buscar-estoque', [EstoqueController::class, 'buscar'])->name('estoque.buscar');
-        Route::get('/editar/{estoqueId}', [EstoqueController::class, 'editar'])->name('estoque.editar');
+        Route::get('/editar/{estoqueId}', [EstoqueController::class, 'editar'])->name('estoque.editar')->middleware('check.permission:edit_post,estoque');
         Route::post('/editar/{estoqueId}', [EstoqueController::class, 'salvarEditar'])->name('estoque.salvarEditar');
         Route::post('/status/{estoqueId}', [EstoqueController::class, 'status'])->name('estoque.status');
         Route::get('/quantidade/{estoqueId}/{operacao}', [EstoqueController::class, 'atualizarEstoque'])->name('estoque.quantidade');
         Route::get('grafico-filtro', [EstoqueController::class, 'graficoFiltro'])->name('estoque.graficoFiltro');
         Route::get('/grafico', [GraficosApiController::class, 'months'])->name('months');
 
-        Route::get('/historico', [EstoqueController::class, 'historico'])->name('estoque.historico')->middleware('can:permissao');
+        Route::get('/historico', [EstoqueController::class, 'historico'])->name('estoque.historico')->middleware('check.permission:view_post,historico');
     });
 
     Route::prefix('/fornecedor')->group(function () {
-        Route::get('/', [FornecedorController::class, 'index'])->name('fornecedor.index')->middleware('can:view_post');
-        Route::get('/cadastro', [FornecedorController::class, 'Cadastro'])->name('fornecedor.cadastro');
+        Route::get('/', [FornecedorController::class, 'index'])->name('fornecedor.index')->middleware('check.permission:view_post,fornecedores');
+        Route::get('/cadastro', [FornecedorController::class, 'Cadastro'])->name('fornecedor.cadastro')->middleware('check.permission:create_post,fornecedores');
         Route::post('/cadastro', [FornecedorController::class, 'inserirCadastro'])->name('fornecedor.inserirCadastro');
         Route::get('/cidade/{estado}', [FornecedorController::class, 'getCidade'])->name('fornecedor.cidade');
         Route::get('/buscar-fornecedor', [FornecedorController::class, 'Buscar'])->name('fornecedor.buscar');
-        Route::get('/editar/{fornecedorId}', [FornecedorController::class, 'editar'])->name('fornecedor.editar');
+        Route::get('/editar/{fornecedorId}', [FornecedorController::class, 'editar'])->name('fornecedor.editar')->middleware('check.permission:edit_post,fornecedores');
         Route::post('/editar/{fornecedorId}', [FornecedorController::class, 'salvarEditar'])->name('fornecedor.salvarEditar');
         Route::post('/status/{fornecedorId}', [FornecedorController::class, 'status'])->name('fornecedor.status');
     });
 
     Route::prefix('/marca')->group(function () {
-        Route::get('/index', [MarcaController::class, 'index'])->name('marca.index')->middleware('can:view_post');
-        Route::get('/cadastro', [MarcaController::class, 'cadastro'])->name('marca.cadastro');
+        Route::get('/index', [MarcaController::class, 'index'])->name('marca.index')->middleware('check.permission:view_post,marca');
+        Route::get('/cadastro', [MarcaController::class, 'cadastro'])->name('marca.cadastro')->middleware('check.permission:create_post,marca');
         Route::post('/cadastro', [MarcaController::class, 'inserirMarca'])->name('marca.inserirMarca');
         Route::get('/buscar-marca', [MarcaController::class, 'Buscar'])->name('marca.buscar');
-        Route::get('/editar/{marcaId}', [MarcaController::class, 'editar'])->name('marca.editar');
+        Route::get('/editar/{marcaId}', [MarcaController::class, 'editar'])->name('marca.editar')->middleware('check.permission:edit_post,marca');
         Route::post('/editar/{marcaId}', [MarcaController::class, 'salvarEditar'])->name('marca.salvarEditar');
         Route::post('/status/{marcaId}', [MarcaController::class, 'status'])->name('marca.status');
     });
 
-    Route::prefix('/usuario')->middleware('can:view_post')->group(function () {
-        Route::get('/index', [UsuarioController::class, 'index'])->name('usuario.index')->middleware('can:view_post');
-        Route::get('/cadastro', [UsuarioController::class, 'cadastro'])->name('usuario.cadastro')->middleware('can:create_post');
-        Route::post('/cadastro', [UsuarioController::class, 'inserirUsuario'])->name('usuario.inserirUsuario')->middleware('can:create_post');
-        Route::get('/editar/{userId}', [UsuarioController::class, 'editar'])->name('usuario.editar')->middleware('can:edit_post');
+    Route::prefix('/usuario')->group(function () {
+        Route::get('/index', [UsuarioController::class, 'index'])->name('usuario.index')->middleware('check.permission:view_post,perfil');
+        Route::get('/cadastro', [UsuarioController::class, 'cadastro'])->name('usuario.cadastro')->middleware('check.permission:create_post,perfil');
+        Route::post('/cadastro', [UsuarioController::class, 'inserirUsuario'])->name('usuario.inserirUsuario');
+        Route::get('/editar/{userId}', [UsuarioController::class, 'editar'])->name('usuario.editar')->middleware('check.permission:edit_post,perfil');
         Route::post('/status/{userId}', [UsuarioController::class, 'status'])->name('usuario.status');
-        Route::put('/editar/{userid}', [UsuarioController::class, 'salvarEditar'])->name('usuario.salvarEditar')->middleware('can:edit_post');
+        Route::put('/editar/{userid}', [UsuarioController::class, 'salvarEditar'])->name('usuario.salvarEditar');
         Route::get('/buscar-usuario', [UsuarioController::class, 'Buscar'])->name('usuario.buscar');
     });
     Route::prefix('/unidades')->group(function () {
-        Route::get('/index', [UnidadeController::class, 'index'])->name('unidades.index')->middleware('check.permission:view_post,Unidades');
-        Route::get('/cadastro', [UnidadeController::class, 'cadastro'])->name('unidades.cadastro');
+        Route::get('/index', [UnidadeController::class, 'index'])->name('unidades.index')->middleware('check.permission:view_post,unidades');
+        Route::get('/cadastro', [UnidadeController::class, 'cadastro'])->name('unidades.cadastro')->middleware('check.permission:create_post,unidades');
         Route::post('/cadastro', [UnidadeController::class, 'inserirUnidade'])->name('unidades.inserirUnidade');
         Route::get('/buscar-unidade', [UnidadeController::class, 'Buscar'])->name('unidades.buscar');
-        Route::get('/editar/{unidadeId}', [UnidadeController::class, 'editar'])->name('unidades.editar');
+        Route::get('/editar/{unidadeId}', [UnidadeController::class, 'editar'])->name('unidades.editar')->middleware('check.permission:edit_post,unidades');
         Route::post('/editar/{unidadeId}', [UnidadeController::class, 'salvarEditar'])->name('unidades.salvarEditar');
         Route::post('/status/{unidadeId}', [UnidadeController::class, 'status'])->name('unidades.status');
     });
 
     Route::prefix('/roles')->group(function () {
-        Route::get('/index', [RoleController::class, 'index'])->name('roles.index');
-        Route::get('/cadastro', [RoleController::class, 'cadastro'])->name('roles.cadastro');
+        Route::get('/index', [RoleController::class, 'index'])->name('roles.index')->middleware('check.permission:view_post,roles');
+        Route::get('/cadastro', [RoleController::class, 'cadastro'])->name('roles.cadastro')->middleware('check.permission:create_post,roles');
         Route::post('/cadastro', [RoleController::class, 'inserirRole'])->name('roles.inserirRole');
         Route::get('/buscar-unidade', [RoleController::class, 'Buscar'])->name('roles.buscar');
-        Route::get('/editar/{roleId}', [RoleController::class, 'editar'])->name('roles.editar');
+        Route::get('/editar/{roleId}', [RoleController::class, 'editar'])->name('roles.editar')->middleware('check.permission:edit_post,roles');
         Route::put('/editar/{rolesId}', [RoleController::class, 'salvarEditar'])->name('roles.salvarEditar');
         Route::post('/status/{rolesId}', [RoleController::class, 'status'])->name('roles.status');
     });
 
     Route::prefix('/vendas')->group(function () {
-        Route::get('/', [VendaController::class, 'vendas'])->name('vendas.venda')->middleware('can:view_post');
+        Route::get('/', [VendaController::class, 'vendas'])->name('vendas.venda')->middleware('check.permission:view_post,vendas');
         Route::post('/buscar-produto', [VendaController::class, 'buscarProduto'])->name('buscar.produto');
         Route::post('/verificar-estoque', [VendaController::class, 'verificarEstoque'])->name('verificar.estoque');
         Route::post('/registrar-venda', [VendaController::class, 'registrarVenda'])->name('registrar.venda');
-        Route::get('/vendas', [VendaController::class, 'historicoVendas'])->name('vendas.historico_vendas')->middleware('can:view_post');
+        Route::get('/vendas', [VendaController::class, 'historicoVendas'])->name('vendas.historico_vendas')->middleware('check.permission:view_post,vendas');
     });
 
     Route::prefix('/spreadsheet')->group(function () {

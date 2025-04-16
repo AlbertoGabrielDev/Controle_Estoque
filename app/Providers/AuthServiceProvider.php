@@ -30,16 +30,23 @@ class AuthServiceProvider extends ServiceProvider
                 return true;
             }
 
-            $permission = Permission::where('name', $permissionName)->first();
+            // Verifica se o menu existe
             $menu = Menu::where('slug', $menuSlug)->first();
+            if (!$menu) {
+                return false; // Bloqueia se o menu não existir
+            }
 
-            if (!$permission || !$menu) return false;
+            // Verifica se a permissão existe
+            $permission = Permission::where('name', $permissionName)->first();
+            if (!$permission) {
+                return false; // Bloqueia se a permissão não existir
+            }
 
-            return $user->roles()
-                ->whereHas('roleMenuPermissions', function ($query) use ($menu, $permission) {
-                    $query->where('menu_id', $menu->id)
-                        ->where('permission_id', $permission->id);
-                })->exists();
+            // Verifica se a role tem a permissão
+            return $user->roles()->whereHas('roleMenuPermissions', function ($query) use ($menu, $permission) {
+                $query->where('menu_id', $menu->id)
+                    ->where('permission_id', $permission->id);
+            })->exists();
         });
     }
 }
