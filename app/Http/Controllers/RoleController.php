@@ -46,7 +46,7 @@ class RoleController extends Controller
         }])->findOrFail($id);
     
         $permissions = Permission::all();
-        $menus = Menu::with('roles')->get();
+        $menus = Menu::with('roles')->whereNotNull('slug')->where('slug', '!=', '') ->get();
     
         // Acessar através da relação correta
         $rolePermissions = $role->roleMenuPermissions->mapWithKeys(function ($item) {
