@@ -92,7 +92,7 @@ Route::middleware([
         Route::get('/buscar-usuario', [UsuarioController::class, 'Buscar'])->name('usuario.buscar');
     });
     Route::prefix('/unidades')->group(function () {
-        Route::get('/index', [UnidadeController::class, 'index'])->name('unidades.index')->middleware('check.permission:view_post,unidades');
+        Route::get('/index', [UnidadeController::class, 'index'])->name('unidade.index')->middleware('check.permission:view_post,unidades');
         Route::get('/cadastro', [UnidadeController::class, 'cadastro'])->name('unidades.cadastro')->middleware('check.permission:create_post,unidades');
         Route::post('/cadastro', [UnidadeController::class, 'inserirUnidade'])->name('unidades.inserirUnidade');
         Route::get('/buscar-unidade', [UnidadeController::class, 'Buscar'])->name('unidades.buscar');
