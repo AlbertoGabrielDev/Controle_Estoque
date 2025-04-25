@@ -15,7 +15,7 @@ use App\Providers\FortifyServiceProvider;
 use App\Http\Controllers\SpreadsheetController;
 
 Route::middleware([
-    'auth:sanctum',
+    'auth',
     config('jetstream.auth_session'),
     'verified',
 ])->prefix('/verdurao')->group(function () {

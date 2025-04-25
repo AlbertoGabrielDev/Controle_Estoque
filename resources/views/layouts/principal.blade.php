@@ -34,16 +34,21 @@
   </style>
 </head>
 
-<body class="bg-gray-100">
+<body class="bg-white h-screen flex flex-col">
   <nav class="bg-white shadow-sm">
     <div class="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
       <div class="relative flex h-16 items-center justify-between">
         <!-- Mobile menu button -->
-        <div class="absolute inset-y-0 left-0 flex items-center sm:hidden">
-          <button id="toggleSidebar" class="inline-flex items-center justify-center p-2 rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-100">
+        <div class="absolute inset-y-0 left-0 flex items-center">
+          <button id="toggleSidebar" class="inline-flex items-center justify-center p-2 rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-100 ml-2">
             <span class="sr-only">Abrir menu</span>
-            <svg class="block h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <!-- Hamburger Icon -->
+            <svg class="h-6 w-6 block hamburger-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+            <!-- Close Icon -->
+            <svg class="h-6 w-6 hidden close-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
         </div>
@@ -68,11 +73,11 @@
 
   @include('componentes.toast')
 
-  <div class="flex">
+  <div class="flex-1 flex overflow-hidden">
     <!-- Sidebar -->
-    <div class="bg-white w-64 space-y-6 py-7 px-2 absolute inset-y-0 left-0 transform -translate-x-full md:relative md:translate-x-0 transition duration-200 ease-in-out"
-      id="sidebar">
+    <div class="bg-white w-64 space-y-6 py-7 px-2 absolute inset-y-0 left-0 transform -translate-x-full md:relative md:translate-x-0 transition duration-200 ease-in-out h-full border-r z-20" id="sidebar">
       <nav>
+        @auth
         @foreach($menus as $menu)
         @if($menu->children->count())
         <div x-data="{ open: false }" class="relative">
@@ -102,6 +107,7 @@
         @endif
         @endif
         @endforeach
+        @endauth
       </nav>
 
       <!-- Logout -->
@@ -115,7 +121,7 @@
     </div>
 
     <!-- Conteúdo Principal -->
-    <div class="flex-1 p-4">
+    <div class="flex-1 p-4 overflow-auto">
       @yield('conteudo')
     </div>
   </div>
@@ -123,32 +129,66 @@
   @stack('scripts')
 
   <script>
-    // Toggle Sidebar
-    document.getElementById('toggleSidebar').addEventListener('click', () => {
-      const sidebar = document.getElementById('sidebar');
-      sidebar.classList.toggle('-translate-x-full');
-    });
+  const toggleButton = document.getElementById('toggleSidebar');
+  const sidebar = document.getElementById('sidebar');
+  const hamburgerIcon = document.querySelector('.hamburger-icon');
+  const closeIcon = document.querySelector('.close-icon');
 
-    // Fechar menu ao clicar fora (mobile)
-    document.addEventListener('click', (event) => {
-      const sidebar = document.getElementById('sidebar');
-      const toggleButton = document.getElementById('toggleSidebar');
+  // Alternar menu
+  toggleButton.addEventListener('click', () => {
+    const isOpen = !sidebar.classList.contains('-translate-x-full');
+    sidebar.classList.toggle('-translate-x-full');
 
-      if (!sidebar.contains(event.target) && !toggleButton.contains(event.target)) {
+    hamburgerIcon.classList.toggle('hidden', !isOpen);
+    closeIcon.classList.toggle('hidden', isOpen);
+  });
+
+  // Clicar em item do menu (fechar no mobile)
+  document.querySelectorAll('#sidebar nav a').forEach(link => {
+    link.addEventListener('click', () => {
+      if (window.innerWidth < 768) {
         sidebar.classList.add('-translate-x-full');
+        hamburgerIcon.classList.remove('hidden');
+        closeIcon.classList.add('hidden');
       }
     });
+  });
 
-    // Atualizar o menu ao redimensionar
-    window.addEventListener('resize', () => {
-      const sidebar = document.getElementById('sidebar');
-      if (window.innerWidth >= 768) {
-        sidebar.classList.remove('-translate-x-full');
-      } else {
-        sidebar.classList.add('-translate-x-full');
-      }
-    });
-  </script>
+  // Clicar fora do menu (fechar no mobile)
+  document.addEventListener('click', (e) => {
+    if (
+      !sidebar.contains(e.target) &&
+      !toggleButton.contains(e.target) &&
+      window.innerWidth < 768
+    ) {
+      sidebar.classList.add('-translate-x-full');
+      hamburgerIcon.classList.remove('hidden');
+      closeIcon.classList.add('hidden');
+    }
+  });
+
+  // Responsivo: atualizar ícones no resize
+  window.addEventListener('resize', () => {
+    if (window.innerWidth >= 768) {
+      sidebar.classList.remove('-translate-x-full');
+      hamburgerIcon.classList.remove('hidden');
+      closeIcon.classList.add('hidden');
+    } else {
+      sidebar.classList.add('-translate-x-full');
+      hamburgerIcon.classList.remove('hidden');
+      closeIcon.classList.add('hidden');
+    }
+  });
+
+  // Inicialização no load
+  window.addEventListener('DOMContentLoaded', () => {
+    if (window.innerWidth < 768) {
+      sidebar.classList.add('-translate-x-full');
+      hamburgerIcon.classList.remove('hidden');
+      closeIcon.classList.add('hidden');
+    }
+  });
+</script>
 </body>
 
 </html>

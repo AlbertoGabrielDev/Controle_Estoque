@@ -1,7 +1,7 @@
 @extends('layouts.principal')
 
 @section('conteudo')
-<div class="bg-white p-6 rounded-md shadow-md w-full">
+
   <h5 class="text-center text-2xl font-semibold text-gray-700 mb-6">Authors Table</h5>
   <div class="flex justify-between mb-4">
     <a class="text-gray-600 py-2 px-4 rounded-lg bg-gray-100 hover:bg-cyan-400 hover:text-white transition" href="{{route('categoria.inicio')}}">
@@ -12,7 +12,7 @@
     </a>
   </div>
 
-  <table class="table-auto w-full border-collapse border border-gray-200 rounded-md shadow-sm">
+  <table class="table-auto w-full border-collapse border border-gray-200 rounded-md ">
     <thead class="bg-gray-100">
       <tr class="text-sm text-gray-600">
         <th class="py-3 px-6 text-left font-medium">Usuario</th>
@@ -82,5 +82,5 @@
       </a>
     </nav>
   </div>
-</div>
+
 @endsection
