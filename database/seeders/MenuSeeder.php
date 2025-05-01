@@ -87,7 +87,7 @@ class MenuSeeder extends Seeder
         $unidade = Menu::create([
             'name' => 'Unidade',
             'slug' => 'unidade',
-            'icon' => 'fa-solid fa-suitcase',
+            'icon' => 'fa-solid fa-suitcase mr-2',
             'route' => 'unidade.index',
             'parent_id' => $usuarios->id,
             'order' => 2,
@@ -111,7 +111,7 @@ class MenuSeeder extends Seeder
         $historicoVenda = Menu::create([
             'name' => 'Vendas',
             'slug' => 'vendas',
-            'icon' => 'fas fa-money-bill-wave-alt',
+            'icon' => 'fas fa-money-bill-wave-alt mr-2',
             'route' => 'vendas.venda',
             'parent_id' => $vendas->id,
             'order' => 1,

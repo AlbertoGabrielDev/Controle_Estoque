@@ -7,16 +7,16 @@
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <meta name="csrf-token" content="{{ csrf_token() }}">
   <title>Principal</title>
-  <script src="https://unpkg.com/html5-qrcode/minified/html5-qrcode.min.js"></script>
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
   <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+  <script src="https://unpkg.com/html5-qrcode/minified/html5-qrcode.min.js"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
   <script src="{{ asset('js/app.js') }}"></script>
   <script src="https://cdn.tailwindcss.com"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
   <style>
@@ -39,7 +39,7 @@
     <div class="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
       <div class="relative flex h-16 items-center justify-between">
         <!-- Mobile menu button -->
-        <div class="absolute inset-y-0 left-0 flex items-center">
+        <div class="absolute inset-y-0 left-0 flex items-center sm:hidden">
           <button id="toggleSidebar" class="inline-flex items-center justify-center p-2 rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-100 ml-2">
             <span class="sr-only">Abrir menu</span>
             <!-- Hamburger Icon -->
@@ -83,7 +83,7 @@
         <div x-data="{ open: false }" class="relative">
           <button @click="open = !open" class="w-full flex items-center p-2 text-gray-600 rounded-lg hover:bg-gray-100">
             <i class="{{ $menu->icon }}"></i>
-            <span class="mx-3">{{ $menu->name }}</span>
+            <span class="ml-1">{{ $menu->name }}</span>
             <i class="fas fa-chevron-down ml-auto text-xs transition-transform" :class="{ 'rotate-180': open }"></i>
           </button>
 
@@ -92,7 +92,7 @@
             @if(auth()->user()->hasPermission($child->slug, 'view_post'))
             <a href="{{ route($child->route) }}" class="flex items-center p-2 text-gray-600 rounded-lg hover:bg-gray-100 {{ request()->routeIs($child->route) ? 'bg-cyan-50 text-cyan-600' : '' }}">
               <i class="{{ $child->icon }}"></i>
-              <span class="mx-3">{{ $child->name }}</span>
+              <span class="ml-1">{{ $child->name }}</span>
             </a>
             @endif
             @endforeach
@@ -102,7 +102,7 @@
         @if(auth()->user()->hasPermission($menu->slug, 'view_post'))
         <a href="{{ route($menu->route) }}" class="flex items-center p-2 text-gray-600 rounded-lg hover:bg-gray-100 {{ request()->routeIs($menu->route) ? 'bg-cyan-50 text-cyan-600' : '' }}">
           <i class="{{ $menu->icon }}"></i>
-          <span class="mx-3">{{ $menu->name }}</span>
+          <span class="ml-1">{{ $menu->name }}</span>
         </a>
         @endif
         @endif
@@ -115,7 +115,7 @@
         @csrf
         <button type="submit" class="w-full flex items-center p-2 text-gray-600 rounded-lg hover:bg-gray-100">
           <i class="fas fa-sign-out-alt"></i>
-          <span class="mx-3">Sair</span>
+          <span class="ml-1">Sair</span>
         </button>
       </form>
     </div>
@@ -127,8 +127,8 @@
   </div>
 
   @stack('scripts')
-
-  <script>
+</body>
+<script>
   const toggleButton = document.getElementById('toggleSidebar');
   const sidebar = document.getElementById('sidebar');
   const hamburgerIcon = document.querySelector('.hamburger-icon');
@@ -136,9 +136,10 @@
 
   // Alternar menu
   toggleButton.addEventListener('click', () => {
+    if (window.innerWidth >= 768) return; // Evita toggle no desktop
+
     const isOpen = !sidebar.classList.contains('-translate-x-full');
     sidebar.classList.toggle('-translate-x-full');
-
     hamburgerIcon.classList.toggle('hidden', !isOpen);
     closeIcon.classList.toggle('hidden', isOpen);
   });
@@ -189,6 +190,6 @@
     }
   });
 </script>
-</body>
+
 
 </html>

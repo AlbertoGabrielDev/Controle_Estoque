@@ -122,13 +122,14 @@
   </form>
 </div>
 @endsection
+@push('scripts')
 <script>
-  $(document).ready(function() {
-
+ document.addEventListener('DOMContentLoaded', function() {
+    // Garante que o DOM está totalmente carregado
     $('.select2-multiple').select2({
       placeholder: "Selecione as permissões",
       allowClear: true,
-      width: '100%'
+      width: '100%',
     });
   });
 
@@ -148,3 +149,4 @@
     }
   }
 </script>
+@endpush
