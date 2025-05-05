@@ -3,83 +3,88 @@
 @section('conteudo')
 
 
-    <div class="max-w-5xl mx-auto bg-white p-6 rounded-lg shadow-md">
-    <h3 class="font-semibold mb-3">{{ ucfirst($role->name) }}</h3>
-        <div class="border p-4 rounded-lg mb-6">  
-            <div class="grid grid-cols-4 gap-4">
-                <div class="flex flex-col items-center">
-                    <label class="flex items-center space-x-2">
-                        <input type="checkbox" class="hidden" checked>
-                        <div class="toggle-switch"></div>
-                    </label>
-                    <span class="text-sm text-gray-600">Dashboard</span>
-                </div>
-                <div class="flex flex-col items-center">
-                    <label class="flex items-center space-x-2">
-                        <input type="checkbox" class="hidden">
-                        <div class="toggle-switch"></div>
-                    </label>
-                    <span class="text-sm text-gray-600">Reports</span>
-                </div>
-                <div class="flex flex-col items-center">
-                    <label class="flex items-center space-x-2">
-                        <input type="checkbox" class="hidden" checked>
-                        <div class="toggle-switch"></div>
-                    </label>
-                    <span class="text-sm text-gray-600">Custom Apps</span>
-                </div>
-                <div class="flex flex-col items-center">
-                    <label class="flex items-center space-x-2">
-                        <input type="checkbox" class="hidden">
-                        <div class="toggle-switch"></div>
-                    </label>
-                    <span class="text-sm text-gray-600">API Access</span>
+<div class="max-w-5xl mx-auto bg-white p-6 rounded-lg shadow-md">
+
+    <!-- Assign Permissions -->
+    <div class="border rounded-lg p-4">
+        <h3 class="font-semibold mb-3">{{ ucfirst($role->name) }}</h3>
+        <form method="POST" action="{{ route('roles.salvarEditar', $role->id) }}">
+            @csrf
+            @method('PUT')
+            <div class="border p-4 rounded-lg mb-6">
+                <div class="grid grid-cols-4 gap-4">
+                    <div class="flex flex-col items-center">
+                        <label class="flex items-center space-x-2">
+                            <input type="checkbox" class="hidden" checked>
+                            <div class="toggle-switch"></div>
+                        </label>
+                        <span class="text-sm text-gray-600">Dashboard</span>
+                    </div>
+                    <div class="flex flex-col items-center">
+                        <label class="flex items-center space-x-2">
+                            <input type="checkbox" class="hidden">
+                            <div class="toggle-switch"></div>
+                        </label>
+                        <span class="text-sm text-gray-600">Reports</span>
+                    </div>
+                    <div class="flex flex-col items-center">
+                        <!-- Campo hidden DEVE vir antes do checkbox -->
+                        <input type="hidden" name="global_permissions[status]" value="0">
+                        <label class="flex items-center space-x-2 cursor-pointer">
+                            <input
+                                type="checkbox"
+                                class="hidden"
+                                name="global_permissions[status]"
+                                value="1"
+                                {{ $role->hasPermission('status') ? 'checked' : '' }}>
+                            <div class="toggle-switch"></div>
+                            <span class="text-sm text-gray-600">Status</span>
+                        </label>
+                    </div>
+                    <div class="flex flex-col items-center">
+                        <label class="flex items-center space-x-2">
+                            <input type="checkbox" class="hidden">
+                            <div class="toggle-switch"></div>
+                        </label>
+                        <span class="text-sm text-gray-600">API Access</span>
+                    </div>
                 </div>
             </div>
-        </div>
-
-        <!-- Assign Permissions -->
-        <div class="border rounded-lg p-4">
-            <h3 class="font-semibold mb-3">Assign Permissions</h3>
-            <form method="POST" action="{{ route('roles.salvarEditar', $role->id) }}">
-                @csrf
-                @method('PUT')
-
-                <table class="w-full border-collapse border border-gray-300">
-                    <thead>
-                        <tr class="bg-gray-200">
-                            <th class="border border-gray-300 p-2 w-1/6">Menu</th>
-                            @foreach ($permissions as $permission)
-                            <th class="border border-gray-300 p-2">{{ $permission->name }}</th>
-                            @endforeach
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach ($menus as $menu)
-                        <tr>
-                            <td class="border border-gray-300 p-2 font-medium">{{ $menu->name }}</td>
-                            @foreach ($permissions as $permission)
-                            <td class="border border-gray-300 p-2 text-center">
-                                <input type="checkbox"
-                                    class="permission-checkbox"
-                                    name="permissions[{{ $menu->id }}][]"
-                                    value="{{ $permission->id }}"
-                                    {{ $role->hasMenuPermission($menu->id, $permission->id) ? 'checked' : '' }}>
-                            </td>
-                            @endforeach
-                        </tr>
+            <table class="w-full border-collapse border border-gray-300">
+                <thead>
+                    <tr class="bg-gray-200">
+                        <th class="border border-gray-300 p-2 w-1/6">Menu</th>
+                        @foreach ($permissions as $permission)
+                        <th class="border border-gray-300 p-2">{{ $permission->name }}</th>
                         @endforeach
-                    </tbody>
-                </table>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach ($menus as $menu)
+                    <tr>
+                        <td class="border border-gray-300 p-2 font-medium">{{ $menu->name }}</td>
+                        @foreach ($permissions as $permission)
+                        <td class="border border-gray-300 p-2 text-center">
+                            <input type="checkbox"
+                                class="permission-checkbox"
+                                name="permissions[{{ $menu->id }}][]"
+                                value="{{ $permission->id }}"
+                                {{ $role->hasMenuPermission($menu->id, $permission->id) ? 'checked' : '' }}>
+                        </td>
+                        @endforeach
+                    </tr>
+                    @endforeach
+                </tbody>
+            </table>
 
-                <div class="mt-4">
-                    <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
-                        Salvar Permissões
-                    </button>
-                </div>
-            </form>
-        </div>
+            <div class="mt-4">
+                <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+                    Salvar Permissões
+                </button>
+            </div>
+        </form>
     </div>
+</div>
 
 
 @endsection

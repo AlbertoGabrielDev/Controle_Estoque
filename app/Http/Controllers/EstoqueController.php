@@ -14,10 +14,10 @@ use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\DB;
 use App\Http\Requests\ValidacaoEstoque;
 use App\Repositories\EstoqueRepository;
-use Illuminate\Http\Request as Requests;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Request;
+// use Illuminate\Support\Facades\Request;
 
 class EstoqueController extends Controller
 {    
@@ -71,28 +71,15 @@ class EstoqueController extends Controller
 
     public function status($statusId)
     {
-      $status = $this->estoqueRepository->status($statusId);
-      return response()->json(['status' => $status->status]);
+        if(!auth()->user()->canToggleStatus()) {
+            abort(403, 'Sem permissão para esta ação');
+        }
+        
+        $status = Estoque::findOrFail($statusId);
+        $status->status = ($status->status == 1) ? 0 : 1;
+        $status->save();
+        
+        return response()->json(['status' => $status->status]);
     }
 
-    public function atualizarEstoque(Requests $request,$estoqueId, $operacao)
-    {
-        $this->estoqueRepository->atualizarEstoque($request, $estoqueId , $operacao);
-        return redirect()->route('estoque.index')->with('success', 'Quantidade atualizada com sucesso');
-    }
-
-    public function graficoFiltro(Requests $request)
-    {
-        $startDate = $request->query('start_date');
-        $endDate = $request->query('end_date');
-
-        $quantidade = $this->estoqueRepository->graficoFiltro($startDate, $endDate);
-        $totalSum = $quantidade['values']->sum();
-       // dd($totalSum);
-        return response()->json([
-            'labels' => $quantidade['labels'],
-            'values' => $quantidade['values'],
-            'total_sum' => $totalSum,
-        ]);
-    }
 }

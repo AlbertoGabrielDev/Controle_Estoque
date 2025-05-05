@@ -19,6 +19,7 @@ return new class extends Migration
             $table->string('route')->nullable();
             $table->integer('parent_id')->nullable()->unsigned();
             $table->integer('order')->default(0);
+            $table->integer('status')->default(1);
             $table->timestamps();
         });
     }

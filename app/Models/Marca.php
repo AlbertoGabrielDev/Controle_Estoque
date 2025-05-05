@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Marca extends Model
 {
@@ -14,6 +15,7 @@ class Marca extends Model
         'nome_marca',
         'id_users_fk'
     ];
+
 
     public function produto(): BelongsToMany{
         return $this->belongsToMany(Produto::class, 'marca_produto' ,'id_marca_fk', 'id_marca')

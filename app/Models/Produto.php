@@ -28,76 +28,6 @@ class Produto extends Model implements Transformable
         'status'
     ];
 
-    public function search(): BelongsToMany
-    {
-        $query = $this->belongsToMany(Fornecedor::class, 'estoque', 'id_produto_fk', 'id_fornecedor_fk')
-            ->as('estoque')
-            ->withPivot([
-                'id_estoque',
-                'quantidade',
-                'localizacao',
-                'preco_custo',
-                'preco_venda',
-                'lote',
-                'data_chegada',
-                'validade',
-                'localizacao',
-                'quantidade_aviso',
-                'created_at',
-                'status'
-            ])
-            ->join('produto as p', 'estoque.id_produto_fk', '=', 'p.id_produto')
-            ->join('marca as m', 'estoque.id_marca_fk', '=', 'm.id_marca')
-            ->join('categoria_produto as cp', 'p.id_produto', '=', 'cp.id_produto_fk')
-            ->join('categoria as c', 'cp.id_categoria_fk', '=', 'c.id_categoria')
-            ->where(function ($query) 
-            {
-                $query->where(function ($subquery) {
-                    if (request()->input('lote')) {
-                        $subquery->where('estoque.lote', request()->input('lote'));
-                    }
-                })->where(function ($subquery) {
-                    if (request()->input('quantidade')) {
-                        $subquery->where('estoque.quantidade', request()->input('quantidade'));
-                    }
-                })->where(function ($subquery) {
-                    if (request()->input('preco_custo')){
-                        $subquery->where('estoque.preco_custo', request()->input('preco_custo'));
-                    }
-                })->where(function ($subquery){
-                    if (request()->input('localizacao')) {
-                        $subquery->where('estoque.localizacao', request()->input('localizacao'));
-                    }
-                })->where(function ($subquery){
-                    if (request()->input('preco_venda')) {
-                        $subquery->where('estoque.preco_venda', request()->input('preco_venda'));
-                    }
-                })->where(function ($subquery){
-                    if (request()->input('validade')) {
-                        $subquery->where('estoque.validade', request()->input('validade'));
-                    }
-                })->where(function ($subquery){
-                    if (request()->input('nome_produto')) {
-                        $subquery->where('p.nome_produto', 'like' ,'%' .request()->input('nome_produto') . '%' );
-                    }
-                })->where(function ($subquery){
-                    if (request()->input('nome_marca')) {
-                        $subquery->where('m.nome_marca', request()->input('nome_marca'));
-                    }
-                })->where(function ($subquery){
-                    if (request()->input('nome_fornecedor')) {
-                        $subquery->where('fornecedor.nome_fornecedor',  request()->input('nome_fornecedor'));
-                    }
-                })->where(function ($subquery){
-                    if (request()->input('nome_categoria')) {
-                        $subquery->where('c.nome_categoria', request()->input('nome_categoria'));
-                    }
-                });
-            });
-
-            return $query;
-    }
-   
     public function fornecedores() : BelongsToMany 
     {
         return $this->belongsToMany(Fornecedor::class ,'estoque', 'id_produto_fk', 'id_fornecedor_fk')
@@ -123,10 +53,9 @@ class Produto extends Model implements Transformable
         return $this->belongsToMany(Categoria::class,  'categoria_produto', 'id_produto_fk', 'id_categoria_fk');
     }
 
-    public function marca(): BelongsToMany
+    public function marcas(): BelongsToMany
     {
-        return $this->belongsToMany(Marca::class, 'marca_produto' ,'id_marca_fk', 'id_marca')
-        ->as('marca_produto');
+        return $this->belongsToMany(Marca::class, 'marca_produto', 'id_produto_fk', 'id_marca_fk')->as('marca_produto');
     }
 
     public function vendas()

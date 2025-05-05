@@ -17,6 +17,13 @@ class Role extends Model
             ->withPivot('menu_id');
     }
 
+    public function hasPermission($permissionName)
+    {
+        return $this->permissions()
+            ->where('name', $permissionName)
+            ->exists();
+    }
+
     public function roleMenuPermissions()
     {
         return $this->hasMany(RoleMenuPermission::class);

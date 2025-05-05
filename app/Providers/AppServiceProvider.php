@@ -13,6 +13,7 @@ use App\Repositories\RoleRepositoryEloquent;
 use App\Repositories\UnidadesRepository;
 use App\Repositories\UnidadesRepositoryEloquent;
 use Illuminate\Support\ServiceProvider;
+
 use Illuminate\Pagination\Paginator;
 class AppServiceProvider extends ServiceProvider
 {
@@ -36,5 +37,7 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Paginator::useBootstrap();
+        Paginator::defaultView('pagination::tailwind');
+        Paginator::defaultSimpleView('pagination::simple-tailwind');
     }
 }

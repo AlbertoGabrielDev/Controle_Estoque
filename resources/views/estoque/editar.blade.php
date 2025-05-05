@@ -1,46 +1,142 @@
 @extends('layouts.principal')
 
 @section('conteudo')
-<div class="bg-white p-4 rounded-md w-full">
-  <div class="mx-auto m-5 text-4xl font-medium text-slate-700 flex justify-center">Editar Estoque</div> 
-    <a class=" text-gray-500 py-2.5 px-4 relative mx-5 my-4 w-1/12 rounded hover:bg-gradient-to-r hover:from-cyan-400 hover:to-cyan-300 hover:text-white" href="{{route('estoque.index')}}">
-      <i class="fa fa-angle-left mr-2"></i>Voltar
-    </a>
-   
-    <form action="{{route('estoque.salvarEditar', $estoques->first()->id_estoque)}}" method="POST">
+<div class="bg-white p-4 rounded-md w-full max-w-4xl mx-auto">
+    <div class="flex justify-between items-center mb-8">
+        <h1 class="text-2xl font-semibold text-slate-700">Editar Estoque</h1>
+        <a href="{{ route('estoque.index') }}"
+            class="flex items-center px-4 py-2 bg-gray-100 hover:bg-cyan-500 text-gray-600 hover:text-white rounded-md transition-colors">
+            <i class="fa fa-angle-left mr-2"></i>Voltar
+        </a>
+    </div>
+
+    <form action="{{ route('estoque.salvarEditar', $estoque->id_estoque) }}" method="POST" class="space-y-6">
         @csrf
-        @foreach ($estoques as $estoque)
-            <div class="grid md:grid-cols-3 md:gap-6 py-4">
-                <div class="relative z-0 w-full mb-6 group">
-                    <input type="text" name="preco_custo" class="block py-2.5 px-0 w-full text-sm bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer" aria-label="Sizing example input" value="{{$estoque->preco_custo}}">
-                    <label class="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6" id="inputGroup-sizing-lg">Preço Custo</label>
-                </div>
-                <div class="relative z-0 w-full mb-6 group">
-                    <input type="text" name="preco_venda" class="block py-2.5 px-0 w-full text-sm bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer" aria-label="Sizing example input" value="{{$estoque->preco_venda}}">
-                    <label class="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6" id="inputGroup-sizing-lg">Preço Venda</label>
-                </div>
-                <div class="relative z-0 w-full mb-6 group">
-                    <input type="number" class="block py-2.5 px-0 w-full text-sm bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer-lg" required name="quantidade_aviso" value="{{$estoque->quantidade_aviso}}">
-                    <label class="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6" id="inputGroup-sizing-lg">Quantidade para aviso</label>
-                </div>
+        @method('PUT')
+        <label class="block text-sm font-medium text-gray-700 mb-1">Produto</label>
+        <input type="text"
+            class="w-full px-3 py-2 border rounded-md bg-gray-100 cursor-not-allowed"
+            value="{{ $estoque->produto->nome_produto }}"
+            disabled>
+        <input type="hidden" name="id_produto_fk" value="{{ $estoque->id_produto_fk }}">
+        <!-- Primeira Linha -->
+        <div class="grid md:grid-cols-3 gap-6">
+            <div class="form-group">
+                <label class="block text-sm font-medium text-gray-700 mb-1">Preço Custo</label>
+                <input type="number" step="0.01" name="preco_custo"
+                    class="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-cyan-500"
+                    value="{{ old('preco_custo', $estoque->preco_custo) }}">
+                @error('preco_custo')
+                <span class="text-red-500 text-sm">{{ $message }}</span>
+                @enderror
             </div>
-            <div class="grid md:grid-cols-2 md:gap-6 py-4">
-                <div class="relative z-0 w-full mb-6 group">
-                    <label class="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6" id="inputGroup-sizing-lg">Localização</label>
-                    <input type="text" name="localizacao" class="block py-2.5 px-0 w-full text-sm bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer" aria-label="Sizing example input" value="{{$estoque->localizacao}}">
-                </div>
-                <div class="relative z-0 w-full mb-6 group">
-                    <label class="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6 w-75" id="inputGroup-sizing-lg">Fornecedor</label>
-                    <select class="block py-2.5 px-0 w-full text-sm bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer-lg w-75" name="fornecedor">
-                        @foreach ($fornecedores as $fornecedor)
-                            <option value="{{ $fornecedor->id_fornecedor }}">{{ $fornecedor->nome_fornecedor }}</option>
-                        @endforeach
-                    </select>
-                </div>
+
+            <div class="form-group">
+                <label class="block text-sm font-medium text-gray-700 mb-1">Preço Venda</label>
+                <input type="number" step="0.01" name="preco_venda"
+                    class="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-cyan-500"
+                    value="{{ old('preco_venda', $estoque->preco_venda) }}">
+                @error('preco_venda')
+                <span class="text-red-500 text-sm">{{ $message }}</span>
+                @enderror
             </div>
-        @endforeach
-        <button type="submit" class="block text-gray-500 py-2.5 relative my-4 w-48 rounded transition duration-200 hover:bg-gradient-to-r hover:from-cyan-400 hover:to-cyan-300 hover:text-white">
-            <i class="fas fa-plus mr-2"></i> Editar Produtos
+
+            <div class="form-group">
+                <label class="block text-sm font-medium text-gray-700 mb-1">Quantidade Alerta</label>
+                <input type="number" name="quantidade_aviso"
+                    class="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-cyan-500"
+                    value="{{ old('quantidade_aviso', $estoque->quantidade_aviso) }}">
+                @error('quantidade_aviso')
+                <span class="text-red-500 text-sm">{{ $message }}</span>
+                @enderror
+            </div>
+        </div>
+
+        <!-- Segunda Linha -->
+        <div class="grid md:grid-cols-2 gap-6">
+            <div class="form-group">
+                <label class="block text-sm font-medium text-gray-700 mb-1">Localização</label>
+                <input type="text" name="localizacao"
+                    class="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-cyan-500"
+                    value="{{ old('localizacao', $estoque->localizacao) }}">
+                @error('localizacao')
+                <span class="text-red-500 text-sm">{{ $message }}</span>
+                @enderror
+            </div>
+
+            <div class="form-group">
+                <label class="block text-sm font-medium text-gray-700 mb-1">Lote</label>
+                <input type="text" name="lote"
+                    class="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-cyan-500"
+                    value="{{ old('lote', $estoque->lote) }}">
+                @error('lote')
+                <span class="text-red-500 text-sm">{{ $message }}</span>
+                @enderror
+            </div>
+        </div>
+
+        <!-- Terceira Linha -->
+        <div class="grid md:grid-cols-3 gap-6">
+            <div class="form-group">
+                <label class="block text-sm font-medium text-gray-700 mb-1">Data Chegada</label>
+                <input type="date" name="data_chegada"
+                    class="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-cyan-500"
+                    value="{{ old('data_chegada', $estoque->data_chegada->format('Y-m-d')) }}">
+                @error('data_chegada')
+                <span class="text-red-500 text-sm">{{ $message }}</span>
+                @enderror
+            </div>
+
+            <div class="form-group">
+                <label class="block text-sm font-medium text-gray-700 mb-1">Data Validade</label>
+                <input type="date" name="validade"
+                    class="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-cyan-500"
+                    value="{{ old('validade', $estoque->validade->format('Y-m-d')) }}">
+                @error('validade')
+                <span class="text-red-500 text-sm">{{ $message }}</span>
+                @enderror
+            </div>
+
+            <div class="form-group">
+                <label class="block text-sm font-medium text-gray-700 mb-1">Quantidade Atual</label>
+                <input type="number" name="quantidade"
+                    class="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-cyan-500"
+                    value="{{ old('quantidade', $estoque->quantidade) }}">
+                @error('quantidade')
+                <span class="text-red-500 text-sm">{{ $message }}</span>
+                @enderror
+            </div>
+        </div>
+
+        <!-- Quarta Linha -->
+        <div class="grid md:grid-cols-2 gap-6">
+            <div class="form-group">
+                <label class="block text-sm font-medium text-gray-700 mb-1">Fornecedor</label>
+                <select name="id_fornecedor_fk" class="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-cyan-500">
+                    @foreach ($fornecedores as $fornecedor)
+                    <option value="{{ $fornecedor->id_fornecedor }}"
+                        {{ $estoque->id_fornecedor_fk == $fornecedor->id_fornecedor ? 'selected' : '' }}>
+                        {{ $fornecedor->nome_fornecedor }}
+                    </option>
+                    @endforeach
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label class="block text-sm font-medium text-gray-700 mb-1">Marca</label>
+                <select name="id_marca_fk" class="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-cyan-500">
+                    @foreach ($marcas as $marca)
+                    <option value="{{ $marca->id_marca }}"
+                        {{ $estoque->id_marca_fk == $marca->id_marca ? 'selected' : '' }}>
+                        {{ $marca->nome_marca }}
+                    </option>
+                    @endforeach
+                </select>
+            </div>
+        </div>
+
+        <button type="submit" class="w-full md:w-auto px-6 py-2 bg-cyan-500 hover:bg-cyan-600 text-white rounded-md transition-colors">
+            <i class="fas fa-save mr-2"></i>Salvar Alterações
         </button>
     </form>
 </div>

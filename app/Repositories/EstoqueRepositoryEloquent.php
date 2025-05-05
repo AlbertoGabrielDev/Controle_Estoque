@@ -10,6 +10,7 @@ use App\Models\Historico;
 use App\Models\Marca;
 use App\Models\MarcaProduto;
 use App\Models\Produto;
+use App\Models\Role;
 use Prettus\Repository\Eloquent\BaseRepository;
 use Prettus\Repository\Criteria\RequestCriteria;
 use App\Repositories\EstoqueRepository;
@@ -18,8 +19,8 @@ use App\Validators\EstoqueValidator;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Gate;
-use Illuminate\Support\Facades\Request;
-use Illuminate\Http\Request as Requests;
+
+use Illuminate\Http\Request;
 
 /**
  * Class EstoqueRepositoryEloquent.
@@ -40,26 +41,23 @@ class EstoqueRepositoryEloquent extends BaseRepository implements EstoqueReposit
 
     public function index()
     {
+      
+        $estoques = Estoque::with(['produto', 'fornecedor'])
+            ->when(!auth()->user()->canToggleStatus(), function ($q) {
+                $q->where('status', 1);
+            })
+            ->paginate(10);
+
         $fornecedores = Fornecedor::all();
         $marcas = Marca::all();
         $categorias = Categoria::all();
-        $produtos = Produto::paginate(15);
-        if (Gate::allows('permissao')) {
-            $estoques = [];
-            foreach ($produtos as $produto) 
-            {
-                $estoquesProduto = $produto->fornecedores->pluck('estoque')->all();
-                $estoques = array_merge($estoques, $estoquesProduto); 
-            }
-        } else {
-            $estoques = [];
-            foreach ($produtos as $produto) 
-            {
-                $estoquesProduto = $produto->fornecedores->pluck('estoque')->where('status', 1)->all();
-                $estoques = array_merge($estoques, $estoquesProduto); 
-            }
-        }
-        return compact('estoques','produtos','fornecedores','marcas','categorias');
+
+        return  [
+            'estoques' => $estoques,
+            'fornecedores' => $fornecedores,
+            'marcas' => $marcas,
+            'categorias' => $categorias
+        ];
     }
 
     public function inserirEstoque(array $data)
@@ -75,7 +73,7 @@ class EstoqueRepositoryEloquent extends BaseRepository implements EstoqueReposit
     }
 
     public function historico()
-    { 
+    {
         $historicos = Historico::with('estoques')->get();
 
         return $historicos;
@@ -86,63 +84,63 @@ class EstoqueRepositoryEloquent extends BaseRepository implements EstoqueReposit
         $produtos = Produto::all(); // resolver isso 
         $marcas = Marca::all();
         $fornecedores = Fornecedor::all();
-        return compact('fornecedores','marcas','produtos');
+        return compact('fornecedores', 'marcas', 'produtos');
     }
 
     public function buscar(Request $request)
     {
-        $fornecedores = Fornecedor::all();
-        $marcas = Marca::all();
-        $categorias = Categoria::all();
-        $produtos = Produto::paginate(2);
-        if (Gate::allows('permissao')) {
-            $estoques = [];
-            foreach ($produtos as $produto) 
-            {
-                $estoquesProduto = $produto->search->pluck('estoque')->all();
-                $estoques = array_merge($estoques, $estoquesProduto);
-            }
-        } else {
-            $estoques = [];
-            foreach ($produtos as $produto) 
-            {
-                $estoquesProduto = $produto->search->pluck('estoque')->where('status', 1)->all();
-                $estoques = array_merge($estoques, $estoquesProduto); 
-            }
-        }
-        
-        return  compact('estoques', 'produtos','fornecedores','marcas','categorias');
+        return [
+            'estoques' => Estoque::buscarComFiltros($request),
+            'fornecedores' => Fornecedor::all(),
+            'marcas' => Marca::all(),
+            'categorias' => Categoria::all()
+        ];
     }
 
     public function editar($estoqueId)
     {
-        $produtos = Estoque::find($estoqueId)->produtos->merge(Produto::all());
-        $fornecedores = Estoque::find($estoqueId)->fornecedores->merge(Fornecedor::all());
-        $marcas = Estoque::find($estoqueId)->marcas->merge(Marca::all());
-        $estoques = Estoque::where('id_estoque', $estoqueId)->get();
+        $repository = app(EstoqueRepository::class);
+        try {
+            $estoque = $this->findWithRelations($estoqueId, ['produto', 'fornecedor', 'marca']);
 
-        return compact('estoques','produtos','fornecedores','marcas');
+            return [
+                'estoque' => $estoque,
+                'fornecedores' => Fornecedor::all(),
+                'marcas' => Marca::all(),
+                'produtos' => Produto::all()
+            ];
+        } catch (\Exception $e) {
+            return redirect()->route('estoque.index')
+                ->with('error', 'Estoque não encontrado');
+        }
     }
 
     public function salvarEditar(ValidacaoEstoque $request, $estoqueId)
     {
-        $estoques = Estoque::where('id_estoque' , $estoqueId)
-        ->update([
-            'localizacao'       =>$request->localizacao,
-            'preco_custo'       =>$request->preco_custo,
-            'preco_venda'       =>$request->preco_venda,
-            'id_fornecedor_fk'  =>$request->input('fornecedor'),
-            'quantidade_aviso'  =>$request->quantidade_aviso
-        ]);
+        try {
 
-        MarcaProduto::where('id_produto_fk', $request->input('nome_produto'))
-        ->update([
-            'id_produto_fk' => $request->input('nome_produto'),
-            'id_marca_fk'   => $request->input('marca')
-        ]);
-     //   return redirect()->route('estoque.index')->with('success', 'Editado com sucesso');
+            $this->update($request->validated(), $estoqueId);
+            return redirect()->route('estoque.index')
+                ->with('toast', [
+                    'type' => 'success',
+                    'message' => 'Estoque atualizado com sucesso!'
+                ]);
+
+            MarcaProduto::update(
+                ['id_produto_fk' => $request->id_produto_fk],
+                ['id_marca_fk' => $request->id_marca_fk]
+            );
+        } catch (\Exception $e) {
+            return back()->with('toast', [
+                'type' => 'error',
+                'message' => 'Erro ao atualizar estoque: ' . $e->getMessage()
+            ]);
+        }
     }
-
+    public function findWithRelations($id, array $relations)
+    {
+        return Estoque::with($relations)->findOrFail($id);
+    }
     public function status($statusId)
     {
         $status = Estoque::findOrFail($statusId);
@@ -151,37 +149,10 @@ class EstoqueRepositoryEloquent extends BaseRepository implements EstoqueReposit
         return $status;
     }
 
-    // public function atualizarEstoque(Requests $request, $estoqueId, $operacao)
-    // {
-    //     $produto = Estoque::find($estoqueId);
-    //     if ($operacao === 'aumentar') {
-    //         $produto->quantidade += $request->input('quantidadeHistorico');
-    //         $produto->save();
-    //     } elseif ($operacao === 'diminuir') {
-    //         $quantidadeDiminuida = $request->input('quantidadeHistorico');
-    //         if ($produto->quantidade >= $quantidadeDiminuida) {
-    //             $produto->quantidade -= $quantidadeDiminuida;
-    //             $venda = $quantidadeDiminuida * $produto->preco_venda;
-    //             $unidadeId = $request->session()->get('id_unidade');
-    //             Historico::create([
-    //                 'id_estoque_fk' => $estoqueId,
-    //                 'quantidade_diminuida' => $quantidadeDiminuida,
-    //                 'quantidade_historico' => $produto->quantidade,
-    //                 'venda' => $venda,
-    //                 'id_unidade_fk' => $unidadeId
-    //             ]);
-    //             $produto->save();
-    //         } else {
-    //             return response()->json(['error' => 'Quantidade insuficiente no estoque'], 400);
-    //         }
-    //     }
-    // }
-    
-
-    public function graficoFiltro($startDate, $endDate):array
+    public function graficoFiltro($startDate, $endDate): array
     {
         if ($startDate && $endDate) {
-            
+
             $startDate = Carbon::parse($startDate)->startOfDay();
             $endDate = Carbon::parse($endDate)->endOfDay();
 
@@ -198,20 +169,20 @@ class EstoqueRepositoryEloquent extends BaseRepository implements EstoqueReposit
             $values = $vendas->map(function ($order) {
                 return number_format($order->venda, 0, '', '');
             });
-        }else{
+        } else {
             $vendas = Historico::selectRaw('MONTH(created_at) as mes, SUM(venda) as venda')
-            ->groupBy('mes')
-            ->orderBy('mes')
-            ->get();
+                ->groupBy('mes')
+                ->orderBy('mes')
+                ->get();
 
-             $labels = $vendas->pluck('mes')->map(function ($mes) {
+            $labels = $vendas->pluck('mes')->map(function ($mes) {
                 return Carbon::create()->month($mes)->format('F'); // Nome do mês
             });
             // $backgrounds = $precos->map(function ($value, $key){
             //     return '#' . dechex(rand(0x000000 , 0xFFFFFF));
             // });
-            $values = $vendas->map(function($order, $key){
-                return number_format($order->venda, 0,'','');
+            $values = $vendas->map(function ($order, $key) {
+                return number_format($order->venda, 0, '', '');
             });
         }
 
@@ -228,5 +199,4 @@ class EstoqueRepositoryEloquent extends BaseRepository implements EstoqueReposit
     {
         $this->pushCriteria(app(RequestCriteria::class));
     }
-    
 }

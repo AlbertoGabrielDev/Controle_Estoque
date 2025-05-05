@@ -65,10 +65,17 @@ class User extends Authenticatable
         'profile_photo_url',
     ];
 
+
+    public function canToggleStatus()
+    {
+        return $this->roles()->whereHas('permissions', function ($query) {
+            $query->where('name', 'status');
+        })->exists();
+    }
     public function roles()
-{
-    return $this->belongsToMany(Role::class, 'user_role');
-}
+    {
+        return $this->belongsToMany(Role::class, 'user_role');
+    }
 
     public function hasRole($roleName)
     {
