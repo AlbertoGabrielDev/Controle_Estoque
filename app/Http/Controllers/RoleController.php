@@ -65,10 +65,9 @@ class RoleController extends Controller
     {
         $role = Role::findOrFail($roleId);
         $menus = Menu::whereNotNull('slug')->where('slug', '!=', '')->get();
-    
+
         $toggleStatus = $request->input('global_permissions.status', '0') === '1';
         $permissionStatus = Permission::firstOrCreate(['name' => 'status']);
-    
         if ($toggleStatus) {
             foreach ($menus as $menu) {
                 RoleMenuPermission::updateOrCreate(
@@ -85,26 +84,26 @@ class RoleController extends Controller
                 ->where('permission_id', $permissionStatus->id)
                 ->delete();
         }
-    
+
         // Lógica para demais permissões
         $inputPermissions = $request->input('permissions', []);
         $currentPermissions = RoleMenuPermission::where('role_id', $role->id)->get();
-    
+
         // Mapas para comparação
         $currentMap = $currentPermissions->map(function ($item) {
             return "{$item->menu_id}_{$item->permission_id}";
         })->toArray();
-    
+
         $newMap = [];
-    
+
         foreach ($inputPermissions as $menuId => $permissionIds) {
             foreach ($permissionIds as $permissionId) {
                 // Ignorar "status" que já está sendo tratado separadamente
                 if ($permissionId == $permissionStatus->id) continue;
-    
+
                 $key = "{$menuId}_{$permissionId}";
                 $newMap[] = $key;
-    
+
                 // Criar se não existir
                 if (!in_array($key, $currentMap)) {
                     RoleMenuPermission::create([
@@ -115,16 +114,17 @@ class RoleController extends Controller
                 }
             }
         }
-    
         // Remover permissões que não estão mais no formulário (exceto "status")
         foreach ($currentPermissions as $perm) {
             $key = "{$perm->menu_id}_{$perm->permission_id}";
             if (!in_array($key, $newMap) && $perm->permission_id != $permissionStatus->id) {
-                $perm->delete();
+                RoleMenuPermission::where('role_id', $perm->role_id)
+                    ->where('menu_id', $perm->menu_id)
+                    ->where('permission_id', $perm->permission_id)
+                    ->delete(); 
             }
         }
-    
+
         return redirect()->back()->with('success', 'Permissões atualizadas com sucesso!');
     }
-    
 }

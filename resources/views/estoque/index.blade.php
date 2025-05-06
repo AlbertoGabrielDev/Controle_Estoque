@@ -2,10 +2,17 @@
 @section('conteudo')
 <div class="bg-white p-4 rounded-md w-full">
   <!-- Cabeçalho e botões... (mantido igual) -->
-
+  <div class="flex justify-end mb-2">
+    <a href="{{ route('estoque.cadastro') }}"
+      class="md:w-auto flex items-center justify-between px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-md text-gray-800 transition-colors">
+      <i class="fas fa-plus mr-2"></i>
+      Cadastrar Estoque
+    </a>
+  </div>
   <!-- Filtro -->
   <div x-data="{ filterOpen: false }" class="mb-4">
-    <button @click="filterOpen = !filterOpen" class="w-full md:w-auto flex items-center justify-between px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-md">
+    <button @click="filterOpen = !filterOpen"
+      class="w-full md:w-auto flex items-center justify-between px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-md">
       <span class="mr-2">Filtrar</span>
       <i class="fas fa-chevron-down transition-transform" :class="{ 'rotate-180': filterOpen }"></i>
     </button>
@@ -176,7 +183,7 @@
             <button class="toggle-ativacao p-2 text-red-600 hover:bg-red-50 rounded-md"
               data-id="{{ $estoque->id_estoque }}"
               @if(!auth()->user()->canToggleStatus()) disabled @endif>
-              <i class="fas fa-power-off"></i>
+              <i class="fas fa-power-off {{ $estoque->status == 1 ? 'text-red-600' : 'text-green-600' }}"></i>
             </button>
           </td>
         </tr>

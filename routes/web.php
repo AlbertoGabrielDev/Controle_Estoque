@@ -53,7 +53,7 @@ Route::middleware([
         Route::get('/buscar-estoque', [EstoqueController::class, 'buscar'])->name('estoque.buscar');
         Route::get('/editar/{estoqueId}', [EstoqueController::class, 'editar'])->name('estoque.editar')->middleware('check.permission:edit_post,estoque');
         Route::put('/editar/{estoqueId}', [EstoqueController::class, 'salvarEditar'])->name('estoque.salvarEditar');
-        Route::post('/status/{estoqueId}', [EstoqueController::class, 'status'])->name('estoque.status');
+        Route::post('/status/{estoqueId}', [EstoqueController::class, 'status'])->middleware('check.permission:status,estoque')->name('estoque.status');
         Route::get('/quantidade/{estoqueId}/{operacao}', [EstoqueController::class, 'atualizarEstoque'])->name('estoque.quantidade');
         Route::get('grafico-filtro', [EstoqueController::class, 'graficoFiltro'])->name('estoque.graficoFiltro');
         Route::get('/grafico', [GraficosApiController::class, 'months'])->name('months');

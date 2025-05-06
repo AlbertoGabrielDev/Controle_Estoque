@@ -12,7 +12,8 @@
     </a>
   </div>
 
-  <table class="table-auto w-full border-collapse border border-gray-200 rounded-md ">
+  <div class="overflow-x-auto w-full">
+  <table class="min-w-full border-collapse border border-gray-200 rounded-md">
     <thead class="bg-gray-100">
       <tr class="text-sm text-gray-600">
         <th class="py-3 px-6 text-left font-medium">Usuario</th>
@@ -66,6 +67,7 @@
       @endforeach
     </tbody>
   </table>
+  </div>
 
   <div class="mt-4 flex justify-center">
     <nav class="flex items-center space-x-2">

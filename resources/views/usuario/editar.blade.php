@@ -124,14 +124,6 @@
 @endsection
 @push('scripts')
 <script>
- document.addEventListener('DOMContentLoaded', function() {
-    // Garante que o DOM está totalmente carregado
-    $('.select2-multiple').select2({
-      placeholder: "Selecione as permissões",
-      allowClear: true,
-      width: '100%',
-    });
-  });
 
   function previewImage(event) {
     const reader = new FileReader();

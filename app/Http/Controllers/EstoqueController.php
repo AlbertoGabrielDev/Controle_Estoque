@@ -79,7 +79,11 @@ class EstoqueController extends Controller
         $status->status = ($status->status == 1) ? 0 : 1;
         $status->save();
         
-        return response()->json(['status' => $status->status]);
+        return response()->json([
+            'status' => $status->status,
+            'message' => 'Status atualizado com sucesso!',
+            'type' => 'success'
+        ]);
     }
 
 }
