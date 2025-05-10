@@ -176,15 +176,11 @@
             {{ \Carbon\Carbon::parse($estoque->validade)->format('d/m/Y') }}
           </td>
           <td class="px-4 py-3 text-sm flex gap-2">
-            <a href="{{route('estoque.editar', $estoque->id_estoque)}}"
-              class="p-2 text-cyan-600 hover:bg-cyan-50 rounded-md">
-              <i class="fas fa-edit"></i>
-            </a>
-            <button class="toggle-ativacao p-2 text-red-600 hover:bg-red-50 rounded-md"
-              data-id="{{ $estoque->id_estoque }}"
-              @if(!auth()->user()->canToggleStatus()) disabled @endif>
-              <i class="fas fa-power-off {{ $estoque->status == 1 ? 'text-red-600' : 'text-green-600' }}"></i>
-            </button>
+            <x-edit-button :route="'estoque.editar'" :modelId="$estoque->id_estoque" />
+            <x-button-status
+              :modelId="$estoque->id_estoque"
+              :status="$estoque->status"
+              endpoint="/estoque/status" />
           </td>
         </tr>
         @endforeach

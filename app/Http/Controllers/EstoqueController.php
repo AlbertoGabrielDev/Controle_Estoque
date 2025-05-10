@@ -71,16 +71,23 @@ class EstoqueController extends Controller
 
     public function status($statusId)
     {
+        $estoque  = Estoque::findOrFail($statusId);
+
         if(!auth()->user()->canToggleStatus()) {
+            return response()->json([
+                'status' => 403,
+                'message' => 'Sem permissão para esta ação!',
+                'type' => 'error'
+            ]);
             abort(403, 'Sem permissão para esta ação');
         }
         
-        $status = Estoque::findOrFail($statusId);
-        $status->status = ($status->status == 1) ? 0 : 1;
-        $status->save();
+        
+        $estoque ->status = ($estoque ->status == 1) ? 0 : 1;
+        $estoque ->save();
         
         return response()->json([
-            'status' => $status->status,
+            'status' => 200,
             'message' => 'Status atualizado com sucesso!',
             'type' => 'success'
         ]);

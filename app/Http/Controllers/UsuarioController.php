@@ -42,7 +42,7 @@ class UsuarioController extends Controller
     {
         $roles = Role::all();
         $units = Unidades::all();
-        return view('usuario.cadastro', compact('units','roles'))->with('success', 'Usuario inserido com sucesso');
+        return view('usuario.cadastro', compact('units', 'roles'))->with('success', 'Usuario inserido com sucesso');
     }
 
     public function buscar(Request $request)
@@ -98,10 +98,13 @@ class UsuarioController extends Controller
     public function status($statusId)
     {
         $status = User::findOrFail($statusId);
-        Gate::authorize('permissao');
         $status->status = ($status->status == 1) ? 0 : 1;
         $status->save();
-        return response()->json(['status' => $status->status]);
+        return response()->json([
+            'status' => 200,
+            'message' => 'Status atualizado com sucesso!',
+            'type' => 'success'
+        ]);
     }
 
     public function unidade()
@@ -124,7 +127,7 @@ class UsuarioController extends Controller
                 $imageName = md5($requestImage->getClientOriginalName() . strtotime("now")) . "." . $extension;
                 $requestImage->move(public_path('img/usuario'), $imageName);
             }
-         
+
             User::create([
                 'name' => $request->name,
                 'email' => $request->email,

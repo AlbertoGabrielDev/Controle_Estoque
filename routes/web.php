@@ -87,7 +87,7 @@ Route::middleware([
         Route::get('/cadastro', [UsuarioController::class, 'cadastro'])->name('usuario.cadastro')->middleware('check.permission:create_post,perfil');
         Route::post('/cadastro', [UsuarioController::class, 'inserirUsuario'])->name('usuario.inserirUsuario');
         Route::get('/editar/{userId}', [UsuarioController::class, 'editar'])->name('usuario.editar')->middleware('check.permission:edit_post,perfil');
-        Route::post('/status/{userId}', [UsuarioController::class, 'status'])->name('usuario.status');
+        Route::post('/status/{userId}', [UsuarioController::class, 'status'])->name('usuario.status')->middleware('check.permission:status,perfil');
         Route::put('/editar/{userid}', [UsuarioController::class, 'salvarEditar'])->name('usuario.salvarEditar');
         Route::get('/buscar-usuario', [UsuarioController::class, 'Buscar'])->name('usuario.buscar');
     });
@@ -98,7 +98,7 @@ Route::middleware([
         Route::get('/buscar-unidade', [UnidadeController::class, 'Buscar'])->name('unidades.buscar');
         Route::get('/editar/{unidadeId}', [UnidadeController::class, 'editar'])->name('unidades.editar')->middleware('check.permission:edit_post,unidades');
         Route::post('/editar/{unidadeId}', [UnidadeController::class, 'salvarEditar'])->name('unidades.salvarEditar');
-        Route::post('/status/{unidadeId}', [UnidadeController::class, 'status'])->name('unidades.status');
+        Route::post('/status/{unidadeId}', [UnidadeController::class, 'updateStatus'])->name('unidades.status');
     });
 
     Route::prefix('/roles')->group(function () {

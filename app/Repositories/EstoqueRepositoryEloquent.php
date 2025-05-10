@@ -2,6 +2,7 @@
 
 namespace App\Repositories;
 
+use App\Criteria\StatusCriteria;
 use App\Http\Requests\ValidacaoEstoque;
 use App\Models\Categoria;
 use App\Models\Estoque;
@@ -41,22 +42,17 @@ class EstoqueRepositoryEloquent extends BaseRepository implements EstoqueReposit
 
     public function index()
     {
-      
-        $estoques = Estoque::with(['produto', 'fornecedor'])
-            ->when(!auth()->user()->canToggleStatus(), function ($q) {
-                $q->where('status', 1);
-            })
-            ->paginate(10);
+        $query = Estoque::select('estoque.*', 'produto.nome_produto', 'fornecedor.nome_fornecedor')
+            ->join('produto', 'estoque.id_produto_fk', '=', 'produto.id_produto')
+            ->join('fornecedor', 'estoque.id_fornecedor_fk', '=', 'fornecedor.id_fornecedor');
 
-        $fornecedores = Fornecedor::all();
-        $marcas = Marca::all();
-        $categorias = Categoria::all();
+        $estoques = $query->paginate(10);
 
-        return  [
+        return [
             'estoques' => $estoques,
-            'fornecedores' => $fornecedores,
-            'marcas' => $marcas,
-            'categorias' => $categorias
+            'fornecedores' => Fornecedor::all(),
+            'marcas' => Marca::all(),
+            'categorias' => Categoria::all()
         ];
     }
 
@@ -141,13 +137,14 @@ class EstoqueRepositoryEloquent extends BaseRepository implements EstoqueReposit
     {
         return Estoque::with($relations)->findOrFail($id);
     }
-    public function status($statusId)
-    {
-        $status = Estoque::findOrFail($statusId);
-        $status->status = ($status->status == 1) ? 0 : 1;
-        $status->save();
-        return $status;
-    }
+    
+    // public function status($statusId)
+    // {
+    //     $status = Estoque::findOrFail($statusId);
+    //     $status->status = ($status->status == 1) ? 0 : 1;
+    //     $status->save();
+    //     return $status;
+    // }
 
     public function graficoFiltro($startDate, $endDate): array
     {
@@ -197,6 +194,7 @@ class EstoqueRepositoryEloquent extends BaseRepository implements EstoqueReposit
      */
     public function boot()
     {
-        $this->pushCriteria(app(RequestCriteria::class));
+        $this->pushCriteria(app(StatusCriteria::class));
+        parent::boot();
     }
 }
