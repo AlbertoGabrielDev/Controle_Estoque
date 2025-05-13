@@ -1,48 +1,110 @@
 @extends('layouts.principal')
 
 @section('conteudo')
-<div class="bg-white p-4 rounded-md w-full">
-  <div class="mx-auto m-5 text-4xl font-medium text-slate-700 flex justify-center ">Editar Fornecedores</div> 
-  <a class=" text-gray-500 py-2.5 px-4 relative mx-5 my-4 w-1/12 rounded hover:bg-gradient-to-r hover:from-cyan-400 hover:to-cyan-300 hover:text-white" href="{{route('fornecedor.index')}}">
-    <i class="fa fa-angle-left mr-2"></i>Voltar
-  </a>
+<div class="bg-white p-4 rounded-md w-full max-w-4xl mx-auto">
+  <div class="flex justify-between items-center mb-8">
+    <h1 class="text-2xl font-semibold text-slate-700">Editar Fornecedor</h1>
+    <a href="{{ route('fornecedor.index') }}"
+      class="flex items-center px-4 py-2 bg-gray-100 hover:bg-cyan-500 text-gray-600 hover:text-white rounded-md transition-colors">
+      <i class="fa fa-angle-left mr-2"></i>Voltar
+    </a>
+  </div>
 
-  <form action="{{route('fornecedor.salvarEditar', $fornecedores->first()->id_fornecedor)}}" method="POST">
+  <form action="{{ route('fornecedor.salvarEditar', $fornecedores->first()->id_fornecedor) }}" method="POST" class="space-y-6">
     @csrf
     @foreach ($fornecedores as $fornecedor)
-      <div class="relative z-0 w-2/12 mb-6 group mt-4">
-        <input type="text" name="nome_fornecedor" class="block py-2.5 px-0 w-full text-sm bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer" disabled aria-label="Sizing example input" aria-label="Sizing example input" value="{{$fornecedor->nome_fornecedor}}">
-        <label for="text" class="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6">Nome</label>
-      </div>
-    @endforeach
-    @foreach ($telefones as $telefone)
-    <div class="grid md:grid-cols-2 md:gap-6 py-4">
-        <div class="relative z-0 w-full mb-6 group">
-          <input type="text" name="ddd" class="block py-2.5 px-0 w-full text-sm bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer" aria-label="Sizing example input" value="{{$telefone->ddd}}">
-          <label for="text" class="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6">DDD</label>
-        </div>
-        <div class="relative z-0 w-full mb-6 group">
-          <input type="text" name="telefone" class="block py-2.5 px-0 w-full text-sm bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer" aria-label="Sizing example input" value="{{$telefone->telefone}}">
-          <label for="text" class="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6">Telefone</label>
-        </div>   
-    </div> 
-    <div class="grid md:grid-cols-3 md:gap-6 py-4">
-      <div class="inline-flex items-center">
-        <input type="checkbox" class="relative h-5 w-5 cursor-pointer appearance-none rounded-md border before:absolute before:top-2/4 before:left-2/4 before:block before:h-12 before:w-12 before:-translate-y-2/4 before:-translate-x-2/4 before:rounded-full before:bg-blue-gray-500 before:opacity-0 before:transition-opacity checked:border-red-500 checked:bg-red-500 checked:before:bg-red-500 hover:before:opacity-10" id="btncheck1" name="principal" value="1" autocomplete="off" {{ $telefone->principal == 1 ? 'checked' : '' }}>
-        <label class="relative flex cursor-pointer items-center rounded-full p-3" for="btncheck1">Principal</label>
-      </div>  
-      <div class="inline-flex items-center">
-        <input type="checkbox" class="relative h-5 w-5 cursor-pointer appearance-none rounded-md border before:absolute before:top-2/4 before:left-2/4 before:block before:h-12 before:w-12 before:-translate-y-2/4 before:-translate-x-2/4 before:rounded-full before:bg-blue-gray-500 before:opacity-0 before:transition-opacity checked:border-green-500 checked:bg-green-500 checked:before:bg-green-500 hover:before:opacity-10" id="btncheck2" name="whatsapp" value="1" autocomplete="off" {{ $telefone->whatsapp == 1 ? 'checked' : '' }}>
-        <label class="relative flex cursor-pointer items-center rounded-full p-3" for="btncheck2">Whatsapp</label>
-      </div>
-      <div class="inline-flex items-center">
-        <input type="checkbox" class="relative h-5 w-5 cursor-pointer appearance-none rounded-md border before:absolute before:top-2/4 before:left-2/4 before:block before:h-12 before:w-12 before:-translate-y-2/4 before:-translate-x-2/4 before:rounded-full before:bg-blue-gray-500 before:opacity-0 before:transition-opacity checked:border-indigo-500 checked:bg-indigo-500 checked:before:bg-indigo-500 hover:before:opacity-10" id="btncheck3" name="telegram" value="1" autocomplete="off" {{ $telefone->telegram == 1 ? 'checked' : '' }}>
-        <label class="relative flex cursor-pointer items-center rounded-full p-3" for="btncheck3">Telegram</label>
-      </div>  
+    <div class="form-group">
+      <label class="block text-sm font-medium text-gray-700 mb-1">Nome</label>
+      <input type="text"
+        name="nome_fornecedor"
+        class="w-full px-3 py-2 border rounded-md bg-gray-100 cursor-not-allowed"
+        value="{{ $fornecedor->nome_fornecedor }}"
+        disabled>
     </div>
     @endforeach
-    <button type="submit" class="block text-gray-500 py-2.5 relative my-4 w-48 rounded transition duration-200 hover:bg-gradient-to-r hover:from-cyan-400 hover:to-cyan-300 hover:text-white">
-      <i class="fas fa-plus mr-2"></i> Editar Fornecedor
+
+    @foreach ($telefones as $telefone)
+    <div class="grid md:grid-cols-2 gap-6">
+      <div class="form-group">
+        <label class="block text-sm font-medium text-gray-700 mb-1">DDD</label>
+        <input type="text"
+          name="ddd"
+          class="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-cyan-500"
+          value="{{ $telefone->ddd }}">
+      </div>
+
+      <div class="form-group">
+        <label class="block text-sm font-medium text-gray-700 mb-1">Telefone</label>
+        <input type="text"
+          name="telefone"
+          class="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-cyan-500"
+          value="{{ $telefone->telefone }}">
+      </div>
+    </div>
+
+    <div class="grid md:grid-cols-3 gap-4">
+      <!-- Checkbox Principal -->
+      <div class="group relative">
+        <input type="checkbox"
+          name="principal"
+          value="1"
+          id="principal"
+          class="absolute opacity-0 peer"
+          {{ $telefone->principal == 1 ? 'checked' : '' }}>
+        <label for="principal"
+          class="flex items-center justify-between p-4 border rounded-lg cursor-pointer transition-all
+                      bg-white hover:border-cyan-300 peer-checked:border-red-500 peer-checked:bg-red-50
+                      peer-focus:ring-2 peer-focus:ring-red-200">
+          <div class="flex items-center space-x-3">
+
+            <span class="text-gray-700 font-medium">Principal</span>
+          </div>
+        </label>
+      </div>
+
+      <!-- Checkbox WhatsApp -->
+      <div class="group relative">
+        <input type="checkbox"
+          name="whatsapp"
+          id="whatsapp"
+          value="1"
+          class="absolute opacity-0 peer"
+          {{ $telefone->whatsapp == 1 ? 'checked' : '' }}>
+        <label for="whatsapp"
+          class="flex items-center justify-between p-4 border rounded-lg cursor-pointer transition-all
+                      bg-white hover:border-cyan-300 peer-checked:border-green-500 peer-checked:bg-green-50
+                      peer-focus:ring-2 peer-focus:ring-green-200">
+          <div class="flex items-center space-x-3">
+
+            <span class="text-gray-700 font-medium">Whatsapp</span>
+          </div>
+        </label>
+      </div>
+
+      <!-- Checkbox Telegram -->
+      <div class="group relative">
+        <input type="checkbox"
+          name="telegram"
+          id="telegram"
+          value="1"
+          class="absolute opacity-0 peer"
+          {{ $telefone->telegram == 1 ? 'checked' : '' }}>
+        <label for="telegram"
+          class="flex items-center justify-between p-4 border rounded-lg cursor-pointer transition-all
+                      bg-white hover:border-cyan-300 peer-checked:border-indigo-500 peer-checked:bg-indigo-50
+                      peer-focus:ring-2 peer-focus:ring-indigo-200">
+          <div class="flex items-center space-x-3">
+
+            <span class="text-gray-700 font-medium">Telegram</span>
+          </div>
+        </label>
+      </div>
+    </div>
+    @endforeach
+
+    <button type="submit"
+      class="w-full md:w-auto px-6 py-2 bg-cyan-500 hover:bg-cyan-600 text-white rounded-md transition-colors">
+      <i class="fas fa-save mr-2"></i>Salvar Alterações
     </button>
   </form>
 </div>
