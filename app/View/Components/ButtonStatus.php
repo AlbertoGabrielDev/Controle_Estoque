@@ -10,15 +10,15 @@ class ButtonStatus extends Component
 {
     public $modelId;
     public $status;
-    public $endpoint;
+    public $modelName;
 
 
-  public function __construct($modelId, $status, $endpoint)
-    {
-        $this->modelId = $modelId;
-        $this->status = $status;
-        $this->endpoint = $endpoint;
-    }
+ public function __construct($modelId, $status, $modelName)
+{
+    $this->modelId = $modelId;
+    $this->status = $status;
+    $this->modelName = $modelName; // Recebe diretamente o nome da model
+}
 
     public function render()
     {

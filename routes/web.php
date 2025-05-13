@@ -53,7 +53,7 @@ Route::middleware([
         Route::get('/buscar-estoque', [EstoqueController::class, 'buscar'])->name('estoque.buscar');
         Route::get('/editar/{estoqueId}', [EstoqueController::class, 'editar'])->name('estoque.editar')->middleware('check.permission:edit_post,estoque');
         Route::put('/editar/{estoqueId}', [EstoqueController::class, 'salvarEditar'])->name('estoque.salvarEditar');
-        Route::post('/status/{estoqueId}', [EstoqueController::class, 'status'])->middleware('check.permission:status,estoque')->name('estoque.status');
+        Route::post('/status/{modelName}/{id}', [EstoqueController::class, 'updateStatus'])->middleware('check.permission:status,estoque')->name('estoque.status');
         Route::get('/quantidade/{estoqueId}/{operacao}', [EstoqueController::class, 'atualizarEstoque'])->name('estoque.quantidade');
         Route::get('grafico-filtro', [EstoqueController::class, 'graficoFiltro'])->name('estoque.graficoFiltro');
         Route::get('/grafico', [GraficosApiController::class, 'months'])->name('months');
@@ -69,7 +69,7 @@ Route::middleware([
         Route::get('/buscar-fornecedor', [FornecedorController::class, 'Buscar'])->name('fornecedor.buscar');
         Route::get('/editar/{fornecedorId}', [FornecedorController::class, 'editar'])->name('fornecedor.editar')->middleware('check.permission:edit_post,fornecedores');
         Route::post('/editar/{fornecedorId}', [FornecedorController::class, 'salvarEditar'])->name('fornecedor.salvarEditar');
-        Route::post('/status/{fornecedorId}', [FornecedorController::class, 'status'])->name('fornecedor.status');
+        Route::post('/status/{modelName}/{id}', [FornecedorController::class, 'updateStatus'])->middleware('check.permission:status,fornecedores')->name('fornecedor.status');
     });
 
     Route::prefix('/marca')->group(function () {

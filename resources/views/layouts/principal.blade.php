@@ -35,6 +35,7 @@
 </head>
 
 <body class="bg-white h-screen flex flex-col">
+  <div id="toast-container" class="fixed top-4 right-4 z-50 flex flex-col gap-2"></div>
   <nav class="bg-white shadow-sm">
     <div class="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
       <div class="relative flex h-16 items-center justify-between">

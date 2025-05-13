@@ -180,8 +180,7 @@
             <x-button-status
               :modelId="$estoque->id_estoque"
               :status="$estoque->status"
-              endpoint="/estoque/status" />
-          </td>
+              modelName="estoque" />
         </tr>
         @endforeach
       </tbody>

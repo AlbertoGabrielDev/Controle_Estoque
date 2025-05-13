@@ -16,6 +16,7 @@ use App\Http\Requests\ValidacaoEstoque;
 use App\Repositories\EstoqueRepository;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Cache;
 // use Illuminate\Support\Facades\Request;
 
@@ -67,30 +68,6 @@ class EstoqueController extends Controller
     {
         $this->estoqueRepository->salvarEditar($request,$estoqueId);
         return redirect()->route('estoque.index')->with('success', 'Editado com sucesso');
-    }
-
-    public function status($statusId)
-    {
-        $estoque  = Estoque::findOrFail($statusId);
-
-        if(!auth()->user()->canToggleStatus()) {
-            return response()->json([
-                'status' => 403,
-                'message' => 'Sem permissão para esta ação!',
-                'type' => 'error'
-            ]);
-            abort(403, 'Sem permissão para esta ação');
-        }
-        
-        
-        $estoque ->status = ($estoque ->status == 1) ? 0 : 1;
-        $estoque ->save();
-        
-        return response()->json([
-            'status' => 200,
-            'message' => 'Status atualizado com sucesso!',
-            'type' => 'success'
-        ]);
     }
 
 }

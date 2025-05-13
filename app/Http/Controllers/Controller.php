@@ -12,8 +12,9 @@ class Controller extends BaseController
 {
     use AuthorizesRequests, ValidatesRequests;
 
-    public function updateStatus(Request $request, $model, $id)
+    public function updateStatus($model, $id)
     {
+    
         $modelClass = 'App\\Models\\' . Str::studly(Str::singular($model));
         
         if (!class_exists($modelClass)) {

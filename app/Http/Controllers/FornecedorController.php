@@ -15,7 +15,7 @@ class FornecedorController extends Controller
 {
     public function index()
     {
-        $fornecedores = Gate::allows('permissao') ? Fornecedor::paginate(15) : Fornecedor::where('status',1)->paginate(15);
+        $fornecedores = Fornecedor::paginate(15);
         return view('fornecedor.index', compact('fornecedores'));
     }
 
@@ -29,7 +29,7 @@ class FornecedorController extends Controller
         if (Gate::allows('permissao')) {
             $fornecedores = Fornecedor::where('nome_fornecedor', 'like' , '%' . $request->input('nome_fornecedor'). '%')->paginate(15);
         } else {
-            $fornecedores = Fornecedor::where('nome_fornecedopr', 'like' , '%' . $request->input('nome_fornecedor'). '%')->where('status',1)->paginate(15);
+            $fornecedores = Fornecedor::where('nome_fornecedor', 'like' , '%' . $request->input('nome_fornecedor'). '%')->where('status',1)->paginate(15);
         }
         return view('fornecedor.index', compact('fornecedores'));
     }
@@ -81,11 +81,4 @@ class FornecedorController extends Controller
         return redirect()->route('fornecedor.index')->with('success', 'Editado com sucesso');
     }
 
-    public function status(Request $request, $statusId)
-    {
-        $status = Fornecedor::findOrFail($statusId);
-        $status->status = ($status->status == 1) ? 0 : 1;
-        $status->save();
-        return response()->json(['status' => $status->status]);
-    }
 }
