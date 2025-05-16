@@ -1,25 +1,32 @@
 @extends('layouts.principal')
 
-
 @section('conteudo')
-<div class="bg-white p-4 rounded-md w-full">
-    <div class="mx-auto m-5 text-4xl font-medium text-slate-700 flex justify-center">Editar Marca</div>
-    <a class=" text-gray-500 py-2.5 px-4 relative mx-5 my-4 w-1/12 rounded hover:bg-gradient-to-r hover:from-cyan-400 hover:to-cyan-300 hover:text-white" href="{{route('marca.index')}}">
-        <i class="fa fa-angle-left mr-2"></i>Voltar
+<div class="bg-white p-4 rounded-md w-full max-w-4xl mx-auto">
+  <!-- Cabeçalho -->
+  <div class="flex justify-between items-center mb-8">
+    <h1 class="text-2xl font-semibold text-slate-700">Editar Marca</h1>
+    <a href="{{ route('marca.index') }}"
+      class="flex items-center px-4 py-2 bg-gray-100 hover:bg-cyan-500 text-gray-600 hover:text-white rounded-md transition-colors">
+      <i class="fa fa-angle-left mr-2"></i>Voltar
     </a>
-    <form action="{{route('marca.editar' , $marcas->first()->id_marca)}}" method="POST">
-        @csrf
-        @foreach ($marcas as $marca)
-        <div class="grid md:grid-cols-2 md:gap-6 py-4">
-            <div class="relative z-0 w-full mb-6 group">
-                <input type="text" required class="block py-2.5 px-0 w-full text-sm bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer" disabled aria-label="Sizing example input" name="nome_marca" value="{{$marca->nome_marca}}" placeholder=" ">
-                <label for="text" class="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6">Nome Marca</label>
-            </div> 
-        </div>   
-        @endforeach
-        <button type="submit" class="block text-gray-500 py-2.5 relative my-4 w-48 rounded transition duration-200 hover:bg-gradient-to-r hover:from-cyan-400 hover:to-cyan-300 hover:text-white">
-            <i class="fas fa-plus mr-2"></i> Editar Marca
-        </button>
-    </form>    
+  </div>
+
+  <form action="{{ route('marca.editar', $marcas->first()->id_marca) }}" method="POST" class="space-y-6">
+    @csrf
+    @foreach ($marcas as $marca)
+    <div class="form-group">
+      <label class="block text-sm font-medium text-gray-700 mb-1">Nome da Marca</label>
+      <input type="text"
+        name="nome_marca"
+        class="w-full px-3 py-2 border rounded-md bg-gray-100 "
+        value="{{ $marca->nome_marca }}">
+    </div>
+    @endforeach
+
+    <button type="submit"
+      class="w-full md:w-auto px-6 py-2 bg-cyan-500 hover:bg-cyan-600 text-white rounded-md transition-colors">
+      <i class="fas fa-save mr-2"></i>Salvar Alterações
+    </button>
+  </form>
 </div>
 @endsection

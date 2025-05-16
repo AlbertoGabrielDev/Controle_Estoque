@@ -7,7 +7,7 @@ trait HasStatus
     public function scopeWithStatus($query)
     {
         if (!auth()->user()->canToggleStatus()) {
-            return $query->where('status', 1);
+            return $query->where('status', 1); 
         }
         return $query;
     }

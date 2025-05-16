@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Traits\HasStatus;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -9,7 +10,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 class Categoria extends Model
 {
     use HasFactory;
-
+    use HasStatus;
     protected $table = 'categoria';
     protected $primaryKey = 'id_categoria';
 

@@ -1,43 +1,57 @@
 @extends('layouts.principal')
 
 @section('conteudo')
-
 <div class="bg-white p-4 rounded-md w-full">
-  <h5 class="mx-auto m-5 text-4xl font-medium text-slate-700 flex justify-center">Index</h5>
-  <div class= "bg-white p-4 rounded-md w-full flex justify-between ">
-    <a class=" text-gray-500 py-2.5 px-4 relative mx-5 my-4 w-1/12 rounded hover:bg-gradient-to-r hover:from-cyan-400 hover:to-cyan-300 hover:text-white"href="{{route('categoria.cadastro')}}">
-      <i class="fas fa-plus mr-2"></i>Cadastrar
-    </a>
-    <a class=" text-gray-500 py-2.5 px-4 relative mx-5 my-4 w-1/12 rounded hover:bg-gradient-to-r hover:from-cyan-400 hover:to-cyan-300 hover:text-white" href="{{route('categoria.inicio')}}">
-      <i class="fa fa-angle-left mr-2"></i>Voltar
-    </a>
+  <!-- Cabeçalho -->
+  <div class="flex justify-between items-center mb-6">
+    <h2 class="text-2xl font-semibold text-slate-700">Categorias</h2>
+    <div class="flex gap-4">
+      <a href="{{route('categoria.inicio')}}"
+        class="flex items-center px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-md text-gray-800 transition-colors">
+        <i class="fas fa-angle-left mr-2"></i>Voltar
+      </a>
+      <a href="{{route('categoria.cadastro')}}"
+        class="flex items-center px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-md text-gray-800 transition-colors">
+        <i class="fas fa-plus mr-2"></i>Cadastrar
+      </a>
+    </div>
   </div>
-    <table class="w-full table-auto ">
-        <thead>
-            <tr class="text-sm leading-normal">
-                <th class="py-4 px-6 uppercase text-sm text-grey-dark border-b border-grey-light">Categoria</th>
-                <!-- <th class="py-4 px-6 bg-grey-lightest font-bold uppercase text-sm text-grey-dark border-b border-grey-light">Editar</th>
-               
-                <th class="py-4 px-6 bg-grey-lightest font-bold uppercase text-sm text-grey-dark border-b border-grey-light text-right">Inativar</th>
-                 -->
-            </tr>
-        </thead>
-        <tbody>
-          @foreach ($categorias as $categoria)
-            <tr class="hover:bg-grey-lighter">
-                <td class="py-4 px-6 border-b border-grey-light">{{$categoria->nome_categoria}}</td>
-                <td class="py-4 px-6 border-b border-grey-light"><a href="{{route('categorias.editar', $categoria->id_categoria)}}" class="btn btn-primary">Editar</a></td>
-                <td class="py-4 px-6 border-b border-grey-light text-right">
-                  <button class="btn btn-primary toggle-ativacao @if($categoria->status === 1) btn-danger @elseif($categoria->status === 0) btn-success @else btn-primary @endif" data-id="{{ $categoria->id_categoria }}">
-                    {{ $categoria->status ? 'Inativar' : 'Ativar' }}
-                  </button>
-                </td>
-            </tr>
-          @endforeach
-        </tbody>
+
+  <!-- Tabela -->
+  <div class="overflow-x-auto rounded-lg border">
+    <table class="w-full">
+      <thead class="bg-gray-50">
+        <tr>
+          <th class="px-4 py-3 text-left text-sm font-medium text-gray-700">Categoria</th>
+          <th class="px-4 py-3 text-left text-sm font-medium text-gray-700">Ações</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-gray-200">
+        @forelse ($categorias as $categoria)
+        <tr class="hover:bg-gray-50">
+          <td class="px-4 py-3 text-sm text-gray-700">{{$categoria->nome_categoria}}</td>
+          <td class="px-4 py-3 text-sm flex gap-2">
+            <x-edit-button :route="'categorias.editar'" :modelId="$categoria->id_categoria" />
+            <x-button-status
+              :modelId="$categoria->id_categoria"
+              :status="$categoria->status"
+              modelName="categoria" />
+          </td>
+        </tr>
+        @empty
+        <tr>
+          <td colspan="2" class="px-4 py-6 text-center text-gray-500">
+            Nenhuma categoria encontrada
+          </td>
+        </tr>
+        @endforelse
+      </tbody>
     </table>
+  </div>
 
-
-  </div>    
-
+  <!-- Paginação -->
+  <div class="mt-4">
+    {{ $categorias->links() }}
+  </div>
+</div>
 @endsection

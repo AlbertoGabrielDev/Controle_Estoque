@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Traits\HasStatus;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Pagination\Paginator;
@@ -13,6 +14,7 @@ class Produto extends Model implements Transformable
 { 
     use TransformableTrait;
     use HasFactory;
+    use HasStatus;
     protected $table= 'produto';
     protected $primaryKey = 'id_produto';
 

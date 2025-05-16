@@ -14,9 +14,10 @@ class Controller extends BaseController
 
     public function updateStatus($model, $id)
     {
-    
-        $modelClass = 'App\\Models\\' . Str::studly(Str::singular($model));
-        
+
+        $modelName = Str::studly($model);
+        $modelClass = 'App\\Models\\' . $modelName;
+
         if (!class_exists($modelClass)) {
             abort(404, 'Model não encontrada');
         }

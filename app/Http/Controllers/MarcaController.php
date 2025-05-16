@@ -13,7 +13,7 @@ class MarcaController extends Controller
 {
     public function index()
     {
-        $marcas = Gate::allows('permissao') ?  $marcas = Marca::paginate(15) : $marcas = Marca::where('status', 1)->paginate(15);
+        $marcas = Marca::paginate(15);
         return view('marca.index', compact('marcas'));
     }
 
@@ -57,12 +57,5 @@ class MarcaController extends Controller
         return redirect()->route('marca.index')->with('success', 'Inserido com sucesso');
     }
 
-    public function status($statusId)
-    {
-        $status = Marca::findOrFail($statusId);
-        $status->status = ($status->status == 1) ? 0 : 1;
-        $status->save();
-        return response()->json(['status' => $status->status]);
-    }
 
 }

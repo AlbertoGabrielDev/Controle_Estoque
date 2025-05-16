@@ -35,7 +35,7 @@ class CategoriaRepositoryEloquent extends BaseRepository implements CategoriaRep
        }
     public function index()
     {
-        $categorias = Categoria::all();
+        $categorias = Categoria::paginate(15);
         return $categorias;
     }
 

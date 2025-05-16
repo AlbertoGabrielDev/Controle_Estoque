@@ -58,10 +58,5 @@ class ProdutoController extends Controller
         $this->produtoRepository->update($request,$produtoId);
         return redirect()->route('produtos.index')->with('success', 'Editado com sucesso');
     }
-    public function status($statusId)
-    {
-       $status = $this->produtoRepository->statusInativar($statusId);
-
-        return response()->json(['status' => $status->status]);
-    }
+  
 }

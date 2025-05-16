@@ -36,7 +36,7 @@ class ProdutoRepository
    }
 
    public function getAll(){
-    $produtos = Gate::allows('permissao') ? Produto::paginate(15) : Produto::where('status', 1)->paginate(15);
+    $produtos = Produto::paginate(15);
     return $produtos;
    }
 

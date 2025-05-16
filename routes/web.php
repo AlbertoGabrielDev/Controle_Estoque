@@ -32,7 +32,7 @@ Route::middleware([
         Route::get('/produto/{categoria}', [CategoriaController::class, 'produto'])->name('categorias.produto');
         Route::get('/editar/{categoriaId}', [CategoriaController::class, 'editar'])->name('categorias.editar')->middleware('check.permission:edit_post,categoria');
         Route::post('/editar/{categoriaId}', [CategoriaController::class, 'salvarEditar'])->name('categorias.salvarEditar');
-        Route::post('/status/{categoriaId}', [CategoriaController::class, 'status'])->name('categorias.status');
+        Route::post('/status/{modelName}/{id}', [CategoriaController::class, 'updateStatus'])->name('categoria.status');
         Route::post('/produto/status/{produtoId}', [ProdutoController::class, 'status'])->name('produtos.status');
     });
 
@@ -43,7 +43,7 @@ Route::middleware([
         Route::get('/buscar-produto', [ProdutoController::class, 'buscarProduto'])->name('produtos.buscar');
         Route::get('/editar/{produtoId}', [ProdutoController::class, 'editar'])->name('produtos.editar')->middleware('check.permission:edit_post,Produtos');
         Route::post('/editar/{produtoId}', [ProdutoController::class, 'salvarEditar'])->name('produtos.salvarEditar');
-        Route::post('/status/{produtoId}', [ProdutoController::class, 'status'])->name('produtos.status');
+        Route::post('/status/{modelName}/{id}', [ProdutoController::class, 'updateStatus'])->name('produto.status');
     });
 
     Route::prefix('/estoque')->group(function () {
@@ -79,7 +79,7 @@ Route::middleware([
         Route::get('/buscar-marca', [MarcaController::class, 'Buscar'])->name('marca.buscar');
         Route::get('/editar/{marcaId}', [MarcaController::class, 'editar'])->name('marca.editar')->middleware('check.permission:edit_post,marca');
         Route::post('/editar/{marcaId}', [MarcaController::class, 'salvarEditar'])->name('marca.salvarEditar');
-        Route::post('/status/{marcaId}', [MarcaController::class, 'status'])->name('marca.status');
+        Route::post('/status/{modelName}/{id}', [MarcaController::class, 'updateStatus'])->name('marca.status')->middleware('check.permission:status,marca');
     });
 
     Route::prefix('/usuario')->group(function () {
@@ -87,7 +87,7 @@ Route::middleware([
         Route::get('/cadastro', [UsuarioController::class, 'cadastro'])->name('usuario.cadastro')->middleware('check.permission:create_post,perfil');
         Route::post('/cadastro', [UsuarioController::class, 'inserirUsuario'])->name('usuario.inserirUsuario');
         Route::get('/editar/{userId}', [UsuarioController::class, 'editar'])->name('usuario.editar')->middleware('check.permission:edit_post,perfil');
-        Route::post('/status/{userId}', [UsuarioController::class, 'status'])->name('usuario.status')->middleware('check.permission:status,perfil');
+        Route::post('/status/{modelName}/{id}', [UsuarioController::class, 'updateStatus'])->name('usuario.status')->middleware('check.permission:status,perfil');
         Route::put('/editar/{userid}', [UsuarioController::class, 'salvarEditar'])->name('usuario.salvarEditar');
         Route::get('/buscar-usuario', [UsuarioController::class, 'Buscar'])->name('usuario.buscar');
     });
@@ -98,7 +98,7 @@ Route::middleware([
         Route::get('/buscar-unidade', [UnidadeController::class, 'Buscar'])->name('unidades.buscar');
         Route::get('/editar/{unidadeId}', [UnidadeController::class, 'editar'])->name('unidades.editar')->middleware('check.permission:edit_post,unidades');
         Route::post('/editar/{unidadeId}', [UnidadeController::class, 'salvarEditar'])->name('unidades.salvarEditar');
-        Route::post('/status/{unidadeId}', [UnidadeController::class, 'updateStatus'])->name('unidades.status');
+        Route::post('/status/{modelName}/{id}', [UnidadeController::class, 'updateStatus'])->name('unidades.status');
     });
 
     Route::prefix('/roles')->group(function () {
@@ -108,7 +108,7 @@ Route::middleware([
         Route::get('/buscar-unidade', [RoleController::class, 'Buscar'])->name('roles.buscar');
         Route::get('/editar/{roleId}', [RoleController::class, 'editar'])->name('roles.editar')->middleware('check.permission:edit_post,roles');
         Route::put('/editar/{rolesId}', [RoleController::class, 'salvarEditar'])->name('roles.salvarEditar');
-        Route::post('/status/{rolesId}', [RoleController::class, 'status'])->name('roles.status');
+        Route::post('/status/{rolesId}', [RoleController::class, 'updateStatus'])->name('roles.status');
     });
 
     Route::prefix('/vendas')->group(function () {
