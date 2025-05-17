@@ -53,9 +53,9 @@ class CategoriaController extends Controller
         return view('categorias.editar', compact('categorias'));
     }
 
-    public function salvarEditar($categoriaId)
+    public function salvarEditar(Request $request,$categoriaId)
     {
-        $this->categoriaRepository->editar($categoriaId);
+        $this->categoriaRepository->salvarEditar($request,$categoriaId);
         return redirect()->route('categoria.index')->with('success', 'Editado com sucesso');
     }
 
