@@ -134,7 +134,7 @@
 
   <!-- Tabela -->
   <div class="overflow-x-auto rounded-lg border">
-    <table class="w-full">
+    <table id="Table" class="w-full" data-order='[[9, "asc"]]'>
       <thead class="bg-gray-50">
         <tr>
           <th class="px-4 py-3 text-left text-sm font-medium text-gray-700">Produto</th>
@@ -185,11 +185,6 @@
         @endforeach
       </tbody>
     </table>
-  </div>
-
-  <!-- Paginação -->
-  <div class="mt-4">
-    {{ $estoques->links() }}
   </div>
 </div>
 @endsection

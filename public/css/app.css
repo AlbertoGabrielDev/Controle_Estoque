@@ -1,0 +1,100 @@
+*{
+    padding: 5px;
+   
+}
+
+
+@media (prefers-color-scheme: dark) {
+
+    td,
+    th {
+        background-color: #ffffff !important;
+        color: #374151 !important;
+    }
+}
+
+/* Ajustes gerais do DataTables */
+.dataTables_wrapper {
+    color: #374151 !important;
+}
+
+/* Campo de busca */
+.dataTables_wrapper .dataTables_filter input {
+    background-color: white !important;
+    color: #374151 !important;
+    border: 1px solid #e5e7eb !important;
+}
+
+/* Select de quantidade */
+.dataTables_wrapper .dataTables_length select {
+    background-color: white !important;
+    color: #374151 !important;
+    border: 1px solid #e5e7eb !important;
+}
+
+/* Paginação */
+.dataTables_wrapper .dataTables_paginate .paginate_button {
+    background-color: white !important;
+    color: #374151 !important;
+    border: 1px solid #e5e7eb !important;
+}
+
+/* Paginação - Hover */
+.dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+    background-color: #f3f4f6 !important;
+    color: #374151 !important;
+}
+
+/* Paginação */
+.dataTables_wrapper .dataTables_paginate .paginate_button {
+    background-color: white !important;
+    color: #374151 !important;
+    border: 1px solid #e5e7eb !important;
+}
+
+/* Paginação - Hover */
+.dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+    background-color: #f3f4f6 !important;
+    color: #374151 !important;
+}
+
+/* Paginação - Ativo */
+.dataTables_wrapper .dataTables_paginate .paginate_button.current {
+    background-color: #06b6d4 !important;
+    color: white !important;
+    border: none !important;
+}
+
+/* Paginação - Ativo */
+.dataTables_wrapper .dataTables_paginate .paginate_button.current {
+    background-color: #06b6d4 !important;
+    color: white !important;
+    border: none !important;
+}
+
+/* Cabeçalho da tabela */
+.dataTables_wrapper thead th {
+    background-color: #f9fafb !important;
+    color: #374151 !important;
+}
+
+/* Linhas alternadas */
+.dataTables_wrapper .odd {
+    background-color: white !important;
+}
+
+.dataTables_wrapper .even {
+    background-color: #f9fafb !important;
+}
+
+
+/* table.dataTable,
+table.dataTable thead,
+table.dataTable tbody,
+table.dataTable th,
+table.dataTable td {
+  all: unset !important;
+  font-family: inherit !important;
+  font-size: inherit !important;
+  color: inherit !important;
+} */

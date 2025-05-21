@@ -46,7 +46,7 @@ class EstoqueRepositoryEloquent extends BaseRepository implements EstoqueReposit
             ->join('produto', 'estoque.id_produto_fk', '=', 'produto.id_produto')
             ->join('fornecedor', 'estoque.id_fornecedor_fk', '=', 'fornecedor.id_fornecedor');
 
-        $estoques = $query->paginate(10);
+        $estoques = $query->get();
 
         return [
             'estoques' => $estoques,

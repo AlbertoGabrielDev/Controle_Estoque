@@ -1,6 +1,37 @@
+ $(document).ready(function() {
+    // Captura a configuração do atributo data-order
+    const table = $('#Table');
+    const orderConfig = JSON.parse(table.attr('data-order') || '[]');
+    
+    // Configuração base
+    const config = {
+      "columnDefs": [
+        { 
+          "targets": 1,
+          "orderable": false,
+          "searchable": false
+        }
+      ],
+      "language": {
+        "url": "//cdn.datatables.net/plug-ins/1.13.6/i18n/pt-BR.json"
+      },
+      "responsive": true,
+      "autoWidth": false,
+      "dom": '<"flex justify-between items-center mb-4"lf>rt<"flex justify-between items-center mt-4"ip>'
+    };
 
-//Método para mudar o status de inativo para ativo, das tabelas fornecedor,produtos,categoria, estoque,usuario,marca
+    // Mescla a configuração do data-order
+    if (orderConfig.length) {
+      config.order = orderConfig;
+    }
+
+    // Inicializa o DataTable
+    table.DataTable(config);
+  });
+
+
 $(document).ready(function () {
+    
     $('.toggle-ativacao').click(function () {
         var button = $(this);
         var produtoId = button.data('id');
@@ -84,17 +115,6 @@ $(document).ready(function () {
             setTimeout(() => toast.classList.add('hidden'), 500);
         };
     }
-    //Método para informar se a quantidade de produto de estoque e menor que a que o usuario desejou ser informado
-    $(".quantidade").each(function () {
-        var quantidade = parseInt($(this).data('quantidade'));
-        var tr = $(this).closest('tr');
-        var aviso = parseInt(tr.find('.aviso').data('aviso'));
-        console.log('quantidade', quantidade);
-        console.log('aviso', aviso);
-        if (quantidade <= aviso) {
-            tr.find('td').css("background-color", "#FF6347");
-        }
-    });
 
     //Método para informar se o produto já validou ou se está prestes a vencer
     var today = new Date();
