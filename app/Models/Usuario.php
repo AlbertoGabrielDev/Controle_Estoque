@@ -2,12 +2,13 @@
 
 namespace App\Models;
 
+use App\Traits\HasStatus;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Usuario extends Model
 {
-
+    use HasStatus;
     protected $table= 'users';
     protected $primaryKey = 'id';
 

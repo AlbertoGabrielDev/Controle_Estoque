@@ -4,7 +4,7 @@
 @section('conteudo')
 <div class="bg-white p-4 rounded-md w-full">
     <div class="mx-auto m-5 text-4xl font-medium text-slate-700 flex justify-center">Editar Unidade</div>
-    <a class=" text-gray-500 py-2.5 px-4 relative mx-5 my-4 w-1/12 rounded hover:bg-gradient-to-r hover:from-cyan-400 hover:to-cyan-300 hover:text-white" href="{{route('unidades.index')}}">
+    <a class=" text-gray-500 py-2.5 px-4 relative mx-5 my-4 w-1/12 rounded hover:bg-gradient-to-r hover:from-cyan-400 hover:to-cyan-300 hover:text-white" href="{{route('unidade.index')}}">
         <i class="fa fa-angle-left mr-2"></i>Voltar
     </a>
     <form action="{{route('unidades.salvarEditar' , $unidades->first()->id_unidade)}}" method="POST">

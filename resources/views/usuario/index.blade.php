@@ -13,17 +13,14 @@
 </div>
 
 <div class="overflow-x-auto w-full">
-  <table class="min-w-full border-collapse border border-gray-200 rounded-md">
+  <table class="min-w-full border-collapse border border-gray-200 rounded-md" id="Table" data-order='[[0, "asc"]]'>
     <thead class="bg-gray-100">
       <tr class="text-sm text-gray-600">
         <th class="py-3 px-6 text-left font-medium">Usuario</th>
         <th class="py-3 px-6 text-left font-medium">Permissões</th>
         <th class="py-3 px-6 text-left font-medium">Status</th>
         <th class="py-3 px-6 text-left font-medium">Ativo desde</th>
-        @if(auth()->check() && auth()->user()->hasPermission('perfil', 'edit_post'))
-        <th class="py-3 px-6 text-left font-medium">Editar</th>
-        @endif
-        <th class="py-3 px-6 text-left font-medium">Ativar/Inativar</th>
+        <th class="py-3 px-6 text-left font-medium">Ações</th>
       </tr>
     </thead>
     <tbody>
@@ -42,14 +39,14 @@
           @php
           $roles = explode(', ', $usuario->role_names);
           @endphp
-        <div>
-          @foreach ($roles as $index => $role)
-          @if ($index > 0 && $index % 2 == 0)
-          <br>
-          @endif
-          {{ ucfirst($role) }}@if($index < count($roles) - 1),@endif
-          @endforeach
-        </div>
+          <div>
+            @foreach ($roles as $index => $role)
+            @if ($index > 0 && $index % 2 == 0)
+            <br>
+            @endif
+            {{ ucfirst($role) }}@if($index < count($roles) - 1),@endif
+              @endforeach
+              </div>
         </td>
         <td class="py-4 px-6">
           <span class="px-3 py-1 text-sm rounded-full {{ $usuario->status ? 'bg-green-200 text-green-700' : 'bg-gray-200 text-gray-700' }}">
@@ -58,13 +55,13 @@
         </td>
         <td class="py-4 px-6 text-gray-600">{{ \Carbon\Carbon::parse($usuario->created_at)->format('d/m/Y') }}</td>
         <td class="py-4 px-6">
-        <x-edit-button :route="'usuario.editar'" :modelId="$usuario->id"/>
+          <x-edit-button :route="'usuario.editar'" :modelId="$usuario->id" />
+          <x-button-status
+            :modelId="$usuario->id"
+            :status="$usuario->status"
+            modelName="usuario" />
         </td>
-        <td class="py-4 px-6">
-          <button class="toggle-ativacao @if($usuario->status === 1) btn-danger @elseif($usuario->status === 0) btn-success @else btn-primary @endif" data-id="{{ $usuario->id}}">
-            {{ $usuario->status ? 'Inativar' : 'Ativar' }}
-          </button>
-        </td>
+
       </tr>
       @endforeach
     </tbody>

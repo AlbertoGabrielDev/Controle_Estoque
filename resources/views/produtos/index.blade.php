@@ -16,23 +16,9 @@
     </div>
   </div>
 
-  <!-- Busca -->
-  <form action="{{ route('produtos.buscar') }}" method="GET" class="mb-6">
-    <div class="flex gap-2 w-full md:w-1/2">
-      <input type="text"
-        name="nome_produto"
-        class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-cyan-500"
-        placeholder="Digite o nome do Produto">
-      <button type="submit"
-        class="px-6 py-2 bg-cyan-500 hover:bg-cyan-600 text-white rounded-full transition-colors">
-        Pesquisar
-      </button>
-    </div>
-  </form>
-
   <!-- Tabela -->
   <div class="overflow-x-auto rounded-lg border">
-    <table class="w-full">
+    <table id="Table" data-order='[[1, "asc"]]' class="w-full">
       <thead class="bg-gray-50">
         <tr>
           <th class="px-4 py-3 text-left text-sm font-medium text-gray-700">Código</th>

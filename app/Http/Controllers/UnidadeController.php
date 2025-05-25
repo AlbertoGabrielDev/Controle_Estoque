@@ -26,7 +26,7 @@ class UnidadeController extends Controller
     public function inserirUnidade(Request $request)
     {
         $this->unidadeRepository->inserirUnidade($request);
-        return redirect()->route('unidades.index')->with('success', 'Inserido com sucesso');
+        return redirect()->route('unidade.index')->with('success', 'Inserido com sucesso');
     }
     public function editar($unidadeId)
     {
@@ -34,10 +34,10 @@ class UnidadeController extends Controller
         return view('unidades.editar', compact('unidades'));
     }
 
-    public function salvarEditar($unidadeId)
+    public function salvarEditar(Request $request,$unidadeId)
     {
-        $this->unidadeRepository->editar($unidadeId);
-        return redirect()->route('unidades.index')->with('success', 'Editado com sucesso');
+        $this->unidadeRepository->salvarEditar($request, $unidadeId);
+        return redirect()->route('unidade.index')->with('success', 'Editado com sucesso');
     }
 
     public function buscar(Request $request)

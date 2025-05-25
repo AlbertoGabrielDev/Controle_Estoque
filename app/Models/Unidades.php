@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Traits\HasStatus;
 use Illuminate\Database\Eloquent\Model;
 use Prettus\Repository\Contracts\Transformable;
 use Prettus\Repository\Traits\TransformableTrait;
@@ -14,6 +15,7 @@ use Prettus\Repository\Traits\TransformableTrait;
 class Unidades extends Model implements Transformable
 {
     use TransformableTrait;
+    use HasStatus;
     protected $table= 'unidades';
     protected $primaryKey = 'id_unidade';
 

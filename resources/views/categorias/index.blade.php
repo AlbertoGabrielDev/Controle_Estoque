@@ -19,7 +19,7 @@
 
   <!-- Tabela -->
   <div class="overflow-x-auto rounded-lg border">
-    <table class="w-full">
+    <table class="w-full" id="Table" data-order='[[0, "asc"]]'>
       <thead class="bg-gray-50">
         <tr>
           <th class="px-4 py-3 text-left text-sm font-medium text-gray-700">Categoria</th>

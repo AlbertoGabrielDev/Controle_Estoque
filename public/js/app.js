@@ -8,8 +8,8 @@
       "columnDefs": [
         { 
           "targets": 1,
-          "orderable": false,
-          "searchable": false
+          "orderable": true,
+          "searchable": true
         }
       ],
       "language": {

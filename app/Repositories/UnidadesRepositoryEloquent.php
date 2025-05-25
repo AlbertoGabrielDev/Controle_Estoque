@@ -29,7 +29,7 @@ class UnidadesRepositoryEloquent extends BaseRepository implements UnidadesRepos
 
     public function index()
     {
-        $unidades = Gate::allows('permissao') ?  $marcas = Unidades::paginate(15) : $marcas = Unidades::where('status', 1)->paginate(15);
+        $unidades = Unidades::paginate(15);
         return $unidades;
     }
 
@@ -48,9 +48,10 @@ class UnidadesRepositoryEloquent extends BaseRepository implements UnidadesRepos
         return $unidades;
     }
 
+
     public function salvarEditar(Request $request, $unidadeId)
     {
-        dd($request);
+      
         $unidades = Unidades::where('id_unidade', $unidadeId)
         ->update([
             'nome' => $request->nome
