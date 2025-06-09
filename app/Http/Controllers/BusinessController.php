@@ -91,7 +91,7 @@ class BusinessController extends Controller
 
                 if (count($allBusinesses) >= $maxResults) {
                     $nextPageToken = null;
-                    break 2; 
+                    break 2;
                 }
             }
 
@@ -158,5 +158,115 @@ class BusinessController extends Controller
         ];
 
         return $zoomLevels[round($zoom)] ?? 1000;
+    }
+
+    public function exportToCsv(Request $request)
+    {
+        $urlData = $this->parseGoogleMapsUrl($request->maps_url);
+
+        if (!$urlData) {
+            return response()->json(['error' => 'URL do Google Maps inválida'], 400);
+        }
+
+        $apiKey = env('GOOGLE_API_KEY');
+        $allBusinesses = [];
+        $nextPageToken = null;
+        $maxPages = 3;
+        $maxResults = 60;
+
+        // Coleta todos os dados
+        do {
+            $params = [
+                'location' => "{$urlData['latitude']},{$urlData['longitude']}",
+                'radius' => $urlData['radius'] ?? 1500,
+                'key' => $apiKey,
+            ];
+
+            if (!empty($urlData['query'])) {
+                $params['keyword'] = $urlData['query'];
+            }
+            if (!empty($urlData['type'])) {
+                $params['type'] = $urlData['type'];
+            }
+            if ($nextPageToken) {
+                $params['pagetoken'] = $nextPageToken;
+                sleep(2);
+            }
+
+            $nearbyResponse = Http::get('https://maps.googleapis.com/maps/api/place/nearbysearch/json', $params);
+
+            if (!$nearbyResponse->ok()) {
+                return response()->json(['error' => 'Erro ao consultar a API do Google Places.'], 500);
+            }
+
+            $results = $nearbyResponse->json()['results'] ?? [];
+            $nextPageToken = $nearbyResponse->json()['next_page_token'] ?? null;
+
+            foreach ($results as $place) {
+                $detailsResponse = Http::get('https://maps.googleapis.com/maps/api/place/details/json', [
+                    'place_id' => $place['place_id'],
+                    'fields' => 'formatted_phone_number,international_phone_number,website,opening_hours,formatted_address,business_status',
+                    'key' => $apiKey,
+                ]);
+
+                $details = $detailsResponse->json()['result'] ?? [];
+
+                $allBusinesses[] = [
+                    'Nome' => $place['name'] ?? '',
+                    'Endereço' => $place['vicinity'] ?? ($details['formatted_address'] ?? ''),
+                    'Telefone' => $details['formatted_phone_number'] ?? ($details['international_phone_number'] ?? ''),
+                    'Website' => $details['website'] ?? '',
+                    'Avaliação' => isset($place['rating']) ? (string) $place['rating'] : '',
+                    'Total de Avaliações' => isset($place['user_ratings_total']) ? (string) $place['user_ratings_total'] : '',
+                    'Status' => $details['business_status'] ?? '',
+                    'Aberto Agora' => isset($place['opening_hours']['open_now']) ? ($place['opening_hours']['open_now'] ? 'Sim' : 'Não') : '',
+                    'Latitude' => isset($place['geometry']['location']['lat']) ? (string) $place['geometry']['location']['lat'] : '',
+                    'Longitude' => isset($place['geometry']['location']['lng']) ? (string) $place['geometry']['location']['lng'] : '',
+                    'Tipos' => implode(', ', $place['types'] ?? [])
+                ];
+
+                if (count($allBusinesses) >= $maxResults) {
+                    $nextPageToken = null;
+                    break 2;
+                }
+            }
+
+            $maxPages--;
+        } while ($nextPageToken && $maxPages > 0);
+
+        // Gera o CSV com formatação correta
+        $filename = 'empresas_' . date('Y-m-d') . '.csv';
+        $headers = [
+            'Content-Type' => 'text/csv; charset=UTF-8',
+            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+        ];
+
+        $callback = function () use ($allBusinesses) {
+            $file = fopen('php://output', 'w');
+
+            // Adiciona BOM para UTF-8 (essencial para Excel)
+            fwrite($file, "\xEF\xBB\xBF");
+
+            if (count($allBusinesses) > 0) {
+                // Cabeçalhos com encapsulamento
+                $headers = array_keys($allBusinesses[0]);
+                fputcsv($file, array_map(function ($header) {
+                    return '"' . str_replace('"', '""', $header) . '"';
+                }, $headers), ';');
+
+                // Dados
+                foreach ($allBusinesses as $business) {
+                    $row = array_map(function ($value) {
+                        return '"' . str_replace('"', '""', $value) . '"';
+                    }, $business);
+
+                    fwrite($file, implode(';', $row) . "\n");
+                }
+            }
+
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
     }
 }

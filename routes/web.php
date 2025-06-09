@@ -42,6 +42,7 @@ Route::middleware([
 
     Route::get('/business-extractor', [BusinessController::class, 'index'])->name('business.index');
     Route::post('/api/business/extract', [BusinessController::class, 'extractFromUrl'])->name('business.extract');
+    Route::post('/business/export', [BusinessController::class, 'exportToCsv'])->name('business.export');
 });
 
 // Route::middleware('auth')->group(function () {

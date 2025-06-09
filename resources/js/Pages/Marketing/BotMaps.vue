@@ -3,12 +3,19 @@
 import { ref, onMounted } from 'vue';
 import { Head, usePage } from '@inertiajs/vue3';
 import { Loader } from '@googlemaps/js-api-loader';
+import Sidebar from '../Sidebar.vue';
+
+const setActiveTab = (tab) => {
+    activeTab.value = tab;
+    showBotEditor.value = false;
+};
 
 const props = defineProps({
     googleMapsApiKey: String,
 });
 
 const businesses = ref([]);
+const activeTab = ref('extract');
 const loading = ref(false);
 const error = ref(null);
 const nextPageToken = ref(null);
@@ -17,6 +24,7 @@ const markers = ref([]);
 const infoWindow = ref(null);
 const mapsUrl = ref('');
 const searchMetadata = ref(null);
+const exporting = ref(false);
 
 const loader = new Loader({
     apiKey: props.googleMapsApiKey,
@@ -24,6 +32,37 @@ const loader = new Loader({
     libraries: ["places"]
 });
 
+const exportToCSV = async () => {
+    if (!mapsUrl.value) {
+        error.value = "Por favor, insira uma URL do Google Maps primeiro";
+        return;
+    }
+
+    exporting.value = true;
+    error.value = null;
+
+    try {
+        const response = await axios.post(route('business.export'), {
+            maps_url: mapsUrl.value,
+        }, {
+            responseType: 'blob'
+        });
+
+        // Cria link para download
+        const url = window.URL.createObjectURL(new Blob([response.data]));
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', `empresas_${new Date().toISOString().slice(0, 10)}.csv`);
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+    } catch (err) {
+        error.value = "Erro ao exportar dados: " + (err.response?.data?.error || err.message);
+        console.error(err);
+    } finally {
+        exporting.value = false;
+    }
+};
 const initMap = async (center = null) => {
     try {
         if (!props.googleMapsApiKey) {
@@ -170,6 +209,7 @@ onMounted(() => {
 </script>
 
 <template>
+    <Sidebar :activeTab="activeTab" :sidebarOpen="sidebarOpen" @update:sidebarOpen="sidebarOpen = $event">
 
     <Head title="Extrator de Empresas do Google Maps" />
 
@@ -186,18 +226,24 @@ onMounted(() => {
                             <input type="url" id="maps-url" v-model="mapsUrl"
                                 placeholder="Cole aqui a URL completa do Google Maps"
                                 class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" />
-                            <p class="mt-1 text-sm text-gray-500">
+                            <p class="mt-1 text-sm text-gray-500 break-all whitespace-pre-wrap overflow-x-auto">
                                 Exemplo:
                                 https://www.google.com/maps/search/restaurante+em+são+paulo/@-23.5505199,-46.6333094,14z
                             </p>
                         </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <button @click="extractBusinesses" :disabled="loading"
+                                class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-md disabled:opacity-50">
+                                <span v-if="loading">Processando...</span>
+                                <span v-else>Extrair Empresas</span>
+                            </button>
 
-                        <button @click="extractBusinesses" :disabled="loading"
-                            class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-md disabled:opacity-50">
-                            <span v-if="loading">Processando...</span>
-                            <span v-else>Extrair Empresas</span>
-                        </button>
-
+                            <button @click="exportToCSV" :disabled="exporting || businesses.length === 0"
+                                class="bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-md disabled:opacity-50">
+                                <span v-if="exporting">Exportando...</span>
+                                <span v-else>Exportar para CSV</span>
+                            </button>
+                        </div>
                         <div v-if="error" class="p-3 bg-red-50 text-red-700 rounded-md">
                             {{ error }}
                         </div>
@@ -291,20 +337,60 @@ onMounted(() => {
             </div>
         </div>
     </div>
+    </Sidebar>
 </template>
 
 <style>
-#map {
-    height: 600px;
+/* Estilos responsivos */
+@media (max-width: 640px) {
+    .grid-cols-1.lg\:grid-cols-3 {
+        grid-template-columns: 1fr;
+    }
+
+    .lg\:col-span-2 {
+        grid-column: span 1;
+    }
+
+    #map {
+        height: 400px;
+    }
+
+    .grid.grid-cols-1.md\:grid-cols-3 {
+        grid-template-columns: 1fr;
+    }
+
+    .grid.grid-cols-2 {
+        grid-template-columns: 1fr;
+        gap: 0.5rem;
+    }
+
+    .py-6.px-4 {
+        padding: 1rem;
+    }
+
+    .max-w-7xl {
+        max-width: 100%;
+    }
+
+    .text-2xl {
+        font-size: 1.5rem;
+    }
+
+    .max-h-\[600px\] {
+        max-height: 400px;
+    }
 }
 
-.gm-style .gm-style-iw-c {
-    padding: 0 !important;
-    max-width: 300px !important;
+/* Estilo para o popup no mobile */
+@media (max-width: 640px) {
+    .gm-style .gm-style-iw-c {
+        max-width: 250px !important;
+    }
+
+    .gm-style .gm-style-iw-d {
+        font-size: 14px;
+    }
 }
 
-.gm-style .gm-style-iw-d {
-    padding: 0 !important;
-    overflow: hidden !important;
-}
+/* Estilos existentes... */
 </style>

@@ -254,13 +254,13 @@ export default {
         setActiveTab(tab) {
             // Redireciona para as rotas corretas
             if (tab === 'dashboard') {
-                router.visit('/dashboard');
+                router.visit('/verdurao/dashboard');
             } else if (tab === 'bulk') {
-                router.visit('/bot');
+                router.visit('/verdurao/bot');
             } else {
                 this.$emit('setActiveTab', tab);
             }
-            this.sidebarOpen = false; // Fecha o menu ao selecionar no mobile
+            this.sidebarOpen = false;
         }
     }
 };
