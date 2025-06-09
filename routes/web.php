@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\GraficosApiController;
+use App\Http\Controllers\BusinessController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\CategoriaController;
 use App\Http\Controllers\ProdutoController;
@@ -26,25 +27,34 @@ Route::get('/welcome', function () {
     ]);
 });
 
-Route::get('/dashboard', function () {
-    return Inertia::render('Dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+Route::middleware([
+    'auth',
+    config('jetstream.auth_session'),
+    'verified',
+])->prefix('/verdurao')->group(function () {
+    Route::get('/dashboard', function () {
+        return Inertia::render('Dashboard');
+    })->middleware(['auth', 'verified'])->name('dashboard');
 
-Route::middleware('auth')->group(function () {
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    Route::get('/bot', function () {
+        return Inertia::render('Marketing/BotWhatsapp');
+    })->middleware(['auth', 'verified'])->name('BotWhatsapp');
+
+    Route::get('/business-extractor', [BusinessController::class, 'index'])->name('business.index');
+    Route::post('/api/business/extract', [BusinessController::class, 'extractFromUrl'])->name('business.extract');
 });
+
+// Route::middleware('auth')->group(function () {
+//     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+//     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+//     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+// });
 
 Route::middleware([
     'auth',
     config('jetstream.auth_session'),
     'verified',
 ])->prefix('/verdurao')->group(function () {
-
-    // Route::get('/vue', function (){
-    //    return view('welcome');
-    // });
 
     Route::prefix('/categoria')->group(function () {
         Route::get('/', [CategoriaController::class, 'Inicio'])->name('categoria.inicio')->middleware('check.permission:view_post,categoria');
@@ -146,7 +156,6 @@ Route::middleware([
         Route::get('/data/{filename}', [SpreadsheetController::class, 'readFile']);
         Route::get('/', [SpreadsheetController::class, 'index']);
         Route::post('/compare', [SpreadsheetController::class, 'compare']);
-
     });
 });
 

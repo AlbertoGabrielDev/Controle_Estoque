@@ -115,7 +115,7 @@
                         <p class="text-xs text-gray-500">10:23</p>
                       </div>
                       <div class="flex justify-between items-center">
-                        <p class="text-sm text-gray-500 truncate">Olá, gostaria de mais informações sobre...</p>
+                        <p class="text-sm text-gray-500 break-words">Olá, gostaria de mais informações sobre...</p>
                         <span
                           class="bg-green-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">2</span>
                       </div>
@@ -131,7 +131,7 @@
                         <p class="text-xs text-gray-500">09:45</p>
                       </div>
                       <div class="flex justify-between items-center">
-                        <p class="text-sm text-gray-500 truncate">Obrigado pelo atendimento! Vou...</p>
+                        <p class="text-sm text-gray-500 break-words">Obrigado pelo atendimento! Vou...</p>
                       </div>
                     </div>
                   </div>
@@ -145,7 +145,7 @@
                         <p class="text-xs text-gray-500">Ontem</p>
                       </div>
                       <div class="flex justify-between items-center">
-                        <p class="text-sm text-gray-500 truncate">Prezado cliente, informamos que seu...</p>
+                        <p class="text-sm text-gray-500 break-words">Prezado cliente, informamos que seu...</p>
                         <span
                           class="bg-green-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">1</span>
                       </div>
@@ -161,7 +161,7 @@
                         <p class="text-xs text-gray-500">22/11</p>
                       </div>
                       <div class="flex justify-between items-center">
-                        <p class="text-sm text-gray-500 truncate">Você: Enviei o orçamento por email...</p>
+                        <p class="text-sm text-gray-500 break-words">Você: Enviei o orçamento por email...</p>
                       </div>
                     </div>
                   </div>
