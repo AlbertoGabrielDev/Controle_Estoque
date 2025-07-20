@@ -23,6 +23,7 @@
         "@googlemaps/js-api-loader": "^1.16.8",
         "@heroicons/vue": "^2.2.0",
         "@popperjs/core": "^2.11.8",
+        "@wppconnect-team/wppconnect": "^1.37.2",
         "bootstrap": "^5.3.1",
         "chart.js": "^4.4.3",
         "chartjs-plugin-datalabels": "^2.2.0",
