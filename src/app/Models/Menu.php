@@ -24,12 +24,12 @@ class Menu extends Model
 
     public function permissions()
     {
-        return $this->belongsToMany(Permission::class, 'menu_permission');
+        return $this->belongsToMany(Permission::class, 'menu_permissions');
     }
     
     public function roles()
     {
-        return $this->belongsToMany(Role::class, 'role_menu_permission')->withPivot('permission_id');
+        return $this->belongsToMany(Role::class, 'role_menu_permissions')->withPivot('permission_id');
     }
 
     // Adicione este método

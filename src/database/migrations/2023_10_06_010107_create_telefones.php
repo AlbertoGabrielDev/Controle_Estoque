@@ -21,7 +21,7 @@ return new class extends Migration
             $table->timestamps();
 
             $table->unsignedSmallInteger('id_fornecedor_fk');
-            $table->foreign('id_fornecedor_fk')->references('id_fornecedor')->on('fornecedor');
+            $table->foreign('id_fornecedor_fk')->references('id_fornecedor')->on('fornecedores');
 
         });
     }

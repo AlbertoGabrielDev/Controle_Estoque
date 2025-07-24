@@ -11,7 +11,7 @@ class Categoria extends Model
 {
     use HasFactory;
     use HasStatus;
-    protected $table = 'categoria';
+    protected $table = 'categorias';
     protected $primaryKey = 'id_categoria';
 
     protected $fillable = [
@@ -23,6 +23,6 @@ class Categoria extends Model
 
     public function produtos() : BelongsToMany
     {
-        return $this->belongsToMany(Produto::class, 'categoria_produto','id_categoria_fk' ,'id_produto_fk');
+        return $this->belongsToMany(Produto::class, 'categoria_produtos','id_categoria_fk' ,'id_produto_fk');
     }
 }

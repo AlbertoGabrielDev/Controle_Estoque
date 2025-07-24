@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('fornecedor', function (Blueprint $table) {
+        Schema::create('fornecedores', function (Blueprint $table) {
             $table->smallIncrements('id_fornecedor');
             $table->string('nome_fornecedor',60)->unique();
             $table->string('cnpj',18)->unique();

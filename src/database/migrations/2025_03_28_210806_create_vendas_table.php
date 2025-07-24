@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
           
             $table->unsignedSmallInteger('id_produto_fk');
-            $table->foreign('id_produto_fk')->references('id_produto')->on('produto');
+            $table->foreign('id_produto_fk')->references('id_produto')->on('produtos');
             $table->foreignId('id_usuario_fk')->constrained('users');
             $table->string('cod_produto',60)->nullable();
             $table->string('unidade_medida',2)->nullable();

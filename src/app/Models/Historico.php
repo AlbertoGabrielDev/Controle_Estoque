@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Historico extends Model
 {
-    protected $table = 'historico';
+    protected $table = 'historicos';
     protected $primaryKey = 'historico_id';
 
     protected $fillable = [

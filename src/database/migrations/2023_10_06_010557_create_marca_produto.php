@@ -11,15 +11,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('marca_produto', function (Blueprint $table) {
+        Schema::create('marca_produtos', function (Blueprint $table) {
             $table->smallIncrements('id_marca_produto');
             $table->timestamps();
 
             $table->unsignedSmallInteger('id_produto_fk');
-            $table->foreign('id_produto_fk')->references('id_produto')->on('produto');
+            $table->foreign('id_produto_fk')->references('id_produto')->on('produtos');
 
             $table->unsignedSmallInteger('id_marca_fk');
-            $table->foreign('id_marca_fk')->references('id_marca')->on('marca');
+            $table->foreign('id_marca_fk')->references('id_marca')->on('marcas');
         });
     }
 

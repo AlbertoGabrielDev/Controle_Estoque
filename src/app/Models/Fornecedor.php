@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 class Fornecedor extends Model
 {
     use HasStatus;
-    protected $table = 'fornecedor';
+    protected $table = 'fornecedores';
     protected $primaryKey = 'id_fornecedor';
 
     protected $fillable = [
@@ -31,11 +31,11 @@ class Fornecedor extends Model
     ];
 
     public function produtos(): BelongsToMany{
-        return $this->belongsToMany(Produto::class, 'estoque', 'id_fornecedor_fk', 'id_produto_fk');
+        return $this->belongsToMany(Produto::class, 'estoques', 'id_fornecedor_fk', 'id_produto_fk');
     }
 
     public function estoques(): BelongsToMany{
-        return $this->belongsToMany(Estoque::class, 'fornecedor' ,'id_fornecedor');
+        return $this->belongsToMany(Estoque::class, 'fornecedores' ,'id_fornecedor');
     }
 
     public function telefones(): HasMany

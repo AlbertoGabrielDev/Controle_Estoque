@@ -10,7 +10,7 @@ class RoleMenuPermission extends Model
 {
     use HasFactory;
 
-    protected $table = 'role_menu_permission';
+    protected $table = 'role_menu_permissions';
     
     protected $fillable = ['role_id', 'menu_id', 'permission_id'];
 }

@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('historico', function (Blueprint $table) {
+        Schema::create('historicos', function (Blueprint $table) {
             $table->smallIncrements('historico_id');
             $table->integer('quantidade_diminuida');
             $table->integer('quantidade_historico');
@@ -19,7 +19,7 @@ return new class extends Migration
             $table->timestamps();
 
             $table->unsignedSmallInteger('id_estoque_fk');
-            $table->foreign('id_estoque_fk')->references('id_estoque')->on('estoque');
+            $table->foreign('id_estoque_fk')->references('id_estoque')->on('estoques');
         });
     }
 

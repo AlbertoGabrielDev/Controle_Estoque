@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('marca', function (Blueprint $table) {
+        Schema::create('marcas', function (Blueprint $table) {
             $table->smallIncrements('id_marca');
             $table->string('nome_marca',20);
             $table->boolean('status')->default(1);

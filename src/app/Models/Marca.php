@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 class Marca extends Model
 {
     use HasStatus;
-    protected $table = 'marca';
+    protected $table = 'marcas';
     protected $primaryKey = 'id_marca';
 
     protected $fillable = [
@@ -20,12 +20,12 @@ class Marca extends Model
 
 
     public function produto(): BelongsToMany{
-        return $this->belongsToMany(Produto::class, 'marca_produto' ,'id_marca_fk', 'id_marca')
+        return $this->belongsToMany(Produto::class, 'marca_produtos' ,'id_marca_fk', 'id_marca')
         ->as('marca_produto');
     }
 
     public function estoques(): BelongsToMany{
-        return $this->belongsToMany(Estoque::class, 'marca' ,'id_marca');
+        return $this->belongsToMany(Estoque::class, 'marcas' ,'id_marca');
     }
 
     use HasFactory;

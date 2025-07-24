@@ -30,21 +30,24 @@ services:
   mysql:
     image: mysql:8.0
     container_name: laravel-mysql
-    restart: always
-    environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: laravel
-      MYSQL_USER: laravel
-      MYSQL_PASSWORD: secret
     ports:
       - "3306:3306"
+    env_file:
+      - ./src/.env
     volumes:
-      - dbdata:/var/lib/mysql
+      - mysql_data:/var/lib/mysql
+      - ./docker/mysql/my.cnf:/etc/mysql/conf.d/my.cnf
     networks:
       - laravel
+    command: --default-authentication-plugin=mysql_native_password --max_connections=300
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 4G
 
 volumes:
-  dbdata:
+  mysql_data:
 
 networks:
   laravel:

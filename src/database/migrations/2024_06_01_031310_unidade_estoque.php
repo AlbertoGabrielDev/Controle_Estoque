@@ -12,7 +12,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('estoque', function (Blueprint $table) {
+        Schema::table('estoques', function (Blueprint $table) {
             // Adicionar a coluna sem a chave estrangeira primeiro
             $table->unsignedSmallInteger('id_unidade_fk')->nullable();
             $table->foreign('id_unidade_fk')->references('id_unidade')->on('unidades');

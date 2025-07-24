@@ -11,12 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('produto', function (Blueprint $table) {
+        Schema::create('produtos', function (Blueprint $table) {
             $table->smallIncrements('id_produto');
             $table->string('cod_produto',60)->unique();
             $table->string('nome_produto',50);
             $table->string('descricao',50);
-            $table->json('inf_nutrientes');
+            $table->json('inf_nutriente');
             $table->string('unidade_medida',2);
             $table->boolean('status')->default(1);
             $table->timestamps();

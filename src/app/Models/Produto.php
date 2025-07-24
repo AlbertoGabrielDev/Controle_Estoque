@@ -15,7 +15,7 @@ class Produto extends Model implements Transformable
     use TransformableTrait;
     use HasFactory;
     use HasStatus;
-    protected $table= 'produto';
+    protected $table= 'produtos';
     protected $primaryKey = 'id_produto';
 
     protected $fillable=[
@@ -32,8 +32,8 @@ class Produto extends Model implements Transformable
 
     public function fornecedores() : BelongsToMany 
     {
-        return $this->belongsToMany(Fornecedor::class ,'estoque', 'id_produto_fk', 'id_fornecedor_fk')
-        ->as('estoque')
+        return $this->belongsToMany(Fornecedor::class ,'estoques', 'id_produto_fk', 'id_fornecedor_fk')
+        ->as('estoques')
         ->withPivot([
             'id_estoque',
             'quantidade',
@@ -52,12 +52,12 @@ class Produto extends Model implements Transformable
 
     public function categorias() : BelongsToMany
     {
-        return $this->belongsToMany(Categoria::class,  'categoria_produto', 'id_produto_fk', 'id_categoria_fk');
+        return $this->belongsToMany(Categoria::class,  'categoria_produtos', 'id_produto_fk', 'id_categoria_fk');
     }
 
     public function marcas(): BelongsToMany
     {
-        return $this->belongsToMany(Marca::class, 'marca_produto', 'id_produto_fk', 'id_marca_fk')->as('marca_produto');
+        return $this->belongsToMany(Marca::class, 'marca_produtos', 'id_produto_fk', 'id_marca_fk')->as('marca_produto');
     }
 
     public function vendas()

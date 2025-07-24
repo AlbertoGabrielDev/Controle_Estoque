@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('role_menu_permission', function (Blueprint $table) {
+        Schema::create('role_menu_permissions', function (Blueprint $table) {
             $table->unsignedBigInteger('role_id');
             $table->unsignedBigInteger('menu_id');
             $table->unsignedBigInteger('permission_id');

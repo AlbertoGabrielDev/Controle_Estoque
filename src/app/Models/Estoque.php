@@ -16,7 +16,7 @@ class Estoque extends Model
 {
     use HasStatus;
     
-    protected  $table = 'estoque';
+    protected  $table = 'estoques';
     protected $primaryKey = 'id_estoque';
 
     protected $fillable = [
@@ -45,26 +45,26 @@ class Estoque extends Model
 
     public static function buscarComFiltros(Request $request)
     {
-        return static::with(['produto', 'fornecedor', 'marca'])
-            ->join('produto as p', 'estoque.id_produto_fk', '=', 'p.id_produto')
-            ->join('fornecedor as f', 'estoque.id_fornecedor_fk', '=', 'f.id_fornecedor')
-            ->join('marca as m', 'estoque.id_marca_fk', '=', 'm.id_marca')
-            ->join('categoria_produto as cp', 'p.id_produto', '=', 'cp.id_produto_fk')
-            ->join('categoria as c', 'cp.id_categoria_fk', '=', 'c.id_categoria')
-            ->select('estoque.*')
-            ->when($request->lote, fn($q, $v) => $q->where('estoque.lote', $v))
-            ->when($request->quantidade, fn($q, $v) => $q->where('estoque.quantidade', $v))
-            ->when($request->preco_custo, fn($q, $v) => $q->where('estoque.preco_custo', $v))
-            ->when($request->preco_venda, fn($q, $v) => $q->where('estoque.preco_venda', $v))
-            ->when($request->validade, fn($q, $v) => $q->whereDate('estoque.validade', $v))
-            ->when($request->localizacao, fn($q, $v) => $q->where('estoque.localizacao', $v))
+        return static::with(['produtos', 'fornecedores', 'marcas'])
+            ->join('produtos as p', 'estoques.id_produto_fk', '=', 'p.id_produto')
+            ->join('fornecedores as f', 'estoques.id_fornecedor_fk', '=', 'f.id_fornecedor')
+            ->join('marcas as m', 'estoques.id_marca_fk', '=', 'm.id_marca')
+            ->join('categoria_produtos as cp', 'p.id_produto', '=', 'cp.id_produto_fk')
+            ->join('categorias as c', 'cp.id_categoria_fk', '=', 'c.id_categoria')
+            ->select('estoques.*')
+            ->when($request->lote, fn($q, $v) => $q->where('estoques.lote', $v))
+            ->when($request->quantidade, fn($q, $v) => $q->where('estoques.quantidade', $v))
+            ->when($request->preco_custo, fn($q, $v) => $q->where('estoques.preco_custo', $v))
+            ->when($request->preco_venda, fn($q, $v) => $q->where('estoques.preco_venda', $v))
+            ->when($request->validade, fn($q, $v) => $q->whereDate('estoques.validade', $v))
+            ->when($request->localizacao, fn($q, $v) => $q->where('estoques.localizacao', $v))
             ->when($request->nome_marca, fn($q, $v) => $q->where('m.nome_marca', $v))
             ->when($request->nome_fornecedor, fn($q, $v) => $q->where('f.nome_fornecedor', $v))
             ->when($request->nome_categoria, fn($q, $v) => $q->where('c.nome_categoria', $v))
             ->when($request->nome_produto, fn($q, $v) => $q->where('p.nome_produto', 'like', "%$v%"))
-            ->when($request->data_cadastro, fn($q, $v) => $q->whereDate('estoque.data_cadastro', $v))
-            ->when($request->data_chegada, fn($q, $v) => $q->whereDate('estoque.data_chegada', $v))
-            ->when(!Gate::allows('permissao'), fn($q) => $q->where('estoque.status', 1))
+            ->when($request->data_cadastro, fn($q, $v) => $q->whereDate('estoques.data_cadastro', $v))
+            ->when($request->data_chegada, fn($q, $v) => $q->whereDate('estoques.data_chegada', $v))
+            ->when(!Gate::allows('permissao'), fn($q) => $q->where('estoques.status', 1))
             ->paginate(5);
     }
 

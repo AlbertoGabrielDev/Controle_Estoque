@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('historico', function (Blueprint $table) {
+        Schema::table('historicos', function (Blueprint $table) {
 
             $table->decimal('venda', 10, 2)->after('quantidade_historico');
         });

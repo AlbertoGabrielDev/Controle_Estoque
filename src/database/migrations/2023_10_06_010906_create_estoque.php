@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('estoque', function (Blueprint $table) {
+        Schema::create('estoques', function (Blueprint $table) {
             $table->smallIncrements('id_estoque');
             $table->double('preco_custo',8,2);
             $table->double('preco_venda',8,2);
@@ -28,15 +28,15 @@ return new class extends Migration
             $table->foreign('id_users_fk')->references('id')->on('users');
 
             $table->unsignedSmallInteger('id_marca_fk');
-            $table->foreign('id_marca_fk')->references('id_marca')->on('marca');
+            $table->foreign('id_marca_fk')->references('id_marca')->on('marcas');
 
             
             $table->unsignedSmallInteger('id_fornecedor_fk');
-            $table->foreign('id_fornecedor_fk')->references('id_fornecedor')->on('fornecedor');
+            $table->foreign('id_fornecedor_fk')->references('id_fornecedor')->on('fornecedores');
 
             
             $table->unsignedSmallInteger('id_produto_fk');
-            $table->foreign('id_produto_fk')->references('id_produto')->on('produto');
+            $table->foreign('id_produto_fk')->references('id_produto')->on('produtos');
         });
     }
 
