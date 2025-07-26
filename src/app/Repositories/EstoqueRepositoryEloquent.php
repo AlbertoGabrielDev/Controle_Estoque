@@ -36,9 +36,9 @@ class EstoqueRepositoryEloquent extends BaseRepository implements EstoqueReposit
 
     public function index()
     {
-        $query = Estoque::select('estoque.*', 'produto.nome_produto', 'fornecedor.nome_fornecedor')
-            ->join('produto', 'estoque.id_produto_fk', '=', 'produto.id_produto')
-            ->join('fornecedor', 'estoque.id_fornecedor_fk', '=', 'fornecedor.id_fornecedor');
+        $query = Estoque::select('estoques.*', 'produtos.nome_produto', 'fornecedores.nome_fornecedor')
+            ->join('produtos', 'estoques.id_produto_fk', '=', 'produtos.id_produto')
+            ->join('fornecedores', 'estoques.id_fornecedor_fk', '=', 'fornecedores.id_fornecedor');
 
         $estoques = $query->get();
 
@@ -91,7 +91,7 @@ class EstoqueRepositoryEloquent extends BaseRepository implements EstoqueReposit
     {
         $repository = app(EstoqueRepository::class);
         try {
-            $estoque = $this->findWithRelations($estoqueId, ['produto', 'fornecedor', 'marca']);
+            $estoque = $this->findWithRelations($estoqueId, ['produtos', 'fornecedor', 'marca']);
 
             return [
                 'estoque' => $estoque,
