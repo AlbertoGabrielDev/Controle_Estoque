@@ -1,24 +1,10 @@
 <?php
 namespace App\Http\Controllers;
-use App\Models\Estoque;
-use App\Models\Marca;
-use App\Models\Produto;
-use App\Models\Fornecedor;
-use App\Models\Categoria;
-use App\Models\MarcaProduto;
-use App\Models\Historico;
-use App\Models\CategoriaProduto;
-use Carbon\Carbon;
-use Illuminate\Support\Facades\Gate;
-use Illuminate\Pagination\Paginator;
-use Illuminate\Support\Facades\DB;
+
 use App\Http\Requests\ValidacaoEstoque;
 use App\Repositories\EstoqueRepository;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Str;
-use Illuminate\Support\Facades\Cache;
-// use Illuminate\Support\Facades\Request;
 
 class EstoqueController extends Controller
 {    
