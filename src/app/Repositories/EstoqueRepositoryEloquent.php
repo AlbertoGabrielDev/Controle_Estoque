@@ -11,15 +11,9 @@ use App\Models\Historico;
 use App\Models\Marca;
 use App\Models\MarcaProduto;
 use App\Models\Produto;
-use App\Models\Role;
 use Prettus\Repository\Eloquent\BaseRepository;
-use Prettus\Repository\Criteria\RequestCriteria;
 use App\Repositories\EstoqueRepository;
-use Illuminate\Support\Facades\Auth;
-use App\Validators\EstoqueValidator;
 use Carbon\Carbon;
-use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Gate;
 
 use Illuminate\Http\Request;
 
@@ -62,7 +56,7 @@ class EstoqueRepositoryEloquent extends BaseRepository implements EstoqueReposit
 
         MarcaProduto::create([
             'id_produto_fk' => $data['id_produto_fk'],
-            'id_marca_fk'   => $data['id_marca_fk'],
+            'id_marca_fk' => $data['id_marca_fk'],
         ]);
 
         return $estoque;
@@ -137,7 +131,7 @@ class EstoqueRepositoryEloquent extends BaseRepository implements EstoqueReposit
     {
         return Estoque::with($relations)->findOrFail($id);
     }
-    
+
     // public function status($statusId)
     // {
     //     $status = Estoque::findOrFail($statusId);

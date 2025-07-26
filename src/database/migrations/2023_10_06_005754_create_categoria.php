@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('categorias', function (Blueprint $table) {
             $table->smallIncrements('id_categoria');
-            $table->string('nome_categoria',20);
+            $table->string('nome_categoria',50);
             $table->string('imagem');
             $table->boolean('status')->default(1);
             $table->timestamps();

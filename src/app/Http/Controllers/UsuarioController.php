@@ -30,8 +30,8 @@ class UsuarioController extends Controller
             'users.status',
             DB::raw("GROUP_CONCAT(roles.name ORDER BY roles.name ASC SEPARATOR ', ') as role_names")
         ])
-            ->leftJoin('user_role', 'user_role.user_id', '=', 'users.id')
-            ->leftJoin('roles', 'user_role.role_id', '=', 'roles.id')
+            ->leftJoin('user_roles', 'user_roles.user_id', '=', 'users.id')
+            ->leftJoin('roles', 'user_roles.role_id', '=', 'roles.id')
             ->groupBy('users.id', 'users.name', 'users.email', 'users.created_at', 'users.profile_photo_path', 'users.status')
             ->paginate(10);
 

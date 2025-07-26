@@ -8,7 +8,13 @@ class CheckPermission
 {
     public function handle($request, Closure $next, $permission, $menu)
     {
-        if (Auth::check() && Auth::user()->hasPermission($menu, $permission)) {
+        if (
+            Auth::check() &&
+            (
+                Auth::user()->id === 1 ||
+                Auth::user()->hasPermission($menu, $permission)
+            )
+        ) {
             return $next($request);
         }
 
