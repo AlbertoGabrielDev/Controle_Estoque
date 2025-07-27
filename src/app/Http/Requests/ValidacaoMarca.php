@@ -15,7 +15,7 @@ class ValidacaoMarca extends FormRequest
     public function rules(): array
     {
         return [
-            'nome_marca' =>'unique:marca,nome_marca|max:20'
+            'nome_marca' =>'unique:marcas,nome_marca|max:20'
         ];
     }
 
@@ -23,7 +23,7 @@ class ValidacaoMarca extends FormRequest
     {
        return[
         'nome_marca.unique' => 'Essa Marca já está cadastrada',
-        'marca.max' => 'Quantidade de caractere excedida. Max:20'
+        'marcas.max' => 'Quantidade de caractere excedida. Max:20'
        ];
     }
 }

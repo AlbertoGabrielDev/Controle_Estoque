@@ -15,8 +15,8 @@ class ValidacaoFornecedor extends FormRequest
     public function rules(): array
     {
         return [
-            'nome_fornecedor' => 'unique:fornecedor,nome_fornecedor|max:60',
-            'cnpj' => 'unique:fornecedor,cnpj|max:18|min:14',
+            'nome_fornecedor' => 'unique:fornecedores,nome_fornecedor|max:60',
+            'cnpj' => 'unique:fornecedores,cnpj|max:18|min:14',
             'cep' => 'max:10|min:8',
             'email' =>'email|max:60',
             'logradouro' => 'max:50',

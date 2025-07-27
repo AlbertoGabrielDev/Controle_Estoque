@@ -22,8 +22,8 @@ class ValidacaoEstoque extends FormRequest
         'quantidade'        => 'max:10000',
         'validade'          => 'date',
         'lote'              => 'max:20',
-        'id_fornecedor_fk'  => 'required|exists:fornecedor,id_fornecedor',
-        'id_marca_fk'       => 'required|exists:marca,id_marca',
+        'id_fornecedor_fk'  => 'required|exists:fornecedores,id_fornecedor',
+        'id_marca_fk'       => 'required|exists:marcas,id_marca',
         ];
     }
     public function messages(): array
