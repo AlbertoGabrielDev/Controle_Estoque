@@ -1,27 +1,36 @@
 FROM php:8.2-fpm
 
-# Instalar dependências do sistema
+# Ambiente
+ARG ENVIRONMENT=production
+ENV ENVIRONMENT=${ENVIRONMENT}
+
+# Instalar dependências básicas
 RUN apt-get update && apt-get install -y \
-    git curl zip unzip libzip-dev libpng-dev libjpeg-dev libfreetype6-dev libonig-dev \
-    npm nodejs
+    git curl zip unzip gnupg2 nano apt-transport-https \
+    libzip-dev libpng-dev libonig-dev libxml2-dev \
+    && docker-php-ext-install zip \
+    && rm -rf /var/lib/apt/lists/*
 
-# Instalar extensões do PHP
-RUN docker-php-ext-configure gd --with-freetype --with-jpeg && \
-    docker-php-ext-install pdo pdo_mysql zip mbstring gd
+# Instalar extensões PHP (somente as necessárias para Laravel + MySQL)
+RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd opcache
 
-# Instalar Composer
-COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
+# Configurações do OPCache e PHP
+RUN echo "opcache.enable=1" >> /usr/local/etc/php/conf.d/opcache.ini && \
+    echo "opcache.memory_consumption=256" >> /usr/local/etc/php/conf.d/opcache.ini && \
+    echo "opcache.interned_strings_buffer=32" >> /usr/local/etc/php/conf.d/opcache.ini && \
+    echo "opcache.max_accelerated_files=10000" >> /usr/local/etc/php/conf.d/opcache.ini && \
+    echo "opcache.revalidate_freq=60" >> /usr/local/etc/php/conf.d/opcache.ini && \
+    echo "memory_limit=6G" > /usr/local/etc/php/conf.d/memory-limit.ini
 
-# Instalar Node.js moderno (18.x) via NodeSource
-RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash - && \
-    apt-get install -y nodejs && npm install -g npm
-
-# Copiar entrypoint customizado
-COPY ./entrypoint.sh /usr/local/bin/entrypoint.sh
+# Copiar entrypoint
+COPY php/entrypoint.sh /usr/local/bin/entrypoint.sh
 RUN chmod +x /usr/local/bin/entrypoint.sh
 
-# Definir diretório de trabalho
-WORKDIR /var/www
+# Composer (multi-stage)
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# Definir o entrypoint
-ENTRYPOINT ["entrypoint.sh"]
+# Diretório de trabalho
+WORKDIR /var/www/html
+
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
+CMD ["php-fpm"]
