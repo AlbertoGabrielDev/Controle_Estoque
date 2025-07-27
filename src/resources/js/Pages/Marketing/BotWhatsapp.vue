@@ -4,14 +4,16 @@
             <div class="bg-white rounded-lg shadow-lg p-4 grid grid-cols-1 md:grid-cols-3 gap-4 max-w-screen-xl w-full">
 
                 <!-- Contatos para Envio -->
-                <!-- Contatos para Envio -->
                 <div class="border rounded-lg p-4">
-                    <h2 class="text-lg font-semibold mb-2">👥 Contatos para Envisso</h2>
+                    <h2 class="text-lg font-semibold mb-2">👥 Contatos para Envio</h2>
                     <div class="text-sm mb-2 text-gray-600">
                         Lista de Contatos
                         <span class="float-right font-medium">Total: {{ contacts.length }}</span>
                     </div>
-                    <div class="border rounded p-2 mb-4 h-40 overflow-y-auto">
+                    <div v-if="loadingContacts" class="text-center text-blue-600 py-2">
+                        Carregando contatos...
+                    </div>
+                    <div v-else class="border rounded p-2 mb-4 h-40 overflow-y-auto">
                         <div v-for="(contact, index) in contacts" :key="index"
                             class="flex justify-between items-center border-b py-1">
                             <div>
@@ -19,6 +21,9 @@
                                 <div class="text-gray-600 text-sm">{{ contact.phone }}</div>
                             </div>
                             <button @click="removeContact(index)" class="text-red-500">🗑️</button>
+                        </div>
+                        <div v-if="!contacts.length && !loadingContacts" class="text-gray-500 text-center py-3">
+                            Nenhum contato carregado.
                         </div>
                     </div>
 
@@ -35,7 +40,7 @@
                         </button>
                     </div>
 
-                    <button class="bg-green-600 text-white px-4 py-2 rounded" @click="showQrModal = true">
+                    <button class="bg-green-600 text-white px-4 py-2 rounded mt-4" @click="showQrModal = true">
                         Conectar WhatsApp
                     </button>
 
@@ -53,8 +58,9 @@
                             <div v-else>
                                 <span class="text-gray-500">Aguardando QRCode...</span>
                             </div>
-                            <button @click="getQrCode" class="mt-4 px-3 py-1 rounded bg-blue-500 text-white">Atualizar
-                                QRCode</button>
+                            <button @click="getQrCode" class="mt-4 px-3 py-1 rounded bg-blue-500 text-white">
+                                Atualizar QRCode
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -94,11 +100,9 @@
                             <div class="font-medium">Prévia</div>
                             <button class="text-blue-600 text-sm">Atualizar prévia</button>
                         </div>
-
                         <div class="bg-white p-3 rounded border mb-3">
                             <div v-html="previewMessage"></div>
                         </div>
-
                         <div class="flex gap-2">
                             <button class="flex-1 bg-blue-600 text-white px-4 py-1.5 rounded text-sm"
                                 :disabled="!manualName || !manualPhone" @click="sendTestMessage">
@@ -117,8 +121,7 @@
                         <option>1 minuto</option>
                     </select>
                     <div class="text-xs text-gray-500 mb-2">Recomendado: 30s<br />Intervalos muito curtos podem resultar
-                        em
-                        bloqueio pela Meta</div>
+                        em bloqueio pela Meta</div>
 
                     <label class="block text-sm font-medium mb-1">Horário de envio</label>
                     <div class="flex gap-2 mb-2">
@@ -141,16 +144,15 @@
                     <div class="text-sm font-medium mb-1">Resumo</div>
                     <div class="border rounded p-2 text-sm mb-2">
                         <div class="text-yellow-600 font-semibold mb-1">Aguardando envio</div>
-                        <div>Total de contatos: <span class="float-right">24</span></div>
+                        <div>Total de contatos: <span class="float-right">{{ contacts.length }}</span></div>
                         <div>Intervalo: <span class="float-right">1 minuto</span></div>
-                        <div>Tempo estimado: <span class="float-right">24 minutos</span></div>
+                        <div>Tempo estimado: <span class="float-right">{{ contacts.length }} minutos</span></div>
                     </div>
 
                     <button class="bg-green-600 text-white w-full py-2 rounded mt-2" @click="sendMassMessage">
                         ▶️ Iniciar Campanha
                     </button>
                 </div>
-
             </div>
         </div>
     </Sidebar>
@@ -172,8 +174,12 @@ export default {
             feedbackType: 'success',
             showQrModal: false,
             qrcode: null,
-            isConnected: false
+            isConnected: false,
+            loadingContacts: false, // mostra carregando contatos
         }
+    },
+    mounted() {
+        this.loadGoogleContacts();
     },
     watch: {
         showQrModal(val) {
@@ -193,6 +199,21 @@ export default {
         }
     },
     methods: {
+        async loadGoogleContacts() {
+            this.loadingContacts = true;
+            try {
+                const response = await fetch('http://localhost:3002/google-contacts');
+                if (!response.ok) throw new Error('Erro ao buscar contatos');
+                const contatos = await response.json();
+                if (Array.isArray(contatos)) {
+                    this.contacts = contatos;
+                }
+            } catch (err) {
+                this.feedback = "Não foi possível carregar contatos do Google.";
+                this.feedbackType = "error";
+            }
+            this.loadingContacts = false;
+        },
         async getQrCode() {
             this.qrcode = null;
             this.isConnected = false;
@@ -225,6 +246,36 @@ export default {
             this.$nextTick(() => {
                 this.$refs.messageTextarea.focus();
             });
+        },
+        async sendTestMessage() {
+            if (!this.manualName || !this.manualPhone) {
+                this.feedback = "Preencha nome e número para testar.";
+                this.feedbackType = "error";
+                return;
+            }
+            this.feedback = "Enviando mensagem...";
+            this.feedbackType = "success";
+            try {
+                const response = await fetch('/verdurao/bot/whatsapp/send-mass', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+                    body: JSON.stringify({
+                        contacts: [{ name: this.manualName, phone: this.manualPhone }],
+                        message: this.message
+                    })
+                });
+                const data = await response.json();
+                if (data[0]?.status === 'enviado') {
+                    this.feedback = "Mensagem enviada com sucesso!";
+                    this.feedbackType = "success";
+                } else {
+                    this.feedback = "Erro ao enviar mensagem.";
+                    this.feedbackType = "error";
+                }
+            } catch (err) {
+                this.feedback = "Erro na requisição ao backend.";
+                this.feedbackType = "error";
+            }
         },
         async sendMassMessage() {
             if (!this.contacts.length) {
@@ -264,7 +315,6 @@ export default {
 body {
     font-family: sans-serif;
 }
-
 /* Melhorias de espaçamento e alinhamento */
 .border-rounded {
     border-radius: 0.5rem;

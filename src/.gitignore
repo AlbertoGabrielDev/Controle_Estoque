@@ -20,3 +20,4 @@ yarn-error.log
 /.vscode
 tokens/
 whatsapp-bot/tokens/
+whatsapp-bot/tokens/sessionName/
