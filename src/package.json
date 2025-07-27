@@ -3,22 +3,35 @@
     "type": "module",
     "scripts": {
         "dev": "vite",
-        "build": "vite build"
+        "build": "vite build && vite build --ssr"
     },
     "devDependencies": {
-        "@tailwindcss/forms": "^0.5.2",
+        "@inertiajs/vue3": "^1.3.0",
+        "@tailwindcss/forms": "^0.5.3",
         "@tailwindcss/typography": "^0.5.0",
-        "autoprefixer": "^10.4.7",
+        "@vitejs/plugin-vue": "^5.2.4",
+        "@vue/server-renderer": "^3.4.0",
+        "autoprefixer": "^10.4.12",
         "axios": "^1.1.2",
+<<<<<<< HEAD:src/package.json
         "postcss": "^8.4.14",
         "tailwindcss": "^3.3.3",
         "vite": "^4.5.0",
         "@vitejs/plugin-vue": "^4.4.0",
         "laravel-vite-plugin": "^0.8.1"
+=======
+        "laravel-vite-plugin": "^1.2.0",
+        "postcss": "^8.4.31",
+        "tailwindcss": "^3.2.1",
+        "vite": "^6.3.5",
+        "vue": "^3.4.0"
+>>>>>>> create_whatsapp_bot:package.json
     },
     "dependencies": {
+        "@googlemaps/js-api-loader": "^1.16.8",
+        "@heroicons/vue": "^2.2.0",
         "@popperjs/core": "^2.11.8",
-        "@vitejs/plugin-vue": "^5.2.1",
+        "@wppconnect-team/wppconnect": "^1.37.2",
         "bootstrap": "^5.3.1",
         "chart.js": "^4.4.3",
         "chartjs-plugin-datalabels": "^2.2.0",
@@ -26,6 +39,7 @@
         "instascan": "^1.0.0",
         "jquery": "^3.7.1",
         "laravel-echo": "^2.0.2",
+        "lucide-vue": "^0.511.0",
         "moment": "^2.29.4",
         "moment-timezone": "^0.5.43",
         "popper.js": "^1.16.1",

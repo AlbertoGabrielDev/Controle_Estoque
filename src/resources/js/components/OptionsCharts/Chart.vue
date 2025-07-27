@@ -4,7 +4,7 @@
       <!-- Input para Data de Início -->
       <div class="relative mr-2">
         <label for="start" class="block text-sm font-medium text-gray-700">Início</label>
-        <input name="start" type="date" v-model="startDate" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full ps-10 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Select date start">
+        <input name="start" type="date" v-model="startDate" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full ps-10 p-2.5" placeholder="Select date start">
       </div>
 
       <span class="text-gray-500 self-end mb-2" style="margin-left: -7px;">a</span>
@@ -12,7 +12,7 @@
       <!-- Input para Data de Fim -->
       <div class="relative">
         <label for="end" class="block text-sm font-medium text-gray-700">Fim</label>
-        <input name="end" type="date" v-model="endDate" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full ps-10 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Select date end">
+        <input name="end" type="date" v-model="endDate" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full ps-10 p-2.5" placeholder="Select date end">
       </div>
     </div>
 

@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\Api\GraficosApiController;
+use App\Http\Controllers\BotWhatsappController;
+use App\Http\Controllers\BusinessController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\CategoriaController;
 use App\Http\Controllers\ProdutoController;
@@ -13,6 +15,41 @@ use App\Http\Controllers\UnidadeController;
 use App\Http\Controllers\VendaController;
 use App\Providers\FortifyServiceProvider;
 use App\Http\Controllers\SpreadsheetController;
+use App\Http\Controllers\ProfileController;
+use Illuminate\Foundation\Application;
+use Inertia\Inertia;
+
+Route::get('/welcome', function () {
+    return Inertia::render('Welcome', [
+        'canLogin' => Route::has('login'),
+        'canRegister' => Route::has('register'),
+        'laravelVersion' => Application::VERSION,
+        'phpVersion' => PHP_VERSION,
+    ]);
+});
+
+Route::middleware([
+    'auth',
+    config('jetstream.auth_session'),
+    'verified',
+])->prefix('/verdurao')->group(function () {
+    Route::get('/dashboard', function () {
+        return Inertia::render('Dashboard');
+    })->middleware(['auth', 'verified'])->name('dashboard');
+
+
+
+
+    Route::get('/business-extractor', [BusinessController::class, 'index'])->name('business.index');
+    Route::post('/api/business/extract', [BusinessController::class, 'extractFromUrl'])->name('business.extract');
+    Route::post('/business/export', [BusinessController::class, 'exportToCsv'])->name('business.export');
+});
+
+// Route::middleware('auth')->group(function () {
+//     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+//     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+//     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+// });
 
 Route::middleware([
     'auth',
@@ -20,9 +57,11 @@ Route::middleware([
     'verified',
 ])->prefix('/verdurao')->group(function () {
 
-    // Route::get('/vue', function (){
-    //    return view('welcome');
-    // });
+
+    Route::prefix('/bot')->group(function () {
+        Route::get('/', [BotWhatsappController::class, 'index'])->name('bot.index');
+        Route::post('/whatsapp/send-mass', [BotWhatsappController::class, 'sendMass']);
+    });
 
     Route::prefix('/categoria')->group(function () {
         Route::get('/', [CategoriaController::class, 'Inicio'])->name('categoria.inicio')->middleware('check.permission:view_post,categoria');
@@ -124,7 +163,6 @@ Route::middleware([
         Route::get('/data/{filename}', [SpreadsheetController::class, 'readFile']);
         Route::get('/', [SpreadsheetController::class, 'index']);
         Route::post('/compare', [SpreadsheetController::class, 'compare']);
-
     });
 });
 
