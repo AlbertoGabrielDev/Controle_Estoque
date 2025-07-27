@@ -12,7 +12,6 @@ services:
       - laravel
     depends_on:
       - mysql
-    command: bash -c "composer install && npm install && php-fpm"
 
   nginx:
     image: nginx:stable-alpine
