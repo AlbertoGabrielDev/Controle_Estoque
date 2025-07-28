@@ -14,5 +14,8 @@
     "cors": "^2.8.5",
     "express": "^5.1.0",
     "googleapis": "^154.0.0"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.0"
   }
 }
