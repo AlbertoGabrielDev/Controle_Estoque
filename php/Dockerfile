@@ -1,9 +1,8 @@
 FROM php:8.2-fpm
 
 # Ambiente
-ARG ENVIRONMENT=production
-ENV ENVIRONMENT=${ENVIRONMENT}
-
+WORKDIR /var/www/html
+RUN docker-php-ext-install pdo_mysql
 # Instalar dependências básicas
 RUN apt-get update && apt-get install -y \
     git curl zip unzip gnupg2 nano apt-transport-https \
@@ -11,8 +10,6 @@ RUN apt-get update && apt-get install -y \
     && docker-php-ext-install zip \
     && rm -rf /var/lib/apt/lists/*
 
-# Instalar extensões PHP (somente as necessárias para Laravel + MySQL)
-RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd opcache
 
 # Configurações do OPCache e PHP
 RUN echo "opcache.enable=1" >> /usr/local/etc/php/conf.d/opcache.ini && \
@@ -22,15 +19,12 @@ RUN echo "opcache.enable=1" >> /usr/local/etc/php/conf.d/opcache.ini && \
     echo "opcache.revalidate_freq=60" >> /usr/local/etc/php/conf.d/opcache.ini && \
     echo "memory_limit=6G" > /usr/local/etc/php/conf.d/memory-limit.ini
 
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 # Copiar entrypoint
 COPY php/entrypoint.sh /usr/local/bin/entrypoint.sh
+
 RUN chmod +x /usr/local/bin/entrypoint.sh
 
-# Composer (multi-stage)
-COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
-
-# Diretório de trabalho
-WORKDIR /var/www/html
 
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
 CMD ["php-fpm"]
