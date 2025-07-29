@@ -4,29 +4,45 @@
             <div class="bg-white rounded-lg shadow-lg p-4 grid grid-cols-1 md:grid-cols-3 gap-4 max-w-screen-xl w-full">
 
                 <!-- Contatos para Envio -->
+                <!-- Contatos para Envio -->
                 <div class="border rounded-lg p-4">
                     <h2 class="text-lg font-semibold mb-2">👥 Contatos para Envio</h2>
                     <div class="text-sm mb-2 text-gray-600">
                         Lista de Contatos
-                        <span class="float-right font-medium">Total: {{ contacts.length }}</span>
+                        <span class="float-right font-medium">
+                            Selecionados: {{ selectedContacts.size }} / {{ contacts.length }}
+                        </span>
                     </div>
+
+                    <!-- Campo de busca -->
+                    <input v-model="searchQuery" type="text" placeholder="🔍 Buscar por nome ou número"
+                        class="border p-1 rounded mb-2 w-full text-sm" />
+
+                    <!-- Carregando contatos -->
                     <div v-if="loadingContacts" class="text-center text-blue-600 py-2">
                         Carregando contatos...
                     </div>
+
+                    <!-- Lista de contatos -->
                     <div v-else class="border rounded p-2 mb-4 h-40 overflow-y-auto">
-                        <div v-for="(contact, index) in contacts" :key="index"
+                        <div v-for="(contact, index) in filteredContacts" :key="index"
                             class="flex justify-between items-center border-b py-1">
-                            <div>
-                                <div class="font-semibold">{{ contact.name }}</div>
-                                <div class="text-gray-600 text-sm">{{ contact.phone }}</div>
+                            <div class="flex items-center gap-2">
+                                <input type="checkbox" :value="contact" :checked="selectedContacts.has(contact)"
+                                    @change="toggleSelection(contact)" />
+                                <div>
+                                    <div class="font-semibold">{{ contact.name }}</div>
+                                    <div class="text-gray-600 text-sm">{{ contact.phone }}</div>
+                                </div>
                             </div>
                             <button @click="removeContact(index)" class="text-red-500">🗑️</button>
                         </div>
-                        <div v-if="!contacts.length && !loadingContacts" class="text-gray-500 text-center py-3">
-                            Nenhum contato carregado.
+                        <div v-if="!filteredContacts.length" class="text-gray-500 text-center py-3">
+                            Nenhum contato encontrado.
                         </div>
                     </div>
 
+                    <!-- Adicionar manualmente -->
                     <div class="mt-4">
                         <label class="block text-sm font-medium mb-1">Adicionar Manualmente</label>
                         <div class="flex gap-2">
@@ -40,6 +56,7 @@
                         </button>
                     </div>
 
+                    <!-- Conectar WhatsApp -->
                     <button class="bg-green-600 text-white px-4 py-2 rounded mt-4" @click="showQrModal = true">
                         Conectar WhatsApp
                     </button>
@@ -64,6 +81,7 @@
                         </div>
                     </div>
                 </div>
+
 
                 <!-- Mensagem -->
                 <div class="border rounded-lg p-4">
@@ -116,20 +134,16 @@
                 <div class="border rounded-lg p-4">
                     <h2 class="text-lg font-semibold mb-2">⚙️ Configurações de Envio</h2>
 
-                    <label class="block text-sm font-medium mb-1">Intervalo entre mensagens</label>
-                    <select class="border rounded p-1 w-full text-sm mb-1">
-                        <option>1 minuto</option>
-                    </select>
-                    <div class="text-xs text-gray-500 mb-2">Recomendado: 30s<br />Intervalos muito curtos podem resultar
-                        em bloqueio pela Meta</div>
-
-                    <label class="block text-sm font-medium mb-1">Horário de envio</label>
-                    <div class="flex gap-2 mb-2">
-                        <select class="border rounded p-1 flex-1 text-sm">
-                            <option>Imediatamente</option>
-                        </select>
-                        <input type="text" placeholder="mm/dd/yyyy, --" class="border rounded p-1 flex-1 text-sm" />
+                    <label class="block text-sm font-medium mb-1">Intervalo entre mensagens (em segundos)</label>
+                    <input v-model.number="intervalSeconds" type="number" min="1"
+                        class="border rounded p-1 w-full text-sm mb-2" placeholder="Ex: 60" />
+                    <div class="text-xs text-gray-500 mb-2">
+                        Recomendado: mínimo 30s para evitar bloqueios.
                     </div>
+
+                    <label class="block text-sm font-medium mb-1">Agendar horário de envio (opcional)</label>
+                    <input v-model="scheduledTime" type="datetime-local"
+                        class="border rounded p-1 w-full text-sm mb-2" />
 
                     <div class="flex items-center gap-2 mb-2">
                         <input type="checkbox" class="accent-gray-700" />
@@ -144,9 +158,11 @@
                     <div class="text-sm font-medium mb-1">Resumo</div>
                     <div class="border rounded p-2 text-sm mb-2">
                         <div class="text-yellow-600 font-semibold mb-1">Aguardando envio</div>
-                        <div>Total de contatos: <span class="float-right">{{ contacts.length }}</span></div>
-                        <div>Intervalo: <span class="float-right">1 minuto</span></div>
-                        <div>Tempo estimado: <span class="float-right">{{ contacts.length }} minutos</span></div>
+                        <div>Total de contatos: <span class="float-right">{{ selectedContacts.size }}</span></div>
+                        <div>Intervalo: <span class="float-right">{{ intervalSeconds }} segundos</span></div>
+                        <div>Tempo estimado: <span class="float-right">{{ estimatedTime }} minutos</span></div>
+                        <div v-if="scheduledTime">Agendado para: <span class="float-right">{{ formatScheduledTime
+                                }}</span></div>
                     </div>
 
                     <button class="bg-green-600 text-white w-full py-2 rounded mt-2" @click="sendMassMessage">
@@ -176,6 +192,10 @@ export default {
             qrcode: null,
             isConnected: false,
             loadingContacts: false, // mostra carregando contatos
+            searchQuery: '',
+            selectedContacts: new Set(),
+            intervalSeconds: 60,
+            scheduledTime: '', // formato datetime-local do input
         }
     },
     mounted() {
@@ -196,6 +216,21 @@ export default {
                 .replace(/{nome}/g, name)
                 .replace(/{telefone}/g, phone)
                 .replace(/\n/g, '<br />');
+        },
+        filteredContacts() {
+            const q = this.searchQuery.toLowerCase();
+            return this.contacts.filter(c =>
+                c.name.toLowerCase().includes(q) || c.phone.toLowerCase().includes(q)
+            );
+        },
+        estimatedTime() {
+            const total = this.selectedContacts.size || 0;
+            return ((total * this.intervalSeconds) / 60).toFixed(1);
+        },
+        formatScheduledTime() {
+            return this.scheduledTime
+                ? new Date(this.scheduledTime).toLocaleString()
+                : '';
         }
     },
     methods: {
@@ -247,64 +282,48 @@ export default {
                 this.$refs.messageTextarea.focus();
             });
         },
-        async sendTestMessage() {
-            if (!this.manualName || !this.manualPhone) {
-                this.feedback = "Preencha nome e número para testar.";
+        async sendMassMessage() {
+            const selected = Array.from(this.selectedContacts);
+            if (!selected.length) {
+                this.feedback = "Selecione ao menos um contato.";
                 this.feedbackType = "error";
                 return;
             }
-            this.feedback = "Enviando mensagem...";
+
+            this.feedback = "Enviando ou agendando mensagens...";
             this.feedbackType = "success";
+
             try {
-                const response = await fetch('/verdurao/bot/whatsapp/send-mass', {
+                const response = await fetch('http://localhost:3001/verdurao/bot/whatsapp/send-scheduled', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        contacts: [{ name: this.manualName, phone: this.manualPhone }],
-                        message: this.message
+                        contacts: selected,
+                        message: this.message,
+                        intervalSeconds: this.intervalSeconds,
+                        scheduledTime: this.scheduledTime || null,
                     })
                 });
+
                 const data = await response.json();
-                if (data[0]?.status === 'enviado') {
-                    this.feedback = "Mensagem enviada com sucesso!";
-                    this.feedbackType = "success";
+                if (data.status === 'agendado') {
+                    this.feedback = `✅ Campanha agendada para ${this.formatScheduledTime}`;
                 } else {
-                    this.feedback = "Erro ao enviar mensagem.";
-                    this.feedbackType = "error";
+                    this.feedback = "✅ Mensagens sendo enviadas agora.";
                 }
+
+                this.feedbackType = "success";
+                this.selectedContacts.clear();
             } catch (err) {
-                this.feedback = "Erro na requisição ao backend.";
+                this.feedback = "❌ Erro ao enviar ou agendar mensagens.";
                 this.feedbackType = "error";
             }
         },
-        async sendMassMessage() {
-            if (!this.contacts.length) {
-                this.feedback = "Adicione pelo menos um contato.";
-                this.feedbackType = "error";
-                return;
-            }
-            this.feedback = "Enviando mensagem...";
-            this.feedbackType = "success";
-            try {
-                const response = await fetch('http://localhost:3001/verdurao/bot/whatsapp/send-mass', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-                    body: JSON.stringify({
-                        contacts: this.contacts,
-                        message: this.message
-                    })
-                });
-                const data = await response.json();
-                if (data && Array.isArray(data) && data.some(r => r.status === 'enviado')) {
-                    this.feedback = "Mensagens enviadas com sucesso!";
-                    this.feedbackType = "success";
-                } else {
-                    this.feedback = "Erro ao enviar mensagens.";
-                    this.feedbackType = "error";
-                }
-            } catch (err) {
-                this.feedback = "Erro na requisição ao backend.";
-                this.feedbackType = "error";
+        toggleSelection(contact) {
+            if (this.selectedContacts.has(contact)) {
+                this.selectedContacts.delete(contact);
+            } else {
+                this.selectedContacts.add(contact);
             }
         }
     }
@@ -315,6 +334,7 @@ export default {
 body {
     font-family: sans-serif;
 }
+
 /* Melhorias de espaçamento e alinhamento */
 .border-rounded {
     border-radius: 0.5rem;

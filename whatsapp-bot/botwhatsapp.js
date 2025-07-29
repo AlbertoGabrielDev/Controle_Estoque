@@ -1,3 +1,5 @@
+// whatsapp-bot/botwhatsapp.js
+
 const express = require('express');
 const wppconnect = require('@wppconnect-team/wppconnect');
 const cors = require('cors');
@@ -9,6 +11,7 @@ app.use(express.json());
 let qrCodeBase64 = null;
 let isConnected = false;
 let clientGlobal = null;
+const setupSettingsRoutes = require('./settings');
 
 wppconnect
   .create({
@@ -27,6 +30,7 @@ wppconnect
   })
   .then((client) => {
     clientGlobal = client;
+    setupSettingsRoutes(app, clientGlobal);
     console.log('Bot WhatsApp iniciado!');
   })
   .catch(console.log);
