@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\GraficosApiController;
 use App\Http\Controllers\BotWhatsappController;
 use App\Http\Controllers\BusinessController;
+use App\Http\Controllers\MessageTemplateController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\CategoriaController;
 use App\Http\Controllers\ProdutoController;
@@ -164,6 +165,13 @@ Route::middleware([
         Route::get('/', [SpreadsheetController::class, 'index']);
         Route::post('/compare', [SpreadsheetController::class, 'compare']);
     });
+
+    Route::prefix('/configuracao')->middleware(middleware: ['auth', 'verified'])->group(function () {
+    Route::get('/modelos-mensagem', [MessageTemplateController::class, 'index'])->name('configuracoes.modelos-mensagem');
+    Route::post('/modelos-mensagem', [MessageTemplateController::class, 'store']);
+    Route::put('/modelos-mensagem/{messageTemplate}', [MessageTemplateController::class, 'update']);
+    Route::delete('/modelos-mensagem/{messageTemplate}', [MessageTemplateController::class, 'destroy']);
+});
 });
 
 Route::get('login', [UsuarioController::class, 'unidade'])->name('login');
