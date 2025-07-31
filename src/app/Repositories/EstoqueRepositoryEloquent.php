@@ -92,7 +92,7 @@ class EstoqueRepositoryEloquent extends BaseRepository implements EstoqueReposit
         $repository = app(EstoqueRepository::class);
         try {
             $estoque = $this->findWithRelations($estoqueId, ['produtos', 'fornecedores', 'marcas']);
-            dd($estoque);
+            // dd($estoque);
             return [
                 'estoque' => $estoque,
                 'fornecedores' => Fornecedor::all(),
