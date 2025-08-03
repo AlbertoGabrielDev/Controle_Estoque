@@ -11,7 +11,7 @@ class MessageTemplateController extends Controller
     public function index()
     {
         $templates = MessageTemplate::all();
-        return Inertia::render('Settings/MessageTemplates', [
+        return Inertia::render('ConfigSidebar/MessageTemplates', [
             'templates' => $templates
         ]);
     }
@@ -22,6 +22,7 @@ class MessageTemplateController extends Controller
             'name' => 'required',
             'body' => 'required'
         ]);
+      
         MessageTemplate::create($request->all());
         return redirect()->back();
     }

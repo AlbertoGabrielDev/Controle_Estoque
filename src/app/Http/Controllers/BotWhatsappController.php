@@ -5,11 +5,15 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Http;
+use App\Models\MessageTemplate;
 class BotWhatsappController extends Controller
 {
     function index()
     {
-        return Inertia::render('Marketing/BotWhatsapp');
+        $templates = MessageTemplate::all();
+        return Inertia::render('Marketing/BotWhatsapp',[
+            'templates' => $templates,
+        ]);
     }
 
 

@@ -2,8 +2,6 @@
     <Sidebar :activeTab="activeTab" @setActiveTab="setActiveTab">
         <div class="flex justify-center p-4 bg-gray-100 min-h-screen">
             <div class="bg-white rounded-lg shadow-lg p-4 grid grid-cols-1 md:grid-cols-3 gap-4 max-w-screen-xl w-full">
-
-                <!-- Contatos para Envio -->
                 <!-- Contatos para Envio -->
                 <div class="border rounded-lg p-4">
                     <h2 class="text-lg font-semibold mb-2">👥 Contatos para Envio</h2>
@@ -85,12 +83,26 @@
 
                 <!-- Mensagem -->
                 <div class="border rounded-lg p-4">
-                    <h2 class="text-lg font-semibold mb-2">💬 Mensagem</h2>
-
                     <label class="block text-sm font-medium mb-1">Modelo de Mensagem</label>
-                    <select class="border rounded p-1 mb-4 w-full text-sm">
-                        <option>Selecionar modelo salvo</option>
-                    </select>
+                    <div class="relative group">
+                        <select v-model="selectedTemplateId" @change="applyTemplate"
+                            class="border rounded px-3 py-2 w-full text-sm focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition outline-none bg-white shadow-sm hover:border-blue-400 cursor-pointer">
+                            <option value="" disabled>Selecionar modelo salvo</option>
+                            <option v-for="tpl in templates" :key="tpl.id" :value="tpl.id"
+                                @mouseenter="showPreview(tpl)" @mouseleave="hidePreview">
+                                {{ tpl.name }}
+                            </option>
+                        </select>
+                        <!-- Preview Tooltip -->
+                        <transition name="fade">
+                            <div v-if="previewTemplate"
+                                class="absolute left-0 mt-1 z-10 bg-white border border-gray-300 rounded shadow-lg p-3 text-xs w-72"
+                                style="pointer-events: none;">
+                                <div class="font-semibold mb-1">{{ previewTemplate.name }}</div>
+                                <div class="text-gray-700 whitespace-pre-line">{{ previewTemplate.body }}</div>
+                            </div>
+                        </transition>
+                    </div>
 
                     <h3 class="text-sm font-medium mb-2">Texto da Mensagem</h3>
 
@@ -161,8 +173,8 @@
                         <div>Total de contatos: <span class="float-right">{{ selectedContacts.size }}</span></div>
                         <div>Intervalo: <span class="float-right">{{ intervalSeconds }} segundos</span></div>
                         <div>Tempo estimado: <span class="float-right">{{ estimatedTime }} minutos</span></div>
-                        <div v-if="scheduledTime">Agendado para: <span class="float-right">{{ formatScheduledTime
-                                }}</span></div>
+                        <div v-if="scheduledTime">Agendado para: <span class="float-right">{{
+                                formatScheduledTime}}</span></div>
                     </div>
 
                     <button class="bg-green-600 text-white w-full py-2 rounded mt-2" @click="sendMassMessage">
@@ -178,6 +190,12 @@
 import Sidebar from '../Sidebar.vue';
 
 export default {
+    props: {
+        templates: {
+            type: Array,
+            default: () => []
+        }
+    },
     components: { Sidebar },
     data() {
         return {
@@ -195,7 +213,9 @@ export default {
             searchQuery: '',
             selectedContacts: new Set(),
             intervalSeconds: 60,
-            scheduledTime: '', // formato datetime-local do input
+            scheduledTime: '',
+            selectedTemplateId: '',
+            previewTemplate: null,
         }
     },
     mounted() {
@@ -325,7 +345,20 @@ export default {
             } else {
                 this.selectedContacts.add(contact);
             }
-        }
+        },
+        applyTemplate() {
+            const tpl = this.templates.find(t => t.id == this.selectedTemplateId);
+            if (tpl) {
+                this.message = tpl.body;
+            }
+        },
+        hidePreview() {
+            this.previewTemplate = null;
+        },
+        showPreview(tpl) {
+            this.previewTemplate = tpl;
+        },
+
     }
 }
 </script>

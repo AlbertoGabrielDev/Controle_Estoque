@@ -166,12 +166,12 @@ Route::middleware([
         Route::post('/compare', [SpreadsheetController::class, 'compare']);
     });
 
-    Route::prefix('/configuracao')->middleware(middleware: ['auth', 'verified'])->group(function () {
-    Route::get('/modelos-mensagem', [MessageTemplateController::class, 'index'])->name('configuracoes.modelos-mensagem');
-    Route::post('/modelos-mensagem', [MessageTemplateController::class, 'store']);
-    Route::put('/modelos-mensagem/{messageTemplate}', [MessageTemplateController::class, 'update']);
-    Route::delete('/modelos-mensagem/{messageTemplate}', [MessageTemplateController::class, 'destroy']);
-});
+    Route::prefix('/configuracoes')->group(function () {
+        Route::get('/modelos-mensagem', [MessageTemplateController::class, 'index'])->name('configuracoes.modelos-mensagem');
+        Route::post('/modelos-mensagem', [MessageTemplateController::class, 'store']);
+        Route::put('/modelos-mensagem/{messageTemplate}', [MessageTemplateController::class, 'update']);
+        Route::delete('/modelos-mensagem/{messageTemplate}', [MessageTemplateController::class, 'destroy']);
+    });
 });
 
 Route::get('login', [UsuarioController::class, 'unidade'])->name('login');

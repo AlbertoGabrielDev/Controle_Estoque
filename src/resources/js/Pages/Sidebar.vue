@@ -1,6 +1,5 @@
 <template>
     <div class="h-screen flex flex-col">
-        <!-- Header -->
         <header class="bg-white shadow-md py-4 px-6 flex justify-between items-center">
             <div class="flex items-center">
                 <!-- ...logo e título... -->
@@ -36,196 +35,47 @@
         </header>
 
         <div class="flex flex-1 overflow-hidden">
-            <!-- Sidebar Desktop -->
-            <div class="sidebar bg-green-800 text-white flex-col w-64 hidden md:flex">
-                <!-- ...menu e plano... -->
-                <nav class="flex-1 px-2 py-4">
-                    <ul>
-                        <li class="mb-2">
-                            <button @click="setActiveTab('dashboard')"
-                                :class="{ 'bg-green-700': activeTab === 'dashboard' }"
-                                class="tab-btn flex items-center w-full px-4 py-2 rounded-lg hover:bg-green-700 transition-colors">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 md:mr-3" fill="none"
-                                    viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-                                </svg>
-                                <span class="hidden md:inline">Dashboard</span>
-                            </button>
-                        </li>
-                        <li class="mb-2">
-                            <button @click="setActiveTab('bulk')" :class="{ 'bg-green-700': activeTab === 'bulk' }"
-                                class="tab-btn flex items-center w-full px-4 py-2 rounded-lg hover:bg-green-700 transition-colors">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 md:mr-3" fill="none"
-                                    viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M8 4H6a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-2m-4-1v8m0 0l3-3m-3 3L9 8m-5 5h2.586a1 1 0 01.707.293l2.414 2.414a1 1 0 00.707.293h3.172a1 1 0 00.707-.293l2.414-2.414a1 1 0 01.707-.293H20" />
-                                </svg>
-                                <span class="hidden md:inline">Envio em Massa</span>
-                            </button>
-                        </li>
-                        <li class="mb-2">
-                            <button @click="setActiveTab('auto')" :class="{ 'bg-green-700': activeTab === 'auto' }"
-                                class="tab-btn flex items-center w-full px-4 py-2 rounded-lg hover:bg-green-700 transition-colors">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 md:mr-3" fill="none"
-                                    viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M13 10V3L4 14h7v7l9-11h-7z" />
-                                </svg>
-                                <span class="hidden md:inline">Respostas Automáticas</span>
-                            </button>
-                        </li>
-                        <li class="mb-2">
-                            <button @click="setActiveTab('extract')"
-                                :class="{ 'bg-green-700': activeTab === 'extract' }"
-                                class="tab-btn flex items-center w-full px-4 py-2 rounded-lg hover:bg-green-700 transition-colors">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 md:mr-3" fill="none"
-                                    viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                                </svg>
-                                <span class="hidden md:inline">Extração do Maps</span>
-                            </button>
-                        </li>
-                        <li class="mb-2">
-                            <button @click="setActiveTab('contacts')"
-                                :class="{ 'bg-green-700': activeTab === 'contacts' }"
-                                class="tab-btn flex items-center w-full px-4 py-2 rounded-lg hover:bg-green-700 transition-colors">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 md:mr-3" fill="none"
-                                    viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                                </svg>
-                                <span class="hidden md:inline">Contatos</span>
-                            </button>
-                        </li>
-                        <li class="mb-2">
-                            <button @click="setActiveTab('settings')"
-                                :class="{ 'bg-green-700': activeTab === 'settings' }"
-                                class="tab-btn flex items-center w-full px-4 py-2 rounded-lg hover:bg-green-700 transition-colors">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 md:mr-3" fill="none"
-                                    viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                </svg>
-                                <span class="hidden md:inline">Configurações</span>
-                            </button>
-                        </li>
-                    </ul>
-                </nav>
-                <div class="p-4">
-                    <div class="bg-green-700 rounded-lg p-3 text-center">
-                        <p class="text-sm">Plano Atual</p>
-                        <p class="font-bold">Premium</p>
-                        <p class="text-xs mt-1">Válido até 15/12/2023</p>
-                    </div>
-                </div>
-            </div>
-            <!-- Sidebar Mobile (overlay) -->
-            <!-- Sidebar Mobile (overlay) -->
+            <!-- Sidebar Desktop/Mobile Unificado -->
             <transition name="fade">
-                <div v-if="sidebarOpen" class="fixed inset-0 z-40 flex md:hidden">
-                    <!-- Backdrop escuro -->
-                    <div class="fixed inset-0 bg-black bg-opacity-50" @click="sidebarOpen = false"></div>
-
-                    <!-- Menu mobile com cores iguais ao desktop -->
-                    <div class="relative bg-green-800 text-white w-64 flex flex-col h-full z-50">
-                        <button class="self-end m-4" @click="sidebarOpen = false">
-                            <svg class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M6 18L18 6M6 6l12 12" />
-                            </svg>
-                        </button>
-                        <nav class="flex-1 px-2 py-4">
-                            <ul>
-                                <li class="mb-2">
-                                    <button @click="setActiveTab('dashboard')"
-                                        :class="{ 'bg-green-700': activeTab === 'dashboard' }"
-                                        class="tab-btn flex items-center w-full px-4 py-2 rounded-lg hover:bg-green-700 transition-colors">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3" fill="none"
-                                            viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-                                        </svg>
-                                        <span>Dashboard</span>
-                                    </button>
-                                </li>
-                                <li class="mb-2">
-                                    <button @click="setActiveTab('bulk')"
-                                        :class="{ 'bg-green-700': activeTab === 'bulk' }"
-                                        class="tab-btn flex items-center w-full px-4 py-2 rounded-lg hover:bg-green-700 transition-colors">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3" fill="none"
-                                            viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M8 4H6a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-2m-4-1v8m0 0l3-3m-3 3L9 8m-5 5h2.586a1 1 0 01.707.293l2.414 2.414a1 1 0 00.707.293h3.172a1 1 0 00.707-.293l2.414-2.414a1 1 0 01.707-.293H20" />
-                                        </svg>
-                                        <span>Envio em Massa</span>
-                                    </button>
-                                </li>
-                                <li class="mb-2">
-                                    <button @click="setActiveTab('auto')"
-                                        :class="{ 'bg-green-700': activeTab === 'auto' }"
-                                        class="tab-btn flex items-center w-full px-4 py-2 rounded-lg hover:bg-green-700 transition-colors">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3" fill="none"
-                                            viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M13 10V3L4 14h7v7l9-11h-7z" />
-                                        </svg>
-                                        <span>Respostas Automáticas</span>
-                                    </button>
-                                </li>
-                                <li class="mb-2">
-                                    <button @click="setActiveTab('extract')"
-                                        :class="{ 'bg-green-700': activeTab === 'extract' }"
-                                        class="tab-btn flex items-center w-full px-4 py-2 rounded-lg hover:bg-green-700 transition-colors">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3" fill="none"
-                                            viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                                        </svg>
-                                        <span>Extração do Maps</span>
-                                    </button>
-                                </li>
-                                <li class="mb-2">
-                                    <button @click="setActiveTab('contacts')"
-                                        :class="{ 'bg-green-700': activeTab === 'contacts' }"
-                                        class="tab-btn flex items-center w-full px-4 py-2 rounded-lg hover:bg-green-700 transition-colors">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3" fill="none"
-                                            viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                                        </svg>
-                                        <span>Contatos</span>
-                                    </button>
-                                </li>
-                                <li class="mb-2">
-                                    <button @click="setActiveTab('settings')"
-                                        :class="{ 'bg-green-700': activeTab === 'settings' }"
-                                        class="tab-btn flex items-center w-full px-4 py-2 rounded-lg hover:bg-green-700 transition-colors">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3" fill="none"
-                                            viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                        </svg>
-                                        <span>Configurações</span>
-                                    </button>
-                                </li>
-                            </ul>
-                        </nav>
-                        <div class="p-4">
-                            <div class="bg-green-700 rounded-lg p-3 text-center">
-                                <p class="text-sm">Plano Atual</p>
-                                <p class="font-bold">Premium</p>
-                                <p class="text-xs mt-1">Válido até 15/12/2023</p>
-                            </div>
+                <div v-if="sidebarOpen || isDesktop"
+                    class="sidebar bg-green-800 text-white flex-col w-64 fixed md:static z-40 h-full"
+                    :class="{ 'hidden md:flex': !sidebarOpen && isDesktop }">
+                    <!-- Botão fechar só no mobile -->
+                    <button v-if="!isDesktop" class="self-end m-4" @click="sidebarOpen = false">
+                        <svg class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                    <nav class="flex-1 px-2 py-4">
+                        <ul>
+                            <li v-for="menu in menus" :key="menu.key" class="mb-2">
+                                <button @click="handleMenuClick(menu)" :class="{ 'bg-green-700': isMenuActive(menu) }"
+                                    class="tab-btn flex items-center w-full px-4 py-2 rounded-lg hover:bg-green-700 transition-colors">
+                                    <span class="mr-2" v-html="menu.icon"></span>
+                                    <span :class="isDesktop ? 'hidden md:inline' : ''">{{ menu.label }}</span>
+                                    <svg v-if="menu.submenus" class="ml-auto" width="16" height="16" fill="none"
+                                        stroke="currentColor">
+                                        <path d="M6 9l6 6 6-6" />
+                                    </svg>
+                                </button>
+                                <ul v-if="menu.submenus && openSubmenu === menu.key" class="ml-6 mt-1">
+                                    <li v-for="submenu in menu.submenus" :key="submenu.key">
+                                        <button @click="handleSubmenuClick(submenu)"
+                                            :class="{ 'bg-green-700': isSubmenuActive(submenu) }"
+                                            class="flex items-center px-2 py-1 text-sm w-full rounded hover:bg-green-700">
+                                            <span>{{ submenu.label }}</span>
+                                        </button>
+                                    </li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </nav>
+                    <div class="p-4">
+                        <div class="bg-green-700 rounded-lg p-3 text-center">
+                            <p class="text-sm">Plano Atual</p>
+                            <p class="font-bold">Premium</p>
+                            <p class="text-xs mt-1">Válido até 15/12/2023</p>
                         </div>
                     </div>
                 </div>
@@ -247,23 +97,150 @@ export default {
     },
     data() {
         return {
-            sidebarOpen: false
-        };
+            sidebarOpen: false,
+            openSubmenu: null,
+            isDesktop: window.innerWidth >= 768,
+            menus: [
+                {
+                    key: 'dashboard',
+                    label: 'Dashboard',
+                    tab: 'dashboard',
+                    route: '/verdurao/dashboard',
+                    icon: `
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 md:mr-3" fill="none"
+                viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+            </svg>
+        `
+                },
+                {
+                    key: 'bulk',
+                    label: 'Envio em Massa',
+                    tab: 'bulk',
+                    route: '/verdurao/bot',
+                    icon: `
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 md:mr-3" fill="none"
+                viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M8 4H6a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-2m-4-1v8m0 0l3-3m-3 3L9 8m-5 5h2.586a1 1 0 01.707.293l2.414 2.414a1 1 0 00.707.293h3.172a1 1 0 00.707-.293l2.414-2.414a1 1 0 01.707-.293H20" />
+            </svg>
+        `
+                },
+                {
+                    key: 'auto',
+                    label: 'Respostas Automáticas',
+                    tab: 'auto',
+                    route: '/verdurao/auto',
+                    icon: `
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 md:mr-3" fill="none"
+                viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M13 10V3L4 14h7v7l9-11h-7z" />
+            </svg>
+        `
+                },
+                {
+                    key: 'extract',
+                    label: 'Extração do Maps',
+                    tab: 'extract',
+                    route: '/verdurao/business-extractor',
+                    icon: `
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 md:mr-3" fill="none"
+                viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>
+        `
+                },
+                {
+                    key: 'contacts',
+                    label: 'Contatos',
+                    tab: 'contacts',
+                    route: '/verdurao/contacts',
+                    icon: `
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 md:mr-3" fill="none"
+                viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+            </svg>
+        `
+                },
+                {
+                    key: 'settings',
+                    label: 'Configurações',
+                    tab: 'settings',
+                    icon: `
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 md:mr-3" fill="none"
+                viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>
+        `,
+                    submenus: [
+                        {
+                            key: 'modelos-mensagem',
+                            label: 'Modelos de Mensagem',
+                            route: '/verdurao/configuracoes/modelos-mensagem'
+                        }
+                        // Adicione outros submenus aqui depois!
+                    ]
+                }
+            ]
+
+        }
+    },
+    mounted() {
+        window.addEventListener('resize', this.handleResize);
+        this.handleResize();
+    },
+    beforeUnmount() {
+        window.removeEventListener('resize', this.handleResize);
     },
     methods: {
-        setActiveTab(tab) {
-            // Redireciona para as rotas corretas
-            if (tab === 'dashboard') {
-                router.visit('/verdurao/dashboard');
-            } else if (tab === 'bulk') {
-                router.visit('/verdurao/bot');
+        handleMenuClick(menu) {
+            if (menu.submenus) {
+                // Expande/recolhe submenu
+                this.openSubmenu = (this.openSubmenu === menu.key) ? null : menu.key;
+                // Se quiser marcar como ativo, pode: this.$emit('setActiveTab', menu.tab);
             } else {
-                this.$emit('setActiveTab', tab);
+                // Redireciona
+                router.visit(menu.route);
+                this.sidebarOpen = false;
+                this.openSubmenu = null;
+                // Marcar tab ativa, se precisar: this.$emit('setActiveTab', menu.tab);
             }
+        },
+        handleSubmenuClick(submenu) {
+            router.visit(submenu.route);
             this.sidebarOpen = false;
-        }
+            // Aqui também você pode emitir evento se quiser atualizar tab ativa
+        },
+        goToSettings() {
+            // Mantido para compatibilidade com menu mobile antigo, se quiser remover, pode!
+            this.handleMenuClick(this.menus.find(m => m.key === 'settings'));
+        },
+        isMenuActive(menu) {
+            // Pode adaptar: tab ativa, pathname, etc
+            if (menu.submenus) {
+                // Se algum submenu está na rota, menu pai fica ativo
+                return menu.submenus.some(sub => window.location.pathname === sub.route);
+            }
+            return window.location.pathname === menu.route;
+        },
+        isSubmenuActive(submenu) {
+            return window.location.pathname === submenu.route;
+        },
+        handleResize() {
+            this.isDesktop = window.innerWidth >= 768;
+            if (this.isDesktop) this.sidebarOpen = false;
+        },
     }
-};
+}
 </script>
 
 <style>
