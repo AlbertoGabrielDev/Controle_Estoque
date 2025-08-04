@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\GraficosApiController;
 use App\Http\Controllers\BotWhatsappController;
 use App\Http\Controllers\BusinessController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\MessageTemplateController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\CategoriaController;
@@ -34,9 +35,7 @@ Route::middleware([
     config('jetstream.auth_session'),
     'verified',
 ])->prefix('/verdurao')->group(function () {
-    Route::get('/dashboard', function () {
-        return Inertia::render('Dashboard');
-    })->middleware(['auth', 'verified'])->name('dashboard');
+   
 
 
 
@@ -61,6 +60,7 @@ Route::middleware([
 
     Route::prefix('/bot')->group(function () {
         Route::get('/', [BotWhatsappController::class, 'index'])->name('bot.index');
+        Route::get('/dashboard', [DashboardController::class, 'index'])->name('bot.dashboard');
         Route::post('/whatsapp/send-mass', [BotWhatsappController::class, 'sendMass']);
     });
 
