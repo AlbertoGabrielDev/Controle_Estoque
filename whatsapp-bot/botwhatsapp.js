@@ -1,10 +1,10 @@
-// whatsapp-bot/botwhatsapp.js
+// C:\Users\Alberto Gabriel\Documents\Projetos\Controle_Estoque\whatsapp-bot\botwhatsapp.js
 
 const express = require('express');
 const wppconnect = require('@wppconnect-team/wppconnect');
 const cors = require('cors');
 const setupSettingsRoutes = require('./settings');
-const dashboardRoutes = require('./dashboard'); // <- já aponta para o arquivo dashboard.js
+const dashboardRoutes = require('./dashboard');
 
 const app = express();
 
@@ -15,7 +15,6 @@ let qrCodeBase64 = null;
 let isConnected = false;
 let clientGlobal = null;
 
-// Inicializa o WPPConnect
 wppconnect
   .create({
     session: 'sessionName',
@@ -33,9 +32,7 @@ wppconnect
   })
   .then((client) => {
     clientGlobal = client;
-
-    // Aqui adiciona as rotas que dependem do client conectado
-    app.use('/dashboard', dashboardRoutes(clientGlobal)); // <-- importante: só aqui!
+    app.use('/dashboard', dashboardRoutes(clientGlobal));
 
     setupSettingsRoutes(app, clientGlobal);
 
@@ -43,7 +40,6 @@ wppconnect
   })
   .catch(console.log);
 
-// Endpoint para pegar o QR Code
 app.get('/verdurao/bot/whatsapp/qrcode', (req, res) => {
   if (isConnected) {
     return res.json({ connected: true });
@@ -54,12 +50,12 @@ app.get('/verdurao/bot/whatsapp/qrcode', (req, res) => {
   res.json({ connected: false, qrcode: qrCodeBase64 });
 });
 
-// Endpoint para envio em massa
 app.post('/verdurao/bot/whatsapp/send-mass', async (req, res) => {
   const { contacts, message } = req.body;
   if (!clientGlobal || !Array.isArray(contacts) || !message) {
     return res.status(400).json({ error: 'Client não conectado ou dados inválidos.' });
   }
+   console.log('[DEBUG] Métodos disponíveis:', Object.keys(clientGlobal));
   const results = [];
   for (const contact of contacts) {
     const number = contact.phone.replace(/\D/g, '');
@@ -80,12 +76,8 @@ app.post('/verdurao/bot/whatsapp/send-mass', async (req, res) => {
   res.json(results);
 });
 
-// (Opcional) endpoint para envio agendado, se você implementar!
 app.post('/verdurao/bot/whatsapp/send-scheduled', async (req, res) => {
-  // TODO: Adicione sua lógica de agendamento se quiser!
-  // Apenas para evitar erro 404 no Dashboard.vue
   res.json({ status: 'agendado' });
 });
 
-// Inicia o servidor Node na porta 3001
 app.listen(3001, () => console.log('API do WhatsApp rodando na porta 3001'));

@@ -1,3 +1,5 @@
+<!-- C:\Users\Alberto Gabriel\Documents\Projetos\Controle_Estoque\src\resources\js\Pages\Dashboard.vue -->
+
 <template>
   <Sidebar :activeTab="activeTab" @setActiveTab="setActiveTab">
     <div class="flex-1 overflow-y-auto bg-gray-100 p-6">
@@ -95,8 +97,8 @@ export default {
   },
   methods: {
     async fetchDashboardStats() {
-      // Endpoint Node: /dashboard/stats/sent-messages e /dashboard/stats/response-rate
       try {
+        
         const [sentRes, respRes] = await Promise.all([
           fetch('http://localhost:3001/dashboard/stats/sent-messages').then(r => r.json()),
           fetch('http://localhost:3001/dashboard/stats/response-rate').then(r => r.json())
@@ -132,7 +134,6 @@ export default {
     async fetchRecentActivities() {
       try {
         const activities = await fetch('http://localhost:3001/dashboard/activity/recent').then(r => r.json())
-        // Ajuste conforme o retorno real do seu backend!
         this.recentActivities = (activities || []).map((item, idx) => ({
           ...item,
           id: idx,
