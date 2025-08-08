@@ -31,7 +31,7 @@ class BotWhatsappController extends Controller
             );
 
             $response = Http::withToken(config('services.wppconnect.token'))
-                ->post(config('services.wppconnect.base_url') . '/' . config('services.wppconnect.session') . '/send-message', [
+                ->post(config('services.wppconnect.base_url') . '/' . config('services.wpcponnect.session') . '/send-message', [
                     'phone' => $contact['phone'],
                     'message' => $personalized,
                 ]);

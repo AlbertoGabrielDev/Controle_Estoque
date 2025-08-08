@@ -1,83 +1,269 @@
-// C:\Users\Alberto Gabriel\Documents\Projetos\Controle_Estoque\whatsapp-bot\botwhatsapp.js
+// whatsapp-bot/botwhatsapp.js
+require('dotenv').config();
 
 const express = require('express');
-const wppconnect = require('@wppconnect-team/wppconnect');
 const cors = require('cors');
-const setupSettingsRoutes = require('./settings');
+const wppconnect = require('@wppconnect-team/wppconnect');
+const { google } = require('googleapis');
 const dashboardRoutes = require('./dashboard');
-
+const setupSettingsRoutes = require('./settings');
+const fs = require('fs');
+const path = require('path');
 const app = express();
 
-app.use(cors());
+const SCOPES = ['https://www.googleapis.com/auth/contacts.readonly'];
+const CREDENTIALS_PATH = path.resolve(__dirname, './credentials.json');
+const TOKEN_PATH = path.resolve(__dirname, './token.json');
+
+function loadCredentials() {
+  if (!fs.existsSync(CREDENTIALS_PATH)) {
+    throw new Error('credentials.json não encontrado. Baixe do Google Cloud Console e coloque em ./whatsapp-bot/credentials.json');
+  }
+  const credentials = JSON.parse(fs.readFileSync(CREDENTIALS_PATH, 'utf8'));
+  const data = credentials.installed || credentials.web;
+  if (!data?.client_id || !data?.client_secret || !(data.redirect_uris && data.redirect_uris.length)) {
+    throw new Error('credentials.json inválido: faltam client_id/client_secret/redirect_uris.');
+  }
+  return data;
+}
+
+function buildOAuthClient() {
+  const { client_id, client_secret, redirect_uris } = loadCredentials();
+  return new google.auth.OAuth2(client_id, client_secret, redirect_uris[0]);
+}
+
+function haveTokenFile() {
+  return fs.existsSync(TOKEN_PATH);
+}
+
+function loadTokens() {
+  return JSON.parse(fs.readFileSync(TOKEN_PATH, 'utf8'));
+}
+
+async function getGoogleAuthOrThrowNeedAuth() {
+  const oAuth2Client = buildOAuthClient();
+
+  if (!haveTokenFile()) {
+    const url = oAuth2Client.generateAuthUrl({
+      access_type: 'offline',
+      scope: SCOPES,
+      prompt: 'consent',
+    });
+    const err = new Error('NEED_AUTH');
+    err.needAuth = true;
+    err.authUrl = url;
+    throw err;
+  }
+
+  const tokens = loadTokens();
+
+  if (!tokens.refresh_token) {
+    const url = oAuth2Client.generateAuthUrl({
+      access_type: 'offline',
+      scope: SCOPES,
+      prompt: 'consent',
+    });
+    const err = new Error('NEED_AUTH_NO_REFRESH');
+    err.needAuth = true;
+    err.authUrl = url;
+    throw err;
+  }
+
+  oAuth2Client.setCredentials(tokens);
+
+  oAuth2Client.on('tokens', (t) => {
+    const merged = { ...oAuth2Client.credentials, ...t };
+    fs.writeFileSync(TOKEN_PATH, JSON.stringify(merged, null, 2));
+  });
+
+  return oAuth2Client;
+}
+
+app.get('/verdurao/bot/whatsapp/google-auth', (req, res) => {
+  try {
+    const oAuth2Client = buildOAuthClient();
+    const url = oAuth2Client.generateAuthUrl({
+      access_type: 'offline',
+      scope: SCOPES,
+      prompt: 'consent',
+    });
+    res.json({ url });
+  } catch (e) {
+    res.status(500).json({ error: String(e.message || e) });
+  }
+});
+
+app.get('/verdurao/bot/whatsapp/google-auth/callback', async (req, res) => {
+  try {
+    const code = req.query.code;
+    const oAuth2Client = buildOAuthClient();
+    const { tokens } = await oAuth2Client.getToken(code);
+    fs.writeFileSync(TOKEN_PATH, JSON.stringify(tokens, null, 2));
+    res.send('Autenticado! Pode fechar esta janela e voltar ao app.');
+  } catch (e) {
+    res.status(500).send('Falha ao autenticar: ' + (e?.message || e));
+  }
+});
+
+app.use(cors({
+  origin: '*',
+  methods: ['GET', 'POST'],
+  allowedHeaders: ['Content-Type'],
+}));
 app.use(express.json());
 
 let qrCodeBase64 = null;
 let isConnected = false;
 let clientGlobal = null;
 
-wppconnect
-  .create({
-    session: 'sessionName',
-    catchQR: (base64Qr, asciiQR) => {
-      qrCodeBase64 = base64Qr;
-      isConnected = false;
-    },
-    statusFind: (status, session) => {
-      if (status === 'isLogged') {
-        isConnected = true;
-        qrCodeBase64 = null;
-      }
-    },
-    logQR: false,
-  })
+const sendLogs = [];
+
+function log(type, message, meta = {}) {
+  const entry = { ts: new Date().toISOString(), type, message, meta };
+  sendLogs.push(entry);
+  console.log(`[${type}] ${message}`, Object.keys(meta).length ? meta : '');
+  if (sendLogs.length > 1000) sendLogs.shift();
+}
+
+wppconnect.create({
+  session: process.env.WPP_SESSION || 'sessionName',
+  catchQR: (base64Qr) => {
+    qrCodeBase64 = base64Qr;
+    isConnected = false;
+    log('qr', 'QR atualizado');
+  },
+  statusFind: (status) => {
+    log('status', `Status da sessão: ${status}`);
+    if (status === 'isLogged') {
+      isConnected = true;
+      qrCodeBase64 = null;
+    }
+  },
+  logQR: false,
+})
   .then((client) => {
     clientGlobal = client;
     app.use('/dashboard', dashboardRoutes(clientGlobal));
-
     setupSettingsRoutes(app, clientGlobal);
-
-    console.log('Bot WhatsApp iniciado!');
+    log('info', 'Bot WhatsApp iniciado!');
   })
-  .catch(console.log);
+  .catch((err) => {
+    log('error', 'Falha ao iniciar wppconnect', { err: String(err) });
+  });
 
 app.get('/verdurao/bot/whatsapp/qrcode', (req, res) => {
-  if (isConnected) {
-    return res.json({ connected: true });
+  if (isConnected) return res.json({ connected: true });
+  return res.json({ connected: false, qrcode: qrCodeBase64 || null });
+});
+
+app.get('/verdurao/bot/whatsapp/all-contacts', async (req, res) => {
+  try {
+    if (!clientGlobal) return res.status(500).json({ error: 'Cliente não conectado' });
+
+    const [saved, chats] = await Promise.all([
+      clientGlobal.getAllContacts(),
+      clientGlobal.listChats(),
+    ]);
+
+    const map = new Map();
+    saved.forEach(c => {
+      map.set(c.id.user, {
+        name: c.formattedName || c.name || c.pushname || c.id.user,
+        phone: c.id.user,
+        saved: true,
+      });
+    });
+    chats.forEach(ch => {
+      const phone = ch.id.user;
+      if (!map.has(phone)) {
+        map.set(phone, {
+          name: ch.formattedTitle || ch.name || phone,
+          phone,
+          saved: false,
+        });
+      }
+    });
+
+    res.json(Array.from(map.values()));
+  } catch (err) {
+    log('error', 'Erro ao listar contatos', { err: String(err) });
+    res.status(500).json({ error: 'Erro ao listar contatos' });
   }
-  if (!qrCodeBase64) {
-    return res.json({ connected: false, qrcode: null });
+});
+
+async function getGoogleContacts(auth) {
+  const service = google.people({ version: 'v1', auth });
+  const r = await service.people.connections.list({
+    resourceName: 'people/me',
+    personFields: 'names,phoneNumbers',
+    pageSize: 1000,
+  });
+  const connections = r.data.connections || [];
+  return connections
+    .map(person => ({
+      name: person.names?.[0]?.displayName || 'Sem Nome',
+      phone: person.phoneNumbers?.[0]?.value || '',
+      saved: true,
+    }))
+    .filter(c => c.phone);
+}
+
+app.get('/verdurao/bot/whatsapp/google-contacts', async (req, res) => {
+  try {
+    const auth = await getGoogleAuthOrThrowNeedAuth();
+    const contacts = await getGoogleContacts(auth);
+    res.json(contacts);
+  } catch (err) {
+    if (err.needAuth) {
+      // Responde 401 para o front disparar o fluxo de login
+      return res.status(401).json({ needAuth: true, url: err.authUrl });
+    }
+    const details = err?.response?.data || err.message || String(err);
+    log('error', 'Erro ao listar contatos do Google', { details });
+    // Quando as ENV estavam faltando, o Google devolvia:
+    // { error: "invalid_request", error_description: "Could not determine client ID from request." }
+    return res.status(500).json({ error: details });
   }
-  res.json({ connected: false, qrcode: qrCodeBase64 });
+});
+
+app.get('/verdurao/bot/whatsapp/logs', (req, res) => {
+  const limit = Math.min(parseInt(req.query.limit || '200', 10), 1000);
+  res.json(sendLogs.slice(-limit));
 });
 
 app.post('/verdurao/bot/whatsapp/send-mass', async (req, res) => {
-  const { contacts, message } = req.body;
-  if (!clientGlobal || !Array.isArray(contacts) || !message) {
+  const { contacts, message, intervalSeconds = 1, randomInterval = false, simulateTyping = false } = req.body || {};
+  if (!clientGlobal || !Array.isArray(contacts) || !contacts.length || !message) {
     return res.status(400).json({ error: 'Client não conectado ou dados inválidos.' });
   }
-   console.log('[DEBUG] Métodos disponíveis:', Object.keys(clientGlobal));
+
+  log('info', 'Iniciando envio em massa', { total: contacts.length });
+
   const results = [];
-  for (const contact of contacts) {
-    const number = contact.phone.replace(/\D/g, '');
-    let fullNumber = number;
-    if (fullNumber.length <= 13 && !fullNumber.endsWith('@c.us')) {
-      fullNumber = `${fullNumber}@c.us`;
-    }
-    const finalMessage = message
-      .replace(/{nome}/g, contact.name)
-      .replace(/{telefone}/g, contact.phone);
+  for (let i = 0; i < contacts.length; i++) {
+    const contact = contacts[i];
+    const raw = (contact.phone || '').replace(/\D/g, '');
+    let jid = raw.endsWith('@c.us') ? raw : `${raw}@c.us`;
+    const personalized = message
+      .replace(/{nome}/g, contact.name || '')
+      .replace(/{telefone}/g, contact.phone || '');
+
     try {
-      await clientGlobal.sendText(fullNumber, finalMessage);
+      if (simulateTyping) await new Promise(r => setTimeout(r, 800));
+      await clientGlobal.sendText(jid, personalized);
+      log('sent', 'Mensagem enviada', { to: jid });
       results.push({ phone: contact.phone, status: 'enviado' });
     } catch (err) {
-      results.push({ phone: contact.phone, status: 'erro', error: err.message });
+      log('error', 'Falha ao enviar', { to: jid, err: String(err) });
+      results.push({ phone: contact.phone, status: 'erro', error: String(err) });
     }
+    const base = Math.max(1, Number(intervalSeconds)) * 1000;
+    const wait = randomInterval ? Math.round(base * (0.7 + Math.random() * 0.6)) : base;
+    if (i < contacts.length - 1) await new Promise(r => setTimeout(r, wait));
   }
+
   res.json(results);
 });
 
-app.post('/verdurao/bot/whatsapp/send-scheduled', async (req, res) => {
-  res.json({ status: 'agendado' });
-});
-
-app.listen(3001, () => console.log('API do WhatsApp rodando na porta 3001'));
+const PORT = process.env.PORT || 3001;
+app.listen(PORT, () => console.log(`API do WhatsApp rodando na porta ${PORT}`));
