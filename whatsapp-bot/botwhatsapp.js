@@ -10,7 +10,6 @@ const setupSettingsRoutes = require('./settings');
 const fs = require('fs');
 const path = require('path');
 const app = express();
-
 const SCOPES = ['https://www.googleapis.com/auth/contacts.readonly'];
 const CREDENTIALS_PATH = path.resolve(__dirname, './credentials.json');
 const TOKEN_PATH = path.resolve(__dirname, './token.json');
@@ -32,45 +31,28 @@ function buildOAuthClient() {
   return new google.auth.OAuth2(client_id, client_secret, redirect_uris[0]);
 }
 
-function haveTokenFile() {
-  return fs.existsSync(TOKEN_PATH);
-}
-
-function loadTokens() {
-  return JSON.parse(fs.readFileSync(TOKEN_PATH, 'utf8'));
-}
+function haveTokenFile() { return fs.existsSync(TOKEN_PATH); }
+function loadTokens() { return JSON.parse(fs.readFileSync(TOKEN_PATH, 'utf8')); }
 
 async function getGoogleAuthOrThrowNeedAuth() {
   const oAuth2Client = buildOAuthClient();
 
   if (!haveTokenFile()) {
-    const url = oAuth2Client.generateAuthUrl({
-      access_type: 'offline',
-      scope: SCOPES,
-      prompt: 'consent',
-    });
+    const url = oAuth2Client.generateAuthUrl({ access_type: 'offline', scope: SCOPES, prompt: 'consent' });
     const err = new Error('NEED_AUTH');
-    err.needAuth = true;
-    err.authUrl = url;
+    err.needAuth = true; err.authUrl = url;
     throw err;
   }
 
   const tokens = loadTokens();
-
   if (!tokens.refresh_token) {
-    const url = oAuth2Client.generateAuthUrl({
-      access_type: 'offline',
-      scope: SCOPES,
-      prompt: 'consent',
-    });
+    const url = oAuth2Client.generateAuthUrl({ access_type: 'offline', scope: SCOPES, prompt: 'consent' });
     const err = new Error('NEED_AUTH_NO_REFRESH');
-    err.needAuth = true;
-    err.authUrl = url;
+    err.needAuth = true; err.authUrl = url;
     throw err;
   }
 
   oAuth2Client.setCredentials(tokens);
-
   oAuth2Client.on('tokens', (t) => {
     const merged = { ...oAuth2Client.credentials, ...t };
     fs.writeFileSync(TOKEN_PATH, JSON.stringify(merged, null, 2));
@@ -82,11 +64,7 @@ async function getGoogleAuthOrThrowNeedAuth() {
 app.get('/verdurao/bot/whatsapp/google-auth', (req, res) => {
   try {
     const oAuth2Client = buildOAuthClient();
-    const url = oAuth2Client.generateAuthUrl({
-      access_type: 'offline',
-      scope: SCOPES,
-      prompt: 'consent',
-    });
+    const url = oAuth2Client.generateAuthUrl({ access_type: 'offline', scope: SCOPES, prompt: 'consent' });
     res.json({ url });
   } catch (e) {
     res.status(500).json({ error: String(e.message || e) });
@@ -105,11 +83,7 @@ app.get('/verdurao/bot/whatsapp/google-auth/callback', async (req, res) => {
   }
 });
 
-app.use(cors({
-  origin: '*',
-  methods: ['GET', 'POST'],
-  allowedHeaders: ['Content-Type'],
-}));
+app.use(cors({ origin: '*', methods: ['GET', 'POST'], allowedHeaders: ['Content-Type'] }));
 app.use(express.json());
 
 let qrCodeBase64 = null;
@@ -117,7 +91,6 @@ let isConnected = false;
 let clientGlobal = null;
 
 const sendLogs = [];
-
 function log(type, message, meta = {}) {
   const entry = { ts: new Date().toISOString(), type, message, meta };
   sendLogs.push(entry);
@@ -127,38 +100,64 @@ function log(type, message, meta = {}) {
 
 wppconnect.create({
   session: process.env.WPP_SESSION || 'sessionName',
-  catchQR: (base64Qr) => {
-    qrCodeBase64 = base64Qr;
-    isConnected = false;
-    log('qr', 'QR atualizado');
-  },
+  catchQR: (base64Qr) => { qrCodeBase64 = base64Qr; isConnected = false; log('qr', 'QR atualizado'); },
   statusFind: (status) => {
     log('status', `Status da sessão: ${status}`);
-    if (status === 'isLogged') {
-      isConnected = true;
-      qrCodeBase64 = null;
-    }
+    if (status === 'isLogged') { isConnected = true; qrCodeBase64 = null; }
   },
   logQR: false,
 })
-  .then((client) => {
-    clientGlobal = client;
-    app.use('/dashboard', dashboardRoutes(clientGlobal));
-    setupSettingsRoutes(app, clientGlobal);
-    log('info', 'Bot WhatsApp iniciado!');
-  })
-  .catch((err) => {
-    log('error', 'Falha ao iniciar wppconnect', { err: String(err) });
-  });
+.then((client) => {
+  clientGlobal = client;
+  app.use('/dashboard', dashboardRoutes(clientGlobal));
+  setupSettingsRoutes(app, clientGlobal);
+  log('info', 'Bot WhatsApp iniciado!');
+})
+.catch((err) => {
+  log('error', 'Falha ao iniciar wppconnect', { err: String(err) });
+});
 
 app.get('/verdurao/bot/whatsapp/qrcode', (req, res) => {
   if (isConnected) return res.json({ connected: true });
   return res.json({ connected: false, qrcode: qrCodeBase64 || null });
 });
 
+function normalizeSavedContact(c) {
+  try {
+    const server = c?.id?.server;
+    const user = c?.id?.user;
+    if (server !== 'c.us' || !user) return null;
+    return {
+      name: c?.formattedName || c?.name || c?.pushname || user,
+      phone: user,
+      saved: true,
+    };
+  } catch {
+    return null;
+  }
+}
+
+function normalizeChat(ch) {
+  try {
+    const server = ch?.id?.server;
+    const user = ch?.id?.user;
+    if (server !== 'c.us' || !user) return null;
+    return {
+      name: ch?.formattedTitle || ch?.name || user,
+      phone: user,
+      saved: false,
+    };
+  } catch {
+    return null;
+  }
+}
+
 app.get('/verdurao/bot/whatsapp/all-contacts', async (req, res) => {
   try {
-    if (!clientGlobal) return res.status(500).json({ error: 'Cliente não conectado' });
+    if (!clientGlobal) {
+      log('warn', 'Tentativa de listar contatos sem client conectado');
+      return res.status(500).json({ error: 'Cliente não conectado' });
+    }
 
     const [saved, chats] = await Promise.all([
       clientGlobal.getAllContacts(),
@@ -166,28 +165,22 @@ app.get('/verdurao/bot/whatsapp/all-contacts', async (req, res) => {
     ]);
 
     const map = new Map();
-    saved.forEach(c => {
-      map.set(c.id.user, {
-        name: c.formattedName || c.name || c.pushname || c.id.user,
-        phone: c.id.user,
-        saved: true,
-      });
-    });
-    chats.forEach(ch => {
-      const phone = ch.id.user;
-      if (!map.has(phone)) {
-        map.set(phone, {
-          name: ch.formattedTitle || ch.name || phone,
-          phone,
-          saved: false,
-        });
-      }
-    });
 
-    res.json(Array.from(map.values()));
+    for (const c of saved || []) {
+      const entry = normalizeSavedContact(c);
+      if (entry) map.set(entry.phone, entry);
+    }
+
+    for (const ch of chats || []) {
+      const entry = normalizeChat(ch);
+      if (entry && !map.has(entry.phone)) map.set(entry.phone, entry);
+    }
+
+    return res.json(Array.from(map.values()));
   } catch (err) {
-    log('error', 'Erro ao listar contatos', { err: String(err) });
-    res.status(500).json({ error: 'Erro ao listar contatos' });
+    const detail = err?.stack || err?.message || String(err);
+    log('error', 'Erro ao listar contatos', { detail });
+    return res.status(500).json({ error: 'Erro ao listar contatos', detail });
   }
 });
 
@@ -214,14 +207,9 @@ app.get('/verdurao/bot/whatsapp/google-contacts', async (req, res) => {
     const contacts = await getGoogleContacts(auth);
     res.json(contacts);
   } catch (err) {
-    if (err.needAuth) {
-      // Responde 401 para o front disparar o fluxo de login
-      return res.status(401).json({ needAuth: true, url: err.authUrl });
-    }
-    const details = err?.response?.data || err.message || String(err);
+    if (err.needAuth) return res.status(401).json({ needAuth: true, url: err.authUrl });
+    const details = err?.response?.data || err?.message || String(err);
     log('error', 'Erro ao listar contatos do Google', { details });
-    // Quando as ENV estavam faltando, o Google devolvia:
-    // { error: "invalid_request", error_description: "Could not determine client ID from request." }
     return res.status(500).json({ error: details });
   }
 });
@@ -243,7 +231,7 @@ app.post('/verdurao/bot/whatsapp/send-mass', async (req, res) => {
   for (let i = 0; i < contacts.length; i++) {
     const contact = contacts[i];
     const raw = (contact.phone || '').replace(/\D/g, '');
-    let jid = raw.endsWith('@c.us') ? raw : `${raw}@c.us`;
+    const jid = raw.endsWith('@c.us') ? raw : `${raw}@c.us`;
     const personalized = message
       .replace(/{nome}/g, contact.name || '')
       .replace(/{telefone}/g, contact.phone || '');
@@ -257,6 +245,7 @@ app.post('/verdurao/bot/whatsapp/send-mass', async (req, res) => {
       log('error', 'Falha ao enviar', { to: jid, err: String(err) });
       results.push({ phone: contact.phone, status: 'erro', error: String(err) });
     }
+
     const base = Math.max(1, Number(intervalSeconds)) * 1000;
     const wait = randomInterval ? Math.round(base * (0.7 + Math.random() * 0.6)) : base;
     if (i < contacts.length - 1) await new Promise(r => setTimeout(r, wait));
