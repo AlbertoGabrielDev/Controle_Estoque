@@ -33,7 +33,7 @@
 
 <script setup>
 import { reactive } from 'vue'
-import Sidebar from '../Sidebar.vue'
+import Sidebar from '../../Layouts/Sidebar.vue'
 
 const props = defineProps({
   templates: Array

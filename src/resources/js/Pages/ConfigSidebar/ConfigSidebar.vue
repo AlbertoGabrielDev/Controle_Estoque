@@ -16,5 +16,5 @@
 
 <script setup>
 import { Link as InertiaLink } from '@inertiajs/vue3'
-import Sidebar from '../Sidebar.vue';
+import Sidebar from '../../Layouts/Sidebar.vue';
 </script>

@@ -3,7 +3,7 @@
 import { ref, onMounted } from 'vue';
 import { Head, usePage } from '@inertiajs/vue3';
 import { Loader } from '@googlemaps/js-api-loader';
-import Sidebar from '../Sidebar.vue';
+import Sidebar from '../../Layouts/Sidebar.vue';
 
 const setActiveTab = (tab) => {
     activeTab.value = tab;

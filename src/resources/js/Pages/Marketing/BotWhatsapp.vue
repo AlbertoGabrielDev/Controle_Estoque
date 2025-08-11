@@ -1,5 +1,4 @@
 <template>
-    <Sidebar :activeTab="activeTab" @setActiveTab="setActiveTab">
         <div class="flex justify-center p-4 bg-gray-100 min-h-screen">
             <div class="bg-white rounded-lg shadow-lg p-4 grid grid-cols-1 md:grid-cols-3 gap-4 max-w-screen-xl w-full">
                 <div class="border rounded-lg p-4">
@@ -206,11 +205,11 @@
 
             </div>
         </div>
-    </Sidebar>
+
 </template>
 
 <script>
-import Sidebar from '../Sidebar.vue';
+
 
 const BASE_URL = import.meta.env.VITE_WHATSAPP_API_URL || 'http://localhost:3001';
 
@@ -218,7 +217,7 @@ export default {
     props: {
         templates: { type: Array, default: () => [] }
     },
-    components: { Sidebar },
+  
     data() {
         return {
             activeTab: null,

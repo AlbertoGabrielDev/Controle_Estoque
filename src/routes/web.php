@@ -5,6 +5,7 @@ use App\Http\Controllers\BotWhatsappController;
 use App\Http\Controllers\BusinessController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\MessageTemplateController;
+use App\Http\Controllers\WhatsAppContactsController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\CategoriaController;
 use App\Http\Controllers\ProdutoController;
@@ -172,6 +173,14 @@ Route::middleware([
         Route::put('/modelos-mensagem/{messageTemplate}', [MessageTemplateController::class, 'update']);
         Route::delete('/modelos-mensagem/{messageTemplate}', [MessageTemplateController::class, 'destroy']);
     });
+
+    Route::prefix('whatsapp')->group(function () {
+    Route::get('/contacts', [WhatsAppContactsController::class, 'index'])->name('whatsapp.contacts');
+
+    Route::post('/labels',        [WhatsAppContactsController::class, 'createLabel'])->name('whatsapp.labels.store');
+    Route::post('/labels/assign', [WhatsAppContactsController::class, 'assignLabel'])->name('whatsapp.labels.assign');
+    Route::delete('/labels/{id}', [WhatsAppContactsController::class, 'deleteLabel'])->name('whatsapp.labels.destroy');
+});
 });
 
 Route::get('login', [UsuarioController::class, 'unidade'])->name('login');

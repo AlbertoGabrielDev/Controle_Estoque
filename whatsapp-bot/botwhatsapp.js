@@ -107,15 +107,17 @@ wppconnect.create({
   },
   logQR: false,
 })
-.then((client) => {
-  clientGlobal = client;
-  app.use('/dashboard', dashboardRoutes(clientGlobal));
-  setupSettingsRoutes(app, clientGlobal);
-  log('info', 'Bot WhatsApp iniciado!');
-})
-.catch((err) => {
-  log('error', 'Falha ao iniciar wppconnect', { err: String(err) });
-});
+  .then((client) => {
+    clientGlobal = client;
+    const setupLabelRoutes = require('./labels');
+    app.use('/dashboard', dashboardRoutes(clientGlobal));
+    setupLabelRoutes(app, clientGlobal, log);
+    setupSettingsRoutes(app, clientGlobal);
+    log('info', 'Bot WhatsApp iniciado!');
+  })
+  .catch((err) => {
+    log('error', 'Falha ao iniciar wppconnect', { err: String(err) });
+  });
 
 app.get('/verdurao/bot/whatsapp/qrcode', (req, res) => {
   if (isConnected) return res.json({ connected: true });

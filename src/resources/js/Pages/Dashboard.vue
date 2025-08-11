@@ -82,7 +82,7 @@
 </template>
 
 <script>
-import Sidebar from './Sidebar.vue'
+import Sidebar from '../Layouts/Sidebar.vue'
 
 export default {
   name: 'Dashboard',
