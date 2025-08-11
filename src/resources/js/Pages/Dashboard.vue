@@ -1,7 +1,7 @@
 <!-- C:\Users\Alberto Gabriel\Documents\Projetos\Controle_Estoque\src\resources\js\Pages\Dashboard.vue -->
 
 <template>
-  <Sidebar :activeTab="activeTab" @setActiveTab="setActiveTab">
+
     <div class="flex-1 overflow-y-auto bg-gray-100 p-6">
       <div class="demo-notice p-4 mb-6 rounded-lg">
         <div class="flex items-start">
@@ -78,15 +78,15 @@
         </div>
       </div>
     </div>
-  </Sidebar>
+
 </template>
 
 <script>
-import Sidebar from '../Layouts/Sidebar.vue'
+
 
 export default {
   name: 'Dashboard',
-  components: { Sidebar },
+
   data() {
     return {
       activeTab: 'dashboard',
