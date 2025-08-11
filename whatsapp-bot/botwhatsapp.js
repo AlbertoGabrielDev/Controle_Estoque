@@ -13,6 +13,7 @@ const app = express();
 const SCOPES = ['https://www.googleapis.com/auth/contacts.readonly'];
 const CREDENTIALS_PATH = path.resolve(__dirname, './credentials.json');
 const TOKEN_PATH = path.resolve(__dirname, './token.json');
+const hasFn = (obj, name) => obj && typeof obj[name] === 'function';
 
 function loadCredentials() {
   if (!fs.existsSync(CREDENTIALS_PATH)) {
@@ -103,7 +104,9 @@ wppconnect.create({
   catchQR: (base64Qr) => { qrCodeBase64 = base64Qr; isConnected = false; log('qr', 'QR atualizado'); },
   statusFind: (status) => {
     log('status', `Status da sessão: ${status}`);
-    if (status === 'isLogged') { isConnected = true; qrCodeBase64 = null; }
+    const okStatuses = ['isLogged', 'inChat', 'chatsAvailable', 'phoneConnected'];
+    isConnected = okStatuses.includes(status);
+    if (isConnected) qrCodeBase64 = null;
   },
   logQR: false,
 })
@@ -122,6 +125,139 @@ wppconnect.create({
 app.get('/verdurao/bot/whatsapp/qrcode', (req, res) => {
   if (isConnected) return res.json({ connected: true });
   return res.json({ connected: false, qrcode: qrCodeBase64 || null });
+});
+
+app.get('/verdurao/bot/whatsapp/session', async (req, res) => {
+  try {
+    if (!clientGlobal) return res.json({ connected: false });
+
+    let phone = null, pushname = null;
+
+    if (isConnected) {
+      // 1) host device
+      if (typeof clientGlobal.getHostDevice === 'function') {
+        try {
+          const host = await clientGlobal.getHostDevice();
+          pushname = host?.pushname || host?.name || null;
+
+          const candHost =
+            host?.wid?._serialized ||
+            (host?.wid?.user && `${host.wid.user}@${host.wid.server || 'c.us'}`) ||
+            host?.id?._serialized ||
+            (host?.id?.user && `${host.id.user}@${host.id.server || 'c.us'}`) ||
+            null;
+
+          if (candHost) phone = String(candHost).replace(/@.*/, '');
+        } catch { }
+      }
+
+      // 2) getWid()
+      if (!phone && typeof clientGlobal.getWid === 'function') {
+        try {
+          const wid = await clientGlobal.getWid();
+          if (wid) phone = String(wid).replace(/@.*/, '');
+        } catch { }
+      }
+
+      // 3) getMe()
+      if ((!phone || !pushname) && typeof clientGlobal.getMe === 'function') {
+        try {
+          const me = await clientGlobal.getMe();
+          const candMe = me?.wid?._serialized || me?.id?._serialized || me;
+          if (!phone && candMe) phone = String(candMe).replace(/@.*/, '');
+          if (!pushname) pushname = me?.pushname || me?.name || null;
+        } catch { }
+      }
+
+      // 4) fallback pelos contatos (acha o "eu")
+      if (!phone && typeof clientGlobal.getAllContacts === 'function') {
+        try {
+          const all = await clientGlobal.getAllContacts();
+          const meC =
+            (all || []).find(c => c?.isMyContact || c?.isMe || c?.isMyNumber) ||
+            (all || []).find(c => c?.id?._serialized?.endsWith('@c.us') && c?.isBusiness === false);
+          const id = meC?.id?._serialized || meC?.id || null;
+          if (id) phone = String(id).replace(/@.*/, '');
+          if (!pushname) pushname = meC?.pushname || meC?.name || null;
+        } catch { }
+      }
+    }
+
+    return res.json({ connected: !!isConnected, phone, pushname });
+  } catch {
+    return res.json({ connected: !!isConnected, phone: null, pushname: null });
+  }
+});
+
+app.post('/verdurao/bot/whatsapp/logout', async (req, res) => {
+  try {
+    if (!clientGlobal) return res.status(500).json({ error: 'Cliente não conectado' });
+
+    if (typeof clientGlobal.logout === 'function') {
+      await clientGlobal.logout();
+    } else if (typeof clientGlobal.close === 'function') {
+      await clientGlobal.close();
+    }
+
+    isConnected = false;
+    qrCodeBase64 = null;
+    log('info', 'Sessão desconectada via API');
+    return res.json({ ok: true });
+  } catch (e) {
+    log('error', 'Falha no logout', { err: String(e) });
+    return res.status(500).json({ error: e?.message || String(e) });
+  }
+});
+
+async function listChatsSmart(client) {
+  if (hasFn(client, 'listChats')) {
+    try { return await client.listChats(); } catch { }
+  }
+  if (hasFn(client, 'getAllChats')) {
+    try { return await client.getAllChats(); } catch { }
+  }
+  return [];
+}
+app.get('/verdurao/bot/whatsapp/labels/:id/chats', async (req, res) => {
+  try {
+    if (!clientGlobal) return res.status(500).json({ error: 'Cliente não conectado' });
+    const labelId = String(req.params.id || '').trim();
+    if (!labelId) return res.status(400).json({ error: 'labelId inválido' });
+
+    let chats = [];
+    if (hasFn(clientGlobal, 'getChatsByLabelId')) {
+      // caminho feliz (algumas versões do wppconnect suportam)
+      chats = await clientGlobal.getChatsByLabelId(labelId);
+    } else {
+      // fallback: pega todos os chats e filtra quem contém a label
+      const all = await listChatsSmart(clientGlobal) || [];
+      chats = all.filter(ch => {
+        const lbls = ch?.labels;
+        if (!lbls) return false;
+        // lbls pode ser array de objetos/strings; tentamos cobrir os formatos comuns
+        const arr = Array.isArray(lbls) ? lbls : Object.values(lbls);
+        return arr.some(l =>
+          String(l?.id ?? l?._serialized ?? l) === labelId
+        );
+      });
+    }
+
+    const items = (chats || []).map(ch => {
+      // extrai jid e phone
+      const rawId = typeof ch?.id === 'object'
+        ? (ch.id._serialized || (ch.id.user && `${ch.id.user}@${ch.id.server}`) || String(ch.id))
+        : String(ch?.id || '');
+      const m = rawId.match(/^(\d+)@/);
+      const phone = m ? m[1] : null;
+      const name = ch?.formattedTitle || ch?.name || ch?.contact?.name || ch?.contact?.pushname || phone;
+      return phone ? { name, phone, jid: rawId } : null;
+    }).filter(Boolean);
+
+    res.json(items);
+  } catch (e) {
+    log('error', 'labels/:id/chats error', { err: String(e) });
+    res.status(500).json({ error: e?.message || String(e) });
+  }
 });
 
 function normalizeSavedContact(c) {

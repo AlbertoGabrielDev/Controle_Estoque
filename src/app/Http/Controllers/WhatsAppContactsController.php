@@ -25,11 +25,11 @@ class WhatsAppContactsController extends Controller
     {
         // Busca contatos com conversa + labels disponíveis para montar a página
         $contacts = $this->getJson("{$this->base}/contacts-with-dialog", []);
-        $labels   = $this->getJson("{$this->base}/labels", []);
+        $labels = $this->getJson("{$this->base}/labels", []);
 
         return Inertia::render('Contacts/Contacts', [
             'contacts' => $contacts,
-            'labels'   => $labels,
+            'labels' => $labels,
         ]);
     }
 
@@ -52,9 +52,9 @@ class WhatsAppContactsController extends Controller
     {
         $data = $request->validate([
             'labelId' => 'required',
-            'type'    => 'required|in:add,remove',
-            'phones'  => 'required|array|min:1',
-            'phones.*'=> 'string',
+            'type' => 'required|in:add,remove',
+            'phones' => 'required|array|min:1',
+            'phones.*' => 'string',
         ]);
 
         $res = $this->postJson("{$this->base}/labels/assign", $data);
@@ -81,7 +81,7 @@ class WhatsAppContactsController extends Controller
     {
         try {
             $r = $this->http->get($url);
-            $b = json_decode((string)$r->getBody(), true);
+            $b = json_decode((string) $r->getBody(), true);
             return is_array($b) ? $b : $fallback;
         } catch (\Throwable $e) {
             Log::warning('getJson fail', ['url' => $url, 'err' => $e->getMessage()]);
@@ -93,7 +93,7 @@ class WhatsAppContactsController extends Controller
     {
         try {
             $r = $this->http->post($url, ['json' => $payload]);
-            return json_decode((string)$r->getBody(), true) ?? [];
+            return json_decode((string) $r->getBody(), true) ?? [];
         } catch (\Throwable $e) {
             Log::warning('postJson fail', ['url' => $url, 'err' => $e->getMessage()]);
             return ['error' => $e->getMessage()];
@@ -104,10 +104,16 @@ class WhatsAppContactsController extends Controller
     {
         try {
             $r = $this->http->delete($url);
-            return json_decode((string)$r->getBody(), true) ?? [];
+            return json_decode((string) $r->getBody(), true) ?? [];
         } catch (\Throwable $e) {
             Log::warning('deleteJson fail', ['url' => $url, 'err' => $e->getMessage()]);
             return ['error' => $e->getMessage()];
         }
+    }
+
+    public function labelMembers($id)
+    {
+        $items = $this->getJson("{$this->base}/labels/{$id}/chats", []);
+        return response()->json($items);
     }
 }

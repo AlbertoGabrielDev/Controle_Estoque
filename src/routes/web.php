@@ -36,7 +36,7 @@ Route::middleware([
     config('jetstream.auth_session'),
     'verified',
 ])->prefix('/verdurao')->group(function () {
-   
+
 
 
 
@@ -175,12 +175,12 @@ Route::middleware([
     });
 
     Route::prefix('whatsapp')->group(function () {
-    Route::get('/contacts', [WhatsAppContactsController::class, 'index'])->name('whatsapp.contacts');
-
-    Route::post('/labels',        [WhatsAppContactsController::class, 'createLabel'])->name('whatsapp.labels.store');
-    Route::post('/labels/assign', [WhatsAppContactsController::class, 'assignLabel'])->name('whatsapp.labels.assign');
-    Route::delete('/labels/{id}', [WhatsAppContactsController::class, 'deleteLabel'])->name('whatsapp.labels.destroy');
-});
+        Route::get('/contacts', [WhatsAppContactsController::class, 'index'])->name('whatsapp.contacts');
+        Route::post('/labels', [WhatsAppContactsController::class, 'createLabel'])->name('whatsapp.labels.store');
+        Route::post('/labels/assign', [WhatsAppContactsController::class, 'assignLabel'])->name('whatsapp.labels.assign');
+        Route::delete('/labels/{id}', [WhatsAppContactsController::class, 'deleteLabel'])->name('whatsapp.labels.destroy');
+        Route::get('/verdurao/whatsapp/labels/{id}/members', [WhatsAppContactsController::class, 'labelMembers'])->name('whatsapp.labels.members');
+    });
 });
 
 Route::get('login', [UsuarioController::class, 'unidade'])->name('login');
