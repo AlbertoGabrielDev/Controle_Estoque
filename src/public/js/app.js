@@ -1,46 +1,48 @@
-$(document).ready(function () {
-  const tableEl = $('#Table');
-  const ajaxUrl = tableEl.data('url');
-  const orderConfig = JSON.parse(tableEl.attr('data-order') || '[]');
+function readJsonAttr($el, attrName, fallback) {
+  const raw = $el.attr(attrName);
+  if (!raw) return fallback;
+  try { return JSON.parse(raw); } catch { return fallback; }
+}
 
-  const dt = tableEl.DataTable({
+$(function () {
+  if (!$.fn || !$.fn.dataTable) return;
+
+  $.extend(true, $.fn.dataTable.defaults, {
     processing: true,
     serverSide: true,
-    ajax: {
-      url: ajaxUrl,
-      type: 'GET',
-      error: function (xhr) {
-        console.error('DT Ajax error:', xhr.status, xhr.responseText);
-        alert('Erro ao carregar dados. Veja o console (F12 > Network).');
-      }
-    },
-    paging: true,
-    pageLength: 15,
-    order: orderConfig.length ? orderConfig : [[1, 'asc']],
-    columns: [
-      { data: 'cod_produto',    name: 'cod_produto' },
-      { data: 'nome_produto',   name: 'nome_produto' },
-      { data: 'descricao',      name: 'descricao', className: 'hidden lg:table-cell' },
-      { data: 'unidade_medida', name: 'unidade_medida' },
-      { data: 'inf_nutriente', name: 'inf_nutriente', orderable: false, searchable: false },
-      { data: 'acoes',          name: 'acoes', orderable: false, searchable: false }
-    ],
-    language: { url: "//cdn.datatables.net/plug-ins/1.13.6/i18n/pt-BR.json" },
     responsive: true,
     autoWidth: false,
+    language: { url: "https://cdn.datatables.net/plug-ins/1.13.6/i18n/pt-BR.json" },
     dom: '<"flex justify-between items-center mb-4"lfr>t<"flex justify-between items-center mt-4"ip>'
   });
 
-  dt.on('draw', function () {
-    if (window.Alpine && Alpine.initTree) {
-      Alpine.initTree(document.getElementById('Table'));
-    }
-  });
+  window.initServerTable = function (tableEl, extra = {}) {
+    const $el = $(tableEl);
+    const url = $el.data('url');
+
+    const columns      = readJsonAttr($el, 'data-columns', extra.columns || []);
+    const order        = readJsonAttr($el, 'data-order', [[0,'asc']]);
+    const pageLength   = parseInt($el.attr('data-length') || extra.pageLength || 15, 10);
+    const lengthMenu   = readJsonAttr($el, 'data-lengthMenu', extra.lengthMenu || [[15,25,50,100],[15,25,50,100]]);
+    const lengthChange = ($el.attr('data-lengthChange') ?? 'true') !== 'false';
+
+    return $el.DataTable({
+      ajax: {
+        url, type: 'GET',
+        error: (xhr) => console.error('DT Ajax error:', xhr.status, xhr.responseText)
+      },
+      columns, order, pageLength, lengthMenu, lengthChange,
+      drawCallback: () => { if (window.Alpine?.initTree) Alpine.initTree($el[0]); },
+      ...extra
+    });
+  };
+
+  $('.dt-server').each(function () { window.initServerTable(this); });
 });
 
 
 $(document).ready(function () {
-    
+
     $('.toggle-ativacao').click(function () {
         var button = $(this);
         var produtoId = button.data('id');
@@ -187,13 +189,13 @@ $(document).ready(function () {
     });
 
 });
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     $('.select2-multiple').select2({
-      placeholder: "Selecione as permissões",
-      allowClear: true,
-      width: '100%',
+        placeholder: "Selecione as permissões",
+        allowClear: true,
+        width: '100%',
     });
-  });
+});
 
 
 

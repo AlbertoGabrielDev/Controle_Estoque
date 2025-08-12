@@ -43,37 +43,29 @@ class ProdutoRepository
         return $produtos;
     }
 
-
     public function getData()
     {
         $query = Produto::query()
             ->select(['id_produto', 'cod_produto', 'nome_produto', 'descricao', 'unidade_medida', 'inf_nutriente', 'status']);
 
-        // if (!Gate::allows(ability: 'permissao')) {
-        //     $query->where('status', operator: 1);
-        // }
-
         return DataTables::eloquent($query)
-            ->editColumn('inf_nutrientes', function ($p) {
-                $nutri = e($p->inf_nutrientes);
-                return '
-                  <div x-data="{open:false}">
-                    <div @click="open = !open" class="flex items-center cursor-pointer text-cyan-600 hover:text-cyan-700">
-                      <div class="w-8 transform transition-transform" :class="{ \'rotate-90\': open }">
-                        <i class="fas fa-angle-down"></i>
-                      </div>
-                      <span class="ml-2">Informações Nutricionais</span>
-                    </div>
-                    <div class="pl-6 mt-2 text-gray-500" x-show="open" x-collapse>' . $nutri . '</div>
-                  </div>';
-            })
             ->addColumn('acoes', function ($p) {
-                return view('produtos.partials.acoes', ['produto' => $p])->render();
+                $editBtn = view('components.edit-button', [
+                    'route' => 'produtos.editar',
+                    'modelId' => $p->id_produto,
+                ])->render();
+
+                $statusBtn = view('components.button-status', [
+                    'modelId' => $p->id_produto,
+                    'status' => (bool) $p->status,
+                    'modelName' => 'produto',
+                ])->render();
+
+                return '<div class="flex gap-2">' . $editBtn . $statusBtn . '</div>';
             })
-            ->rawColumns(['inf_nutrientes', 'acoes'])
+            ->rawColumns(['acoes'])
             ->toJson();
     }
-
 
     public function cadastro()
     {
