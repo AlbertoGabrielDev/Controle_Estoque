@@ -1,33 +1,42 @@
- $(document).ready(function() {
-    // Captura a configuração do atributo data-order
-    const table = $('#Table');
-    const orderConfig = JSON.parse(table.attr('data-order') || '[]');
-    
-    // Configuração base
-    const config = {
-      "columnDefs": [
-        { 
-          "targets": 1,
-          "orderable": true,
-          "searchable": true
-        }
-      ],
-      "language": {
-        "url": "//cdn.datatables.net/plug-ins/1.13.6/i18n/pt-BR.json"
-      },
-      "responsive": true,
-      "autoWidth": false,
-      "dom": '<"flex justify-between items-center mb-4"lf>rt<"flex justify-between items-center mt-4"ip>'
-    };
+$(document).ready(function () {
+  const tableEl = $('#Table');
+  const ajaxUrl = tableEl.data('url');
+  const orderConfig = JSON.parse(tableEl.attr('data-order') || '[]');
 
-    // Mescla a configuração do data-order
-    if (orderConfig.length) {
-      config.order = orderConfig;
-    }
-
-    // Inicializa o DataTable
-    table.DataTable(config);
+  const dt = tableEl.DataTable({
+    processing: true,
+    serverSide: true,
+    ajax: {
+      url: ajaxUrl,
+      type: 'GET',
+      error: function (xhr) {
+        console.error('DT Ajax error:', xhr.status, xhr.responseText);
+        alert('Erro ao carregar dados. Veja o console (F12 > Network).');
+      }
+    },
+    paging: true,
+    pageLength: 15,
+    order: orderConfig.length ? orderConfig : [[1, 'asc']],
+    columns: [
+      { data: 'cod_produto',    name: 'cod_produto' },
+      { data: 'nome_produto',   name: 'nome_produto' },
+      { data: 'descricao',      name: 'descricao', className: 'hidden lg:table-cell' },
+      { data: 'unidade_medida', name: 'unidade_medida' },
+      { data: 'inf_nutriente', name: 'inf_nutriente', orderable: false, searchable: false },
+      { data: 'acoes',          name: 'acoes', orderable: false, searchable: false }
+    ],
+    language: { url: "//cdn.datatables.net/plug-ins/1.13.6/i18n/pt-BR.json" },
+    responsive: true,
+    autoWidth: false,
+    dom: '<"flex justify-between items-center mb-4"lfr>t<"flex justify-between items-center mt-4"ip>'
   });
+
+  dt.on('draw', function () {
+    if (window.Alpine && Alpine.initTree) {
+      Alpine.initTree(document.getElementById('Table'));
+    }
+  });
+});
 
 
 $(document).ready(function () {

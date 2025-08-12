@@ -16,9 +16,7 @@ use App\Http\Controllers\MarcaController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UnidadeController;
 use App\Http\Controllers\VendaController;
-use App\Providers\FortifyServiceProvider;
 use App\Http\Controllers\SpreadsheetController;
-use App\Http\Controllers\ProfileController;
 use Illuminate\Foundation\Application;
 use Inertia\Inertia;
 
@@ -85,6 +83,7 @@ Route::middleware([
         Route::get('/editar/{produtoId}', [ProdutoController::class, 'editar'])->name('produtos.editar')->middleware('check.permission:edit_post,Produtos');
         Route::post('/editar/{produtoId}', [ProdutoController::class, 'salvarEditar'])->name('produtos.salvarEditar');
         Route::post('/status/{modelName}/{id}', [ProdutoController::class, 'updateStatus'])->name('produto.status');
+        Route::get('/produtos/data', [ProdutoController::class, 'data'])->name('produtos.data')->middleware(['web','auth']);
     });
 
     Route::prefix('/estoque')->group(function () {
