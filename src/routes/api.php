@@ -1,17 +1,17 @@
 <?php
 
-use App\Http\Controllers\Api\GraficosApiController;
-use App\Http\Controllers\CategoriaController;
-use Illuminate\Http\Request;
+use App\Http\Controllers\ProdutoController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\CartController;
+use App\Http\Controllers\OrderController;
 
-Route::middleware([
-    'auth:sanctum',
-    config('jetstream.auth_session'),
-    'verified',
-])->prefix('/graficos')->group(function() {
-    Route::get('/months',[GraficosApiController::class, 'months']);
-    
 
-});
+
+    Route::get('/products/search', [ProdutoController::class, 'search']);
+    Route::get('/products/{sku}', [ProdutoController::class, 'show']);
+
+    Route::post('/carts/upsert', [CartController::class, 'upsert']);
+    Route::get('/carts/by-msisdn/{msisdn}', [CartController::class, 'getByMsisdn']);
+
+    Route::post('/orders', [OrderController::class, 'store']);
 

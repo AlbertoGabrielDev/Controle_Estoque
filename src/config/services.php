@@ -35,4 +35,8 @@ return [
         'url' => env('WHATSAPP_NODE_URL', 'http://localhost:3001/verdurao/bot/whatsapp'),
     ],
 
+    'n8n' => [
+        'api_key' => env('N8N_API_KEY'),
+    ],
+
 ];
