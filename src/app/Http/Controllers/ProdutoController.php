@@ -59,28 +59,86 @@ class ProdutoController extends Controller
         return redirect()->route('produtos.index')->with('success', 'Editado com sucesso');
     }
 
-    public function search(Request $request)
-    {
-       
-        $q = trim((string) $request->query('q', ''));
-        $query = DB::table('produtos as p')
-            ->select(
-                'p.cod_produto',
-                'p.nome_produto',
-                DB::raw('COALESCE((SELECT MAX(e.preco_venda) FROM estoques e WHERE e.id_produto_fk = p.id_produto AND e.status = 1), 0) as preco_venda'),
-                DB::raw('COALESCE((SELECT SUM(e2.quantidade) FROM estoques e2 WHERE e2.id_produto_fk = p.id_produto AND e2.status = 1), 0) as qtd_disponivel')
-            )
-            ->where('p.status', 1);
-            
-        if ($q !== '') {
-            $query->where(function ($w) use ($q) {
-                $w->where('p.cod_produto', 'like', "%{$q}%")
-                    ->orWhere('p.nome_produto', 'like', "%{$q}%");
-            });
-        }
+   public function search(Request $request)
+{
+    $q = trim((string) $request->query('q', ''));
 
-        return response()->json($query->orderBy('p.nome_produto')->limit(25)->get());
+    // Agregação de estoque ativo
+    $stockAgg = DB::table('estoques')
+        ->select(
+            'id_produto_fk',
+            DB::raw('MAX(preco_venda)  AS preco_venda'),
+            DB::raw('SUM(quantidade)  AS qtd_disponivel')
+        )
+        ->where('status', 1)
+        ->groupBy('id_produto_fk');
+
+    $query = DB::table('produtos as p')
+        ->leftJoinSub($stockAgg, 's', fn ($j) => $j->on('s.id_produto_fk', '=', 'p.id_produto'))
+        ->where('p.status', 1)
+        ->select(
+            'p.cod_produto',
+            'p.nome_produto',
+            DB::raw('COALESCE(s.preco_venda, 0)   AS preco_venda'),
+            DB::raw('COALESCE(s.qtd_disponivel, 0) AS qtd_disponivel')
+        );
+
+    if ($q !== '') {
+        // Normaliza e quebra em termos (ignora termos de 1 char)
+        $needle = preg_replace('/\s+/u', ' ', mb_strtolower($q, 'UTF-8'));
+        $terms  = array_values(array_filter(
+            preg_split('/\s+/u', $needle, -1, PREG_SPLIT_NO_EMPTY),
+            fn ($t) => mb_strlen($t, 'UTF-8') > 1
+        ));
+
+        // Coloque aqui o collation do seu MySQL/MariaDB que seja case/acento-insensível
+        // (ajuste se o seu banco usar outro; utf8mb4_unicode_ci é uma boa base)
+        $collation = 'utf8mb4_unicode_ci';
+
+        // 1) Filtro: todos os termos precisam aparecer (AND),
+        //    em cod_produto OU nome_produto (OR).
+        $query->where(function ($w) use ($terms, $collation) {
+            foreach ($terms as $t) {
+                $w->where(function ($w2) use ($t, $collation) {
+                    $w2->whereRaw("p.cod_produto   COLLATE {$collation} LIKE ?", ["%{$t}%"])
+                       ->orWhereRaw("p.nome_produto COLLATE {$collation} LIKE ?", ["%{$t}%"]);
+                });
+            }
+        });
+
+        // 2) Ordenação por "relevância" simples:
+        //    - frase exata no nome (mais forte)
+        //    - começa com a frase
+        //    - contém a frase
+        //    - contém na SKU
+        $orderSql = "CASE
+            WHEN p.nome_produto COLLATE {$collation} = ?  THEN 400
+            WHEN p.nome_produto COLLATE {$collation} LIKE ? THEN 300   -- começa com
+            WHEN p.nome_produto COLLATE {$collation} LIKE ? THEN 200   -- contém
+            WHEN p.cod_produto   COLLATE {$collation} LIKE ? THEN 150  -- SKU contém
+            ELSE 0 END DESC, p.nome_produto ASC";
+
+        $orderBindings = [
+            $needle,
+            "{$needle}%",
+            "%{$needle}%",
+            "%{$needle}%",
+        ];
+
+        $query->orderByRaw($orderSql, $orderBindings);
+    } else {
+        $query->orderBy('p.nome_produto');
     }
+
+    // Retorno
+    $rows = $query->limit(25)->get()->map(function ($r) {
+        $r->preco_venda    = (float) $r->preco_venda;
+        $r->qtd_disponivel = (int)   $r->qtd_disponivel;
+        return $r;
+    });
+
+    return response()->json($rows);
+}
 
     public function show(string $sku)
     {

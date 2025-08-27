@@ -13,8 +13,10 @@ services:
     depends_on:
       - db
     environment:
+      - APP_ENV=local
       - DB_HOST=db
-      - PHP_OPCACHE_VALIDATE_TIMESTAMPS=1
+      - RUN_MIGRATIONS=0
+      - RUN_SEED=0
     extra_hosts:
       - "host.docker.internal:host-gateway"
     ports:

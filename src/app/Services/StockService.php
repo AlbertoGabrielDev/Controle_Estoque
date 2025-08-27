@@ -21,7 +21,7 @@ class StockService
         }
 
         // Agrega estoque ativo
-        $estoque = DB::table('estoque as e')
+        $estoque = DB::table('estoques as e')
             ->selectRaw('SUM(e.quantidade) as qtd_disponivel, MAX(e.preco_venda) as preco_venda')
             ->where('e.id_produto_fk', $produto->id_produto)
             ->where('e.status', 1)
@@ -82,7 +82,7 @@ class StockService
 
         $restante = $qty;
 
-        $lotes = DB::table('estoque')
+        $lotes = DB::table('estoques')
             ->where('id_produto_fk', $produto->id_produto)
             ->where('status', 1)
             ->where('quantidade', '>', 0)
@@ -95,7 +95,7 @@ class StockService
             if ($restante <= 0) break;
 
             $consumir = min($restante, (int)$lote->quantidade);
-            DB::table('estoque')
+            DB::table('estoques')
                 ->where('id_estoque', $lote->id_estoque)
                 ->update(['quantidade' => (int)$lote->quantidade - $consumir]);
             $restante -= $consumir;

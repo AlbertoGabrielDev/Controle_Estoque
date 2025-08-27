@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Gate;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Yajra\DataTables\Facades\DataTables;
-
+use Illuminate\Support\Facades\Blade;
 /**
  * Interface ProdutoRepository.
  *
@@ -45,23 +45,28 @@ class ProdutoRepository
 
     public function getData()
     {
+        request()->attributes->set('currentMenuSlug', 'produtos');
+
         $query = Produto::query()
             ->select(['id_produto', 'cod_produto', 'nome_produto', 'descricao', 'unidade_medida', 'inf_nutriente', 'status']);
 
         return DataTables::eloquent($query)
             ->addColumn('acoes', function ($p) {
-                $editBtn = view('components.edit-button', [
-                    'route' => 'produtos.editar',
-                    'modelId' => $p->id_produto,
-                ])->render();
+                $editBtn = Blade::render(
+                    '<x-edit-button :route="$route" :model-id="$modelId" />',
+                    ['route' => 'produtos.editar', 'modelId' => $p->id_produto]
+                );
 
-                $statusBtn = view('components.button-status', [
-                    'modelId' => $p->id_produto,
-                    'status' => (bool) $p->status,
-                    'modelName' => 'produto',
-                ])->render();
+                $statusBtn = Blade::render(
+                    '<x-button-status :model-id="$modelId" :status="$status" model-name="produto" />',
+                    ['modelId' => $p->id_produto, 'status' => (bool) $p->status]
+                );
 
-                return '<div class="flex gap-2">' . $editBtn . $statusBtn . '</div>';
+                $html = trim($editBtn . $statusBtn);
+                if ($html === '') {
+                    $html = '<span class="inline-block w-8 h-8 opacity-0" aria-hidden="true">&nbsp;</span>';
+                }
+                return '<div class="flex gap-2 justify-end items-center">'.$html.'</div>';
             })
             ->rawColumns(['acoes'])
             ->toJson();

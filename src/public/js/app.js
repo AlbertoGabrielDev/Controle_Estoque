@@ -10,7 +10,7 @@ $(function () {
   $.extend(true, $.fn.dataTable.defaults, {
     processing: true,
     serverSide: true,
-    responsive: true,
+    responsive: $.fn.dataTable.Responsive ? { details: false } : false,
     autoWidth: false,
     language: { url: "https://cdn.datatables.net/plug-ins/1.13.6/i18n/pt-BR.json" },
     dom: '<"flex justify-between items-center mb-4"lfr>t<"flex justify-between items-center mt-4"ip>'
@@ -25,13 +25,24 @@ $(function () {
     const pageLength   = parseInt($el.attr('data-length') || extra.pageLength || 15, 10);
     const lengthMenu   = readJsonAttr($el, 'data-lengthMenu', extra.lengthMenu || [[15,25,50,100],[15,25,50,100]]);
     const lengthChange = ($el.attr('data-lengthChange') ?? 'true') !== 'false';
+    const columnDefs   = readJsonAttr($el, 'data-column-defs', extra.columnDefs || []);
+    columnDefs.push({
+      targets: -1,
+      defaultContent: '<span class="inline-block w-8 h-8 opacity-0" aria-hidden="true">&nbsp;</span>',
+    });
 
     return $el.DataTable({
       ajax: {
-        url, type: 'GET',
+        url,
+        type: 'GET',
         error: (xhr) => console.error('DT Ajax error:', xhr.status, xhr.responseText)
       },
-      columns, order, pageLength, lengthMenu, lengthChange,
+      columns, order, pageLength, lengthMenu, lengthChange, columnDefs,
+
+      createdRow: (row /*, data, dataIndex */) => {
+        $('td, th', row).addClass('px-4 py-3'); 
+      },
+
       drawCallback: () => { if (window.Alpine?.initTree) Alpine.initTree($el[0]); },
       ...extra
     });

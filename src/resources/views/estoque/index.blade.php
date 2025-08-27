@@ -153,8 +153,8 @@
       <tbody class="divide-y divide-gray-200">
         @foreach ($estoques as $estoque)
         <tr class="hover:bg-gray-50">
-          <td class="px-4 py-3 text-sm text-gray-700">{{ $estoque->produto->nome_produto ?? 'N/A' }}</td>
-          <td class="px-4 py-3 text-sm text-gray-700">{{ $estoque->fornecedor->nome_fornecedor ?? 'N/A' }}</td>
+          <td class="px-4 py-3 text-sm text-gray-700">{{ $estoque->produtos->nome_produto ?? 'N/A' }}</td>
+          <td class="px-4 py-3 text-sm text-gray-700">{{ $estoque->fornecedores->nome_fornecedor ?? 'N/A' }}</td>
           <td class="px-4 py-3 text-sm text-gray-700 hidden md:table-cell">R$ {{number_format($estoque->preco_custo, 2, ',', '.')}}</td>
           <td class="px-4 py-3 text-sm text-gray-700 hidden md:table-cell">R$ {{number_format($estoque->preco_venda, 2, ',', '.')}}</td>
           <td class="px-4 py-3 text-sm font-medium 

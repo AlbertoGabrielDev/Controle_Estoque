@@ -71,7 +71,7 @@ class EstoqueRepositoryEloquent extends BaseRepository implements EstoqueReposit
 
     public function cadastro()
     {
-        $produtos = Produto::all(); // resolver isso 
+        $produtos = Produto::all();
         $marcas = Marca::all();
         $fornecedores = Fornecedor::all();
         return compact('fornecedores', 'marcas', 'produtos');
@@ -89,20 +89,16 @@ class EstoqueRepositoryEloquent extends BaseRepository implements EstoqueReposit
 
     public function editar($estoqueId)
     {
-        $repository = app(EstoqueRepository::class);
-        try {
-            $estoque = $this->findWithRelations($estoqueId, ['produtos', 'fornecedores', 'marcas']);
-            // dd($estoque);
-            return [
-                'estoque' => $estoque,
-                'fornecedores' => Fornecedor::all(),
-                'marcas' => Marca::all(),
-                'produtos' => Produto::all()
-            ];
-        } catch (\Exception $e) {
-            return redirect()->route('estoque.index')
-                ->with('error', 'Estoque não encontrado');
-        }
+
+        $estoque = $this->findWithRelations($estoqueId, ['produtos', 'fornecedores', 'marcas']);
+
+        return [
+            'estoque' => $estoque,
+            'fornecedores' => Fornecedor::all(),
+            'marcas' => Marca::all(),
+            'produtos' => Produto::all()
+        ];
+
     }
 
     public function salvarEditar(ValidacaoEstoque $request, $estoqueId)

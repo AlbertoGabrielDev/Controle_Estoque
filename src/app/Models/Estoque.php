@@ -82,17 +82,17 @@ class Estoque extends Model
         return $this->hasMany(Historico::class, 'id_estoque_fk', 'id_estoque');
     }
 
-    public function produto(): BelongsTo
+    public function produtos(): BelongsTo
     {
         return $this->belongsTo(Produto::class, 'id_produto_fk', 'id_produto');
     }
 
-    public function fornecedor(): BelongsTo
+    public function fornecedores(): BelongsTo
     {
         return $this->belongsTo(Fornecedor::class, 'id_fornecedor_fk', 'id_fornecedor');
     }
 
-    public function marca(): BelongsTo
+    public function marcas(): BelongsTo
     {
         return $this->belongsTo(Marca::class, 'id_marca_fk', 'id_marca');
     }
