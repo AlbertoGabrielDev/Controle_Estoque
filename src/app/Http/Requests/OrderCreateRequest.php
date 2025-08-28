@@ -22,7 +22,7 @@ class OrderCreateRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'msisdn' => ['required', 'string', 'max:20'],
+            'client' => ['required', 'string', 'max:20'],
             'cart_id' => ['nullable', 'integer', 'exists:carts,id'],
         ];
     }

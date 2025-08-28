@@ -22,7 +22,7 @@ class CartUpsertRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'msisdn' => ['required', 'string', 'max:20'],
+            'client' => ['required', 'string', 'max:20'],
             'items' => ['required', 'array', 'min:1'],
             'items.*.sku' => ['required', 'string', 'max:60'],
             'items.*.qty' => ['required', 'integer', 'min:1'],

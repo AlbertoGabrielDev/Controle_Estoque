@@ -17,7 +17,7 @@ return new class extends Migration {
             $table->string('nome_produto', 60);
             $table->decimal('preco_unit', 10, 2);
             $table->unsignedInteger('quantidade');
-            $table->decimal('subtotal', 10, 2);
+            $table->decimal('sub_valor', 10, 2);
             $table->timestamps();
         });
     }

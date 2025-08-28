@@ -38,7 +38,7 @@ class StockService
 
     /**
      * Verifica disponibilidade para uma lista de itens [{sku, qty}]
-     * Retorna array com linhas resolvidas (nome, preço snapshot, subtotal) e total.
+     * Retorna array com linhas resolvidas (nome, preço snapshot, subtotal_valor) e total.
      */
     public function checkAndPrice(array $items): array
     {
@@ -57,19 +57,19 @@ class StockService
                 throw new \RuntimeException("SKU {$sku} sem estoque suficiente. Disp: {$p['qtd_disponivel']}.");
             }
             $preco = (float)$p['preco_venda'];
-            $subtotal = $preco * $qty;
+            $subtotal_valor = $preco * $qty;
 
             $linhas[] = [
                 'cod_produto'  => $p['cod_produto'],
                 'nome_produto' => $p['nome_produto'],
                 'preco_unit'   => $preco,
                 'quantidade'   => $qty,
-                'subtotal'     => $subtotal,
+                'subtotal_valor'     => $subtotal_valor,
             ];
-            $total += $subtotal;
+            $total += $subtotal_valor;
         }
 
-        return ['linhas' => $linhas, 'total' => $total];
+        return ['linhas' => $linhas, 'total_valor' => $total];
     }
 
     /**

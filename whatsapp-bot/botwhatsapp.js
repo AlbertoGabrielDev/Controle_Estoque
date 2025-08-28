@@ -3,7 +3,7 @@
 /**
  * Bot WhatsApp (WPPConnect) + Integração n8n/Laravel
  * - Lê .env da pasta do bot (ou cwd/../) com fallback
- * - Modo n8n (USE_N8N=true): envia {msisdn,text} para o Webhook (Production URL)
+ * - Modo n8n (USE_N8N=true): envia {client,text} para o Webhook (Production URL)
  * - Modo direto (USE_N8N=false): chama API do Laravel (/api/products, /api/carts, /api/orders)
  */
 
@@ -62,7 +62,7 @@ if (!N8N_WEBHOOK && ENV_PATH && fs.existsSync(ENV_PATH)) {
 /* ========================= UTILS ========================= */
 const hasFn = (obj, name) => obj && typeof obj[name] === 'function';
 const mask  = (v) => (v ? v.slice(0, 4) + '…' + v.slice(-4) : '');
-const msisdnFrom = (jid) => String(jid || '').replace('@c.us', '');
+const clientFrom = (jid) => String(jid || '').replace('@c.us', '');
 
 function validateWebhookOrThrow() {
   if (!N8N_WEBHOOK) {
@@ -395,9 +395,9 @@ app.post('/verdurao/bot/whatsapp/send-mass', async (req, res) => {
 });
 
 /* ========================= E-COMMERCE: n8n / API ========================= */
-async function callN8n(msisdn, text) {
+async function callN8n(client, text) {
   validateWebhookOrThrow();
-  const payload = { msisdn, text };
+  const payload = { client, text };
   log('n8n', 'POST webhook', { url: N8N_WEBHOOK, payload });
   const res = await axios.post(N8N_WEBHOOK, payload, {
     timeout: 15000,
@@ -407,7 +407,7 @@ async function callN8n(msisdn, text) {
   return typeof data === 'string' ? data : JSON.stringify(data);
 }
 
-async function callApiDirect(msisdn, text) {
+async function callApiDirect(client, text) {
   const parts = (text || '').trim().split(/\s+/);
   const cmd = (parts.shift() || '').toUpperCase();
   const headers = { 'X-API-KEY': N8N_API_KEY, 'Content-Type': 'application/json' };
@@ -432,34 +432,34 @@ async function callApiDirect(msisdn, text) {
     const qty = Number(parts[1] || 1);
     if (!sku) return 'Uso: ADD <SKU> <QTD>';
     const r = await axios.post(`${API_BASE_URL}/api/carts/upsert`,
-      { msisdn, items: [{ sku, qty }] }, { headers, timeout: 15000 });
+      { client, items: [{ sku, qty }] }, { headers, timeout: 15000 });
     const cart = r.data || {};
     const lines = (cart.items || []).map(i =>
-      `• ${i.cod_produto} x${i.quantidade} = R$ ${Number(i.subtotal).toFixed(2)}`
+      `• ${i.cod_produto} x${i.quantidade} = R$ ${Number(i.subtotal_valor).toFixed(2)}`
     ).join('\n');
-    return `Carrinho #${cart.id}\n${lines}\nTotal: R$ ${Number(cart.total || 0).toFixed(2)}\n\nEnvie: CARRINHO ou FINALIZAR`;
+    return `Carrinho #${cart.id}\n${lines}\nTotal: R$ ${Number(cart.total_valor || 0).toFixed(2)}\n\nEnvie: CARRINHO ou FINALIZAR`;
   }
 
   if (cmd === 'CARRINHO') {
-    const r = await axios.get(`${API_BASE_URL}/api/carts/by-msisdn/${msisdn}`, {
+    const r = await axios.get(`${API_BASE_URL}/api/carts/by-client/${client}`, {
       headers: { 'X-API-KEY': N8N_API_KEY }, timeout: 15000
     });
     const cart = r.data || {};
     if (!cart.items || !cart.items.length) return 'Seu carrinho está vazio.';
     const lines = cart.items.map(i =>
-      `• ${i.cod_produto} x${i.quantidade} = R$ ${Number(i.subtotal).toFixed(2)}`
+      `• ${i.cod_produto} x${i.quantidade} = R$ ${Number(i.subtotal_valor).toFixed(2)}`
     ).join('\n');
-    return `Carrinho #${cart.id}\n${lines}\nTotal: R$ ${Number(cart.total || 0).toFixed(2)}\n\nEnvie: FINALIZAR`;
+    return `Carrinho #${cart.id}\n${lines}\nTotal: R$ ${Number(cart.total_valor || 0).toFixed(2)}\n\nEnvie: FINALIZAR`;
   }
 
   if (cmd === 'FINALIZAR') {
     const r = await axios.post(`${API_BASE_URL}/api/orders`,
-      { msisdn }, { headers, timeout: 15000 });
+      { client }, { headers, timeout: 15000 });
     const o = r.data || {};
     const lines = (o.items || []).map(i =>
-      `• ${i.cod_produto} x${i.quantidade} = R$ ${Number(i.subtotal).toFixed(2)}`
+      `• ${i.cod_produto} x${i.quantidade} = R$ ${Number(i.subtotal_valor).toFixed(2)}`
     ).join('\n');
-    return `Pedido #${o.id}\n${lines}\nTotal: R$ ${Number(o.total || 0).toFixed(2)}\nStatus: ${o.status || 'created'}`;
+    return `Pedido #${o.id}\n${lines}\nTotal: R$ ${Number(o.total_valor || 0).toFixed(2)}\nStatus: ${o.status || 'created'}`;
   }
 
   return 'Comando inválido. Use: CATALOGO <termo> | ADD <sku> <qtd> | CARRINHO | FINALIZAR';
@@ -495,7 +495,7 @@ wppconnect.create({
       if (!message?.from || !message?.body) return;
       if (message.isGroupMsg) return; // ignora grupos
 
-      const msisdn = msisdnFrom(message.from);
+      const client = clientFrom(message.from);
       const text   = String(message.body || '').trim();
 
       // teste rápido
@@ -504,19 +504,19 @@ wppconnect.create({
         return;
       }
 
-      log('rx', 'msg recebida', { msisdn, text });
+      log('rx', 'msg recebida', { client, text });
 
       let reply;
       if (USE_N8N) {
-        reply = await callN8n(msisdn, text);
+        reply = await callN8n(client, text);
       } else {
         if (!API_BASE_URL) throw new Error('API_BASE_URL não configurada no .env.');
-        reply = await callApiDirect(msisdn, text);
+        reply = await callApiDirect(client, text);
       }
 
       if (reply) {
         await client.sendText(message.from, String(reply));
-        log('tx', 'resposta enviada', { msisdn });
+        log('tx', 'resposta enviada', { client });
       }
     } catch (err) {
       const detail = err?.response?.data || err?.message || String(err);

@@ -11,7 +11,7 @@ Route::get('/products/search', [ProdutoController::class, 'search']);
 Route::get('/products/{sku}', [ProdutoController::class, 'show']);
 
 Route::post('/carts/upsert', [CartController::class, 'upsert']);
-Route::get('/carts/by-msisdn/{msisdn}', [CartController::class, 'getByMsisdn']);
+Route::get('/carts/by-client/{client}', [CartController::class, 'getByclient']);
 
 Route::post('/carts/remove', [CartController::class, 'remove']);
 Route::post('/orders', [OrderController::class, 'store']);

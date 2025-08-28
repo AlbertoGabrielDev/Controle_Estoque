@@ -16,25 +16,25 @@ class OrderController extends Controller
 
     public function store(OrderCreateRequest $request)
     {
-        $msisdn = $request->input('msisdn');
+        $client = $request->input('client');
         $cartId = $request->input('cart_id');
 
         $cart = $cartId
-            ? Cart::with('items')->where('id', $cartId)->where('msisdn', $msisdn)->where('status','open')->first()
-            : Cart::with('items')->where('msisdn', $msisdn)->where('status','open')->first();
+            ? Cart::with('items')->where('id', $cartId)->where('client', $client)->where('status','open')->first()
+            : Cart::with('items')->where('client', $client)->where('status','open')->first();
 
         if (!$cart || $cart->items->isEmpty()) {
             return response()->json(['message' => 'Carrinho vazio ou não encontrado'], 400);
         }
 
-        return DB::transaction(function () use ($cart, $msisdn) {
+        return DB::transaction(function () use ($cart, $client) {
             // Confirma estoque no momento da baixa
             foreach ($cart->items as $item) {
                 $this->stock->decrementStock($item->cod_produto, (int)$item->quantidade);
             }
 
             $order = Order::create([
-                'msisdn' => $msisdn,
+                'client' => $client,
                 'cart_id'=> $cart->id,
                 'status' => 'created',
                 'total'  => $cart->total,
@@ -47,7 +47,7 @@ class OrderController extends Controller
                     'nome_produto' => $ci->nome_produto,
                     'preco_unit'   => $ci->preco_unit,
                     'quantidade'   => $ci->quantidade,
-                    'subtotal'     => $ci->subtotal,
+                    'subtotal_valor'     => $ci->subtotal_valor,
                 ]);
             }
 

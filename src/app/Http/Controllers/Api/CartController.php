@@ -18,15 +18,15 @@ class CartController extends Controller
 
     public function upsert(CartUpsertRequest $request)
     {
-        $msisdn = $request->input('msisdn');
+        $client = $request->input('client');
         $items = $request->input('items');
 
         $priced = $this->stock->checkAndPrice($items);
 
-        return DB::transaction(function () use ($msisdn, $priced) {
+        return DB::transaction(function () use ($client, $priced) {
             $cart = Cart::firstOrCreate(
-                ['msisdn' => $msisdn, 'status' => 'open'],
-                ['total' => 0]
+                ['client' => $client, 'status' => 'open'],
+                ['total_valor' => 0]
             );
 
             // zera itens e re-insere para ficar idempotente
@@ -39,19 +39,19 @@ class CartController extends Controller
                     'nome_produto' => $linha['nome_produto'],
                     'preco_unit' => $linha['preco_unit'],
                     'quantidade' => $linha['quantidade'],
-                    'subtotal' => $linha['subtotal'],
+                    'subtotal_valor' => $linha['subtotal_valor'],
                 ]);
             }
-            $cart->total = $priced['total'];
+            $cart->total_valor = $priced['total_valor'];
             $cart->save();
 
             return response()->json($cart->load('items'));
         });
     }
 
-    public function getByMsisdn(string $msisdn)
+    public function getByclient(string $client)
     {
-        $cart = Cart::with('items')->where('msisdn', $msisdn)->where('status', 'open')->first();
+        $cart = Cart::with('items')->where('client', $client)->where('status', 'open')->first();
         if (!$cart)
             return response()->json(['message' => 'Carrinho não encontrado'], 404);
         return response()->json($cart);
@@ -60,19 +60,19 @@ class CartController extends Controller
     public function remove(Request $request)
     {
         $data = $request->validate([
-            'msisdn' => 'required|string',
+            'client' => 'required|string',
             'items' => 'required|array|min:1',
             'items.*.sku' => 'required|string',          // aceita sku vindo do n8n
             'items.*.qty' => 'nullable|integer|min:0',   // null/0 => remove linha inteira
         ]);
 
-        $msisdn = (string) $data['msisdn'];
+        $client = (string) $data['client'];
         $items = $data['items'];
         $removed = [];   // <<— log do que saiu
 
-        DB::transaction(function () use ($msisdn, $items, &$removed) {
+        DB::transaction(function () use ($client, $items, &$removed) {
             $cart = DB::table('carts')
-                ->where('msisdn', $msisdn)
+                ->where('client', $client)
                 ->where('status', 'open')
                 ->first();
 
@@ -96,7 +96,7 @@ class CartController extends Controller
                         'removed_qty' => 0,
                         'old_qty' => 0,
                         'new_qty' => 0,
-                        'removed_subtotal' => 0,
+                        'removed_subtotal_valor' => 0,
                         'action' => 'not_found',
                     ];
                     continue;
@@ -117,7 +117,7 @@ class CartController extends Controller
                     $newQty = $old - $removedQty;
                     DB::table('cart_items')->where('id', $row->id)->update([
                         'quantidade' => $newQty,
-                        'subtotal' => round($pu * $newQty, 2),
+                        'subtotal_valor' => round($pu * $newQty, 2),
                         'updated_at' => now(),
                     ]);
                     $action = 'decremented';
@@ -130,7 +130,7 @@ class CartController extends Controller
                     'removed_qty' => $removedQty,
                     'old_qty' => $old,
                     'new_qty' => $newQty,
-                    'removed_subtotal' => round($pu * $removedQty, 2),
+                    'removed_subtotal_valor' => round($pu * $removedQty, 2),
                     'action' => $action,
                 ];
             }
@@ -138,21 +138,21 @@ class CartController extends Controller
             // recalcula total
             $newTotal = (float) DB::table('cart_items')
                 ->where('cart_id', $cart->id)
-                ->sum('subtotal');
+                ->sum('subtotal_valor');
 
             DB::table('carts')
                 ->where('id', $cart->id)
-                ->update(['total' => $newTotal, 'updated_at' => now()]);
+                ->update(['total_valor' => $newTotal, 'updated_at' => now()]);
         });
 
         // resposta com carrinho + removidos
-        $cart = DB::table('carts')->where('msisdn', $msisdn)->where('status', 'open')->first();
+        $cart = DB::table('carts')->where('client', $client)->where('status', 'open')->first();
         $itemsResp = $cart ? DB::table('cart_items')->where('cart_id', $cart->id)->get() : collect();
 
         return response()->json([
-            'msisdn' => $msisdn,
+            'client' => $client,
             'status' => $cart->status ?? 'open',
-            'total' => (float) ($cart->total ?? 0),
+            'total_valor' => (float) ($cart->total_valor ?? 0),
             'items' => $itemsResp,
             'removed' => $removed,   // <<— o n8n vai usar isto
         ]);
