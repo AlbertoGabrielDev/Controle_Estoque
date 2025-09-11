@@ -83,7 +83,7 @@ Route::middleware([
         Route::get('/editar/{produtoId}', [ProdutoController::class, 'editar'])->name('produtos.editar')->middleware('check.permission:edit_post,Produtos');
         Route::post('/editar/{produtoId}', [ProdutoController::class, 'salvarEditar'])->name('produtos.salvarEditar');
         Route::post('/status/{modelName}/{id}', [ProdutoController::class, 'updateStatus'])->name('produto.status');
-        Route::get('/produtos/data', [ProdutoController::class, 'data'])->name('produtos.data')->middleware(['web','auth']);
+        Route::get('/produtos/data', [ProdutoController::class, 'data'])->name('produtos.data')->middleware(['web', 'auth']);
     });
 
     Route::prefix('/estoque')->group(function () {
@@ -156,6 +156,11 @@ Route::middleware([
         Route::post('/buscar-produto', [VendaController::class, 'buscarProduto'])->name('buscar.produto');
         Route::post('/verificar-estoque', [VendaController::class, 'verificarEstoque'])->name('verificar.estoque');
         Route::post('/registrar-venda', [VendaController::class, 'registrarVenda'])->name('registrar.venda');
+        Route::post('/carrinho/adicionar', [VendaController::class, 'adicionarItem'])->name('adicionar.venda');
+        Route::post('/carrinho/quantidade', [VendaController::class, 'atualizarQuantidade'])->name('atualizar_quantidade.venda');
+        Route::post('/carrinho/registrar-venda', [VendaController::class, 'registrarVenda'])->name('registrar.venda');
+        Route::post('/carrinho', [VendaController::class, 'carrinho'])->name('carrinho.venda');
+        Route::post('/carrinho/remover', [VendaController::class, 'removerItem'])->name('remover.venda');
         Route::get('/vendas', [VendaController::class, 'historicoVendas'])->name('vendas.historico_vendas')->middleware('check.permission:view_post,vendas');
     });
 

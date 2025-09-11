@@ -2,21 +2,21 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\VendaService;
 use Illuminate\Http\Request;
 use App\Http\Requests\ValidacaoProduto;
 use App\Http\Requests\ValidacaoProdutoEditar;
 use App\Repositories\ProdutoRepository;
 use Illuminate\Support\Facades\DB;
-use App\Services\StockService;
 
 class ProdutoController extends Controller
 {
     protected $produtoRepository;
-    protected $stock;
-    public function __construct(ProdutoRepository $produtoRepository, StockService $stock)
+    protected $venda;
+    public function __construct(ProdutoRepository $produtoRepository, VendaService $venda)
     {
         $this->produtoRepository = $produtoRepository;
-        $this->stock = $stock;
+        $this->venda = $venda;
     }
     public function index()
     {
@@ -63,8 +63,7 @@ class ProdutoController extends Controller
 {
     $q = trim((string) $request->query('q', ''));
 
-    // Agregação de estoque ativo
-    $stockAgg = DB::table('estoques')
+    $VendaAgg = DB::table('estoques')
         ->select(
             'id_produto_fk',
             DB::raw('MAX(preco_venda)  AS preco_venda'),
@@ -74,7 +73,7 @@ class ProdutoController extends Controller
         ->groupBy('id_produto_fk');
 
     $query = DB::table('produtos as p')
-        ->leftJoinSub($stockAgg, 's', fn ($j) => $j->on('s.id_produto_fk', '=', 'p.id_produto'))
+        ->leftJoinSub($VendaAgg, 's', fn ($j) => $j->on('s.id_produto_fk', '=', 'p.id_produto'))
         ->where('p.status', 1)
         ->select(
             'p.cod_produto',
@@ -84,19 +83,12 @@ class ProdutoController extends Controller
         );
 
     if ($q !== '') {
-        // Normaliza e quebra em termos (ignora termos de 1 char)
         $needle = preg_replace('/\s+/u', ' ', mb_strtolower($q, 'UTF-8'));
         $terms  = array_values(array_filter(
             preg_split('/\s+/u', $needle, -1, PREG_SPLIT_NO_EMPTY),
             fn ($t) => mb_strlen($t, 'UTF-8') > 1
         ));
-
-        // Coloque aqui o collation do seu MySQL/MariaDB que seja case/acento-insensível
-        // (ajuste se o seu banco usar outro; utf8mb4_unicode_ci é uma boa base)
         $collation = 'utf8mb4_unicode_ci';
-
-        // 1) Filtro: todos os termos precisam aparecer (AND),
-        //    em cod_produto OU nome_produto (OR).
         $query->where(function ($w) use ($terms, $collation) {
             foreach ($terms as $t) {
                 $w->where(function ($w2) use ($t, $collation) {
@@ -105,12 +97,6 @@ class ProdutoController extends Controller
                 });
             }
         });
-
-        // 2) Ordenação por "relevância" simples:
-        //    - frase exata no nome (mais forte)
-        //    - começa com a frase
-        //    - contém a frase
-        //    - contém na SKU
         $orderSql = "CASE
             WHEN p.nome_produto COLLATE {$collation} = ?  THEN 400
             WHEN p.nome_produto COLLATE {$collation} LIKE ? THEN 300   -- começa com
@@ -129,8 +115,6 @@ class ProdutoController extends Controller
     } else {
         $query->orderBy('p.nome_produto');
     }
-
-    // Retorno
     $rows = $query->limit(25)->get()->map(function ($r) {
         $r->preco_venda    = (float) $r->preco_venda;
         $r->qtd_disponivel = (int)   $r->qtd_disponivel;
@@ -142,7 +126,7 @@ class ProdutoController extends Controller
 
     public function show(string $sku)
     {
-        $p = $this->stock->getProductBySku($sku);
+        $p = $this->venda->getProductBySku($sku);
         if (!$p)
             return response()->json(['message' => 'Produto não encontrado'], 404);
         return response()->json($p);
