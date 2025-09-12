@@ -13,18 +13,12 @@ class VendaController extends Controller
         //
     }
 
-    /* ===========================
-       LISTAGEM (mantida)
-       =========================== */
     public function vendas()
     {
         $vendas = Venda::with('usuario')->paginate(10);
         return view('vendas.venda', compact('vendas'));
     }
 
-    /* ===========================
-       BUSCAR PRODUTO POR QR CODE
-       =========================== */
     public function buscarProduto(Request $request)
     {
         $request->validate(['codigo_qr' => 'required|string']);
@@ -44,9 +38,6 @@ class VendaController extends Controller
         }
     }
 
-    /* ===========================
-       VERIFICAÇÃO DE ESTOQUE
-       =========================== */
     public function verificarEstoque(Request $request)
     {
         $request->validate([
@@ -78,11 +69,6 @@ class VendaController extends Controller
         }
     }
 
-    /* ===========================
-       CARRINHO
-       =========================== */
-
-    // Criar/obter carrinho aberto do cliente
     public function carrinho(Request $request)
     {
         $request->validate(['client' => 'required|string|max:20']);
@@ -94,7 +80,6 @@ class VendaController extends Controller
         ]);
     }
 
-    // Adicionar item ao carrinho
     public function adicionarItem(Request $request)
     {
         $request->validate([
@@ -122,7 +107,6 @@ class VendaController extends Controller
         }
     }
 
-    // Atualizar quantidade de um item
     public function atualizarQuantidade(Request $request)
     {
         $request->validate([
@@ -150,7 +134,6 @@ class VendaController extends Controller
         }
     }
 
-    // Remover item do carrinho
     public function removerItem(Request $request)
     {
         $request->validate([
@@ -176,9 +159,6 @@ class VendaController extends Controller
         }
     }
 
-    /* ===========================
-       FINALIZAR VENDA (CHECKOUT)
-       =========================== */
     public function registrarVenda(Request $request)
     {
         $request->validate([
@@ -211,7 +191,6 @@ class VendaController extends Controller
 
     public function historicoVendas()
     {
-        // A view pode consumir a tabela orders / order_items
         return view('vendas.historico_vendas');
     }
 }

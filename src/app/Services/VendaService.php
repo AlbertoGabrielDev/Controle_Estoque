@@ -8,6 +8,7 @@ use App\Models\Estoque;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Produto;
+use App\Models\Venda;                 // <--- inclui Venda
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
@@ -97,23 +98,20 @@ class VendaService
 
         $cart = $this->obterOuCriarCarrinho($client);
 
-        // Se o mesmo produto já estiver no carrinho, só soma a quantidade
-        $item = $cart->items()
-            ->where('cod_produto', $produto->cod_produto)
-            ->first();
+        $item = $cart->items()->where('cod_produto', $produto->cod_produto)->first();
 
         if ($item) {
             $item->quantidade += $quantidade;
-            $item->preco_unit = $precoUnit; // mantém atualizado
+            $item->preco_unit = $precoUnit;
             $item->subtotal_valor = $item->quantidade * $item->preco_unit;
             $item->save();
         } else {
             $cart->items()->create([
-                'cod_produto'   => $produto->cod_produto,
-                'nome_produto'  => $produto->nome_produto,
-                'preco_unit'    => $precoUnit,
-                'quantidade'    => $quantidade,
-                'subtotal_valor'=> $quantidade * $precoUnit,
+                'cod_produto'    => $produto->cod_produto,
+                'nome_produto'   => $produto->nome_produto,
+                'preco_unit'     => $precoUnit,
+                'quantidade'     => $quantidade,
+                'subtotal_valor' => $quantidade * $precoUnit,
             ]);
         }
 
@@ -130,7 +128,6 @@ class VendaService
         $item = $cart->items()->where('id', $cartItemId)->firstOrFail();
 
         if ($quantidade < 1) {
-            // remover se a quantidade for zerada/pedida inválida
             $item->delete();
         } else {
             $item->quantidade = $quantidade;
@@ -172,7 +169,6 @@ class VendaService
             throw ValidationException::withMessages(['carrinho' => 'Carrinho vazio.']);
         }
 
-        // Verificação de estoque antes de transacionar
         $faltantes = $this->verificarEstoqueItens(
             $cart->items->map(fn ($i) => [
                 'id_produto' => $this->produtoIdPorCodigo($i->cod_produto),
@@ -186,9 +182,8 @@ class VendaService
                 'mensagem' => 'Alguns produtos não possuem estoque suficiente',
                 'faltantes' => $faltantes,
             ];
-        }
+    }
 
-        // Transação: cria pedido, baixa estoque FIFO e fecha carrinho
         return DB::transaction(function () use ($cart, $client) {
 
             $order = Order::create([
@@ -201,29 +196,45 @@ class VendaService
             foreach ($cart->items as $ci) {
                 $produtoId = $this->produtoIdPorCodigo($ci->cod_produto);
 
-                // Baixa estoque FIFO por data_chegada (lotes antigos primeiro)
+                // Baixa estoque FIFO
                 $this->baixarEstoqueFIFO($produtoId, $ci->quantidade);
 
-                // Cria item do pedido (atenção: coluna no banco é "sub_valor")
+                // Grava item do pedido (coluna é sub_valor)
                 $oi = new OrderItem();
-                $oi->order_id    = $order->id;
-                $oi->cod_produto = $ci->cod_produto;
-                $oi->nome_produto= $ci->nome_produto;
-                $oi->preco_unit  = $ci->preco_unit;
-                $oi->quantidade  = $ci->quantidade;
-                $oi->sub_valor   = $ci->subtotal_valor; // coluna real da migration
+                $oi->order_id     = $order->id;
+                $oi->cod_produto  = $ci->cod_produto;
+                $oi->nome_produto = $ci->nome_produto;
+                $oi->preco_unit   = $ci->preco_unit;
+                $oi->quantidade   = $ci->quantidade;
+                $oi->sub_valor    = $ci->subtotal_valor;
                 $oi->save();
+
+                // ===== Também grava na tabela VENDAS (uma linha por item) =====
+                $unidade = Produto::where('cod_produto', $ci->cod_produto)->value('unidade_medida');
+
+                $venda = new Venda();
+                $venda->id_produto_fk  = $produtoId;
+                $venda->id_usuario_fk  = auth()->id(); // se null e a coluna não aceitar, ajuste o default no schema
+                $venda->quantidade     = $ci->quantidade;
+                $venda->preco_venda    = $ci->preco_unit;
+                $venda->cod_produto    = $ci->cod_produto;
+                $venda->unidade_medida = $unidade;
+                $venda->nome_produto   = $ci->nome_produto;
+                $venda->save();
             }
 
-            // Fecha o carrinho
+            // Fecha carrinho
             $cart->status = 'ordered';
             $cart->save();
 
+            // Cria (ou deixa pronto) um carrinho novo open na próxima carga
+            // $this->obterOuCriarCarrinho($client); // opcional
+
             return [
-                'ok'         => true,
-                'order_id'   => $order->id,
-                'total'      => (float) $order->total_valor,
-                'status'     => $order->status,
+                'ok'       => true,
+                'order_id' => $order->id,
+                'total'    => (float) $order->total_valor,
+                'status'   => $order->status,
             ];
         });
     }
@@ -234,10 +245,9 @@ class VendaService
             return;
         }
 
-        // Linhas de estoque bloqueadas para update (evita corrida)
         $lotes = Estoque::where('id_produto_fk', $produtoId)
             ->where('status', 1)
-            ->orderBy('data_chegada') // FIFO
+            ->orderBy('data_chegada')
             ->lockForUpdate()
             ->get();
 
@@ -256,7 +266,6 @@ class VendaService
         }
 
         if ($restante > 0) {
-            // Em tese não ocorre pois checamos antes, mas mantém a segurança
             throw ValidationException::withMessages([
                 'estoque' => "Estoque insuficiente para o produto {$produtoId}. Faltam {$restante}."
             ]);
