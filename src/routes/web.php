@@ -152,34 +152,16 @@ Route::middleware([
     });
 
     Route::prefix('/vendas')->group(function () {
-        Route::get('/', [VendaController::class, 'vendas'])
-            ->name('vendas.venda')
-            ->middleware('check.permission:view_post,vendas');
-
-        Route::post('/buscar-produto', [VendaController::class, 'buscarProduto'])
-            ->name('buscar.produto');
-
-        Route::post('/verificar-estoque', [VendaController::class, 'verificarEstoque'])
-            ->name('verificar.estoque');
-
-        Route::post('/registrar-venda', [VendaController::class, 'registrarVenda'])
-            ->name('registrar.venda');
-
-        Route::post('/carrinho', [VendaController::class, 'carrinho'])
-            ->name('carrinho.venda'); // <-- era /carrinho/carrinho
-
-        Route::post('/carrinho/adicionar', [VendaController::class, 'adicionarItem'])
-            ->name('adicionar.venda');
-
-        Route::post('/carrinho/quantidade', [VendaController::class, 'atualizarQuantidade'])
-            ->name('atualizar_quantidade.venda');
-
-        Route::post('/carrinho/remover', [VendaController::class, 'removerItem'])
-            ->name('remover.venda');
-
-        Route::get('/vendas', [VendaController::class, 'historicoVendas'])
-            ->name('vendas.historico_vendas')
-            ->middleware('check.permission:view_post,vendas');
+        Route::get('/', [VendaController::class, 'vendas'])->name('vendas.venda')->middleware('check.permission:view_post,vendas');
+        Route::post('/buscar-produto', [VendaController::class, 'buscarProduto'])->name('buscar.produto');
+        Route::post('/verificar-estoque', [VendaController::class, 'verificarEstoque'])->name('verificar.estoque');
+        Route::post('/registrar-venda', [VendaController::class, 'registrarVenda'])->name('registrar.venda');
+        Route::post('/carrinho', [VendaController::class, 'carrinho'])->name('carrinho.venda'); // <-- era /carrinho/carrinho
+        Route::post('/carrinho/adicionar', [VendaController::class, 'adicionarItem'])->name('adicionar.venda');
+        Route::post('/carrinho/quantidade', [VendaController::class, 'atualizarQuantidade'])->name('atualizar_quantidade.venda');
+        Route::post('/carrinho/remover', [VendaController::class, 'removerItem'])->name('remover.venda');
+        Route::get('/vendas', [VendaController::class, 'historicoVendas'])->name('vendas.historico_vendas')->middleware('check.permission:view_post,vendas');
+        Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     });
 
     Route::prefix('/spreadsheet')->group(function () {

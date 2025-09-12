@@ -220,6 +220,7 @@ class VendaService
                 $venda->cod_produto    = $ci->cod_produto;
                 $venda->unidade_medida = $unidade;
                 $venda->nome_produto   = $ci->nome_produto;
+                $venda->id_unidade_fk  = current_unidade()->id_unidade;
                 $venda->save();
             }
 

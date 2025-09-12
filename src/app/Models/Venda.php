@@ -18,7 +18,11 @@ class Venda extends Model
         'unidade_medida',
         'nome_produto',
         'quantidade',
-        'preco_venda'
+        'preco_venda',
+        'id_unidade_fk',
+        'origem_venda',
+        'created_at',
+        'updated_at',
     ];
 
     // Relacionamento com Produto
