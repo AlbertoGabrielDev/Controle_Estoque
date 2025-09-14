@@ -11,7 +11,7 @@ class BotWhatsappController extends Controller
     function index()
     {
         $templates = MessageTemplate::all();
-        return Inertia::render('Marketing/BotWhatsapp',[
+        return Inertia::render('Wpp/Marketing/BotWhatsapp',[
             'templates' => $templates,
         ]);
     }

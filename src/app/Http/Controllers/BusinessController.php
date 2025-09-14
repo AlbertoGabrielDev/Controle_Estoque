@@ -23,6 +23,12 @@ class BusinessController extends Controller
         ]);
     }
 
+
+      public function dasboard()
+    {
+        return Inertia::render('Dashboard');
+    }
+
     public function extractFromUrl(Request $request)
     {
         $urlData = $this->parseGoogleMapsUrl($request->maps_url);

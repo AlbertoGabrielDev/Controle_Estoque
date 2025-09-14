@@ -29,39 +29,27 @@ Route::get('/welcome', function () {
     ]);
 });
 
-Route::middleware([
-    'auth',
-    config('jetstream.auth_session'),
-    'verified',
-])->prefix('/verdurao')->group(function () {
+Route::middleware(['auth'])
+    ->prefix('/verdurao/wpp')
+    ->name('wpp.')
+    ->group(function () {
+        Route::prefix('/bot')->group(function () {
+            Route::get('/', [BotWhatsappController::class, 'index'])->name('bot.index');
+            Route::get('/dashboard', [BusinessController::class, 'dasboard'])->name('bot.dashboard');
+            Route::post('/whatsapp/send-mass', [BotWhatsappController::class, 'sendMass']);
 
-
-
-
-
-    Route::get('/business-extractor', [BusinessController::class, 'index'])->name('business.index');
-    Route::post('/api/business/extract', [BusinessController::class, 'extractFromUrl'])->name('business.extract');
-    Route::post('/business/export', [BusinessController::class, 'exportToCsv'])->name('business.export');
-});
-
-// Route::middleware('auth')->group(function () {
-//     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-//     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-//     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-// });
-
-Route::middleware([
-    'auth',
-    config('jetstream.auth_session'),
-    'verified',
-])->prefix('/verdurao')->group(function () {
-
-
-    Route::prefix('/bot')->group(function () {
-        Route::get('/', [BotWhatsappController::class, 'index'])->name('bot.index');
-        Route::get('/dashboard', [DashboardController::class, 'index'])->name('bot.dashboard');
-        Route::post('/whatsapp/send-mass', [BotWhatsappController::class, 'sendMass']);
+            Route::get('/business-extractor', [BusinessController::class, 'index'])->name('business.index');
+            Route::post('/api/business/extract', [BusinessController::class, 'extractFromUrl'])->name('business.extract');
+            Route::post('/business/export', [BusinessController::class, 'exportToCsv'])->name('business.export');
+        });
     });
+
+
+Route::middleware([
+    'auth',
+    config('jetstream.auth_session'),
+    'verified',
+])->prefix('/verdurao')->group(function () {
 
     Route::prefix('/categoria')->group(function () {
         Route::get('/', [CategoriaController::class, 'Inicio'])->name('categoria.inicio')->middleware('check.permission:view_post,categoria');
@@ -161,7 +149,7 @@ Route::middleware([
         Route::post('/carrinho/quantidade', [VendaController::class, 'atualizarQuantidade'])->name('atualizar_quantidade.venda');
         Route::post('/carrinho/remover', [VendaController::class, 'removerItem'])->name('remover.venda');
         Route::get('/vendas', [VendaController::class, 'historicoVendas'])->name('vendas.historico_vendas')->middleware('check.permission:view_post,vendas');
-        Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+        Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard.index')->middleware('check.permission:view_post,vendas');
     });
 
     Route::prefix('/spreadsheet')->group(function () {
@@ -188,4 +176,4 @@ Route::middleware([
 });
 
 Route::get('login', [UsuarioController::class, 'unidade'])->name('login');
-Route::get('register', [UsuarioController::class, 'unidadeRegister'])->name('register');
+Route::get('register', action: [UsuarioController::class, 'unidadeRegister'])->name('register');

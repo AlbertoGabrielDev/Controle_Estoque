@@ -28,17 +28,24 @@ class HandleInertiaRequests extends Middleware
      *
      * @return array<string, mixed>
      */
-    public function share(Request $request): array
-    {
-        return [
-            ...parent::share($request),
-            'auth' => [
-                'user' => $request->user(),
-            ],
-            'ziggy' => fn () => [
-                ...(new Ziggy)->toArray(),
-                'location' => $request->url(),
-            ],
-        ];
-    }
+   public function share(Request $request): array
+{
+    return [
+        ...parent::share($request),
+        'auth' => [
+            'user' => $request->user(),
+        ],
+        'menus' => fn () => \App\Models\Menu::with(['children' => function($q){
+                            $q->orderBy('order');
+                        }])
+                        ->whereNull('parent_id')
+                        ->orderBy('order')
+                        ->get(['id','name','slug','icon','route','parent_id','order']),
+    ];
+}
+
+   public function rootView(Request $request): string
+{
+    return 'app'; // uma root para tudo
+}
 }
