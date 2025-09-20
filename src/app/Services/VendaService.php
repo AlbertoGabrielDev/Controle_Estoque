@@ -18,9 +18,16 @@ class VendaService
        CONSULTAS DE PRODUTO/ESTOQUE
        =========================== */
 
-    public function buscarProdutoPorQr(string $codigoQr): array
+    public function buscarProduto(?string $codigoQr = null, ?string $codigoProd = null): array
     {
-        $produto = Produto::where('qrcode', $codigoQr)->firstOrFail();
+        $produto = Produto::query()
+            ->where(function ($q) use ($codigoQr, $codigoProd) {
+                if ($codigoQr)
+                    $q->orWhere('qrcode', trim($codigoQr));
+                if ($codigoProd)
+                    $q->orWhere('cod_produto', trim($codigoProd));
+            })
+            ->firstOrFail();
 
         $preco = Estoque::where('id_produto_fk', $produto->id_produto)
             ->where('status', 1)
@@ -32,13 +39,13 @@ class VendaService
             ->sum('quantidade');
 
         return [
-            'id_produto'     => $produto->id_produto,
-            'nome_produto'   => $produto->nome_produto,
-            'cod_produto'    => $produto->cod_produto,
+            'id_produto' => $produto->id_produto,
+            'nome_produto' => $produto->nome_produto,
+            'cod_produto' => $produto->cod_produto,
             'unidade_medida' => $produto->unidade_medida,
-            'qrcode'         => $produto->qrcode,
-            'preco_venda'    => (float) ($preco ?? 0),
-            'estoque_atual'  => $qtdDisponivel,
+            'qrcode' => $produto->qrcode,
+            'preco_venda' => (float) ($preco ?? 0),
+            'estoque_atual' => $qtdDisponivel,
         ];
     }
 
@@ -56,9 +63,9 @@ class VendaService
 
             if ($disponivel < $qtdPedida) {
                 $faltantes[] = [
-                    'id_produto'             => $produtoId,
-                    'estoque_atual'          => $disponivel,
-                    'quantidade_solicitada'  => $qtdPedida,
+                    'id_produto' => $produtoId,
+                    'estoque_atual' => $disponivel,
+                    'quantidade_solicitada' => $qtdPedida,
                 ];
             }
         }
@@ -107,10 +114,10 @@ class VendaService
             $item->save();
         } else {
             $cart->items()->create([
-                'cod_produto'    => $produto->cod_produto,
-                'nome_produto'   => $produto->nome_produto,
-                'preco_unit'     => $precoUnit,
-                'quantidade'     => $quantidade,
+                'cod_produto' => $produto->cod_produto,
+                'nome_produto' => $produto->nome_produto,
+                'preco_unit' => $precoUnit,
+                'quantidade' => $quantidade,
                 'subtotal_valor' => $quantidade * $precoUnit,
             ]);
         }
@@ -156,11 +163,6 @@ class VendaService
         $cart->total_valor = $total;
         $cart->save();
     }
-
-    /* ===========================
-       FINALIZAÇÃO (CHECKOUT)
-       =========================== */
-
     public function finalizarVendaDoCarrinho(string $client): array
     {
         $cart = Cart::with('items')->where('client', $client)->where('status', 'open')->first();
@@ -170,7 +172,7 @@ class VendaService
         }
 
         $faltantes = $this->verificarEstoqueItens(
-            $cart->items->map(fn ($i) => [
+            $cart->items->map(fn($i) => [
                 'id_produto' => $this->produtoIdPorCodigo($i->cod_produto),
                 'quantidade' => $i->quantidade,
             ])->all()
@@ -182,14 +184,14 @@ class VendaService
                 'mensagem' => 'Alguns produtos não possuem estoque suficiente',
                 'faltantes' => $faltantes,
             ];
-    }
+        }
 
         return DB::transaction(function () use ($cart, $client) {
 
             $order = Order::create([
-                'client'      => $client,
-                'cart_id'     => $cart->id,
-                'status'      => 'created',
+                'client' => $client,
+                'cart_id' => $cart->id,
+                'status' => 'created',
                 'total_valor' => $cart->total_valor,
             ]);
 
@@ -201,26 +203,26 @@ class VendaService
 
                 // Grava item do pedido (coluna é sub_valor)
                 $oi = new OrderItem();
-                $oi->order_id     = $order->id;
-                $oi->cod_produto  = $ci->cod_produto;
+                $oi->order_id = $order->id;
+                $oi->cod_produto = $ci->cod_produto;
                 $oi->nome_produto = $ci->nome_produto;
-                $oi->preco_unit   = $ci->preco_unit;
-                $oi->quantidade   = $ci->quantidade;
-                $oi->sub_valor    = $ci->subtotal_valor;
+                $oi->preco_unit = $ci->preco_unit;
+                $oi->quantidade = $ci->quantidade;
+                $oi->sub_valor = $ci->subtotal_valor;
                 $oi->save();
 
                 // ===== Também grava na tabela VENDAS (uma linha por item) =====
                 $unidade = Produto::where('cod_produto', $ci->cod_produto)->value('unidade_medida');
 
                 $venda = new Venda();
-                $venda->id_produto_fk  = $produtoId;
-                $venda->id_usuario_fk  = auth()->id(); // se null e a coluna não aceitar, ajuste o default no schema
-                $venda->quantidade     = $ci->quantidade;
-                $venda->preco_venda    = $ci->preco_unit;
-                $venda->cod_produto    = $ci->cod_produto;
+                $venda->id_produto_fk = $produtoId;
+                $venda->id_usuario_fk = auth()->id(); // se null e a coluna não aceitar, ajuste o default no schema
+                $venda->quantidade = $ci->quantidade;
+                $venda->preco_venda = $ci->preco_unit;
+                $venda->cod_produto = $ci->cod_produto;
                 $venda->unidade_medida = $unidade;
-                $venda->nome_produto   = $ci->nome_produto;
-                $venda->id_unidade_fk  = current_unidade()->id_unidade;
+                $venda->nome_produto = $ci->nome_produto;
+                $venda->id_unidade_fk = current_unidade()->id_unidade;
                 $venda->save();
             }
 
@@ -232,10 +234,10 @@ class VendaService
             // $this->obterOuCriarCarrinho($client); // opcional
 
             return [
-                'ok'       => true,
+                'ok' => true,
                 'order_id' => $order->id,
-                'total'    => (float) $order->total_valor,
-                'status'   => $order->status,
+                'total' => (float) $order->total_valor,
+                'status' => $order->status,
             ];
         });
     }
@@ -255,7 +257,8 @@ class VendaService
         $restante = $qtdNecessaria;
 
         foreach ($lotes as $lote) {
-            if ($restante <= 0) break;
+            if ($restante <= 0)
+                break;
 
             $usa = min($lote->quantidade, $restante);
 

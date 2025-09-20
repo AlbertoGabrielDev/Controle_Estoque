@@ -21,10 +21,23 @@ class VendaController extends Controller
 
     public function buscarProduto(Request $request)
     {
-        $request->validate(['codigo_qr' => 'required|string']);
+        $request->validate([
+            'codigo_qr' => 'nullable|string',
+            'codigo_produto' => 'nullable|string',
+        ]);
+
+        if (!$request->filled('codigo_qr') && !$request->filled('codigo_produto')) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Informe codigo_qr ou codigo_produto.'
+            ], 422);
+        }
 
         try {
-            $dados = $this->service->buscarProdutoPorQr($request->codigo_qr);
+            $dados = $this->service->buscarProduto(
+                $request->input('codigo_qr'),
+                $request->input('codigo_produto')
+            );
 
             return response()->json([
                 'success' => true,
@@ -41,9 +54,9 @@ class VendaController extends Controller
     public function verificarEstoque(Request $request)
     {
         $request->validate([
-            'itens'                 => 'required|array|min:1',
-            'itens.*.id_produto'    => 'required|integer',
-            'itens.*.quantidade'    => 'required|integer|min:1',
+            'itens' => 'required|array|min:1',
+            'itens.*.id_produto' => 'required|integer',
+            'itens.*.quantidade' => 'required|integer|min:1',
         ]);
 
         try {
@@ -64,7 +77,7 @@ class VendaController extends Controller
         } catch (\Throwable $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Erro ao verificar estoque: '.$e->getMessage()
+                'message' => 'Erro ao verificar estoque: ' . $e->getMessage()
             ], 500);
         }
     }
@@ -76,16 +89,16 @@ class VendaController extends Controller
 
         return response()->json([
             'success' => true,
-            'cart'    => $cart->toArray(),
+            'cart' => $cart->toArray(),
         ]);
     }
 
     public function adicionarItem(Request $request)
     {
         $request->validate([
-            'client'      => 'required|string|max:20',
-            'id_produto'  => 'required|integer',
-            'quantidade'  => 'required|integer|min:1',
+            'client' => 'required|string|max:20',
+            'id_produto' => 'required|integer',
+            'quantidade' => 'required|integer|min:1',
         ]);
 
         try {
@@ -97,12 +110,12 @@ class VendaController extends Controller
 
             return response()->json([
                 'success' => true,
-                'cart'    => $cart->toArray(),
+                'cart' => $cart->toArray(),
             ]);
         } catch (\Throwable $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Erro ao adicionar item: '.$e->getMessage(),
+                'message' => 'Erro ao adicionar item: ' . $e->getMessage(),
             ], 400);
         }
     }
@@ -110,9 +123,9 @@ class VendaController extends Controller
     public function atualizarQuantidade(Request $request)
     {
         $request->validate([
-            'client'       => 'required|string|max:20',
+            'client' => 'required|string|max:20',
             'cart_item_id' => 'required|integer',
-            'quantidade'   => 'required|integer|min:0',
+            'quantidade' => 'required|integer|min:0',
         ]);
 
         try {
@@ -124,12 +137,12 @@ class VendaController extends Controller
 
             return response()->json([
                 'success' => true,
-                'cart'    => $cart->toArray(),
+                'cart' => $cart->toArray(),
             ]);
         } catch (\Throwable $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Erro ao atualizar item: '.$e->getMessage(),
+                'message' => 'Erro ao atualizar item: ' . $e->getMessage(),
             ], 400);
         }
     }
@@ -137,7 +150,7 @@ class VendaController extends Controller
     public function removerItem(Request $request)
     {
         $request->validate([
-            'client'       => 'required|string|max:20',
+            'client' => 'required|string|max:20',
             'cart_item_id' => 'required|integer',
         ]);
 
@@ -149,12 +162,12 @@ class VendaController extends Controller
 
             return response()->json([
                 'success' => true,
-                'cart'    => $cart->toArray(),
+                'cart' => $cart->toArray(),
             ]);
         } catch (\Throwable $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Erro ao remover item: '.$e->getMessage(),
+                'message' => 'Erro ao remover item: ' . $e->getMessage(),
             ], 400);
         }
     }
@@ -170,8 +183,8 @@ class VendaController extends Controller
 
             if (!$resultado['ok']) {
                 return response()->json([
-                    'success'  => false,
-                    'message'  => $resultado['mensagem'] ?? 'Falha ao finalizar',
+                    'success' => false,
+                    'message' => $resultado['mensagem'] ?? 'Falha ao finalizar',
                     'detalhes' => $resultado['faltantes'] ?? [],
                 ], 400);
             }
@@ -179,12 +192,12 @@ class VendaController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'Venda registrada com sucesso!',
-                'order'   => $resultado,
+                'order' => $resultado,
             ]);
         } catch (\Throwable $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Erro ao processar a venda: '.$e->getMessage(),
+                'message' => 'Erro ao processar a venda: ' . $e->getMessage(),
             ], 500);
         }
     }
