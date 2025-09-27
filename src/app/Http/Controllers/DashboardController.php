@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 use App\Models\User;
 use App\Services\DashboardService;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -13,20 +14,23 @@ class DashboardController extends Controller
     public function index(Request $request)
     {
         $attendantId = $request->integer('atendente') ?: null;
+        $fromStr = $request->input('from');
+        $toStr   = $request->input('to');
+        $from = $fromStr ? Carbon::createFromFormat('Y-m-d', $fromStr)->startOfDay() : null;
+        $to   = $toStr   ? Carbon::createFromFormat('Y-m-d', $toStr)->endOfDay()   : null;
 
-        // liste os atendentes (ajuste a relação caso use outro pacote/nomes)
         $attendants = User::query()
             ->select('id','name')
-            ->whereHas('roles', fn($q) => $q->where('name', 'atendente')) // <= ajuste se seu schema for diferente
+            ->whereHas('roles', fn($q) => $q->where('name', 'atendente'))
             ->orderBy('name')
             ->get();
 
-        $daily    = $this->service->getDailySales(30, $attendantId);
-        $topProd  = $this->service->getTopProducts(5, $attendantId);
-        $byStatus = $this->service->getOrdersByStatus();
-        $monthly  = $this->service->getMonthlySales((int)date('Y'), $attendantId);
-        $byUnit   = $this->service->getSalesByUnit($attendantId);
-        $kpis     = $this->service->getTodayKpis($attendantId);
+        $daily    = $this->service->getDailySales(30, $attendantId, $from, $to);
+        $topProd  = $this->service->getTopProducts(5, $attendantId, $from, $to);
+        $byStatus = $this->service->getOrdersByStatus($from, $to); 
+        $monthly  = $this->service->getMonthlySales(null, $attendantId, $from, $to);
+        $byUnit   = $this->service->getSalesByUnit($attendantId, $from, $to);
+        $kpis     = $this->service->getKpis($attendantId, $from, $to); 
 
         return Inertia::render('Dashboard/SalesDashboard', [
             'daily'       => $daily,
@@ -37,7 +41,10 @@ class DashboardController extends Controller
             'kpis'        => $kpis,
             'unidade'     => optional(current_unidade())->nome,
             'attendants'  => $attendants,
-            'attendantId' => $attendantId, 
+            'attendantId' => $attendantId,
+            'from'        => $from?->toDateString(),
+            'to'          => $to?->toDateString(),
         ]);
     }
-}
+    }
+

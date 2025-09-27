@@ -3,7 +3,6 @@
 namespace App\Services;
 
 use App\Models\Cart;
-use App\Models\Order;
 use App\Models\Venda;
 use Carbon\Carbon;
 use Carbon\CarbonPeriod;
@@ -11,7 +10,19 @@ use Illuminate\Support\Facades\DB;
 
 class DashboardService
 {
-    private function vendasQuery(?int $userId)
+    private function normalizeRange(?Carbon $from, ?Carbon $to, int $fallbackDays = 30): array
+    {
+        if (!$from || !$to) {
+            $to = Carbon::today()->endOfDay();
+            $from = Carbon::today()->subDays($fallbackDays - 1)->startOfDay();
+        }
+        if ($from->gt($to)) {
+            [$from, $to] = [$to->copy()->startOfDay(), $from->copy()->endOfDay()];
+        }
+        return [$from->copy(), $to->copy()];
+    }
+
+    private function vendasBase(?int $userId)
     {
         $q = Venda::query();
         if ($userId) {
@@ -20,16 +31,15 @@ class DashboardService
         return $q;
     }
 
-    public function getDailySales(int $days = 30, ?int $userId = null): array
+    public function getDailySales(int $days = 30, ?int $userId = null, ?Carbon $from = null, ?Carbon $to = null): array
     {
-        $start = Carbon::today()->subDays($days - 1);
-        $end   = Carbon::today();
+        [$from, $to] = $this->normalizeRange($from, $to, $days);
 
-        $rows = $this->vendasQuery($userId)
+        $rows = $this->vendasBase($userId)
             ->selectRaw('DATE(created_at) as dia,
                          SUM(quantidade * preco_venda) as total,
                          SUM(quantidade) as qtd')
-            ->whereBetween('created_at', [$start->startOfDay(), $end->endOfDay()])
+            ->whereBetween('created_at', [$from, $to])
             ->groupBy('dia')
             ->orderBy('dia')
             ->get()
@@ -39,7 +49,7 @@ class DashboardService
         $totais = [];
         $qtds   = [];
 
-        foreach (CarbonPeriod::create($start, $end) as $date) {
+        foreach (CarbonPeriod::create($from, $to) as $date) {
             $d = $date->toDateString();
             $labels[] = $date->format('d/m');
             $totais[] = isset($rows[$d]) ? (float)$rows[$d]->total : 0.0;
@@ -49,9 +59,12 @@ class DashboardService
         return compact('labels', 'totais', 'qtds');
     }
 
-    public function getTopProducts(int $limit = 5, ?int $userId = null): array
+    public function getTopProducts(int $limit = 5, ?int $userId = null, ?Carbon $from = null, ?Carbon $to = null): array
     {
-        $rows = $this->vendasQuery($userId)
+        [$from, $to] = $this->normalizeRange($from, $to);
+
+        $rows = $this->vendasBase($userId)
+            ->whereBetween('created_at', [$from, $to])
             ->selectRaw('cod_produto, nome_produto,
                          SUM(quantidade * preco_venda) as total,
                          SUM(quantidade) as qtd')
@@ -67,9 +80,12 @@ class DashboardService
         ];
     }
 
-    public function getOrdersByStatus(): array
+    public function getOrdersByStatus(?Carbon $from = null, ?Carbon $to = null): array
     {
+        [$from, $to] = $this->normalizeRange($from, $to);
+
         $rows = Cart::selectRaw('status, COUNT(*) as total')
+            ->whereBetween('created_at', [$from, $to])
             ->groupBy('status')
             ->get();
 
@@ -79,37 +95,46 @@ class DashboardService
         ];
     }
 
-    public function getMonthlySales(?int $year = null, ?int $userId = null): array
+    public function getMonthlySales(?int $year = null, ?int $userId = null, ?Carbon $from = null, ?Carbon $to = null): array
     {
-        $year = $year ?: (int)date('Y');
+        [$from, $to] = $this->normalizeRange($from, $to);
 
-        $rows = $this->vendasQuery($userId)
-            ->selectRaw('MONTH(created_at) as mes,
+        // Agrupa por ano/mês dentro do range (cobre ranges跨-anos)
+        $rows = $this->vendasBase($userId)
+            ->whereBetween('created_at', [$from, $to])
+            ->selectRaw('YEAR(created_at) as ano, MONTH(created_at) as mes,
                          SUM(quantidade * preco_venda) as total')
-            ->whereYear('created_at', $year)
-            ->groupBy('mes')
-            ->orderBy('mes')
-            ->get()
-            ->keyBy('mes');
+            ->groupBy('ano','mes')
+            ->orderBy('ano')->orderBy('mes')
+            ->get();
 
+        // Construir labels do período mês a mês
         $labels = [];
         $totais = [];
-        for ($m = 1; $m <= 12; $m++) {
-            $labels[] = Carbon::createFromDate($year, $m, 1)->locale('pt_BR')->isoFormat('MMM');
-            $totais[] = isset($rows[$m]) ? (float)$rows[$m]->total : 0.0;
+        $byKey = $rows->keyBy(fn($r) => sprintf('%04d-%02d', $r->ano, $r->mes));
+
+        // percorre de mês em mês
+        $cursor = $from->copy()->startOfMonth();
+        $limit  = $to->copy()->startOfMonth();
+        while ($cursor <= $limit) {
+            $key = $cursor->format('Y-m');
+            $labels[] = $cursor->locale('pt_BR')->isoFormat('MMM/YY');
+            $totais[] = isset($byKey[$key]) ? (float)$byKey[$key]->total : 0.0;
+            $cursor->addMonth();
         }
 
-        return compact('labels', 'totais', 'year');
+        return ['labels' => $labels, 'totais' => $totais, 'year' => $from->year === $to->year ? $from->year : null];
     }
 
-    public function getSalesByUnit(?int $userId = null): array
+    public function getSalesByUnit(?int $userId = null, ?Carbon $from = null, ?Carbon $to = null): array
     {
-        $q = DB::table('vendas as v')
-            ->join('unidades as u', 'u.id_unidade', '=', 'v.id_unidade_fk');
+        [$from, $to] = $this->normalizeRange($from, $to);
 
-        if ($userId) {
-            $q->where('v.id_usuario_fk', $userId);
-        }
+        $q = DB::table('vendas as v')
+            ->join('unidades as u', 'u.id_unidade', '=', 'v.id_unidade_fk')
+            ->whereBetween('v.created_at', [$from, $to]);
+
+        if ($userId) $q->where('v.id_usuario_fk', $userId);
 
         $rows = $q->selectRaw('u.nome as unidade, SUM(v.quantidade * v.preco_venda) as total')
             ->groupBy('u.nome')
@@ -122,24 +147,23 @@ class DashboardService
         ];
     }
 
-    public function getTodayKpis(?int $userId = null): array
+    public function getKpis(?int $userId = null, ?Carbon $from = null, ?Carbon $to = null): array
     {
-        $start = Carbon::today()->startOfDay();
-        $end   = Carbon::today()->endOfDay();
+        [$from, $to] = $this->normalizeRange($from, $to, 1); // se não vierem datas, considera hoje
 
-        $salesCount = $this->vendasQuery($userId)
-            ->whereBetween('created_at', [$start, $end])
+        $salesCount = $this->vendasBase($userId)
+            ->whereBetween('created_at', [$from, $to])
             ->count();
 
-        $revenue = (float) $this->vendasQuery($userId)
-            ->whereBetween('created_at', [$start, $end])
+        $revenue = (float) $this->vendasBase($userId)
+            ->whereBetween('created_at', [$from, $to])
             ->selectRaw('COALESCE(SUM(quantidade * preco_venda),0) AS total')
             ->value('total');
 
         $profit = (float) DB::table('vendas AS v')
-            ->join('estoques AS e', 'e.id_produto_fk', '=', 'v.id_produto_fk') // ajuste se necessário
+            ->join('estoques AS e', 'e.id_produto_fk', '=', 'v.id_produto_fk')
             ->when($userId, fn($qq) => $qq->where('v.id_usuario_fk', $userId))
-            ->whereBetween('v.created_at', [$start, $end])
+            ->whereBetween('v.created_at', [$from, $to])
             ->selectRaw('COALESCE(SUM( (v.preco_venda - e.preco_custo) * v.quantidade ),0) AS lucro')
             ->value('lucro');
 

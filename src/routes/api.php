@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CalendarController;
 use App\Http\Controllers\ProdutoController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\CartController;
@@ -16,3 +17,4 @@ Route::get('/carts/by-client/{client}', [CartController::class, 'getByclient']);
 Route::post('/carts/remove', [CartController::class, 'remove']);
 Route::post('/orders', [OrderController::class, 'store']);
 
+Route::get('/vendas/month', [CalendarController::class, 'month'])->name('api.vendas.month');

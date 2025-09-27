@@ -26,7 +26,7 @@ class BusinessController extends Controller
 
       public function dasboard()
     {
-        return Inertia::render('Dashboard');
+        return Inertia::render('Wpp/Dashboard');
     }
 
     public function extractFromUrl(Request $request)

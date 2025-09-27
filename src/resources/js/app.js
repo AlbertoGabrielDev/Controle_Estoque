@@ -19,6 +19,7 @@ const USE_VUE_SIDEBAR = [
 // Páginas que devem usar o "principal" (antigo Blade) em Vue
 const USE_PRINCIPAL = [
   /^Dashboard\//,
+  /^Calendar\//,
   /^Vendas\//,
   /^Estoque\//,
   /^Categoria\//,

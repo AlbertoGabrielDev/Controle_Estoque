@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\GraficosApiController;
 use App\Http\Controllers\BotWhatsappController;
 use App\Http\Controllers\BusinessController;
+use App\Http\Controllers\CalendarController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\MessageTemplateController;
 use App\Http\Controllers\WhatsAppContactsController;
@@ -150,6 +151,7 @@ Route::middleware([
         Route::post('/carrinho/remover', [VendaController::class, 'removerItem'])->name('remover.venda');
         Route::get('/vendas', [VendaController::class, 'historicoVendas'])->name('vendas.historico_vendas')->middleware('check.permission:view_post,vendas');
         Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard.index')->middleware('check.permission:view_post,vendas');
+        Route::get('/calendar', [CalendarController::class, 'index'])->name('vendas.calendar');
     });
 
     Route::prefix('/spreadsheet')->group(function () {
