@@ -5,6 +5,8 @@ namespace App\Providers;
 use App\Models\Produto;
 use App\Repositories\CategoriaRepository;
 use App\Repositories\CategoriaRepositoryEloquent;
+use App\Repositories\ClienteRepository;
+use App\Repositories\ClienteRepositoryEloquent;
 use App\Repositories\EstoqueRepository;
 use App\Repositories\EstoqueRepositoryEloquent;
 use App\Repositories\ProdutoRepository;
@@ -29,6 +31,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(EstoqueRepository::class, EstoqueRepositoryEloquent::class);
         $this->app->bind(UnidadesRepository::class, UnidadesRepositoryEloquent::class);
         $this->app->bind(RoleRepository::class, RoleRepositoryEloquent::class);
+        $this->app->bind(ClienteRepository::class, ClienteRepositoryEloquent::class);
     }
 
     /**

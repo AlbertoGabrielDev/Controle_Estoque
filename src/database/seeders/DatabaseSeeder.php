@@ -23,6 +23,8 @@ class DatabaseSeeder extends Seeder
             MarcaSeeder::class,
             FornecedorSeeder::class,
             TelefoneSeeder::class,
+            ClientesSeeder::class,
+            TaxSeeder::class,
         ]);
 
     }

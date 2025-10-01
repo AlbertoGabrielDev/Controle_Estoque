@@ -47,29 +47,45 @@ class ProdutoRepository
     {
         request()->attributes->set('currentMenuSlug', 'produtos');
 
-        $query = Produto::query()
-            ->select(['id_produto', 'cod_produto', 'nome_produto', 'descricao', 'unidade_medida', 'inf_nutriente', 'status']);
+        $query = Produto::query()->select([
+            'id_produto        as id',
+            'cod_produto       as c1',
+            'nome_produto      as c2',
+            'descricao         as c3',
+            'unidade_medida    as c4',
+            'inf_nutriente     as c5',
+            'status            as st',
+        ]);
 
-        return DataTables::eloquent($query)
+        $dt = DataTables::eloquent($query)
+            ->orderColumn('c1', 'cod_produto $1')
+            ->orderColumn('c2', 'nome_produto $1')
+            ->orderColumn('c3', 'descricao $1')
+            ->orderColumn('c4', 'unidade_medida $1')
+            ->filterColumn('c1', fn($q, $k) => $q->where('cod_produto', 'like', "%{$k}%"))
+            ->filterColumn('c2', fn($q, $k) => $q->where('nome_produto', 'like', "%{$k}%"))
+            ->filterColumn('c3', fn($q, $k) => $q->where('descricao', 'like', "%{$k}%"))
+            ->filterColumn('c4', fn($q, $k) => $q->where('unidade_medida', 'like', "%{$k}%"))
+
             ->addColumn('acoes', function ($p) {
-                $editBtn = Blade::render(
+                $editBtn = \Illuminate\Support\Facades\Blade::render(
                     '<x-edit-button :route="$route" :model-id="$modelId" />',
-                    ['route' => 'produtos.editar', 'modelId' => $p->id_produto]
+                    ['route' => 'produtos.editar', 'modelId' => $p->id]
                 );
-
-                $statusBtn = Blade::render(
+                $statusBtn = \Illuminate\Support\Facades\Blade::render(
                     '<x-button-status :model-id="$modelId" :status="$status" model-name="produto" />',
-                    ['modelId' => $p->id_produto, 'status' => (bool) $p->status]
+                    ['modelId' => $p->id, 'status' => (bool) $p->st]
                 );
-
-                $html = trim($editBtn . $statusBtn);
-                if ($html === '') {
-                    $html = '<span class="inline-block w-8 h-8 opacity-0" aria-hidden="true">&nbsp;</span>';
-                }
-                return '<div class="flex gap-2 justify-end items-center">'.$html.'</div>';
+                $html = trim($editBtn . $statusBtn) ?: '<span class="inline-block w-8 h-8 opacity-0">&nbsp;</span>';
+                return '<div class="flex gap-2 justify-end items-center">' . $html . '</div>';
             })
-            ->rawColumns(['acoes'])
-            ->toJson();
+            ->rawColumns(['acoes']);
+
+        $json = $dt->toJson();
+        $payload = $json->getData(true);
+        foreach (['queries', 'input', 'options', 'debug', 'request'] as $k)
+            unset($payload[$k]);
+        return response()->json($payload);
     }
 
     public function cadastro()

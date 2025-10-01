@@ -7,7 +7,6 @@ use App\Models\Permission;
 use App\Models\Role;
 use App\Models\RoleMenuPermission;
 use App\Repositories\RoleRepository;
-use App\Repositories\RoleRepositoryEloquent;
 use Illuminate\Http\Request;
 
 class RoleController extends Controller

@@ -12,185 +12,197 @@ class MenuSeeder extends Seeder
         $inicio = Menu::updateOrCreate(
             ['slug' => 'inicio'],
             [
-                'name'      => 'Inicio',
-                'slug'      => 'inicio',
-                'icon'      => 'fas fa-home mr-2',
-                'route'     => 'categoria.inicio',
+                'name' => 'Inicio',
+                'slug' => 'inicio',
+                'icon' => 'fas fa-home mr-2',
+                'route' => 'categoria.inicio',
                 'parent_id' => null,
-                'order'     => 1,
+                'order' => 1,
             ]
         );
 
         $produto = Menu::updateOrCreate(
             ['slug' => 'produtos'],
             [
-                'name'      => 'Produtos',
-                'slug'      => 'produtos',
-                'icon'      => 'fas fa-file-alt mr-2',
-                'route'     => 'produtos.index',
+                'name' => 'Produtos',
+                'slug' => 'produtos',
+                'icon' => 'fas fa-file-alt mr-2',
+                'route' => 'produtos.index',
                 'parent_id' => null,
-                'order'     => 2,
+                'order' => 2,
             ]
         );
 
         $fornecedor = Menu::updateOrCreate(
             ['slug' => 'fornecedores'],
             [
-                'name'      => 'Fornecedores',
-                'slug'      => 'fornecedores',
-                'icon'      => 'fas fa-address-book mr-2',
-                'route'     => 'fornecedor.index',
+                'name' => 'Fornecedores',
+                'slug' => 'fornecedores',
+                'icon' => 'fas fa-address-book mr-2',
+                'route' => 'fornecedor.index',
                 'parent_id' => null,
-                'order'     => 3,
+                'order' => 3,
             ]
         );
 
         $marca = Menu::updateOrCreate(
             ['slug' => 'marca'],
             [
-                'name'      => 'Marca',
-                'slug'      => 'marca',
-                'icon'      => 'fas fa-hashtag mr-2',
-                'route'     => 'marca.index',
+                'name' => 'Marca',
+                'slug' => 'marca',
+                'icon' => 'fas fa-hashtag mr-2',
+                'route' => 'marca.index',
                 'parent_id' => null,
-                'order'     => 4,
+                'order' => 4,
             ]
         );
         $estoques = Menu::updateOrCreate(
             ['name' => 'Estoques', 'parent_id' => null],
             [
-                'name'      => 'Estoques',
-                'icon'      => 'fas fa-server mr-2',
+                'name' => 'Estoques',
+                'icon' => 'fas fa-server mr-2',
                 'parent_id' => null,
-                'order'     => 5,
+                'order' => 5,
             ]
         );
 
         $usuarios = Menu::updateOrCreate(
             ['name' => 'Usuários', 'parent_id' => null],
             [
-                'name'      => 'Usuários',
-                'icon'      => 'fas fa-users mr-2',
+                'name' => 'Usuários',
+                'icon' => 'fas fa-users mr-2',
                 'parent_id' => null,
-                'order'     => 6,
+                'order' => 6,
             ]
         );
 
         $vendas = Menu::updateOrCreate(
             ['name' => 'Venda', 'parent_id' => null],
             [
-                'name'      => 'Venda',
-                'icon'      => 'fas fa-history mr-2',
+                'name' => 'Venda',
+                'icon' => 'fas fa-history mr-2',
                 'parent_id' => null,
-                'order'     => 8,
+                'order' => 8,
             ]
         );
 
         $dasboard = Menu::updateOrCreate(
             ['slug' => 'dashboard'],
             [
-                'name'      => 'Dashboard',
-                'slug'      => 'dashboard',
-                'icon'      => 'fas fa-history mr-2',
-                'route'     => 'dashboard.index',
+                'name' => 'Dashboard',
+                'slug' => 'dashboard',
+                'icon' => 'fas fa-history mr-2',
+                'route' => 'dashboard.index',
                 'parent_id' => null,
-                'order'     => 8,
+                'order' => 8,
             ]
         );
 
         $calendario = Menu::updateOrCreate(
             ['slug' => 'calendario'],
             [
-                'name'      => 'Calendario',
-                'slug'      => 'calendario',
-                'icon'      => 'fas fa-history mr-2',
-                'route'     => 'vendas.calendar',
+                'name' => 'Calendario',
+                'slug' => 'calendario',
+                'icon' => 'fas fa-history mr-2',
+                'route' => 'vendas.calendar',
                 'parent_id' => null,
-                'order'     => 9,
+                'order' => 9,
+            ]
+        );
+
+        $clientes = Menu::updateOrCreate(
+            ['name' => 'Clientes', 'parent_id' => null],
+            [
+                'name' => 'Clientes',
+                'slug' => 'clientes',
+                'icon' => 'fas fa-users mr-2',
+                'parent_id' => null,
+                'route' => 'clientes.index',
+                'order' => 10,
             ]
         );
 
         $estoque = Menu::updateOrCreate(
             ['slug' => 'estoque'],
             [
-                'name'      => 'Estoque',
-                'slug'      => 'estoque',
-                'icon'      => 'fas fa-server mr-2',
-                'route'     => 'estoque.index',
+                'name' => 'Estoque',
+                'slug' => 'estoque',
+                'icon' => 'fas fa-server mr-2',
+                'route' => 'estoque.index',
                 'parent_id' => $estoques->id,
-                'order'     => 1,
+                'order' => 1,
             ]
         );
 
         $historico = Menu::updateOrCreate(
             ['slug' => 'historico'],
             [
-                'name'      => 'Histórico',
-                'slug'      => 'historico',
-                'icon'      => 'fas fa-history mr-2',
-                'route'     => 'estoque.historico',
+                'name' => 'Histórico',
+                'slug' => 'historico',
+                'icon' => 'fas fa-history mr-2',
+                'route' => 'estoque.historico',
                 'parent_id' => $estoques->id,
-                'order'     => 2,
+                'order' => 2,
             ]
         );
 
         $usuario = Menu::updateOrCreate(
             ['slug' => 'perfil'],
             [
-                'name'      => 'Perfil',
-                'slug'      => 'perfil',
-                'icon'      => 'fas fa-user-tie mr-2',
-                'route'     => 'usuario.index',
+                'name' => 'Perfil',
+                'slug' => 'perfil',
+                'icon' => 'fas fa-user-tie mr-2',
+                'route' => 'usuario.index',
                 'parent_id' => $usuarios->id,
-                'order'     => 1,
+                'order' => 1,
             ]
         );
 
         $unidade = Menu::updateOrCreate(
             ['slug' => 'unidade'],
             [
-                'name'      => 'Unidade',
-                'slug'      => 'unidade',
-                'icon'      => 'fa-solid fa-suitcase mr-2',
-                'route'     => 'unidade.index',
+                'name' => 'Unidade',
+                'slug' => 'unidade',
+                'icon' => 'fa-solid fa-suitcase mr-2',
+                'route' => 'unidade.index',
                 'parent_id' => $usuarios->id,
-                'order'     => 2,
+                'order' => 2,
             ]
         );
 
         $roles = Menu::updateOrCreate(
             ['slug' => 'permissao'],
             [
-                'name'      => 'Permissão',
-                'slug'      => 'permissao',
-                'icon'      => 'fas fa-user-shield mr-2',
-                'route'     => 'roles.index',
+                'name' => 'Permissão',
+                'slug' => 'permissao',
+                'icon' => 'fas fa-user-shield mr-2',
+                'route' => 'roles.index',
                 'parent_id' => $usuarios->id,
-                'order'     => 7,
+                'order' => 7,
             ]
         );
 
         $historicoVenda = Menu::updateOrCreate(
             ['slug' => 'vendas'],
             [
-                'name'      => 'Vendas',
-                'slug'      => 'vendas',
-                'icon'      => 'fas fa-money-bill-wave-alt mr-2',
-                'route'     => 'vendas.venda',
+                'name' => 'Vendas',
+                'slug' => 'vendas',
+                'icon' => 'fas fa-money-bill-wave-alt mr-2',
+                'route' => 'vendas.venda',
                 'parent_id' => $vendas->id,
-                'order'     => 1,
+                'order' => 1,
             ]
         );
 
         $historicoVenda2 = Menu::updateOrCreate(
             ['slug' => 'historico_vendas'],
             [
-                'name'      => 'Histórico de Venda',
-                'slug'      => 'historico_vendas',
-                'icon'      => 'fas fa-history mr-2',
-                'route'     => 'vendas.historico_vendas',
+                'name' => 'Histórico de Venda',
+                'slug' => 'historico_vendas',
+                'icon' => 'fas fa-history mr-2',
+                'route' => 'vendas.historico_vendas',
                 'parent_id' => $vendas->id,
-                'order'     => 2,
+                'order' => 2,
             ]
         );
     }
