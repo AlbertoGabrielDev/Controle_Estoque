@@ -4,11 +4,11 @@ namespace App\Repositories;
 
 use App\Models\Cliente;
 use App\Models\CustomerSegment;
-use App\Repositories\ClienteRepository;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
 use Prettus\Repository\Eloquent\BaseRepository;
 use App\Criteria\StatusCriteria;
+
 class ClienteRepositoryEloquent extends BaseRepository implements ClienteRepository
 {
     public function model()
@@ -16,7 +16,7 @@ class ClienteRepositoryEloquent extends BaseRepository implements ClienteReposit
         return Cliente::class;
     }
 
-   public function boot()
+    public function boot()
     {
         $this->pushCriteria(app(StatusCriteria::class));
         parent::boot();
@@ -24,14 +24,15 @@ class ClienteRepositoryEloquent extends BaseRepository implements ClienteReposit
 
     public function paginateWithFilters(array $filters): LengthAwarePaginator
     {
-        $q         = (string) ($filters['q'] ?? '');
-        $uf        = (string) ($filters['uf'] ?? '');
+        $q         = trim((string) ($filtewrs['q'] ?? ''));
+        $uf        = strtoupper(trim((string) ($filters['uf'] ?? '')));
         $segmentId = $filters['segment_id'] ?? null;
-        $status    = array_key_exists('status', $filters) ? $filters['status'] : null;
+        $raw    = $filters['status'] ?? 1;
+        $status = ((string)$raw === '1' || $raw === 1) ? 1 : 0;
 
         $query = $this->model
             ->newQuery()
-            ->when($q, fn($qry) => $qry->where(function($s) use ($q) {
+            ->when($q !== '', fn($qry) => $qry->where(function($s) use ($q) {
                 $s->where('nome','like',"%{$q}%")
                   ->orWhere('nome_fantasia','like',"%{$q}%")
                   ->orWhere('razao_social','like',"%{$q}%")
@@ -39,16 +40,15 @@ class ClienteRepositoryEloquent extends BaseRepository implements ClienteReposit
                   ->orWhere('whatsapp','like',"%{$q}%")
                   ->orWhere('email','like',"%{$q}%");
             }))
-            ->when($uf, fn($qry) => $qry->where('uf', $uf))
-            ->when($segmentId, fn($qry) => $qry->where('segment_id', $segmentId))
+            ->when($uf !== '', fn($qry) => $qry->whereRaw('UPPER(uf) = ?', [$uf]))
+            ->when(!is_null($segmentId), fn($qry) => $qry->where('segment_id', $segmentId))
             ->when(!is_null($status), fn($qry) => $qry->where('status', $status))
             ->with('segmento:id,nome')
             ->orderByDesc('id_cliente');
 
         $perPage = (int) ($filters['per_page'] ?? 10);
-
         $paginator = $query->paginate($perPage);
-        // mantém filtros nos links de paginação
+
         return $paginator->appends($filters);
     }
 
@@ -57,43 +57,42 @@ class ClienteRepositoryEloquent extends BaseRepository implements ClienteReposit
         return CustomerSegment::select('id','nome')->orderBy('nome')->get();
     }
 
-    public function createWithUser(array $data, int $userId): Cliente
+    public function createCliente(array $data, int $userId): Cliente
     {
         $data['id_users_fk'] = $userId;
-        /** @var Cliente $cliente */
-        $cliente = $this->create($data); 
+        $cliente = $this->create($data);
         return $cliente;
+    }
+
+    public function updateCliente(int|string $id, array $data): Cliente
+    {
+        $updated = $this->update($data, $id); 
+        return $updated;
     }
 
     public function findWithRelations(int|string $id): Cliente
     {
-        /** @var Cliente $cliente */
         $cliente = $this->with(['segmento:id,nome'])->find($id);
         return $cliente;
     }
 
-    public function updateCliente(Cliente $cliente, array $data): bool
+    public function deleteCliente(int|string $id): bool
     {
-        return $cliente->update($data);
-    }
-
-    public function deleteCliente(Cliente $cliente): bool
-    {
-        return (bool) $cliente->delete();
+        return (bool) $this->delete($id);
     }
 
     public function autocomplete(string $term, int $limit = 20): Collection
     {
         return $this->model
             ->newQuery()
-            ->when($term, fn($q)=> $q->where(function($s) use ($term){
+            ->when($term !== '', fn($q)=> $q->where(function($s) use ($term){
                 $s->where('nome','like',"%{$term}%")
                   ->orWhere('nome_fantasia','like',"%{$term}%")
                   ->orWhere('razao_social','like',"%{$term}%")
                   ->orWhere('whatsapp','like',"%{$term}%");
             }))
             ->select('id_cliente','nome','nome_fantasia','razao_social','whatsapp','documento')
-            ->orderBy('nome_fantasia')
+            ->orderByRaw('COALESCE(nome_fantasia, razao_social, nome) ASC')
             ->limit($limit)
             ->get()
             ->map(function($c){
@@ -110,5 +109,4 @@ class ClienteRepositoryEloquent extends BaseRepository implements ClienteReposit
     {
         return ['AC','AL','AP','AM','BA','CE','DF','ES','GO','MA','MT','MS','MG','PA','PB','PR','PE','PI','RJ','RN','RS','RO','RR','SC','SP','SE','TO'];
     }
-    
 }

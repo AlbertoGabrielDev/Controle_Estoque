@@ -3,92 +3,151 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ClienteStoreRequest;
+use App\Http\Requests\ClienteUpdateRequest;
 use App\Models\Cliente;
 use App\Repositories\ClienteRepository;
+use App\Models\CustomerSegment;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
-
+use App\Services\DataTableService;
+use Illuminate\Support\Facades\Blade;
+use Illuminate\Support\Facades\DB;
 class ClienteController extends Controller
 {
-    public function __construct(private ClienteRepository $clientes) {}
+    // public function __construct(private ClienteRepository $clientes)
+    // {
+    // }
+
+    public function __construct(private DataTableService $dt)
+    {
+    }
+
+    // public function index(Request $request)
+    // {
+    //     $filters = [
+    //         'q'          => $request->query('q', ''),
+    //         'uf'         => $request->query('uf', ''),
+    //         'segment_id' => ($request->query('segment_id', '') === '' ? null : (int) $request->query('segment_id')),
+    //         'status'     => $request->query('status', 1),
+    //         'per_page'   => 10,
+    //     ];
+
+    //     return Inertia::render('Clients/Index', [
+    //         'filters'   => [
+    //             'q' => $filters['q'],
+    //             'uf' => $filters['uf'],
+    //             'segment_id' => $filters['segment_id'],
+    //             'status'     => (int) $filters['status'],
+    //         ],
+    //         'clientes'  => $this->clientes->paginateWithFilters($filters),
+    //         'segmentos' => $this->clientes->getSegments(),
+    //         'ufs'       => $this->clientes->ufs(),
+    //     ]);
+    // }
 
     public function index(Request $request)
     {
-        $filters = [
-            'q'          => $request->string('q')->toString(),
-            'uf'         => $request->string('uf')->toString(),
-            'segment_id' => $request->integer('segment_id'),
-            'status'     => $request->has('status') ? $request->integer('status') : null,
-            'per_page'   => 10,
-        ];
-
         return Inertia::render('Clients/Index', [
-            'filters'   => [
-                'q' => $filters['q'],
-                'uf' => $filters['uf'],
-                'segment_id' => $filters['segment_id'],
-                'status' => $filters['status'],
+            'filters' => [
+                'q' => (string) $request->query('q', ''),
+                'uf' => (string) $request->query('uf', ''),
+                'segment_id' => (string) $request->query('segment_id', ''),
+                'status' => (string) $request->query('status', ''),
             ],
-            'clientes'  => $this->clientes->paginateWithFilters($filters),
-            'segmentos' => $this->clientes->getSegments(),
-            'ufs'       => $this->clientes->ufs(),
+            'segmentos' => CustomerSegment::select('id', 'nome')->orderBy('nome')->get(),
+            'ufs' => ['AC', 'AL', 'AP', 'AM', 'BA', 'CE', 'DF', 'ES', 'GO', 'MA', 'MT', 'MS', 'MG', 'PA', 'PB', 'PR', 'PE', 'PI', 'RJ', 'RN', 'RS', 'RO', 'RR', 'SC', 'SP', 'SE', 'TO'],
         ]);
     }
+
+    public function data(Request $request)
+    {
+        // Se usa Criteria contextual:
+        request()->attributes->set('currentMenuSlug', 'clientes');
+
+        // 1) Query + columnsMap vindos da Model (dinâmico)
+        [$query, $columnsMap] = Cliente::makeDatatableQuery($request);
+
+        // 2) Entrega para o DataTableService e adiciona a coluna "ações"
+        return $this->dt->make(
+            $query,
+            $columnsMap,
+            rawColumns: ['acoes'],
+            decorate: function ($dt) {
+                $dt->addColumn('acoes', function ($row) {
+                    $editBtn = Blade::render(
+                        '<x-edit-button :route="$route" :model-id="$id" />',
+                        ['route' => 'clientes.edit', 'id' => $row->id]
+                    );
+                    $statusBtn = Blade::render(
+                        '<x-button-status :model-id="$id" :status="$st" model-name="cliente" />',
+                        ['id' => $row->id, 'st' => (bool) $row->st]
+                    );
+                    $html = trim($editBtn . $statusBtn);
+                    if ($html === '') {
+                        $html = '<span class="inline-block w-8 h-8 opacity-0" aria-hidden="true">&nbsp;</span>';
+                    }
+                    return '<div class="flex gap-2 justify-start items-center">' . $html . '</div>';
+                });
+            }
+        );
+    }
+
 
     public function create()
     {
         return Inertia::render('Clients/Create', [
             'segmentos' => $this->clientes->getSegments(),
-            'ufs'       => $this->clientes->ufs(),
+            'ufs' => $this->clientes->ufs(),
         ]);
     }
 
     public function store(ClienteStoreRequest $request)
     {
-        $cliente = $this->clientes->createWithUser($request->validated(), $request->user()->id);
-        return redirect()->route('clientes.show', $cliente)->with('success','Cliente criado com sucesso.');
+        $cliente = $this->clientes->createCliente($request->validated(), $request->user()->id);
+        return redirect()->route('clientes.show', $cliente)->with('success', 'Cliente criado com sucesso.');
     }
 
     public function show(Cliente $cliente, Request $request)
     {
         $cliente = $this->clientes->findWithRelations($cliente->id_cliente);
 
-        $pedidosCount     = method_exists($cliente, 'pedidos')  ? $cliente->pedidos()->count() : 0;
-        $carrinhosAbertos = method_exists($cliente, 'carrinhos')? $cliente->carrinhos()->where('status','open')->count() : 0;
+        $pedidosCount = method_exists($cliente, 'pedidos') ? $cliente->pedidos()->count() : 0;
+        $carrinhosAbertos = method_exists($cliente, 'carrinhos') ? $cliente->carrinhos()->where('status', 'open')->count() : 0;
 
         return Inertia::render('Clients/Show', [
-            'cliente'  => $cliente,
+            'cliente' => $cliente,
             'metricas' => [
                 'pedidos_total' => $pedidosCount,
                 'carrinhos_abertos' => $carrinhosAbertos,
             ],
-            'tab'      => $request->string('tab','resumo')->toString(),
+            'tab' => (string) $request->query('tab', 'resumo'),
         ]);
     }
 
     public function edit(Cliente $cliente)
     {
         return Inertia::render('Clients/Edit', [
-            'cliente'   => $this->clientes->findWithRelations($cliente->id_cliente),
+            'cliente' => $this->clientes->findWithRelations($cliente->id_cliente),
             'segmentos' => $this->clientes->getSegments(),
-            'ufs'       => $this->clientes->ufs(),
+            'ufs' => $this->clientes->ufs(),
         ]);
     }
-    public function update(Request $request, Cliente $cliente)
+
+    public function update(ClienteUpdateRequest $request, Cliente $cliente)
     {
-        $this->clientes->updateCliente($cliente, $request->validated());
-        return redirect()->route('clientes.show', $cliente)->with('success','Cliente atualizado com sucesso.');
+        $updated = $this->clientes->updateCliente($cliente->id_cliente, $request->validated());
+        return redirect()->route('clientes.show', $updated)->with('success', 'Cliente atualizado com sucesso.');
     }
 
     public function destroy(Cliente $cliente)
     {
-        $this->clientes->deleteCliente($cliente);
-        return redirect()->route('clientes.index')->with('success','Cliente removido.');
+        $this->clientes->deleteCliente($cliente->id_cliente);
+        return redirect()->route('clientes.index')->with('success', 'Cliente removido.');
     }
 
     public function autocomplete(Request $request)
     {
-        $term = $request->string('q')->toString();
+        $term = trim((string) $request->query('q', ''));
         return response()->json($this->clientes->autocomplete($term));
     }
 }

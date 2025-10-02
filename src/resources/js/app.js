@@ -7,7 +7,8 @@ import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers'
 import { ZiggyVue } from '../../vendor/tightenco/ziggy'
 import SidebarLayout from './Layouts/Sidebar.vue'          // layout do módulo WPP (Vue)
 import PrincipalLayout from './Layouts/PrincipalLayout.vue'// novo layout que criamos acima
-
+import $ from 'jquery';
+window.$ = window.jQuery = $;
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel'
 
 // Páginas que usam o sidebar em Vue (WhatsApp)
