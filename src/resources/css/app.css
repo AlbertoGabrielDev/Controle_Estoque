@@ -88,3 +88,47 @@ body {
   background-color: rgba(255, 193, 7, 0.2);
   border-left: 4px solid #ffc107;
 }
+
+
+/* Remover listrado padrão do DataTables (se não quiser) */
+table.dataTable.stripe tbody tr.odd,
+table.dataTable.display tbody tr.odd {
+  background-color: transparent;
+}
+
+/* Head do DataTables – garantimos visual do seu Blade */
+table.dataTable thead th {
+  border-bottom: 1px solid rgb(229 231 235); /* border-gray-200 */
+}
+
+/* Inputs/selects do cabeçalho do DataTables em layout flex */
+.dataTables_wrapper .dataTables_length,
+.dataTables_wrapper .dataTables_filter,
+.dataTables_wrapper .dataTables_info,
+.dataTables_wrapper .dataTables_paginate {
+  /* ajuda no layout alinhado com seu DOM padrão */
+}
+
+
+@layer components {
+  /* wrapper para isolarmos o escopo */
+  .dt-tailwind .dataTables_length label { @apply flex items-center gap-2 text-sm text-gray-700; }
+  .dt-tailwind .dataTables_length select { @apply border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-500; }
+
+  .dt-tailwind .dataTables_filter label { @apply flex items-center gap-2 text-sm text-gray-700; }
+  .dt-tailwind .dataTables_filter input { @apply border rounded-full px-4 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-500; }
+
+  .dt-tailwind .dataTables_info { @apply text-sm text-gray-600; }
+
+  .dt-tailwind .dataTables_paginate { @apply flex items-center gap-2; }
+  .dt-tailwind .dataTables_paginate .paginate_button {
+    @apply px-3 py-1 rounded border text-sm text-gray-700 border-gray-300 hover:bg-gray-50 transition;
+  }
+  .dt-tailwind .dataTables_paginate .paginate_button.current {
+    @apply bg-blue-600 text-white border-blue-600;
+  }
+  .dt-tailwind .dataTables_paginate .paginate_button.disabled {
+    @apply opacity-50 pointer-events-none;
+  }
+}
+

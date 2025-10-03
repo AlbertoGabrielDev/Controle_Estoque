@@ -33,7 +33,7 @@ const dtColumns = [
   },
   { data: 'acoes', title: 'Ações', orderable: false, searchable: false }
 ]
-// chave para reinit DataTables quando a lista mudar (nova página/filtro)
+
 const reinitKey = ref(0)
 
 watch(form, () => {
@@ -92,18 +92,15 @@ watch(form, () => {
     </div>
   </div>
 
-   <DataTable
-    ref="dtRef"
-    table-id="dt-clientes"
-    :enhance-only="false"
-    :ajax-url="route('clientes.data')"
-    :ajax-params="form"
-    :order="[[0,'asc']]"
-    :page-length="10"
-    :columns="dtColumns"
-    :column-defs="dtColumnDefs"
-  />
-
-  <!-- Se estiver usando DataTables (client-side), a paginação do Laravel pode ficar redundante;
-       você pode ocultar o bloco de links se quiser -->
+<DataTable
+  table-id="dt-clientes"
+  :enhance-only="false"
+  :ajax-url="route('clientes.data')"
+  :ajax-params="form"
+  :order="[[0,'asc']]"
+  :page-length="10"
+  :columns="dtColumns"
+  :actions-col-index="6"
+>
+</DataTable>
 </template>

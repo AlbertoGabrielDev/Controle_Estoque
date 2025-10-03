@@ -1,4 +1,4 @@
-<!-- resources/js/Components/DataTable.vue -->
+<!-- resources/js/components/DataTable.vue -->
 <script setup>
 import { onMounted, onBeforeUnmount, ref, watch, nextTick } from 'vue'
 import 'datatables.net-dt'
@@ -7,24 +7,19 @@ import 'datatables.net-dt/css/dataTables.dataTables.css'
 
 const props = defineProps({
   tableId: { type: String, required: true },
-
-  // serverSide (ajax) vs enhanceOnly
   enhanceOnly: { type: Boolean, default: false },
   ajaxUrl: { type: String, default: '' },
   ajaxParams: { type: Object, default: () => ({}) },
-
   columns: { type: Array, default: () => [] },
   columnDefs: { type: Array, default: () => [] },
-
   order: { type: Array, default: () => [[0,'asc']] },
   pageLength: { type: Number, default: 10 },
   lengthMenu: { type: Array, default: () => [[10,25,50,100],[10,25,50,100]] },
   responsive: { type: Boolean, default: false },
   dom: { type: String, default: '<"flex justify-between items-center mb-4"lfr>t<"flex justify-between items-center mt-4"ip>' },
   languageUrl: { type: String, default: 'https://cdn.datatables.net/plug-ins/1.13.6/i18n/pt-BR.json' },
-
-  // reinitKey para forçar reinicialização
   reinitKey: { type: [String, Number], default: 0 },
+  actionsColIndex: { type: Number, default: -1 },
 })
 
 const tableRef = ref(null)
@@ -43,10 +38,18 @@ function init() {
     order: props.order,
     pageLength: props.pageLength,
     lengthMenu: props.lengthMenu,
+    pagingType: 'full_numbers', // « ‹ 1 2 3 › »
+    headerCallback: (thead) => {
+      window.jQuery(thead).find('th')
+        .addClass('px-4 py-3 text-left text-sm font-medium text-gray-700 bg-gray-50')
+    },
+    createdRow: (row) => {
+      window.jQuery(row).find('td, th').addClass('px-4 py-3 text-sm text-gray-700')
+      window.jQuery(row).addClass('hover:bg-gray-50')
+    },
     columnDefs: [
-      // padding padronizado (igual sua tabela)
       { targets: '_all', createdCell: (td) => td.classList.add('px-4','py-3') },
-      ...props.columnDefs
+      ...(props.columnDefs || []),
     ],
   }
 
@@ -70,6 +73,13 @@ function init() {
       searching: true,
     })
   }
+
+  if (props.actionsColIndex >= 0) {
+    dt.on('draw.dt', () => {
+      window.jQuery(dt.column(props.actionsColIndex).nodes())
+        .addClass('text-left')
+    })
+  }
 }
 
 function destroy(){ try{ if(dt){ dt.destroy(); dt=null } }catch{} }
@@ -77,20 +87,18 @@ function destroy(){ try{ if(dt){ dt.destroy(); dt=null } }catch{} }
 onMounted(async ()=>{ await nextTick(); init() })
 onBeforeUnmount(()=> destroy())
 
-// Reinicializa quando filtros mudarem
+// Recarrega quando filtros mudarem
 watch(()=> JSON.stringify(props.ajaxParams), async ()=>{
-  if (dt && !props.enhanceOnly) {
-    dt.ajax.reload(null,false); // reload mantendo página
-  } else {
-    destroy(); await nextTick(); init();
-  }
+  if (dt && !props.enhanceOnly) dt.ajax.reload(null,false)
+  else { destroy(); await nextTick(); init() }
 })
 
 watch(()=> props.reinitKey, async ()=>{ destroy(); await nextTick(); init() })
 </script>
 
 <template>
-  <div class="overflow-x-auto rounded-lg border">
+  <!-- wrapper com classe para aplicar as regras Tailwind da paginação -->
+  <div class="dt-tailwind overflow-x-auto rounded-lg border">
     <table :id="tableId" ref="tableRef" class="w-full">
       <thead class="bg-gray-50">
         <tr><slot name="thead" /></tr>
