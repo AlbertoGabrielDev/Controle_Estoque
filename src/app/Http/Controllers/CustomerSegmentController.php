@@ -4,25 +4,58 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\CustomerSegmentRequest;
 use App\Models\CustomerSegment;
+use App\Services\DataTableService;
+use Blade;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class CustomerSegmentController extends Controller
 {
+
+    public function __construct(
+        private DataTableService $dt,
+    ) {
+    }
     public function index(Request $request)
     {
         $q = $request->string('q')->toString();
 
         $segmentos = CustomerSegment::query()
-            ->when($q, fn($qry)=> $qry->where('nome','like',"%{$q}%"))
+            ->when($q, fn($qry) => $qry->where('nome', 'like', "%{$q}%"))
             ->orderBy('nome')
-            ->paginate(10)
-            ->appends($request->all());
-        
-        return Inertia::render('Segmentos/Index', [
+          
+           ;
+
+        return Inertia::render('Segments/Index', [
             'segmentos' => $segmentos,
             'q' => $q,
         ]);
+    }
+
+    public function data(Request $request)
+    {
+
+        [$query, $columnsMap] = CustomerSegment::makeDatatableQuery($request);
+
+        return $this->dt->make(
+            $query,
+            $columnsMap,
+            rawColumns: ['acoes'],
+            decorate: function ($dt) {
+                $dt->addColumn('acoes', function ($row) {
+                    $editBtn = Blade::render(
+                        '<x-edit-button :route="$route" :model-id="$id" />',
+                        ['route' => 'segmentos.edit', 'id' => $row->id]
+                    );
+                  
+                    $html = trim($editBtn);
+                    if ($html === '') {
+                        $html = '<span class="inline-block w-8 h-8 opacity-0" aria-hidden="true">&nbsp;</span>';
+                    }
+                    return '<div class="flex gap-2 justify-start items-center">' . $html . '</div>';
+                });
+            }
+        );
     }
 
     public function create()

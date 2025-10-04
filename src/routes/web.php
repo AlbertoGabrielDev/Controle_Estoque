@@ -69,7 +69,7 @@ Route::middleware([
     Route::prefix('/clientes')->group(function () {
         // Route::get('/clientes', [ClienteController::class, 'index'])->name('clientes.index');
        
-         Route::get('/clientes', [ClienteController::class, 'index'])->name('clientes.index');
+        Route::get('/clientes', [ClienteController::class, 'index'])->name('clientes.index');
         Route::get('/clientes/data', [ClienteController::class, 'data'])->name('clientes.data');
       
         Route::get('/clientes/create', [ClienteController::class, 'create'])->name('clientes.create');
@@ -83,6 +83,7 @@ Route::middleware([
 
         // Segmentos
         Route::get('/segmentos', [CustomerSegmentController::class, 'index'])->name('segmentos.index');
+        Route::get('/segmentos/data', [CustomerSegmentController::class, 'data'])->name('segmentos.data');
         Route::get('/segmentos/create', [CustomerSegmentController::class, 'create'])->name('segmentos.create');
         Route::post('/segmentos', [CustomerSegmentController::class, 'store'])->name('segmentos.store');
         Route::get('/segmentos/{segment}', [CustomerSegmentController::class, 'edit'])->name('segmentos.edit');

@@ -14,42 +14,18 @@ use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\DB;
 class ClienteController extends Controller
 {
-    // public function __construct(private ClienteRepository $clientes)
-    // {
-    // }
 
-    public function __construct(private DataTableService $dt)
-    {
+    public function __construct(
+        private DataTableService $dt,
+        private ClienteRepository $clientes,
+    ) {
     }
-
-    // public function index(Request $request)
-    // {
-    //     $filters = [
-    //         'q'          => $request->query('q', ''),
-    //         'uf'         => $request->query('uf', ''),
-    //         'segment_id' => ($request->query('segment_id', '') === '' ? null : (int) $request->query('segment_id')),
-    //         'status'     => $request->query('status', 1),
-    //         'per_page'   => 10,
-    //     ];
-
-    //     return Inertia::render('Clients/Index', [
-    //         'filters'   => [
-    //             'q' => $filters['q'],
-    //             'uf' => $filters['uf'],
-    //             'segment_id' => $filters['segment_id'],
-    //             'status'     => (int) $filters['status'],
-    //         ],
-    //         'clientes'  => $this->clientes->paginateWithFilters($filters),
-    //         'segmentos' => $this->clientes->getSegments(),
-    //         'ufs'       => $this->clientes->ufs(),
-    //     ]);
-    // }
 
     public function index(Request $request)
     {
         return Inertia::render('Clients/Index', [
             'filters' => [
-                'q' => (string) $request->query('q', ''),
+                // 'q' => (string) $request->query('q', ''),
                 'uf' => (string) $request->query('uf', ''),
                 'segment_id' => (string) $request->query('segment_id', ''),
                 'status' => (string) $request->query('status', ''),
@@ -61,13 +37,9 @@ class ClienteController extends Controller
 
     public function data(Request $request)
     {
-        // Se usa Criteria contextual:
         request()->attributes->set('currentMenuSlug', 'clientes');
-
-        // 1) Query + columnsMap vindos da Model (dinâmico)
         [$query, $columnsMap] = Cliente::makeDatatableQuery($request);
-
-        // 2) Entrega para o DataTableService e adiciona a coluna "ações"
+        
         return $this->dt->make(
             $query,
             $columnsMap,

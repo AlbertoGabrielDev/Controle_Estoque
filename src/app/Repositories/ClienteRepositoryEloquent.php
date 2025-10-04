@@ -24,7 +24,7 @@ class ClienteRepositoryEloquent extends BaseRepository implements ClienteReposit
 
     public function paginateWithFilters(array $filters): LengthAwarePaginator
     {
-        $q         = trim((string) ($filtewrs['q'] ?? ''));
+        // $q         = trim((string) ($filtewrs['q'] ?? ''));
         $uf        = strtoupper(trim((string) ($filters['uf'] ?? '')));
         $segmentId = $filters['segment_id'] ?? null;
         $raw    = $filters['status'] ?? 1;

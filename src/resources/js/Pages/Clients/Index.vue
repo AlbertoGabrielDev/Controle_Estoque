@@ -3,7 +3,7 @@ import { Head, Link, router } from '@inertiajs/vue3'
 import { reactive, watch, ref } from 'vue'
 import EditButton from '@/Components/EditButton.vue'
 import ButtonStatus from '@/Components/ButtonStatus.vue'
-import DataTable from '../../components/DataTable.vue'
+import DataTable, { linkify } from '../../components/DataTable.vue'
 
 const props = defineProps({
   filters: Object,
@@ -19,7 +19,7 @@ const form = reactive({
   status: props.filters.status ?? ''
 })
 const dtColumns = [
-  { data: 'c1',  title: 'Nome' },
+  linkify({ data: 'c1', title: 'Nome' }, { routeName: 'clientes.show', idField: 'id' }),
   { data: 'c2',  title: 'Documento', className: 'hidden md:table-cell' },
   { data: 'c3',  title: 'WhatsApp',  className: 'hidden lg:table-cell' },
   { data: 'c4',  title: 'UF' },
@@ -63,16 +63,6 @@ watch(form, () => {
   </div>
 
   <div class="mb-6">
-    <div class="flex gap-2 w-full md:w-1/2">
-      <input v-model="form.q" type="text"
-        class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-cyan-500"
-        placeholder="Buscar (nome, doc, whatsapp, email)" />
-      <button type="button" @click="router.get(route('clientes.index'), form, { preserveState: true, replace: true })"
-        class="px-6 py-2 bg-cyan-500 hover:bg-cyan-600 text-white rounded-full transition-colors">
-        Pesquisar
-      </button>
-    </div>
-
     <div class="mt-3 grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-2">
       <select v-model="form.uf" class="px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500">
         <option value="">UF</option>
@@ -101,6 +91,6 @@ watch(form, () => {
   :page-length="10"
   :columns="dtColumns"
   :actions-col-index="6"
->
-</DataTable>
+/>
+
 </template>
