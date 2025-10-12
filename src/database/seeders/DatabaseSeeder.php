@@ -25,6 +25,7 @@ class DatabaseSeeder extends Seeder
             TelefoneSeeder::class,
             ClientesSeeder::class,
             TaxSeeder::class,
+            SupermercadoBasicoTaxesSeeder::class
         ]);
 
     }
