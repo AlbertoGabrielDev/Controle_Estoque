@@ -32,6 +32,7 @@ const USE_PRINCIPAL = [
   /^Roles\//,
   /^Clients\//,
   /^Segments\//,
+  /^Taxes\//,
 ]
 
 createInertiaApp({

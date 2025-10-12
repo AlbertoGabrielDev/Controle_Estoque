@@ -12,6 +12,8 @@ use App\Repositories\EstoqueRepositoryEloquent;
 use App\Repositories\ProdutoRepository;
 use App\Repositories\RoleRepository;
 use App\Repositories\RoleRepositoryEloquent;
+use App\Repositories\TaxRuleRepository;
+use App\Repositories\TaxRuleRepositoryEloquent;
 use App\Repositories\UnidadesRepository;
 use App\Repositories\UnidadesRepositoryEloquent;
 use Illuminate\Support\ServiceProvider;
@@ -32,6 +34,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(UnidadesRepository::class, UnidadesRepositoryEloquent::class);
         $this->app->bind(RoleRepository::class, RoleRepositoryEloquent::class);
         $this->app->bind(ClienteRepository::class, ClienteRepositoryEloquent::class);
+        $this->app->bind(TaxRuleRepository::class, TaxRuleRepositoryEloquent::class);
     }
 
     /**

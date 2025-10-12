@@ -37,7 +37,7 @@ class ClienteController extends Controller
 
     public function data(Request $request)
     {
-        request()->attributes->set('currentMenuSlug', 'clientes');
+        // request()->attributes->set('currentMenuSlug', 'clientes');
         [$query, $columnsMap] = Cliente::makeDatatableQuery($request);
         
         return $this->dt->make(

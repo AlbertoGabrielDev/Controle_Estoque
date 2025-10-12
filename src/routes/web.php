@@ -8,6 +8,7 @@ use App\Http\Controllers\ClienteController;
 use App\Http\Controllers\CustomerSegmentController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\MessageTemplateController;
+use App\Http\Controllers\TaxRuleController;
 use App\Http\Controllers\WhatsAppContactsController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\CategoriaController;
@@ -68,10 +69,10 @@ Route::middleware([
 
     Route::prefix('/clientes')->group(function () {
         // Route::get('/clientes', [ClienteController::class, 'index'])->name('clientes.index');
-       
+
         Route::get('/clientes', [ClienteController::class, 'index'])->name('clientes.index');
         Route::get('/clientes/data', [ClienteController::class, 'data'])->name('clientes.data');
-      
+
         Route::get('/clientes/create', [ClienteController::class, 'create'])->name('clientes.create');
         Route::post('/clientes', [ClienteController::class, 'store'])->name('clientes.store');
         Route::get('/clientes/{cliente}', [ClienteController::class, 'show'])->name('clientes.show');
@@ -202,6 +203,16 @@ Route::middleware([
         Route::post('/labels/assign', [WhatsAppContactsController::class, 'assignLabel'])->name('whatsapp.labels.assign');
         Route::delete('/labels/{id}', [WhatsAppContactsController::class, 'deleteLabel'])->name('whatsapp.labels.destroy');
         Route::get('/verdurao/whatsapp/labels/{id}/members', [WhatsAppContactsController::class, 'labelMembers'])->name('whatsapp.labels.members');
+    });
+
+    Route::prefix('taxes')->name('taxes.')->group(function () {
+        Route::get('/', [TaxRuleController::class, 'index'])->name('index');
+        Route::get('/data', [TaxRuleController::class, 'data'])->name('data');
+        Route::get('/create', [TaxRuleController::class, 'create'])->name('create');
+        Route::post('/', [TaxRuleController::class, 'store'])->name('store');
+        Route::get('/{rule}', [TaxRuleController::class, 'edit'])->name('edit');
+        Route::put('/{rule}', [TaxRuleController::class, 'update'])->name('update');
+        Route::delete('/{rule}', [TaxRuleController::class, 'destroy'])->name('destroy');
     });
 });
 

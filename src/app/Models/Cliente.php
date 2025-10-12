@@ -118,6 +118,56 @@ class Cliente extends Model
         });
     }
     /** =================== CONFIG COLUMNS (LISTAGEM) =================== */
+    /**
+     * Mapa de colunas para o DataTables (server-side).
+     *
+     * Cada entrada do array externo representa um **alias** que será enviado no JSON
+     * para o front (e usado em DataTables columns[n].data). Para cada alias você pode
+     * configurar as chaves abaixo:
+     *
+     * - db (string)                -> Coluna real da base (ex.: "clientes.nome").
+     *                                 É a referência usada para ORDER BY e para a busca
+     *                                 global (search). Mantenha simples para aproveitar
+     *                                 índices do banco.
+     *
+     * - select (string, opcional)  -> Expressão usada no SELECT AS <alias> (ex.:
+     *                                 "COALESCE(customer_segments.nome,'')", "CONCAT(codigo,' - ',nome)").
+     *                                 Serve apenas para o valor mostrado no payload; ORDER/SEARCH continuam
+     *                                 usando 'db' para desempenho.
+     *
+     * - label (string, opcional)   -> Rótulo amigável da coluna. Metadado útil para UI,
+     *                                 não é utilizado pelo service.
+     *
+     * - order (bool)               -> Se true, permite ordenação nessa coluna. O service aplicará
+     *                                 "ORDER BY <db> ASC|DESC".
+     *
+     * - search (bool)              -> Se true, essa coluna entra na busca global. O service aplicará
+     *                                 "LOWER(<db>) LIKE %termo%".
+     *
+     * - join (array, opcional)     -> Define JOIN necessário para que 'db'/'select' funcionem:
+     *                                 ['tabela', 'tabela.col_esq', '=', 'tabela_base.col_dir', 'left|inner|right?']
+     *                                 O tipo é opcional e por padrão é 'left'. O trait evita JOIN duplicado.
+     *
+     * - computed (bool)            -> Se true, a coluna **não** entra no SELECT. Ela deve ser montada
+     *                                 no decorate (ex.: $dt->addColumn('acoes', fn($row)=>'...')). Colunas
+     *                                 computadas não são ordenáveis/pesquisáveis pelo service.
+     *
+     * Observações:
+     * - Use 'select' para formatar a saída (COALESCE/CONCAT/FORMAT) sem perder a performance de
+     *   ordenação e busca baseada em 'db'.
+     * - O alias definido aqui **precisa** existir no front (DataTables columns[n].data).
+     * - Para colunas HTML, lembre-se de marcá-las como raw no controller: ->make(..., rawColumns:['acoes']).
+     *
+     * @return array<string, array{
+     *     db?: string,
+     *     select?: string,
+     *     label?: string,
+     *     order?: bool,
+     *     search?: bool,
+     *     join?: array{0:string,1:string,2:string,3:string,4?:'left'|'inner'|'right'},
+     *     computed?: bool
+     * }>
+     */
     public static function dtColumns(): array
     {
         $t = (new static)->getTable();
