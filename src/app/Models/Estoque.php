@@ -15,8 +15,8 @@ use Illuminate\Support\Facades\Gate;
 class Estoque extends Model
 {
     use HasStatus;
-    
-    protected  $table = 'estoques';
+
+    protected $table = 'estoques';
     protected $primaryKey = 'id_estoque';
 
     protected $fillable = [
@@ -38,7 +38,10 @@ class Estoque extends Model
         'created_at',
         'quantidade_aviso',
         'id_users_fk',
-        'status'
+        'status',
+        'imposto_total',
+        'impostos_json',
+
     ];
     protected $dateFormat = 'Y-m-d';
 

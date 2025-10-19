@@ -52,6 +52,7 @@ class EstoqueRepositoryEloquent extends BaseRepository implements EstoqueReposit
 
     public function inserirEstoque(array $data)
     {
+        $data = current_unidade()->id_unidade_fk;
         $estoque = $this->create($data);
 
         MarcaProduto::create([
@@ -165,9 +166,7 @@ class EstoqueRepositoryEloquent extends BaseRepository implements EstoqueReposit
             $labels = $vendas->pluck('mes')->map(function ($mes) {
                 return Carbon::create()->month($mes)->format('F'); // Nome do mês
             });
-            // $backgrounds = $precos->map(function ($value, $key){
-            //     return '#' . dechex(rand(0x000000 , 0xFFFFFF));
-            // });
+      
             $values = $vendas->map(function ($order, $key) {
                 return number_format($order->venda, 0, '', '');
             });

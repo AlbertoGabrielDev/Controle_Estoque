@@ -23,13 +23,13 @@ class Produto extends Model implements Transformable
         'nome_produto',
         'descricao',
         'unidade_medida',
-        'id_categoria_fk',
-        'inf_nutrientes',
+        'inf_nutriente',
         'id_users_fk',
         'qrcode',
         'status'
     ];
 
+    protected $casts = ['inf_nutriente' => 'array'];
     public function fornecedores() : BelongsToMany 
     {
         return $this->belongsToMany(Fornecedor::class ,'estoques', 'id_produto_fk', 'id_fornecedor_fk')

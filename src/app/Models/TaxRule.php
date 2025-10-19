@@ -47,15 +47,18 @@ class TaxRule extends Model
         'metodo' => TaxMethod::class,
     ];
 
-    public function scopeVigentes(Builder $q, ?Carbon $data = null): Builder
-    {
-        $data = $data ?: now();
+    public function scopeVigentes(
+        Builder $q,
+        \DateTimeInterface|string|null $data = null
+    ): Builder {
+        $d = $data ? Carbon::parse($data) : now();
+
         return $q
-            ->where(function ($s) use ($data) {
-                $s->whereNull('vigencia_inicio')->orWhere('vigencia_inicio', '<=', $data->toDateString());
+            ->where(function ($w) use ($d) {
+                $w->whereNull('vigencia_inicio')->orWhere('vigencia_inicio', '<=', $d);
             })
-            ->where(function ($s) use ($data) {
-                $s->whereNull('vigencia_fim')->orWhere('vigencia_fim', '>=', $data->toDateString());
+            ->where(function ($w) use ($d) {
+                $w->whereNull('vigencia_fim')->orWhere('vigencia_fim', '>=', $d);
             });
     }
 

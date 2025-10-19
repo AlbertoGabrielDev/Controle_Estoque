@@ -109,7 +109,9 @@ Route::middleware([
         Route::get('/cadastro', [EstoqueController::class, 'Cadastro'])->name('estoque.cadastro')->middleware('check.permission:create_post,estoque');
         Route::post('/cadastro', [EstoqueController::class, 'inserirEstoque'])->name('estoque.inserirEstoque');
         Route::get('/buscar-estoque', [EstoqueController::class, 'buscar'])->name('estoque.buscar');
+        Route::post('/estoque/calc-impostos', [EstoqueController::class, 'calcImpostos'])->name('estoque.calcImpostos');
         Route::get('/editar/{estoqueId}', [EstoqueController::class, 'editar'])->name('estoque.editar')->middleware('check.permission:edit_post,estoque');
+        Route::post('/estoque/preview-impostos', [EstoqueController::class, 'previewImpostos'])->name('estoque.previewImpostos');
         Route::put('/editar/{estoqueId}', [EstoqueController::class, 'salvarEditar'])->name('estoque.salvarEditar');
         Route::post('/status/{modelName}/{id}', [EstoqueController::class, 'updateStatus'])->middleware('check.permission:status,estoque')->name('estoque.status');
         Route::get('/quantidade/{estoqueId}/{operacao}', [EstoqueController::class, 'atualizarEstoque'])->name('estoque.quantidade');

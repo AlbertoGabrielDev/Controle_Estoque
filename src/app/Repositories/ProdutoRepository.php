@@ -124,21 +124,41 @@ class ProdutoRepository
     }
     public function editarView($produtoId)
     {
-        $produtos = Produto::where('id_produto', $produtoId)->get();
-        return $produtos;
-    }
+        $produto = Produto::with('categorias')->where('id_produto', $produtoId)->firstOrFail();
 
+        $categorias = Categoria::select('id_categoria', 'nome_categoria')->orderBy('nome_categoria')->get();
+        return [
+            'produtos' => collect([$produto]),
+            'categorias' => $categorias,
+        ];
+    }
     public function update(ValidacaoProdutoEditar $request, $produtoId)
     {
-        $produtos = Produto::where('id_produto', $produtoId)
-            ->update([
-                'cod_produto' => $request->cod_produto,
-                'nome_produto' => $request->nome_produto,
-                'qrcode' => $request->qrcode,
-                'descricao' => $request->descricao,
-                'inf_nutrientes' => json_encode($request->inf_nutrientes)
-            ]);
-        return $produtos;
+        $produto = Produto::findOrFail($produtoId);
+
+        // Normaliza o JSON vindo do textarea (string -> array) por segurança:
+        $inf = $request->input('inf_nutriente');
+        if (is_string($inf) && $inf !== '') {
+            $decoded = json_decode($inf, true);
+            // se JSON inválido, $decoded será null; a FormRequest já barrou antes (regra 'json')
+        } else {
+            $decoded = null; // permite limpar
+        }
+  
+        $produto->update([
+            'cod_produto' => $request->cod_produto,
+            'nome_produto' => $request->nome_produto,
+            'qrcode' => $request->qrcode,
+            'descricao' => $request->descricao,
+            'inf_nutriente' => $decoded, // <-- coluna JSON no banco
+        ]);
+
+        if ($request->filled('id_categoria_fk')) {
+            // atualiza a TABELA PIVOT (categoria_produtos)
+            $produto->categorias()->sync([$request->id_categoria_fk]);
+        }
+
+        return $produto;
     }
 
     public function statusInativar($statusId)
