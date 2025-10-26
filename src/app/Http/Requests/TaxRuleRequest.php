@@ -2,7 +2,8 @@
 
 namespace App\Http\Requests;
 
-use App\Enums\Scope;
+use App\Enums\Canal;
+use App\Enums\TipoOperacao;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -10,38 +11,29 @@ class TaxRuleRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        // Ajuste se quiser checar policies/permissions
         return true;
     }
 
     public function rules(): array
     {
-        $ufs = ['AC', 'AL', 'AP', 'AM', 'BA', 'CE', 'DF', 'ES', 'GO', 'MA', 'MT', 'MS', 'MG', 'PA', 'PB', 'PR', 'PE', 'PI', 'RJ', 'RN', 'RS', 'RO', 'RR', 'SC', 'SP', 'SE', 'TO'];
-
         return [
             'name' => 'required|string|max:120',
             'tax_code' => 'required|string|max:30',
-
             'scope' => ['required', 'integer', Rule::in([1, 2, 3])],
-
             'priority' => 'nullable|integer|min:0|max:100000',
-
             'starts_at' => 'nullable|date',
             'ends_at' => 'nullable|date|after_or_equal:starts_at',
-
             'origin_uf' => 'nullable|string|size:2',
             'dest_uf' => 'nullable|string|size:2',
-
             'customer_segment_id' => 'nullable|integer|exists:customer_segments,id',
-            'product_segment_id' => 'nullable|integer', // ajuste conforme PK da sua categoria
-
+            'product_segment_id' => 'nullable|integer',
             'base' => ['required', Rule::in(['price', 'price+freight', 'subtotal'])],
             'method' => ['required', Rule::in(['percent', 'fixed', 'formula'])],
-
-            'rate' => 'nullable|numeric|min:0|max:999.9999',
-            'amount' => 'nullable|numeric|min:0|max:9999999999.99',
+            'rate' => ['nullable', 'decimal:0,4', 'gte:0', 'lte:100', 'required_if:method,percent'],
+            'amount' => ['nullable', 'decimal:0,2', 'gte:0', 'lte:9999999999.99'],
             'formula' => 'nullable|string|max:1000',
-
+            'canal' => ['nullable', Rule::enum(Canal::class)],
+            'tipo_operacao' => ['nullable', Rule::enum(TipoOperacao::class)],
             'apply_mode' => ['required', Rule::in(['stack', 'exclusive'])],
         ];
     }
@@ -50,96 +42,75 @@ class TaxRuleRequest extends FormRequest
     {
         return [
             'name.required' => 'Informe um nome para a regra.',
+            'tax_code.required' => 'Informe o código do imposto.',
             'method.required' => 'Selecione o método de cálculo.',
             'method.in' => 'Método inválido.',
             'rate.required_if' => 'Informe a taxa (%) quando o método for percentual.',
-            'rate.numeric' => 'A taxa deve ser numérica.',
-            'rate.min' => 'A taxa não pode ser negativa.',
-            'rate.max' => 'A taxa não pode exceder 100%.',
-            'amount.required_if' => 'Informe o valor fixo quando o método for valor.',
-            'amount.numeric' => 'O valor fixo deve ser numérico.',
-            'formula.required_if' => 'Informe a expressão quando o método for fórmula.',
-            'formula.regex' => 'A fórmula contém caracteres inválidos.',
-            'uf.in' => 'UF inválida.',
-            'segment_id.exists' => 'Segmento de cliente inválido.',
+            'rate.decimal' => 'A taxa deve ter no máximo 4 casas decimais.',
+            'rate.gte' => 'A taxa não pode ser negativa.',
+            'rate.lte' => 'A taxa não pode exceder 100%.',
+            'amount.decimal' => 'O valor fixo deve ter no máximo 2 casas decimais.',
+            'amount.gte' => 'O valor fixo não pode ser negativo.',
+            'origin_uf.size' => 'UF de origem deve ter 2 letras.',
+            'dest_uf.size' => 'UF de destino deve ter 2 letras.',
+            'customer_segment_id.exists' => 'Segmento de cliente inválido.',
             'product_segment_id.exists' => 'Segmento de produto inválido.',
             'ends_at.after_or_equal' => 'A data final deve ser igual ou posterior à data inicial.',
         ];
     }
 
-    /**
-     * Normaliza/“higieniza” os dados antes da validação.
-     */
     protected function prepareForValidation(): void
     {
-        $uf = strtoupper(trim((string) $this->input('uf', '')));
-        $city = trim((string) $this->input('city', ''));
+        $normalizeNumber = function ($value) {
+            if ($value === '' || $value === null)
+                return null;
 
-        // Booleans vindos de checkbox / "on"/"1"
-        $active = filter_var($this->input('active', false), FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
-        $cumulative = filter_var($this->input('cumulative', false), FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+            $value = is_string($value) ? trim($value) : $value;
 
-        // Números aceitando vírgula
-        $rate = $this->normalizeNumber($this->input('rate'));
-        $amount = $this->normalizeNumber($this->input('amount'));
+            if (is_string($value)) {
+                if (str_contains($value, ',')) {
+                    $value = str_replace(['.', ','], ['', '.'], $value);
+                } else {
+                    $value = str_replace(' ', '', $value);
+                }
+            }
 
-        $priority = $this->input('priority');
-        $priority = is_numeric($priority) ? (int) $priority : null;
+            return is_numeric($value) ? $value : null;
+        };
 
-        $segmentId = $this->input('segment_id');
-        $segmentId = ($segmentId === '' || $segmentId === null) ? null : (int) $segmentId;
-
-        $prodSegId = $this->input('product_segment_id');
-        $prodSegId = ($prodSegId === '' || $prodSegId === null) ? null : (int) $prodSegId;
-
-        $method = $this->input('method');
+        $normalizeNullable = fn($v) => ($v === '' ? null : $v);
 
         $this->merge([
-            'uf' => $uf !== '' ? $uf : null,
-            'city' => $city !== '' ? $city : null,
-            'active' => (bool) $active,
-            'cumulative' => (bool) $cumulative,
-            'rate' => $rate,
-            'amount' => $amount,
-            'priority' => $priority,
-            'segment_id' => $segmentId,
-            'product_segment_id' => $prodSegId,
-            'method' => $method,
+            'rate' => $normalizeNumber($this->input('rate')),
+            'amount' => $normalizeNumber($this->input('amount')),
+            'origin_uf' => $normalizeNullable(strtoupper((string) $this->input('origin_uf', ''))),
+            'dest_uf' => $normalizeNullable(strtoupper((string) $this->input('dest_uf', ''))),
+            'customer_segment_id' => $normalizeNullable($this->input('customer_segment_id')),
+            'product_segment_id' => $normalizeNullable($this->input('product_segment_id')),
+            'canal' => ($v = $this->input('canal')) ? strtolower($v) : null,              // <<<
+            'tipo_operacao' => ($v = $this->input('tipo_operacao')) ? strtolower($v) : null,
         ]);
 
-        // Zera campos que não se aplicam ao método escolhido (evita “ghost values”)
+        $method = $this->input('method');
         if ($method === 'percent') {
             $this->merge(['amount' => null, 'formula' => null]);
         } elseif ($method === 'fixed') {
             $this->merge(['rate' => null, 'formula' => null]);
         } elseif ($method === 'formula') {
-            $this->merge(['rate' => null, 'amount' => null]);
+            $this->merge(['amount' => null]);
         }
-    }
-
-    /**
-     * Converte "10,5" para "10.5" e retorna float ou null.
-     */
-    private function normalizeNumber($value): ?float
-    {
-        if ($value === '' || $value === null) {
-            return null;
-        }
-        if (is_string($value)) {
-            $value = str_replace(['.', ','], ['', '.'], $value); // "1.234,56" -> "1234.56"
-        }
-        return is_numeric($value) ? (float) $value : null;
     }
 
     public function attributes(): array
     {
         return [
             'name' => 'nome',
-            'uf' => 'UF',
-            'city' => 'cidade',
+            'tax_code' => 'código do imposto',
             'method' => 'método',
             'rate' => 'taxa (%)',
             'amount' => 'valor',
+            'origin_uf' => 'UF de origem',
+            'dest_uf' => 'UF de destino',
         ];
     }
 }

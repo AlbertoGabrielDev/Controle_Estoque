@@ -11,7 +11,7 @@ class TaxCalculatorService
     {
 
         $data = data_get($contexto, 'data') ?: now()->toDateString();
-        $ignorarSegmento = (bool) data_get($contexto, 'ignorar_segmento', false);
+       $ignorarSegmento = (bool) data_get($contexto, 'ignorar_segmento', false);
         $ufCli = data_get($contexto, 'clientes.uf');
         $tipoOp = data_get($contexto, 'operacao.tipo', 'venda');
         $canal = data_get($contexto, 'operacao.canal');

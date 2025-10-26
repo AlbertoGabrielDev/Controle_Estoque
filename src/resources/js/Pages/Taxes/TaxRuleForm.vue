@@ -4,6 +4,8 @@ const props = defineProps({
   ufs: { type: Array, default: () => [] },
   customerSegments: { type: Array, default: () => [] },
   productSegments: { type: Array, default: () => [] },
+  channels: { type: Array, default: () => [] },
+  operationTypes: { type: Array, default: () => [] },
 })
 const emit = defineEmits(['submit'])
 
@@ -25,6 +27,8 @@ const hints = {
   amount: 'Valor fixo da regra (em R$). Usado quando o método = Valor Fixo.',
   formula: 'Expressão de cálculo quando método = Fórmula. Variáveis usuais: base, rate, freight, uf_origem, uf_destino.',
   apply_mode: 'Como combinar com outras regras do mesmo imposto+escopo: "Cumulativa" soma; "Exclusiva" inibe as demais.',
+  canal: 'Por onde a venda ocorre (loja_fisica, ecommerce, marketplace, etc.). Em branco = todos.',
+  tipo_operacao: 'Natureza da operação (venda, devolucao, bonificacao, remessa…). Em branco = todas.',
 }
 </script>
 
@@ -168,7 +172,8 @@ const hints = {
         Alíquota (%)
         <span class="ml-1 text-gray-400 cursor-help" :title="hints.rate">ⓘ</span>
       </label>
-      <input v-model.number="form.rate" type="number" step="0.01" class="w-full border rounded px-3 py-2" />
+      <input v-model="form.rate" type="number" step="0.0001" min="0" class="w-full border rounded px-3 py-2"
+        @input="form.rate = form.rate === '' ? null : form.rate" />
       <div v-if="form.errors.rate" class="text-sm text-red-600 mt-1">{{ form.errors.rate }}</div>
     </div>
 
@@ -193,6 +198,30 @@ const hints = {
         <code>uf_destino</code>.
       </p>
       <div v-if="form.errors.formula" class="text-sm text-red-600 mt-1">{{ form.errors.formula }}</div>
+    </div>
+
+    <div>
+      <label class="block text-sm font-medium text-gray-700 mb-1">
+        Canal
+        <span class="ml-1 text-gray-400 cursor-help" :title="hints.canal">ⓘ</span>
+      </label>
+      <select v-model="form.canal" class="w-full border rounded px-3 py-2">
+        <option value="">—</option>
+        <option v-for="c in channels" :key="c.value" :value="c.value">{{ c.label }}</option>
+      </select>
+      <div v-if="form.errors?.canal" class="text-sm text-red-600 mt-1">{{ form.errors.canal }}</div>
+    </div>
+
+    <div>
+      <label class="block text-sm font-medium text-gray-700 mb-1">
+        Tipo de Operação
+        <span class="ml-1 text-gray-400 cursor-help" :title="hints.tipo_operacao">ⓘ</span>
+      </label>
+      <select v-model="form.tipo_operacao" class="w-full border rounded px-3 py-2">
+        <option value="">—</option>
+        <option v-for="op in operationTypes" :key="op.value" :value="op.value">{{ op.label }}</option>
+      </select>
+      <div v-if="form.errors?.tipo_operacao" class="text-sm text-red-600 mt-1">{{ form.errors.tipo_operacao }}</div>
     </div>
 
     <div>

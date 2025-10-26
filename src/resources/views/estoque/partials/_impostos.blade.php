@@ -3,6 +3,7 @@
 @endphp
 
 @if(empty($vm))
+ 
   <div class="text-slate-500">Selecione o produto e informe o preço de venda.</div>
 @else
   <div 
@@ -15,6 +16,7 @@
     <div class="mb-3">Preço com impostos: <strong>{{ $fmt($vm['__totais']['total_com_impostos'] ?? 0) }}</strong></div>
 
     @foreach(($vm['impostos'] ?? []) as $imp)
+   
       <div class="mb-4">
         <div class="mb-1">
           <span class="font-semibold">

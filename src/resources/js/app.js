@@ -32,8 +32,31 @@ const USE_PRINCIPAL = [
   /^Roles\//,
   /^Clients\//,
   /^Segments\//,
-  /^Taxes\//,
+  /^Taxes\//, // Módulo de Imposto (Taxas)
 ]
+
+// IMPORTANTe: rotas tratadas como Inertia Link (sem full reload)
+// além de 'wpp.' e 'bot.', incluí 'taxes.' para o módulo de imposto
+const INERTIA_PREFIXES = ['wpp.', 'bot.', 'taxes.']
+
+const isInertiaMenu = (item) => {
+  if (typeof item?.inertia === 'boolean') return item.inertia
+  const name = item?.route || ''
+  return !!name && INERTIA_PREFIXES.some(p => name.startsWith(p))
+}
+
+const tagFor = (item) => (isInertiaMenu(item) ? Link : 'a')
+
+import { Link } from '@inertiajs/vue3'
+
+const linkClass = (routeName) => {
+  let active = false
+  try { active = route().current(routeName) } catch (_) { active = false }
+  return [
+    'flex items-center p-2 text-gray-600 rounded-lg hover:bg-gray-100',
+    active ? 'bg-cyan-50 text-cyan-600' : ''
+  ].join(' ')
+}
 
 createInertiaApp({
   title: (title) => `${title} - ${appName}`,
@@ -72,6 +95,7 @@ function getCsrf() {
   return meta?.content || '';
 }
 
+// Handler para botões .toggle-status (mantido e com fix no catch)
 document.addEventListener('click', async (ev) => {
   const btn = ev.target.closest('.toggle-status');
   if (!btn) return;
@@ -83,14 +107,14 @@ document.addEventListener('click', async (ev) => {
   try {
     const res = await fetch(btn.dataset.url, {
       method: 'POST',
-      credentials: 'same-origin',              // <-- IMPORTANTE: manda os cookies
+      credentials: 'same-origin',              // manda os cookies
       headers: {
         'Accept': 'application/json',
         'X-Requested-With': 'XMLHttpRequest',
-        'X-CSRF-TOKEN': getCsrf(),             // <-- token do <meta>
+        'X-CSRF-TOKEN': getCsrf(),
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({})                 // opcional, só pra não ser request vazia
+      body: JSON.stringify({})
     });
     if (!res.ok) throw new Error('HTTP ' + res.status);
     const data = await res.json();
@@ -105,31 +129,39 @@ document.addEventListener('click', async (ev) => {
     btn.classList.toggle('bg-red-400', !active);
     btn.classList.toggle('hover:bg-red-500', !active);
 
-   const message = active ? 'Status ativado com sucesso!' : 'Status desativado com sucesso!';
-  showToast(message, active ? 'success' : 'error');
+    const message = active ? 'Status ativado com sucesso!' : 'Status desativado com sucesso!';
+    showToast(message, active ? 'success' : 'error');
+
   } catch (err) {
     console.error('toggle-status failed', err);
-    showToast(data.message || 'Erro ao atualizar status.', 'error');
+    // FIX: 'data' não existe no catch; usar a mensagem do erro
+    showToast(err?.message || 'Erro ao atualizar status.', 'error');
   } finally {
     btn.dataset.processing = '0';
   }
 });
 
 function showToast(message, type = 'success') {
-    const container = document.getElementById('toast-container') || (() => {
-        const d = document.createElement('div');
-        d.id = 'toast-container';
-        d.className = 'fixed top-4 right-4 z-50 flex flex-col gap-2';
-        document.body.appendChild(d);
-        return d;
-    })();
-    const toast = document.createElement('div');
-    toast.className = `flex items-center w-full max-w-xs p-4 rounded-lg shadow-sm text-sm fade-in gap-3
-        ${type === 'success' ? 'bg-green-400 text-white' : ''}
-        ${type === 'error' ? 'bg-red-400 text-white' : ''}`;
-    toast.innerHTML = `<span class="flex-1">${message}</span>
-        <button type="button" class="ml-2 text-white/80 hover:text-white" onclick="this.closest('.toast').remove()">✕</button>`;
-    toast.classList.add('toast');
-    container.appendChild(toast);
-    setTimeout(() => { toast.classList.add('fade-out'); setTimeout(() => toast.remove(), 500); }, 3000);
+  const container = document.getElementById('toast-container') || (() => {
+    const d = document.createElement('div');
+    d.id = 'toast-container';
+    d.className = 'fixed top-4 right-4 z-50 flex flex-col gap-2';
+    document.body.appendChild(d);
+    return d;
+  })();
+
+  const toast = document.createElement('div');
+  toast.className = `toast flex items-center w-full max-w-xs p-4 rounded-lg shadow-sm text-sm fade-in gap-3
+    ${type === 'success' ? 'bg-green-400 text-white' : ''}
+    ${type === 'error' ? 'bg-red-400 text-white' : ''}`;
+
+  toast.innerHTML = `<span class="flex-1">${message}</span>
+    <button type="button" class="ml-2 text-white/80 hover:text-white" onclick="this.closest('.toast').remove()">✕</button>`;
+
+  container.appendChild(toast);
+
+  setTimeout(() => {
+    toast.classList.add('fade-out');
+    setTimeout(() => toast.remove(), 500);
+  }, 3000);
 }

@@ -18,6 +18,7 @@ class MenuSeeder extends Seeder
                 'route' => 'categoria.inicio',
                 'parent_id' => null,
                 'order' => 1,
+                // 'inertia' => false, // opcional
             ]
         );
 
@@ -56,6 +57,7 @@ class MenuSeeder extends Seeder
                 'order' => 4,
             ]
         );
+
         $estoques = Menu::updateOrCreate(
             ['name' => 'Estoques', 'parent_id' => null],
             [
@@ -111,7 +113,7 @@ class MenuSeeder extends Seeder
         );
 
         $clientes = Menu::updateOrCreate(
-            ['name' => 'Clientes', 'parent_id' => null],
+            ['slug' => 'clientes'],
             [
                 'name' => 'Clientes',
                 'slug' => 'clientes',
@@ -203,6 +205,41 @@ class MenuSeeder extends Seeder
                 'route' => 'vendas.historico_vendas',
                 'parent_id' => $vendas->id,
                 'order' => 2,
+            ]
+        );
+
+        /**
+         * =========================
+         * NOVO: Configurações + Taxas
+         * =========================
+         */
+
+        // Pai: Configurações
+        $configuracoes = Menu::updateOrCreate(
+            ['slug' => 'configuracoes'],
+            [
+                'name' => 'Configurações',
+                'slug'  => 'configuracoes',
+                'icon'  => 'fas fa-cog mr-2',
+                'route' => null,           // pai sem rota
+                'parent_id' => null,
+                'order' => 11,
+                // se quiser forçar Inertia no clique do pai (não recomendado sem rota):
+                // 'inertia' => false,
+            ]
+        );
+
+        // Filho: Taxas (Imposto) — ROTA Inertia: taxes.index
+        $taxas = Menu::updateOrCreate(
+            ['slug' => 'taxas'],
+            [
+                'name' => 'Taxas (Imposto)',
+                'slug' => 'taxas',
+                'icon' => 'fas fa-percent mr-2',
+                'route' => 'taxes.index',  // defina essa rota no web.php
+                'parent_id' => $configuracoes->id,
+                'order' => 1,
+                // força Link Inertia no seu Sidebar.vue
             ]
         );
     }

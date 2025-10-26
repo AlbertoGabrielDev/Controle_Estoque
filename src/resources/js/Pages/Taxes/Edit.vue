@@ -7,7 +7,9 @@ const props = defineProps({
   taxes: Object,
   ufs: Array,
   customerSegments: Array,
-  productSegments: Array
+  productSegments: Array,
+  channels: { type: Array, default: () => [] },
+  operationTypes: { type: Array, default: () => [] },
 })
 function dbBaseToUi(baseFormula) {
   switch (baseFormula) {
@@ -16,6 +18,16 @@ function dbBaseToUi(baseFormula) {
     case 'valor': return 'subtotal'
     default: return 'price'
   }
+}
+function normalizeDecimal(v) {
+  if (v === '' || v === null || v === undefined) return null
+  const s = String(v).trim()
+  if (s.includes(',')) {
+    // "1.234,56" -> "1234.56" ; "2,23" -> "2.23"
+    return s.replace(/\./g, '').replace(',', '.')
+  }
+  // Já está com ponto decimal ("2.23") -> mantém
+  return s
 }
 function dbMethodToUi(metodo) {
   switch (Number(metodo)) {
@@ -42,10 +54,18 @@ const form = useForm({
   amount: props.rule?.valor_fixo ?? null,
   formula: props.rule?.expression ?? '',
   apply_mode: (props.rule?.cumulativo ? 'stack' : 'exclusive'),
+  canal: props.rule.canal ?? '',
+  tipo_operacao: props.rule.tipo_operacao ?? '',
 })
 
 function submit() {
-  form.put(route('taxes.update', props.rule.id))
+  form
+    .transform(data => ({
+      ...data,
+      rate: normalizeDecimal(data.rate),
+      amount: normalizeDecimal(data.amount),
+    }))
+    .put(route('taxes.update', props.rule.id))
 }
 </script>
 
@@ -60,6 +80,6 @@ function submit() {
 
   <div class="bg-white rounded shadow p-4">
     <TaxRuleForm :form="form" :ufs="ufs" :customer-segments="customerSegments" :product-segments="productSegments"
-      @submit="submit" />
+      :channels="channels" :operation-types="operationTypes" @submit="submit" />
   </div>
 </template>

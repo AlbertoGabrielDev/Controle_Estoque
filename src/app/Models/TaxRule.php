@@ -10,6 +10,8 @@ use App\Traits\HasStatus;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Carbon;
+use App\Enums\Canal;
+use App\Enums\TipoOperacao;
 
 class TaxRule extends Model
 {
@@ -45,6 +47,8 @@ class TaxRule extends Model
         'uf_origem' => UF::class,
         'escopo' => Scope::class,
         'metodo' => TaxMethod::class,
+        'canal' => Canal::class,
+        'tipo_operacao' => TipoOperacao::class,
     ];
 
     public function scopeVigentes(
