@@ -24,7 +24,7 @@ class Estoque extends Model
         'quantidade',
         'localizacao',
         'data_entrega',
-        'data_cadastro',
+        'created_at',
         'preco_custo',
         'preco_venda',
         'lote',
@@ -48,27 +48,53 @@ class Estoque extends Model
 
     public static function buscarComFiltros(Request $request)
     {
-        return static::with(['produtos', 'fornecedores', 'marcas'])
-            ->join('produtos as p', 'estoques.id_produto_fk', '=', 'p.id_produto')
-            ->join('fornecedores as f', 'estoques.id_fornecedor_fk', '=', 'f.id_fornecedor')
-            ->join('marcas as m', 'estoques.id_marca_fk', '=', 'm.id_marca')
-            ->join('categoria_produtos as cp', 'p.id_produto', '=', 'cp.id_produto_fk')
-            ->join('categorias as c', 'cp.id_categoria_fk', '=', 'c.id_categoria')
-            ->select('estoques.*')
-            ->when($request->lote, fn($q, $v) => $q->where('estoques.lote', $v))
-            ->when($request->quantidade, fn($q, $v) => $q->where('estoques.quantidade', $v))
-            ->when($request->preco_custo, fn($q, $v) => $q->where('estoques.preco_custo', $v))
-            ->when($request->preco_venda, fn($q, $v) => $q->where('estoques.preco_venda', $v))
-            ->when($request->validade, fn($q, $v) => $q->whereDate('estoques.validade', $v))
-            ->when($request->localizacao, fn($q, $v) => $q->where('estoques.localizacao', $v))
-            ->when($request->nome_marca, fn($q, $v) => $q->where('m.nome_marca', $v))
-            ->when($request->nome_fornecedor, fn($q, $v) => $q->where('f.nome_fornecedor', $v))
-            ->when($request->nome_categoria, fn($q, $v) => $q->where('c.nome_categoria', $v))
-            ->when($request->nome_produto, fn($q, $v) => $q->where('p.nome_produto', 'like', "%$v%"))
-            ->when($request->data_cadastro, fn($q, $v) => $q->whereDate('estoques.data_cadastro', $v))
-            ->when($request->data_chegada, fn($q, $v) => $q->whereDate('estoques.data_chegada', $v))
-            ->when(!Gate::allows('permissao'), fn($q) => $q->where('estoques.status', 1))
-            ->paginate(5);
+        $query = static::query()
+            ->with(['produtos', 'fornecedores', 'marcas'])
+            ->select('estoques.*');
+
+        $query
+            ->when($request->filled('lote'), fn($q) => $q->where('estoques.lote', $request->lote))
+            ->when($request->filled('quantidade'), fn($q) => $q->where('estoques.quantidade', $request->quantidade))
+            ->when($request->filled('preco_custo'), fn($q) => $q->where('estoques.preco_custo', $request->preco_custo))
+            ->when($request->filled('preco_venda'), fn($q) => $q->where('estoques.preco_venda', $request->preco_venda))
+            ->when($request->filled('validade'), fn($q) => $q->whereDate('estoques.validade', $request->validade))
+            ->when($request->filled('localizacao'), fn($q) => $q->where('estoques.localizacao', $request->localizacao))
+            ->when($request->filled('created_at'), fn($q) => $q->whereDate('estoques.created_at', $request->created_at))
+            ->when($request->filled('data_chegada'), fn($q) => $q->whereDate('estoques.data_chegada', $request->data_chegada))
+            ->when(!\Gate::allows('permissao'), fn($q) => $q->where('estoques.status', 1));
+        $query
+            ->when($request->filled('nome_marca'), function ($q) use ($request) {
+                $q->whereIn('id_marca_fk', function ($sub) use ($request) {
+                    $sub->select('id_marca')
+                        ->from('marcas')
+                        ->where('nome_marca', $request->nome_marca);
+                });
+            })
+            ->when($request->filled('nome_fornecedor'), function ($q) use ($request) {
+                $q->whereIn('id_fornecedor_fk', function ($sub) use ($request) {
+                    $sub->select('id_fornecedor')
+                        ->from('fornecedores')
+                        ->where('nome_fornecedor', $request->nome_fornecedor);
+                });
+            })
+            ->when($request->filled('nome_produto'), function ($q) use ($request) {
+                $q->whereIn('id_produto_fk', function ($sub) use ($request) {
+                    $sub->select('id_produto')
+                        ->from('produtos')
+                        ->where('nome_produto', 'like', '%' . $request->nome_produto . '%');
+                });
+            })
+            ->when($request->filled('nome_categoria'), function ($q) use ($request) {
+                $q->whereIn('id_produto_fk', function ($sub) use ($request) {
+                    $sub->select('cp.id_produto_fk')
+                        ->from('categoria_produtos as cp')
+                        ->join('categorias as c', 'cp.id_categoria_fk', '=', 'c.id_categoria')
+                        ->where('c.nome_categoria', $request->nome_categoria);
+                });
+            });
+        return $query
+            ->orderByDesc('estoques.id_estoque')
+            ->simplePaginate(10);
     }
 
     public function getDataChegadaAttribute($value)

@@ -36,17 +36,15 @@ class EstoqueRepositoryEloquent extends BaseRepository implements EstoqueReposit
 
     public function index()
     {
-        $query = Estoque::select('estoques.*', 'produtos.nome_produto', 'fornecedores.nome_fornecedor')
-            ->join('produtos', 'estoques.id_produto_fk', '=', 'produtos.id_produto')
-            ->join('fornecedores', 'estoques.id_fornecedor_fk', '=', 'fornecedores.id_fornecedor');
-
-        $estoques = $query->get();
+        $estoques = Estoque::with(['produtos', 'fornecedores'])
+            ->orderByDesc('id_estoque')
+            ->paginate(10); 
 
         return [
             'estoques' => $estoques,
             'fornecedores' => Fornecedor::all(),
             'marcas' => Marca::all(),
-            'categorias' => Categoria::all()
+            'categorias' => Categoria::all(),
         ];
     }
 
@@ -166,7 +164,7 @@ class EstoqueRepositoryEloquent extends BaseRepository implements EstoqueReposit
             $labels = $vendas->pluck('mes')->map(function ($mes) {
                 return Carbon::create()->month($mes)->format('F'); // Nome do mês
             });
-      
+
             $values = $vendas->map(function ($order, $key) {
                 return number_format($order->venda, 0, '', '');
             });

@@ -23,30 +23,8 @@ class AuthServiceProvider extends ServiceProvider
     {
         $this->registerPolicies();
 
-        // Verifica se o usuário tem uma permissão específica em um menu
-        Gate::define('has-permission', function (User $user, $menuSlug, $permissionName) {
-            // Admin tem acesso total
-            if ($user->hasRole('admin')) {
-                return true;
-            }
-
-            // Verifica se o menu existe
-            $menu = Menu::where('slug', $menuSlug)->first();
-            if (!$menu) {
-                return false; // Bloqueia se o menu não existir
-            }
-
-            // Verifica se a permissão existe
-            $permission = Permission::where('name', $permissionName)->first();
-            if (!$permission) {
-                return false; // Bloqueia se a permissão não existir
-            }
-
-            // Verifica se a role tem a permissão
-            return $user->roles()->whereHas('roleMenuPermissions', function ($query) use ($menu, $permission) {
-                $query->where('menu_id', $menu->id)
-                    ->where('permission_id', $permission->id);
-            })->exists();
+        Gate::define('has-permission', function (User $user, string $menuSlug, string $permissionName): bool {
+            return $user->hasPermission($menuSlug, $permissionName);
         });
     }
 }

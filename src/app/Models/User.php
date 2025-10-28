@@ -9,6 +9,8 @@ use Illuminate\Support\Facades\Gate;
 use Laravel\Fortify\TwoFactorAuthenticatable;
 use Laravel\Jetstream\HasProfilePhoto;
 use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Support\Facades\DB;
 
 class User extends Authenticatable
 {
@@ -39,10 +41,9 @@ class User extends Authenticatable
         'profile_photo_url',
     ];
 
-    public function roles()
+    public function roles(): BelongsToMany
     {
-        // padronizado para 'user_role' (ajuste se seu banco usar 'user_roles')
-        return $this->belongsToMany(Role::class, 'user_roles');
+        return $this->belongsToMany(Role::class, 'user_roles', 'user_id', 'role_id');
     }
 
     public function hasRole($roleName)
@@ -57,9 +58,25 @@ class User extends Authenticatable
         })->exists();
     }
 
-    public function hasPermission($menuSlug, $permissionName)
+    public function hasPermission(string $menuSlug, string $permissionName): bool
     {
-        return Gate::allows('has-permission', [$menuSlug, $permissionName]);
+        if ((int) $this->id === 1) {
+            return true;
+        }
+        $roleIds = $this->roles()->pluck('roles.id');
+        if ($roleIds->isEmpty()) {
+            return false;
+        }
+
+        $exists = DB::table('role_menu_permissions as rmp')
+            ->join('menus as m', 'm.id', '=', 'rmp.menu_id')
+            ->join('permissions as p', 'p.id', '=', 'rmp.permission_id')
+            ->whereIn('rmp.role_id', $roleIds->all())
+            ->where('m.slug', $menuSlug)
+            ->where('p.name', $permissionName)
+            ->exists();
+
+        return $exists;
     }
 
     public function unidade()
