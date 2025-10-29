@@ -60,7 +60,7 @@ class FornecedorController extends Controller
 
     public function editar(Request $request, $fornecedorId)
     {
-        $fornecedores = Fornecedor::where('fornecedor.id_fornecedor', $fornecedorId)->get();
+        $fornecedores = Fornecedor::where('fornecedores.id_fornecedor', $fornecedorId)->get();
         $telefones = Fornecedor::find($fornecedorId)->telefones;
         return view('fornecedor.editar', compact('fornecedores', 'telefones'));
     }

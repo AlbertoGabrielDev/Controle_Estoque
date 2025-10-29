@@ -15,31 +15,49 @@ class ValidacaoEstoque extends FormRequest
     public function rules(): array
     {
         return [
-        'localizacao'       => 'max:10',
-        'preco_custo'       => 'max:8',
-        'preco_venda'       => 'max:8',
-        'data_chegada'      => 'date',
-        'quantidade'        => 'max:10000',
-        'validade'          => 'date',
-        'lote'              => 'max:20',
-        'id_fornecedor_fk'  => 'required|exists:fornecedores,id_fornecedor',
-        'id_marca_fk'       => 'required|exists:marcas,id_marca',
+            'localizacao' => 'nullable|string|max:10',
+            'preco_custo' => 'nullable|numeric',
+            'preco_venda' => 'nullable|numeric',
+            'data_chegada' => 'nullable|date',
+            'validade' => 'nullable|date',
+            'lote' => 'nullable|string|max:20',
+
+            'quantidade' => 'required|numeric|min:0|lte:10000',
+            'quantidade_aviso' => 'nullable|numeric|min:0|lte:10000',
+
+            'id_fornecedor_fk' => 'required|exists:fornecedores,id_fornecedor',
+            'id_marca_fk' => 'required|exists:marcas,id_marca',
+            'id_produto_fk' => 'required|exists:produtos,id_produto',
+
+            // >>> adicionados para permitir persistência via $request->validated()
+            'imposto_total' => 'nullable|numeric',
+            'impostos_json' => 'nullable|string',
         ];
     }
     public function messages(): array
     {
-        return[
-            'localizacao.max' => 'Maximo de número permitido no campo Localização e 10',
-            'preco_custo.max' => 'Maximo de número permitido no campo Preço Custo e 10',
-            'preco_venda' => 'Maximo de número permitido no campo Preço Venda e 10',
-            'data_chegada.date' => 'Formato de data errado',
-            'validade.date' => 'Formato de data errado',
-            'quantidade.max' => 'Maximo de número permitido no campo Quantidade e 10000',
-            'lote' => 'Maximo de número permitido no campo Lote e 20',
-            'id_fornecedor_fk.required' => 'O fornecedor é obrigatório',
-            'id_fornecedor_fk.exists' => 'Fornecedor inválido',
-            'id_marca_fk.required' => 'A marca é obrigatória',
-            'id_marca_fk.exists' => 'Marca inválida',
+        return [
+            'localizacao.max' => 'Máximo permitido para Localização é 10 caracteres.',
+            'preco_custo.numeric' => 'Preço de Custo deve ser numérico.',
+            'preco_venda.numeric' => 'Preço de Venda deve ser numérico.',
+            'data_chegada.date' => 'Formato de data inválido em Data de Chegada.',
+            'validade.date' => 'Formato de data inválido em Validade.',
+            'lote.max' => 'Máximo permitido para Lote é 20 caracteres.',
+
+            'quantidade.required' => 'Quantidade é obrigatória.',
+            'quantidade.numeric' => 'Quantidade deve ser numérica.',
+            'quantidade.min' => 'Quantidade não pode ser negativa.',
+            'quantidade.lte' => 'Quantidade deve ser menor ou igual a 10000.',
+            'quantidade_aviso.numeric' => 'Quantidade Alerta deve ser numérica.',
+            'quantidade_aviso.min' => 'Quantidade Alerta não pode ser negativa.',
+            'quantidade_aviso.lte' => 'Quantidade Alerta deve ser menor ou igual a 10000.',
+
+            'id_fornecedor_fk.required' => 'O fornecedor é obrigatório.',
+            'id_fornecedor_fk.exists' => 'Fornecedor inválido.',
+            'id_marca_fk.required' => 'A marca é obrigatória.',
+            'id_marca_fk.exists' => 'Marca inválida.',
+            'id_produto_fk.required' => 'O produto é obrigatório.',
+            'id_produto_fk.exists' => 'Produto inválido.',
         ];
     }
 }

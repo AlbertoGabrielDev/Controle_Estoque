@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
+
 use App\Models\User;
 use App\Services\DashboardService;
 use Carbon\Carbon;
@@ -27,10 +28,10 @@ class DashboardController extends Controller
 
         $daily    = $this->service->getDailySales(30, $attendantId, $from, $to);
         $topProd  = $this->service->getTopProducts(5, $attendantId, $from, $to);
-        $byStatus = $this->service->getOrdersByStatus($from, $to); 
+        $byStatus = $this->service->getOrdersByStatus($from, $to);
         $monthly  = $this->service->getMonthlySales(null, $attendantId, $from, $to);
         $byUnit   = $this->service->getSalesByUnit($attendantId, $from, $to);
-        $kpis     = $this->service->getKpis($attendantId, $from, $to); 
+        $kpis     = $this->service->getKpis($attendantId, $from, $to);
 
         return Inertia::render('Dashboard/SalesDashboard', [
             'daily'       => $daily,
@@ -46,5 +47,4 @@ class DashboardController extends Controller
             'to'          => $to?->toDateString(),
         ]);
     }
-    }
-
+}

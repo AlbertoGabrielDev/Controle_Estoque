@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Menu extends Model
 {
@@ -22,14 +22,17 @@ class Menu extends Model
         return $this->belongsTo(Menu::class, 'parent_id');
     }
 
-    public function permissions()
+
+    public function roles(): BelongsToMany
     {
-        return $this->belongsToMany(Permission::class, 'menu_permissions');
+        return $this->belongsToMany(Role::class, 'role_menu_permissions', 'menu_id', 'role_id')
+            ->withPivot('permission_id');
     }
-    
-    public function roles()
+
+    public function permissions(): BelongsToMany
     {
-        return $this->belongsToMany(Role::class, 'role_menu_permissions')->withPivot('permission_id');
+        return $this->belongsToMany(Permission::class, 'role_menu_permissions', 'menu_id', 'permission_id')
+            ->withPivot('role_id');
     }
 
     // Adicione este método

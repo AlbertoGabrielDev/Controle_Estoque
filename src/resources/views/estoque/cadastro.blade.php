@@ -135,3 +135,71 @@
   </div>
 
 @endsection
+
+@push('scripts')
+<script>
+(function() {
+  const CSRF = "{{ csrf_token() }}";
+  const impostosArea = document.getElementById('impostosArea');
+  const inpProduto   = document.querySelector('select[name="id_produto_fk"]');
+  const inpPreco     = document.querySelector('input[name="preco_venda"]');
+  const hidTotal     = document.getElementById('imposto_total');
+  const hidJson      = document.getElementById('impostos_json');
+
+  // Usa jQuery se disponível, senão fallback para fetch
+  const hasJQ = !!(window.jQuery && window.jQuery.ajax);
+
+  async function recalc() {
+    const id_produto_fk = (inpProduto?.value || '').trim();
+    const preco_venda   = (inpPreco?.value || '').trim();
+
+    if (!id_produto_fk || preco_venda === '') {
+      // limpa o preview se campos estiverem vazios
+      if (impostosArea) impostosArea.innerHTML =
+        '<div class="text-slate-500">Selecione o produto e informe o preço de venda.</div>';
+      hidTotal && (hidTotal.value = '');
+      hidJson  && (hidJson.value  = '');
+      return;
+    }
+
+    const payload = { _token: CSRF, id_produto_fk, preco_venda };
+
+    try {
+      let resp;
+      if (hasJQ) {
+        resp = await window.jQuery.ajax({
+          url: "{{ route('estoque.calcImpostos') }}",
+          method: 'POST',
+          data: payload
+        });
+      } else {
+        resp = await fetch("{{ route('estoque.calcImpostos') }}", {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: new URLSearchParams(payload),
+        }).then(r => r.json());
+      }
+
+      if (resp && resp.html) {
+        impostosArea.innerHTML = resp.html;
+        // Atualiza hidden para o submit
+        if (hidTotal) hidTotal.value = (resp.raw && typeof resp.raw._total_impostos !== 'undefined')
+          ? resp.raw._total_impostos : 0;
+        if (hidJson)  hidJson.value  = JSON.stringify(resp.raw || {});
+      }
+    } catch (e) {
+      console.error('Falha ao calcular impostos', e);
+    }
+  }
+
+  // Dispara on-change
+  inpProduto && inpProduto.addEventListener('change', recalc);
+  inpPreco   && inpPreco.addEventListener('input',  recalc);
+
+  // Se vier com valores (old()), calcula na entrada
+  if ((inpProduto?.value && inpPreco?.value !== '')) {
+    recalc();
+  }
+})();
+</script>
+@endpush
