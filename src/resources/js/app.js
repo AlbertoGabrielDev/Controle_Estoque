@@ -2,14 +2,19 @@ import './bootstrap'
 import '../css/app.css'
 import '@fortawesome/fontawesome-free/css/fontawesome.min.css';
 import '@fortawesome/fontawesome-free/css/solid.min.css'
+
 import { createApp, h } from 'vue'
-import { createInertiaApp } from '@inertiajs/vue3'
+import { createInertiaApp, Link } from '@inertiajs/vue3'
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers'
-import { ZiggyVue } from '../../vendor/tightenco/ziggy'
+import { ZiggyVue } from '../../vendor/tightenco/ziggy/dist/vue.m.js'
+import { Ziggy } from './ziggy'  
+
 import SidebarLayout from './Layouts/Sidebar.vue'          // layout do módulo WPP (Vue)
 import PrincipalLayout from './Layouts/PrincipalLayout.vue'// novo layout que criamos acima
+
 import $ from 'jquery';
 window.$ = window.jQuery = $;
+
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel'
 
 // Páginas que usam o sidebar em Vue (WhatsApp)
@@ -47,8 +52,6 @@ const isInertiaMenu = (item) => {
 
 const tagFor = (item) => (isInertiaMenu(item) ? Link : 'a')
 
-import { Link } from '@inertiajs/vue3'
-
 const linkClass = (routeName) => {
   let active = false
   try { active = route().current(routeName) } catch (_) { active = false }
@@ -74,6 +77,7 @@ createInertiaApp({
       } else if (isDash) {
         page.layout = page.layout || PrincipalLayout
       } else {
+        // página sem layout específico → usa o próprio
       }
 
       return mod
@@ -83,7 +87,8 @@ createInertiaApp({
   setup({ el, App, props, plugin }) {
     return createApp({ render: () => h(App, props) })
       .use(plugin)
-      .use(ZiggyVue)
+      // ✅ Registra o plugin do Ziggy passando o objeto de rotas
+      .use(ZiggyVue, Ziggy)
       .mount(el)
   },
 

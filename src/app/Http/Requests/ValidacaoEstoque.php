@@ -25,9 +25,7 @@ class ValidacaoEstoque extends FormRequest
             'quantidade' => 'required|numeric|min:0|lte:10000',
             'quantidade_aviso' => 'nullable|numeric|min:0|lte:10000',
 
-            'id_fornecedor_fk' => 'required|exists:fornecedores,id_fornecedor',
-            'id_marca_fk' => 'required|exists:marcas,id_marca',
-            'id_produto_fk' => 'required|exists:produtos,id_produto',
+           
 
             // >>> adicionados para permitir persistência via $request->validated()
             'imposto_total' => 'nullable|numeric',
@@ -52,12 +50,7 @@ class ValidacaoEstoque extends FormRequest
             'quantidade_aviso.min' => 'Quantidade Alerta não pode ser negativa.',
             'quantidade_aviso.lte' => 'Quantidade Alerta deve ser menor ou igual a 10000.',
 
-            'id_fornecedor_fk.required' => 'O fornecedor é obrigatório.',
-            'id_fornecedor_fk.exists' => 'Fornecedor inválido.',
-            'id_marca_fk.required' => 'A marca é obrigatória.',
-            'id_marca_fk.exists' => 'Marca inválida.',
-            'id_produto_fk.required' => 'O produto é obrigatório.',
-            'id_produto_fk.exists' => 'Produto inválido.',
+           
         ];
     }
 }

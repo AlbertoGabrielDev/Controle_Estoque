@@ -50,7 +50,7 @@ class EstoqueRepositoryEloquent extends BaseRepository implements EstoqueReposit
 
     public function inserirEstoque(array $data)
     {
-        $data = current_unidade()->id_unidade_fk;
+        // $data = current_unidade()->id_unidade_fk ?? 1;
         $estoque = $this->create($data);
 
         MarcaProduto::create([

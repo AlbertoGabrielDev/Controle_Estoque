@@ -36,123 +36,112 @@ class EstoqueController extends Controller
     public function cadastro()
     {
         $cadastro = $this->estoqueRepository->cadastro();
-
-        // Pré-preenche (ex.: depois de erro de validação)
-        $previewInput = [
-            'id_produto_fk' => old('id_produto_fk'),
-            'preco_venda' => old('preco_venda'),
-        ];
-
-        $previewVM = null;
-        $impostosRaw = [];
-
-        if (!empty($previewInput['id_produto_fk']) && $previewInput['preco_venda'] !== null && $previewInput['preco_venda'] !== '') {
-            $raw = $this->calcularImpostoParaProduto(
-                (int) $previewInput['id_produto_fk'],
-                ['preco_venda' => (float) $previewInput['preco_venda']],
-                false
-            );
-
-            $previewVM = [
-                '__totais' => [
-                    'preco_base' => (float) $previewInput['preco_venda'],
-                    'total_impostos' => $raw['_total_impostos'] ?? 0,
-                    'total_com_impostos' => $raw['_total_com_impostos'] ?? ((float) $previewInput['preco_venda'] + ($raw['_total_impostos'] ?? 0)),
-                ],
-                'impostos' => array_values(array_filter(
-                    $raw,
-                    fn($v, $k) => is_array($v) && !str_starts_with((string) $k, '_'),
-                    ARRAY_FILTER_USE_BOTH
-                )),
-            ];
-            $impostosRaw = $raw;
-        }
-
-        return view('estoque.cadastro', array_merge($cadastro, [
-            'previewInput' => $previewInput,
-            'previewVM' => $previewVM,
-            'impostos_raw' => $impostosRaw,
-        ]));
+        return view('estoque.cadastro',$cadastro);
     }
 
     public function buscar(Request $request)
     {
         $buscar = $this->estoqueRepository->buscar($request);
-        return view('estoque.index', $buscar);
+        return view('estoque.index',$buscar);
     }
 
     public function inserirEstoque(ValidacaoEstoque $request)
     {
-        $calc = $this->calcularImpostoParaProduto(
-            (int) $request->id_produto_fk,
-            $request->only('preco_venda'),
-            false
-        );
-
-        $data = $request->merge([
-            'id_users_fk' => Auth::id(),
-            'imposto_total' => $calc['_total_impostos'] ?? 0,
-            'impostos_json' => json_encode($calc),
-        ])->all();
-
+        $data = $request->merge(['id_users_fk' => Auth::id()])->all();
         $this->estoqueRepository->inserirEstoque($data);
-
         return redirect()->route('estoque.index')->with('success', 'Inserido com sucesso');
     }
+
     public function editar($estoqueId)
     {
         $editar = $this->estoqueRepository->editar($estoqueId);
-        $estoque = $editar['estoque'];
-
-        // Recalcula impostos para mostrar no preview do editar
-        $raw = $this->calcularImpostoParaProduto(
-            (int) $estoque->id_produto_fk,
-            ['preco_venda' => (float) $estoque->preco_venda],
-            false
-        );
-
-        $previewVM = [
-            '__totais' => [
-                'preco_base' => (float) $estoque->preco_venda,
-                'total_impostos' => $raw['_total_impostos'] ?? 0,
-                'total_com_impostos' => $raw['_total_com_impostos'] ?? ((float) $estoque->preco_venda + ($raw['_total_impostos'] ?? 0)),
-            ],
-            'impostos' => array_values(array_filter(
-                $raw,
-                fn($v, $k) => is_array($v) && !str_starts_with((string) $k, '_'),
-                ARRAY_FILTER_USE_BOTH
-            )),
-        ];
-
-        return view('estoque.editar', array_merge($editar, [
-            'previewVM' => $previewVM,
-            'impostos_raw' => $raw,
-        ]));
+        return view('estoque.editar', $editar);
     }
 
-
-    public function salvarEditar(Request $request, $estoqueId)
+    public function salvarEditar(ValidacaoEstoque $request, $estoqueId)
     {
-        $estoque = Estoque::findOrFail($estoqueId);
-        $fillable = $estoque->getFillable();
-
-        $data = $request->only($fillable);
-
-        $produtoId = (int) ($data['id_produto_fk'] ?? $estoque->id_produto_fk);
-
-        $raw = $this->calcularImpostoParaProduto(
-            $produtoId,
-            ['preco_venda' => (float) ($data['preco_venda'] ?? $estoque->preco_venda ?? 0)],
-            false
-        );
-
-        $data['impostos_json'] = json_encode($raw);
-        $data['imposto_total'] = $raw['_total_impostos'] ?? 0;
-
-        $estoque->fill($data)->save();
-
-        return redirect()->route('estoque.index')->with('success', 'Estoque atualizado com sucesso!');
+        $this->estoqueRepository->salvarEditar($request,$estoqueId);
+        return redirect()->route('estoque.index')->with('success', 'Editado com sucesso');
     }
+
+    // public function buscar(Request $request)
+    // {
+    //     $buscar = $this->estoqueRepository->buscar($request);
+    //     return view('estoque.index', $buscar);
+    // }
+
+    // public function inserirEstoque(ValidacaoEstoque $request)
+    // {
+    //     $calc = $this->calcularImpostoParaProduto(
+    //         (int) $request->id_produto_fk,
+    //         $request->only('preco_venda'),
+    //         false
+    //     );
+
+    //     $data = $request->merge([
+    //         'id_users_fk' => Auth::id(),
+    //         'imposto_total' => $calc['_total_impostos'] ?? 0,
+    //         'impostos_json' => json_encode($calc),
+    //     ])->all();
+
+    //     $this->estoqueRepository->inserirEstoque($data);
+
+    //     return redirect()->route('estoque.index')->with('success', 'Inserido com sucesso');
+    // }
+    // public function editar($estoqueId)
+    // {
+    //     $editar = $this->estoqueRepository->editar($estoqueId);
+    //     $estoque = $editar['estoque'];
+
+    //     // Recalcula impostos para mostrar no preview do editar
+    //     $raw = $this->calcularImpostoParaProduto(
+    //         (int) $estoque->id_produto_fk,
+    //         ['preco_venda' => (float) $estoque->preco_venda],
+    //         false
+    //     );
+
+    //     $previewVM = [
+    //         '__totais' => [
+    //             'preco_base' => (float) $estoque->preco_venda,
+    //             'total_impostos' => $raw['_total_impostos'] ?? 0,
+    //             'total_com_impostos' => $raw['_total_com_impostos'] ?? ((float) $estoque->preco_venda + ($raw['_total_impostos'] ?? 0)),
+    //         ],
+    //         'impostos' => array_values(array_filter(
+    //             $raw,
+    //             fn($v, $k) => is_array($v) && !str_starts_with((string) $k, '_'),
+    //             ARRAY_FILTER_USE_BOTH
+    //         )),
+    //     ];
+
+    //     return view('estoque.editar', array_merge($editar, [
+    //         'previewVM' => $previewVM,
+    //         'impostos_raw' => $raw,
+    //     ]));
+    // }
+
+
+    // public function salvarEditar(Request $request, $estoqueId)
+    // {
+    //     $estoque = Estoque::findOrFail($estoqueId);
+    //     $fillable = $estoque->getFillable();
+
+    //     $data = $request->only($fillable);
+
+    //     $produtoId = (int) ($data['id_produto_fk'] ?? $estoque->id_produto_fk);
+
+    //     $raw = $this->calcularImpostoParaProduto(
+    //         $produtoId,
+    //         ['preco_venda' => (float) ($data['preco_venda'] ?? $estoque->preco_venda ?? 0)],
+    //         false
+    //     );
+
+    //     $data['impostos_json'] = json_encode($raw);
+    //     $data['imposto_total'] = $raw['_total_impostos'] ?? 0;
+
+    //     $estoque->fill($data)->save();
+
+    //     return redirect()->route('estoque.index')->with('success', 'Estoque atualizado com sucesso!');
+    // }
 
     public function calcImpostos(Request $req, TaxCalculatorService $svc)
     {
