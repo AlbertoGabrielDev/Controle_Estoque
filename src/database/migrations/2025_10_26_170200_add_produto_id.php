@@ -9,11 +9,8 @@ return new class extends Migration {
     public function up(): void
     {
         Schema::table('tax_rules', function (Blueprint $table) {
-            $table->unsignedBigInteger('produto_id')->nullable()->after('segment_id');
-
-
-            $table->index('produto_id', 'tax_rules_produto_id_index');
-            $table->foreign('produto_id', 'tax_rules_produto_id_fk')
+            $table->unsignedSmallInteger('produto_id_fk')->nullable()->after('segment_id');
+            $table->foreign('produto_id_fk')
                 ->references('id_produto')
                 ->on('produtos')
                 ->nullOnDelete();
@@ -23,9 +20,8 @@ return new class extends Migration {
     public function down(): void
     {
         Schema::table('tax_rules', function (Blueprint $table) {
-            $table->dropForeign('tax_rules_produto_id_fk');
-            $table->dropIndex('tax_rules_produto_id_index');
-            $table->dropColumn('produto_id');
+            $table->dropForeign('produto_id_fk');
+            $table->dropColumn('produto_id_fk');
         });
     }
 };
