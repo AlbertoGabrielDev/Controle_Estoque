@@ -70,6 +70,13 @@ class Estoque extends Model
                         ->where('nome_marca', $request->nome_marca);
                 });
             })
+            ->when($request->filled('cod_produto'), function ($q) use ($request) {
+                $q->whereIn('id_produto_fk', function ($sub) use ($request) {
+                    $sub->select('id_produto')
+                        ->from('produtos')
+                        ->where('cod_produto', 'like', '%' . $request->cod_produto . '%');
+                });
+            })
             ->when($request->filled('nome_fornecedor'), function ($q) use ($request) {
                 $q->whereIn('id_fornecedor_fk', function ($sub) use ($request) {
                     $sub->select('id_fornecedor')
@@ -78,7 +85,7 @@ class Estoque extends Model
                 });
             })
             ->when($request->filled('nome_produto'), function ($q) use ($request) {
-                $q->whereIn('id_produto_fk', function ($sub) use ($request) {
+                $q->whereIn('id_produto_fk', values: function ($sub) use ($request) {
                     $sub->select('id_produto')
                         ->from('produtos')
                         ->where('nome_produto', 'like', '%' . $request->nome_produto . '%');

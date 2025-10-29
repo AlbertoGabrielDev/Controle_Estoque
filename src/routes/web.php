@@ -45,6 +45,13 @@ Route::middleware(['auth'])
             Route::get('/business-extractor', [BusinessController::class, 'index'])->name('business.index');
             Route::post('/api/business/extract', [BusinessController::class, 'extractFromUrl'])->name('business.extract');
             Route::post('/business/export', [BusinessController::class, 'exportToCsv'])->name('business.export');
+
+            Route::prefix('/configuracoes')->group(function () {
+                Route::get('/modelos-mensagem', [MessageTemplateController::class, 'index'])->name('configuracoes.modelos-mensagem');
+                Route::post('/modelos-mensagem', [MessageTemplateController::class, 'store']);
+                Route::put('/modelos-mensagem/{messageTemplate}', [MessageTemplateController::class, 'update']);
+                Route::delete('/modelos-mensagem/{messageTemplate}', [MessageTemplateController::class, 'destroy']);
+            });
         });
     });
 
@@ -191,12 +198,7 @@ Route::middleware([
         Route::post('/compare', [SpreadsheetController::class, 'compare']);
     });
 
-    Route::prefix('/configuracoes')->group(function () {
-        Route::get('/modelos-mensagem', [MessageTemplateController::class, 'index'])->name('configuracoes.modelos-mensagem');
-        Route::post('/modelos-mensagem', [MessageTemplateController::class, 'store']);
-        Route::put('/modelos-mensagem/{messageTemplate}', [MessageTemplateController::class, 'update']);
-        Route::delete('/modelos-mensagem/{messageTemplate}', [MessageTemplateController::class, 'destroy']);
-    });
+
 
     Route::prefix('whatsapp')->group(function () {
         Route::get('/contacts', [WhatsAppContactsController::class, 'index'])->name('whatsapp.contacts');

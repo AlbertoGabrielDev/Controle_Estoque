@@ -1,6 +1,7 @@
 @extends('layouts.principal')
 @section('conteudo')
   <div class="bg-white p-4 rounded-md w-full">
+    <!-- Cabeçalho e botões -->
     <div class="flex justify-end mb-2">
       <a href="{{ route('estoque.cadastro') }}"
         class="md:w-auto flex items-center justify-between px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-md text-gray-800 transition-colors">
@@ -9,6 +10,7 @@
       </a>
     </div>
 
+    <!-- Filtro -->
     <div x-data="{ filterOpen: false }" class="mb-4">
       <button @click="filterOpen = !filterOpen"
         class="w-full md:w-auto flex items-center justify-between px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-md">
@@ -20,70 +22,58 @@
         <form action="{{ route('estoque.buscar') }}" method="GET"
           class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" x-ref="filterForm">
           <div>
-            <div class="relative">
-              <label class="block text-sm font-medium text-gray-700 mb-1">Data de Chegada</label>
-              <div class="relative">
-                <input type="date" name="data_chegada"
-                  class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500"
-                  value="{{ request('data_chegada') }}">
-              </div>
-            </div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Código do Produto</label>
+            <input type="text" name="cod_produto" placeholder="Ex.: ABC-123"
+              class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500"
+              value="{{ request('cod_produto') }}">
           </div>
 
           <div>
-            <div class="relative">
-              <label class="block text-sm font-medium text-gray-700 mb-1">Data de Validade</label>
-              <div class="relative">
-                <input type="date" name="validade"
-                  class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500"
-                  value="{{ request('validade') }}">
-              </div>
-            </div>
-          </div>
-
-          <div>
-            <div class="relative">
-              <label class="block text-sm font-medium text-gray-700 mb-1">Data de Cadastro</label>
-              <div class="relative">
-                <input type="date" name="created_at"
-                  class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500"
-                  value="{{ request('created_at') }}">
-              </div>
-            </div>
-          </div>
-
-          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Nome do Produto</label>
             <input type="text" name="nome_produto" placeholder="Nome do Produto"
               class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500"
               value="{{ request('nome_produto') }}">
           </div>
+
           <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Lote</label>
             <input type="text" name="lote" placeholder="Lote"
               class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500"
               value="{{ request('lote') }}">
           </div>
+
+          <!-- Linha 2 -->
           <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Localização</label>
             <input type="text" name="localizacao" placeholder="Localização"
               class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500"
               value="{{ request('localizacao') }}">
           </div>
+
           <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Preço Custo</label>
             <input type="number" step="0.01" name="preco_custo" placeholder="Preço Custo"
               class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500"
               value="{{ request('preco_custo') }}">
           </div>
+
           <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Preço Venda</label>
             <input type="number" step="0.01" name="preco_venda" placeholder="Preço Venda"
               class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500"
               value="{{ request('preco_venda') }}">
           </div>
+
+          <!-- Linha 3 -->
           <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Quantidade</label>
             <input type="number" name="quantidade" placeholder="Quantidade"
               class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500"
               value="{{ request('quantidade') }}">
           </div>
 
           <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Marca</label>
             <select name="nome_marca"
               class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500">
               <option value="">Selecione uma Marca</option>
@@ -94,7 +84,9 @@
               @endforeach
             </select>
           </div>
+
           <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Fornecedor</label>
             <select name="nome_fornecedor"
               class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500">
               <option value="">Selecione um Fornecedor</option>
@@ -105,7 +97,10 @@
               @endforeach
             </select>
           </div>
+
+          <!-- Linha 4 -->
           <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Categoria</label>
             <select name="nome_categoria"
               class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500">
               <option value="">Selecione uma Categoria</option>
@@ -116,11 +111,14 @@
               @endforeach
             </select>
           </div>
+
+          <!-- Botões -->
           <div class="md:col-span-3 flex flex-col sm:flex-row gap-2">
             <button type="submit"
               class="w-full sm:w-auto px-6 py-2 bg-cyan-500 hover:bg-cyan-600 text-white rounded-md transition-colors">
               Aplicar Filtros
             </button>
+
             <button type="button" @click="$refs.filterForm.reset(); window.location='{{ route('estoque.buscar') }}'"
               class="w-full sm:w-auto px-6 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-md transition-colors">
               Limpar Filtros
@@ -130,17 +128,18 @@
       </div>
     </div>
 
+
+    <!-- Tabela -->
     <div class="overflow-x-auto rounded-lg border">
-      <table id="Table" class="w-full" data-order='[[9, "asc"]]'>
+      <table id="Table" class="w-full">
         <thead class="bg-gray-50">
           <tr>
+            <th class="px-4 py-3 text-left text-sm font-medium text-gray-700">Código</th>
             <th class="px-4 py-3 text-left text-sm font-medium text-gray-700">Produto</th>
             <th class="px-4 py-3 text-left text-sm font-medium text-gray-700">Fornecedor</th>
             <th class="px-4 py-3 text-left text-sm font-medium text-gray-700 hidden md:table-cell">Custo</th>
             <th class="px-4 py-3 text-left text-sm font-medium text-gray-700 hidden md:table-cell">Venda</th>
             <th class="px-4 py-3 text-left text-sm font-medium text-gray-700">Qtde</th>
-            <th class="px-4 py-3 text-left text-sm font-medium text-gray-700 hidden lg:table-cell">Chegada</th>
-            <th class="px-4 py-3 text-left text-sm font-medium text-gray-700 hidden xl:table-cell">Cadastro</th>
             <th class="px-4 py-3 text-left text-sm font-medium text-gray-700">Lote</th>
             <th class="px-4 py-3 text-left text-sm font-medium text-gray-700 hidden md:table-cell">Local</th>
             <th class="px-4 py-3 text-left text-sm font-medium text-gray-700">Validade</th>
@@ -150,8 +149,15 @@
         <tbody class="divide-y divide-gray-200">
           @forelse ($estoques as $estoque)
             <tr class="hover:bg-gray-50">
-              <td class="px-4 py-3 text-sm text-gray-700">{{ $estoque->produtos->nome_produto ?? 'N/A' }}</td>
-              <td class="px-4 py-3 text-sm text-gray-700">{{ $estoque->fornecedores->nome_fornecedor ?? 'N/A' }}</td>
+              <td class="px-4 py-3 text-sm text-gray-700">
+                {{ $estoque->produtos->cod_produto ?? '—' }}
+              </td>
+              <td class="px-4 py-3 text-sm text-gray-700">
+                {{ $estoque->produtos->nome_produto ?? 'N/A' }}
+              </td>
+              <td class="px-4 py-3 text-sm text-gray-700">
+                {{ $estoque->fornecedores->nome_fornecedor ?? 'N/A' }}
+              </td>
               <td class="px-4 py-3 text-sm text-gray-700 hidden md:table-cell">
                 R$ {{ number_format($estoque->preco_custo, 2, ',', '.') }}
               </td>
@@ -159,37 +165,33 @@
                 R$ {{ number_format($estoque->preco_venda, 2, ',', '.') }}
               </td>
               <td class="px-4 py-3 text-sm font-medium
-                      @if($estoque->quantidade <= $estoque->quantidade_aviso) text-red-600 @else text-gray-700 @endif">
+                  @if($estoque->quantidade <= $estoque->quantidade_aviso) text-red-600 @else text-gray-700 @endif">
                 {{ $estoque->quantidade }}
               </td>
-              <td class="px-4 py-3 text-sm text-gray-700 hidden lg:table-cell">
-                {{ optional($estoque->data_chegada)->format('d/m/Y') }}
-              </td>
-              <td class="px-4 py-3 text-sm text-gray-700 hidden xl:table-cell">
-                {{ optional($estoque->created_at)->format('d/m/Y H:i') }}
-              </td>
+
               <td class="px-4 py-3 text-sm text-gray-700">{{ $estoque->lote }}</td>
               <td class="px-4 py-3 text-sm text-gray-700 hidden md:table-cell">{{ $estoque->localizacao }}</td>
               <td class="px-4 py-3 text-sm
-                      @if(optional($estoque->validade)->isPast()) text-red-600
-                      @elseif(optional($estoque->validade)->diffInDays() < 30) text-yellow-600
-                      @else text-gray-700 @endif">
+                  @if(optional($estoque->validade)->isPast()) text-red-600
+                  @elseif(optional($estoque->validade)->diffInDays() < 30) text-yellow-600
+                  @else text-gray-700 @endif">
                 {{ optional($estoque->validade)->format('d/m/Y') }}
               </td>
               <td class="px-4 py-3 text-sm flex gap-2">
-                <x-edit-button :route="'estoque.editar'" :modelId="$estoque->id_estoque" />
+                <x-edit-button :route="'estoque.editar'" :modelId="$estoque->id_estoque" menuSlug="estoques" />
                 <x-button-status :modelId="$estoque->id_estoque" :status="$estoque->status" modelName="estoque" />
               </td>
             </tr>
           @empty
             <tr>
-              <td colspan="11" class="px-4 py-6 text-center text-sm text-gray-500">Nenhum registro encontrado.</td>
+              <td colspan="10" class="px-4 py-6 text-center text-sm text-gray-500">Nenhum registro encontrado.</td>
             </tr>
           @endforelse
         </tbody>
       </table>
     </div>
 
+    <!-- Paginação -->
     @if(method_exists($estoques, 'links'))
       <div class="mt-4">
         {{ $estoques->appends(request()->except('page'))->links() }}

@@ -3,26 +3,35 @@
 namespace App\Services;
 
 use App\Models\{Tax, TaxRule};
-use Carbon\Carbon;
 
 class TaxCalculatorService
 {
     public function calcular(array $contexto): array
     {
-
         $data = data_get($contexto, 'data') ?: now()->toDateString();
-       $ignorarSegmento = (bool) data_get($contexto, 'ignorar_segmento', false);
+        $ignorarSegmento = (bool) data_get($contexto, 'ignorar_segmento', false);
+
         $ufCli = data_get($contexto, 'clientes.uf');
         $tipoOp = data_get($contexto, 'operacao.tipo', 'venda');
         $canal = data_get($contexto, 'operacao.canal');
         $ufO = data_get($contexto, 'operacao.uf_origem');
         $ufD = data_get($contexto, 'operacao.uf_destino', $ufCli);
-        $catId = data_get($contexto, 'produto.categoria_id');
-        $ncm = data_get($contexto, 'produto.ncm');
+
+        // >>> Agora suportamos múltiplas categorias (via pivot)
+        $catIds = (array) data_get($contexto, 'produto.categorias_ids', []);
+        $catId = data_get($contexto, 'produto.categoria_id'); // compat
+        if ($catId !== null && !in_array((int) $catId, array_map('intval', $catIds), true)) {
+            $catIds[] = (int) $catId;
+        }
+
+        $ncm = null;
+        // dd($ncm, $contexto);
         $valor = (float) data_get($contexto, 'valores.valor', 0.0);
         $desconto = (float) data_get($contexto, 'valores.desconto', 0.0);
         $frete = (float) data_get($contexto, 'valores.frete', 0.0);
+
         $resultado = [];
+
         $taxes = Tax::query()
             ->where('ativo', true)
             ->with([
@@ -33,51 +42,85 @@ class TaxCalculatorService
             ->get();
 
         foreach ($taxes as $tax) {
-            $candidatas = $tax->rules->filter(function (TaxRule $r) use ($ignorarSegmento, $catId, $ncm, $ufO, $ufD, $canal, $tipoOp) {
-                if ($this->enumInt($r->escopo) !== 1)
+
+            $candidatas = $tax->rules->filter(function (TaxRule $r) use ($ignorarSegmento, $catIds, $ncm, $ufO, $ufD, $canal, $tipoOp) {
+              
+                // escopo 1 = produto (mantive seu critério)
+                if ($this->enumInt($r->escopo) !== 1) {
+
                     return false;
-                if (!$ignorarSegmento) {
-                    if ($r->segment_id !== null)
-                        return false;
                 }
-                if (!is_null($r->categoria_produto_id) && (int) $r->categoria_produto_id !== (int) $catId)
-                    return false;
-                if (!is_null($r->ncm_padrao) && $r->ncm_padrao !== $ncm)
-                    return false;
+
+                // Segmento: manteve sua lógica original
+                if (!$ignorarSegmento) {
+                    if ($r->segment_id !== null) {
+                        return false;
+                    }
+                }
+
+                // Categoria (AGORA aceita múltiplas categorias)
+                if (!is_null($r->categoria_produto_id)) {
+                    if (empty($catIds)) {
+                        return false;
+                    }
+                    if (!in_array((int) $r->categoria_produto_id, array_map('intval', $catIds), true)) {
+                        return false;
+                    }
+                }
+
+                // NCM
+                // if (!is_null($r->ncm_padrao) && $r->ncm_padrao !== $ncm) {
+
+                //     return false;
+                // }
+
+                // UFs
                 $ufOrigemRegra = $this->enumStr($r->uf_origem);
                 $ufDestinoRegra = $this->enumStr($r->uf_destino);
-                if (!is_null($ufOrigemRegra) && $ufOrigemRegra !== $ufO)
+                if (!is_null($ufOrigemRegra) && $ufOrigemRegra !== $ufO) {
                     return false;
-                if (!is_null($ufDestinoRegra) && $ufDestinoRegra !== $ufD)
+                }
+                if (!is_null($ufDestinoRegra) && $ufDestinoRegra !== $ufD) {
+                    return false;
+                }
+
+                // Canal / Tipo de operação
+                $canalRegra = $this->enumStr($r->canal);
+                if (!is_null($canalRegra) && (string) $canalRegra !== (string) $canal)
                     return false;
 
-                if (!is_null($r->canal) && $r->canal !== $canal)
+                $tipoRegra = $this->enumStr($r->tipo_operacao);
+                if (!is_null($tipoRegra) && (string) $tipoRegra !== (string) $tipoOp)
                     return false;
-                if (!is_null($r->tipo_operacao) && $r->tipo_operacao !== $tipoOp)
-                    return false;
+
                 return true;
             });
-
-            if ($candidatas->isEmpty())
+ 
+            if ($candidatas->isEmpty()) {
                 continue;
-
+            }
+              
+            // Ordenação por especificidade e prioridade
             $candidatas = $candidatas->sort(function (TaxRule $a, TaxRule $b) {
                 $specA = $this->especificidade($a);
                 $specB = $this->especificidade($b);
-                if ($specA === $specB)
+                if ($specA === $specB) {
                     return $a->prioridade <=> $b->prioridade;
+                }
                 return $specB <=> $specA;
             });
-
+       
             $aplicadas = [];
             foreach ($candidatas as $rule) {
-
                 [$base, $valorImposto, $aliq] = $this->avaliarRegra($rule, $valor, $desconto, $frete);
+
                 if ($valorImposto <= 0) {
-                    if (!$rule->cumulativo)
+                    if (!$rule->cumulativo) {
                         break;
+                    }
                     continue;
                 }
+
                 $aplicadas[] = [
                     'tax' => $tax->codigo,
                     'tax_nome' => $tax->nome,
@@ -111,8 +154,9 @@ class TaxCalculatorService
                     ],
                 ];
 
-                if (!$rule->cumulativo)
+                if (!$rule->cumulativo) {
                     break;
+                }
             }
 
             if (!empty($aplicadas)) {
@@ -136,15 +180,17 @@ class TaxCalculatorService
     {
         $campos = ['segment_id', 'categoria_produto_id', 'ncm_padrao', 'uf_origem', 'uf_destino', 'canal', 'tipo_operacao'];
         $score = 0;
-        foreach ($campos as $c)
-            if (!is_null($r->{$c}))
+        foreach ($campos as $c) {
+            if (!is_null($r->{$c})) {
                 $score++;
+            }
+        }
         return $score;
     }
 
     protected function avaliarRegra(TaxRule $r, float $valor, float $desconto, float $frete): array
     {
-        [$base, $baseFoiPersonalizada] = $this->calcularBase(
+        [$base] = $this->calcularBase(
             $r->base_formula,
             $valor,
             $desconto,
@@ -175,7 +221,6 @@ class TaxCalculatorService
                 ];
                 [$base, $imposto] = $this->executarExpression($r->expression, $vars);
                 break;
-
             default:
                 $imposto = $base * ($aliq / 100.0);
                 break;
@@ -183,6 +228,7 @@ class TaxCalculatorService
 
         return [(float) $base, (float) $imposto, (float) $aliq];
     }
+
     private function baseLabel(?string $f): string
     {
         return match ($f) {
@@ -230,22 +276,27 @@ class TaxCalculatorService
         $lines = preg_split('/[;\r\n]+/', $expr);
         foreach ($lines as $line) {
             $line = trim($line);
-            if ($line === '' || !str_contains($line, '='))
+            if ($line === '' || !str_contains($line, '=')) {
                 continue;
+            }
             [$left, $right] = array_map('trim', explode('=', $line, 2));
-            if (!in_array($left, $allowed, true))
+            if (!in_array($left, $allowed, true)) {
                 continue;
+            }
             $safe = $right;
             foreach ($allowed as $v) {
                 $safe = preg_replace('/\b' . preg_quote($v, '/') . '\b/u', (string) ($vars[$v]), $safe);
             }
-            if (preg_match('/[^0-9\.\+\-\*\/\(\)\s]/', $safe))
+            if (preg_match('/[^0-9\.\+\-\*\/\(\)\s]/', $safe)) {
                 continue;
+            }
             try {
                 $result = eval ("return (float)($safe);");
-                if (is_finite($result))
+                if (is_finite($result)) {
                     $vars[$left] = $result;
-            } catch (\Throwable $e) { /* ignora */
+                }
+            } catch (\Throwable $e) {
+                // ignora
             }
         }
         return [(float) $vars['base'], (float) $vars['imposto']];
@@ -265,5 +316,41 @@ class TaxCalculatorService
             return (string) $maybeEnum->value;
         }
         return $maybeEnum !== null ? (string) $maybeEnum : null;
+    }
+
+    public function montarContextoImposto(\App\Models\Produto $produto, array $input, bool $debug = false): array
+    {
+        // coleta as categorias do produto via pivot
+        $categoriaIds = DB::table('categoria_produtos')
+            ->where('id_produto_fk', $produto->id_produto)
+            ->pluck('id_categoria_fk')
+            ->map(fn($v) => (int) $v)
+            ->values()
+            ->all();
+
+        // mantém um `categoria_id` único para compatibilidade (pega o primeiro se existir)
+        $categoriaIdCompat = $categoriaIds[0] ?? ($produto->id_categoria ?? null);
+
+        return [
+            'data' => now()->toDateString(),
+            'debug' => $debug,
+            'operacao' => [
+                'tipo' => $input['tipo'] ?? \App\Enums\TipoOperacao::Venda->value,
+                'canal' => $input['canal'] ?? \App\Enums\Canal::Balcao->value,
+                'uf_origem' => strtoupper($input['uf_origem'] ?? config('app.uf', 'GO')),
+                'uf_destino' => strtoupper($input['uf_destino'] ?? config('app.uf', 'GO')),
+            ],
+            'ignorar_segmento' => true,
+            'produto' => [
+                'categoria_id' => $categoriaIdCompat,
+                'categorias_ids' => $categoriaIds,   // <<< usado pelo motor
+                'ncm' => $produto->ncm ?? null,
+            ],
+            'valores' => [
+                'valor' => (float) ($input['preco_venda'] ?? 0),
+                'desconto' => (float) ($input['desconto'] ?? 0),
+                'frete' => (float) ($input['frete'] ?? 0),
+            ],
+        ];
     }
 }
