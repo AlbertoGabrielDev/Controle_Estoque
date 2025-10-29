@@ -1,0 +1,4 @@
+docker compose up --build
+docker exec -it laravel_app bash
+php artisan serve 
+
