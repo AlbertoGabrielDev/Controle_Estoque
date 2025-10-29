@@ -22,5 +22,29 @@ class UserSeeder extends Seeder
             'profile_photo_path' => null,
         ]);
 
+        User::create([
+            'name' => 'Vendedor',
+            'email' => 'vendedor@hotmail.com',
+            'password' => Hash::make('123456789'),
+            'status' => 1,
+            'profile_photo_path' => null,
+        ]);
+
+        User::create([
+            'name' => 'Vendedor2',
+            'email' => 'vendedo2r@hotmail.com',
+            'password' => Hash::make('123456789'),
+            'status' => 1,
+            'profile_photo_path' => null,
+        ]);
+
+        User::create([
+            'name' => 'Marketing',
+            'email' => 'marketing@hotmail.com',
+            'password' => Hash::make('123456789'),
+            'status' => 1,
+            'profile_photo_path' => null,
+        ]);
+
     }
 }
