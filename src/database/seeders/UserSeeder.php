@@ -1,50 +1,58 @@
 <?php
 
 namespace Database\Seeders;
+
 use App\Models\User;
-use App\Models\UserRole;
-use Hash;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Hash;
 
 class UserSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
     {
-        User::create([
-            'name' => 'Admin',
-            'email' => 'admin@hotmail.com',
-            'password' => Hash::make('123456789'),
-            'status' => 1,
-            'profile_photo_path' => null,
-        ]);
+        $users = [
+            [
+                'name'  => 'Admin',
+                'email' => 'admin@hotmail.com',
+                'password' => '123456789',
+                'status' => 1,
+            ],
+            [
+                'name'  => 'Vendedor',
+                'email' => 'vendedor@hotmail.com',
+                'password' => '123456789',
+                'status' => 1,
+            ],
+            [
+                'name'  => 'Vendedor2',
+                'email' => 'vendedo2r@hotmail.com', // (mantido como você enviou)
+                'password' => '123456789',
+                'status' => 1,
+            ],
+            [
+                'name'  => 'Marketing',
+                'email' => 'marketing@hotmail.com',
+                'password' => '123456789',
+                'status' => 1,
+            ],
+        ];
 
-        User::create([
-            'name' => 'Vendedor',
-            'email' => 'vendedor@hotmail.com',
-            'password' => Hash::make('123456789'),
-            'status' => 1,
-            'profile_photo_path' => null,
-        ]);
+        foreach ($users as $u) {
+            $user = User::firstOrCreate(
+                ['email' => $u['email']], // critério de existência
+                [
+                    'name' => $u['name'],
+                    'password' => Hash::make($u['password']),
+                    'status' => $u['status'],
+                    'profile_photo_path' => null,
+                ]
+            );
 
-        User::create([
-            'name' => 'Vendedor2',
-            'email' => 'vendedo2r@hotmail.com',
-            'password' => Hash::make('123456789'),
-            'status' => 1,
-            'profile_photo_path' => null,
-        ]);
-
-        User::create([
-            'name' => 'Marketing',
-            'email' => 'marketing@hotmail.com',
-            'password' => Hash::make('123456789'),
-            'status' => 1,
-            'profile_photo_path' => null,
-        ]);
-
+            $this->command?->info(
+                $user->wasRecentlyCreated
+                    ? "Criado: {$u['email']}"
+                    : "Já existia: {$u['email']} (não alterado)"
+            );
+        }
     }
 }

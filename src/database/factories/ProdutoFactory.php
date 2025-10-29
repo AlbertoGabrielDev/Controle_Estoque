@@ -9,16 +9,9 @@ use Illuminate\Database\Eloquent\Factories\Factory;
  */
 class ProdutoFactory extends Factory
 {
-    /**
-     * Define the model's default state.
-     *
-     * @return array<string, mixed>
-     */
-    public function definition(): array
+    public static function baseList(): array
     {
-        static $indice = 0;
-
-        $produtos = [
+        return [
             [
                 'nome' => 'Arroz Integral Tipo 1',
                 'descricao' => 'Arroz integral de grãos selecionados, fonte de fibras.',
@@ -870,7 +863,12 @@ class ProdutoFactory extends Factory
                 ]
             ],
         ];
+    }
+    public function definition(): array
+    {
+        static $indice = 0;
 
+        $produtos = self::baseList();
         $produto = $produtos[$indice % count($produtos)];
         $indice++;
 

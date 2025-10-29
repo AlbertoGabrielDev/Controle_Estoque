@@ -14,19 +14,18 @@ services:
       - bootstrap_cache:/var/www/html/bootstrap/cache
       - storage:/var/www/html/storage
     environment:
-      - APP_ENV=local
-      - DB_HOST=db
-      - RUN_SEED=0
-      - CACHE_DRIVER=redis
-      - SESSION_DRIVER=redis
-      - LOG_CHANNEL=stderr
-      - REDIS_HOST=redis
-      - RUN_MIGRATIONS: 1     
-      - MIGRATE_FRESH: 0      
-      - RUN_SEED: 1           
-      - SEED_CLASS: DatabaseSeeder 
-      - DB_WAIT_RETRIES: 30
-      - DB_WAIT_SLEEP: 2
+      APP_ENV: local
+      DB_HOST: db
+      CACHE_DRIVER: redis
+      SESSION_DRIVER: redis
+      LOG_CHANNEL: stderr
+      REDIS_HOST: redis
+      RUN_MIGRATIONS: "1"
+      MIGRATE_FRESH: "0"
+      RUN_SEED: "1"
+      SEED_CLASS: "DatabaseSeeder"
+      DB_WAIT_RETRIES: "30"
+      DB_WAIT_SLEEP: "2"
     extra_hosts:
       - "host.docker.internal:host-gateway"
     depends_on:
