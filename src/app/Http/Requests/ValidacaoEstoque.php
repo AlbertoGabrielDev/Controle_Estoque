@@ -21,15 +21,9 @@ class ValidacaoEstoque extends FormRequest
             'data_chegada' => 'nullable|date',
             'validade' => 'nullable|date',
             'lote' => 'nullable|string|max:20',
-
             'quantidade' => 'required|numeric|min:0|lte:10000',
             'quantidade_aviso' => 'nullable|numeric|min:0|lte:10000',
 
-           
-
-            // >>> adicionados para permitir persistência via $request->validated()
-            'imposto_total' => 'nullable|numeric',
-            'impostos_json' => 'nullable|string',
         ];
     }
     public function messages(): array
@@ -42,10 +36,7 @@ class ValidacaoEstoque extends FormRequest
             'validade.date' => 'Formato de data errado',
             'quantidade.max' => 'Maximo de número permitido no campo Quantidade e 10000',
             'lote' => 'Maximo de número permitido no campo Lote e 20',
-            'id_fornecedor_fk.required' => 'O fornecedor é obrigatório',
-            'id_fornecedor_fk.exists' => 'Fornecedor inválido',
-            'id_marca_fk.required' => 'A marca é obrigatória',
-            'id_marca_fk.exists' => 'Marca inválida',
+          
         ];
     }
 }

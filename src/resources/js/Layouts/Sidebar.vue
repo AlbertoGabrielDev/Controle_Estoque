@@ -105,7 +105,7 @@ export default {
                     key: 'dashboard',
                     label: 'Dashboard',
                     tab: 'dashboard',
-                    route: '/verdurao/bot/dashboard',
+                    route: '/verdurao/wpp/bot/dashboard',
                     icon: `
             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 md:mr-3" fill="none"
                 viewBox="0 0 24 24" stroke="currentColor">
@@ -118,7 +118,7 @@ export default {
                     key: 'bulk',
                     label: 'Envio em Massa',
                     tab: 'bulk',
-                    route: '/verdurao/bot',
+                    route: '/verdurao/wpp/bot',
                     icon: `
             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 md:mr-3" fill="none"
                 viewBox="0 0 24 24" stroke="currentColor">
@@ -131,7 +131,7 @@ export default {
                     key: 'auto',
                     label: 'Respostas Automáticas',
                     tab: 'auto',
-                    route: '/verdurao/auto',
+                    route: '/verdurao/wpp/auto',
                     icon: `
             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 md:mr-3" fill="none"
                 viewBox="0 0 24 24" stroke="currentColor">
@@ -144,7 +144,7 @@ export default {
                     key: 'extract',
                     label: 'Extração do Maps',
                     tab: 'extract',
-                    route: '/verdurao/business-extractor',
+                    route: '/verdurao/wpp/bot/business-extractor',
                     icon: `
             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 md:mr-3" fill="none"
                 viewBox="0 0 24 24" stroke="currentColor">
@@ -159,7 +159,7 @@ export default {
                     key: 'contacts',
                     label: 'Contatos',
                     tab: 'contacts',
-                    route: '/verdurao/whatsapp/contacts',
+                    route: '/verdurao/wpp/bot/whatsapp/contacts',
                     icon: `
             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 md:mr-3" fill="none"
                 viewBox="0 0 24 24" stroke="currentColor">
@@ -185,7 +185,7 @@ export default {
                         {
                             key: 'modelos-mensagem',
                             label: 'Modelos de Mensagem',
-                            route: '/verdurao/configuracoes/modelos-mensagem'
+                            route: '/verdurao/wpp/bot/configuracoes/modelos-mensagem'
                         }
                         // Adicione outros submenus aqui depois!
                     ]

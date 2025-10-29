@@ -63,6 +63,13 @@ class Estoque extends Model
             ->when($request->filled('data_chegada'), fn($q) => $q->whereDate('estoques.data_chegada', $request->data_chegada))
             ->when(!\Gate::allows('permissao'), fn($q) => $q->where('estoques.status', 1));
         $query
+            ->when($request->filled('cod_produto'), function ($q) use ($request) {
+                $q->whereIn('id_produto_fk', function ($sub) use ($request) {
+                    $sub->select('id_produto')
+                        ->from('produtos')
+                        ->where('cod_produto', 'like', '%' . $request->cod_produto . '%');
+                });
+            })
             ->when($request->filled('nome_marca'), function ($q) use ($request) {
                 $q->whereIn('id_marca_fk', function ($sub) use ($request) {
                     $sub->select('id_marca')

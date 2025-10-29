@@ -11,7 +11,7 @@ class MessageTemplateController extends Controller
     public function index()
     {
         $templates = MessageTemplate::all();
-        return Inertia::render('ConfigSidebar/MessageTemplates', [
+        return Inertia::render('Wpp/ConfigSidebar/MessageTemplates', [
             'templates' => $templates
         ]);
     }
