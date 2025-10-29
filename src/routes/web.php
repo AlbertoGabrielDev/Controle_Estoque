@@ -180,7 +180,7 @@ Route::middleware([
         Route::post('/carrinho/quantidade', [VendaController::class, 'atualizarQuantidade'])->name('atualizar_quantidade.venda');
         Route::post('/carrinho/remover', [VendaController::class, 'removerItem'])->name('remover.venda');
         Route::get('/vendas', [VendaController::class, 'historicoVendas'])->name('vendas.historico_vendas')->middleware('check.permission:view_post,vendas');
-        Route::get('/dashboards', [DashboardController::class, 'index'])->name('dashboard.index')->middleware('check.permission:view_post,vendas');
+        Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard.index')->middleware('check.permission:view_post,vendas');
         Route::get('/calendar', [CalendarController::class, 'index'])->name('vendas.calendar');
     });
 

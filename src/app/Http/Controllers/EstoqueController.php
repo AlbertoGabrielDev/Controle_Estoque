@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 use App\Enums\Canal;
 use App\Enums\TipoOperacao;
 use App\Http\Requests\ValidacaoEstoque;
+use App\Models\Estoque;
 use App\Models\Produto;
 use App\Repositories\EstoqueRepository;
 use App\Services\TaxCalculatorService;
@@ -36,7 +37,7 @@ class EstoqueController extends Controller
     {
         $cadastro = $this->estoqueRepository->cadastro();
         return view('estoque.cadastro',$cadastro);
-        return view('estoque.cadastro', $cadastro);
+ 
     }
 
     public function buscar(Request $request)

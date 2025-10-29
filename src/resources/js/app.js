@@ -6,8 +6,8 @@ import '@fortawesome/fontawesome-free/css/solid.min.css'
 import { createApp, h } from 'vue'
 import { createInertiaApp, Link } from '@inertiajs/vue3'
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers'
-import { ZiggyVue } from '../../vendor/tightenco/ziggy/dist/vue.m.js'
-import { Ziggy } from './ziggy'  
+
+import { ZiggyVue } from 'ziggy-js'
 
 import SidebarLayout from './Layouts/Sidebar.vue'          // layout do módulo WPP (Vue)
 import PrincipalLayout from './Layouts/PrincipalLayout.vue'// novo layout que criamos acima
