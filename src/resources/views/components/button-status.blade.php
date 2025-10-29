@@ -1,14 +1,29 @@
 @if(auth()->check() && auth()->user()->canToggleStatus())
-<button
-    data-id="{{ $modelId }}"
-    data-url="{{ route($modelName . '.status', ['modelName' => $modelName, 'id' => $modelId]) }}"
-    class="toggle-status flex items-center px-3 py-1 rounded-full text-sm transition-colors gap-1 
-           {{ $status ? 'bg-green-400 hover:bg-green-400' : 'bg-red-400 hover:bg-red-400' }}"
-    data-status="{{ $status ? 1 : 0 }}"
-    data-processing="false"
-    title="{{ $status ? 'Desativar' : 'Ativar' }}">
-    <i class="fa-solid fa-power-off text-xs text-gray-600"></i>
+<meta name="csrf-token" content="{{ csrf_token() }}">
+@props([
+  'modelName',        // ex: 'cliente'
+  'modelId',
+  'status' => false,
+  'canToggle' => true,
+])
+
+@php
+
+  $active = (bool) $status;
+  $url = route('cliente.status', ['modelName' => $modelName, 'id' => $modelId]);
+@endphp
+
+<button type="button"
+        class="toggle-status inline-flex items-center justify-center w-10 h-10 rounded-full transition
+               {{ $active ? 'bg-green-500 hover:bg-green-600' : 'bg-red-400 hover:bg-red-500' }}"
+        data-url="{{ $url }}"
+        data-active="{{ $active ? 1 : 0 }}"
+        aria-pressed="{{ $active ? 'true' : 'false' }}"
+        @disabled(!$canToggle)
+>
+  <i class="fa-solid fa-power-off text-white"></i>
 </button>
+
 
 <script>
 document.addEventListener('click', function(e) {
@@ -65,7 +80,7 @@ function showToast(message, type = 'success') {
     setTimeout(() => { toast.classList.add('fade-out'); setTimeout(() => toast.remove(), 500); }, 3000);
 }
 </script>
-
+<!-- Quando eu remover todo o blade, lembrar de remover esse script, ja tem ele em app,js -->
 <style>
 .fade-in { opacity: 0; animation: fadeIn .3s forwards; }
 .fade-out { animation: fadeOut .5s forwards; }

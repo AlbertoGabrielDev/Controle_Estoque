@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 class Role extends Model
 {
     use HasFactory;
@@ -29,11 +30,21 @@ class Role extends Model
         return $this->hasMany(RoleMenuPermission::class);
     }
 
-    public function hasMenuPermission($menuId, $permissionId)
+    public function hasPermissionByNames(string $menuSlug, string $permissionName): bool
     {
-        return $this->roleMenuPermissions()
-            ->where('menu_id', $menuId)
-            ->where('permission_id', $permissionId)
+        return $this->menus()
+            ->where('menus.slug', $menuSlug)
+            ->whereHas('permissions', function ($q) use ($permissionName) {
+                $q->where('permissions.name', $permissionName);
+            })
+            ->exists();
+    }
+
+    public function hasMenuPermission(int $menuId, int $permissionId): bool
+    {
+        return $this->menus()
+            ->where('menus.id', $menuId)
+            ->wherePivot('permission_id', $permissionId)
             ->exists();
     }
 
@@ -42,9 +53,9 @@ class Role extends Model
         return $this->belongsToMany(User::class, 'user_role');
     }
 
-    public function menus()
+    public function menus(): BelongsToMany
     {
-        return $this->belongsToMany(Menu::class, 'role_menu_permission')
+        return $this->belongsToMany(Menu::class, 'role_menu_permissions', 'role_id', 'menu_id')
             ->withPivot('permission_id');
     }
 }

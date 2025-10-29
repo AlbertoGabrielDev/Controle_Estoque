@@ -42,7 +42,7 @@ class CategoriaController extends Controller
     public function produto($categoriaId)
     {
         $categoria = Categoria::find($categoriaId)->nome_categoria; 
-        $produtos =  Gate::allows('view_post') ? Categoria::find($categoriaId)->produtos()->paginate(2) : Categoria::find($categoriaId)->produtos()->where('status', 1)->paginate(2);
+        $produtos =  Gate::allows('view_post') ? Categoria::find($categoriaId)->produtos()->paginate(10) : Categoria::find($categoriaId)->produtos()->where('status', 1)->paginate(10);
         return view('categorias.produto',compact('categoria','produtos'));
 
     }

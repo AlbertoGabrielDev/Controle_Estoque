@@ -13,8 +13,9 @@ class ValidacaoProdutoEditar extends FormRequest
     public function rules(): array
     {
         return [
-            'descricao'  => 'required|max:255',
-            'inf_nutrientes'  => 'required|max:255',
+            'descricao' => 'required|max:255',
+            'inf_nutriente' => ['nullable', 'json'],
+
         ];
     }
 

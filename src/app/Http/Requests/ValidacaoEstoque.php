@@ -15,15 +15,15 @@ class ValidacaoEstoque extends FormRequest
     public function rules(): array
     {
         return [
-        'localizacao'       => 'max:10',
-        'preco_custo'       => 'max:8',
-        'preco_venda'       => 'max:8',
-        'data_chegada'      => 'date',
-        'quantidade'        => 'max:10000',
-        'validade'          => 'date',
-        'lote'              => 'max:20',
-        'id_fornecedor_fk'  => 'required|exists:fornecedores,id_fornecedor',
-        'id_marca_fk'       => 'required|exists:marcas,id_marca',
+            'localizacao' => 'nullable|string|max:10',
+            'preco_custo' => 'nullable|numeric',
+            'preco_venda' => 'nullable|numeric',
+            'data_chegada' => 'nullable|date',
+            'validade' => 'nullable|date',
+            'lote' => 'nullable|string|max:20',
+            'quantidade' => 'required|numeric|min:0|lte:10000',
+            'quantidade_aviso' => 'nullable|numeric|min:0|lte:10000',
+
         ];
     }
     public function messages(): array
@@ -36,10 +36,7 @@ class ValidacaoEstoque extends FormRequest
             'validade.date' => 'Formato de data errado',
             'quantidade.max' => 'Maximo de número permitido no campo Quantidade e 10000',
             'lote' => 'Maximo de número permitido no campo Lote e 20',
-            'id_fornecedor_fk.required' => 'O fornecedor é obrigatório',
-            'id_fornecedor_fk.exists' => 'Fornecedor inválido',
-            'id_marca_fk.required' => 'A marca é obrigatória',
-            'id_marca_fk.exists' => 'Marca inválida',
+          
         ];
     }
 }
