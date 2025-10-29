@@ -18,7 +18,7 @@ class BusinessController extends Controller
             abort(500, 'Chave do Google Maps não configurada');
         }
 
-        return Inertia::render('Wpp/Marketing/BotMaps', [
+        return Inertia::render('Marketing/BotMaps', [
             'googleMapsApiKey' => env('GOOGLE_API_KEY'),
         ]);
     }

@@ -1,6 +1,6 @@
 <script setup>
-import { computed, ref, watch } from 'vue'
-import { Head, router } from '@inertiajs/vue3'
+import { computed, ref, watch  } from 'vue'
+import { Head } from '@inertiajs/vue3'
 import {
   Chart as ChartJS,
   Title, Tooltip, Legend,
@@ -8,7 +8,7 @@ import {
   CategoryScale, LinearScale
 } from 'chart.js'
 import { Line, Bar, Doughnut } from 'vue-chartjs'
-
+import { router } from '@inertiajs/vue3';
 ChartJS.register(
   Title, Tooltip, Legend,
   LineElement, BarElement, PointElement, ArcElement,
@@ -25,66 +25,10 @@ const props = defineProps({
   kpis: Object,
   attendants: Array,
   attendantId: Number,
-  from: String, // yyyy-mm-dd
-  to: String    // yyyy-mm-dd
 })
-
+const selectedAtt = ref(props.attendantId ?? '')
 const DASHBOARD_ROUTE_NAME = 'dashboard.index'
 
-// Filtros (atendente + intervalo)
-const selectedAtt = ref(props.attendantId ?? '')
-const fromDate = ref(props.from ?? '')
-const toDate = ref(props.to ?? '')
-
-// Util: aplica filtros via Inertia GET preservando o estado da página
-function applyFilters(extra = {}) {
-  const params = {
-    atendente: selectedAtt.value || undefined,
-    from: fromDate.value || undefined,
-    to: toDate.value || undefined,
-    ...extra
-  }
-  router.get(route(DASHBOARD_ROUTE_NAME), params, {
-    preserveScroll: true,
-    preserveState: true,
-    replace: true,
-  })
-}
-
-// Mudança de atendente aplica filtros mantendo data atual
-watch(selectedAtt, () => applyFilters())
-
-// Presets de intervalo
-function setPreset(days) {
-  // days: 7, 30, etc. Define from = hoje - (days-1) e to = hoje
-  const today = new Date()
-  const to = today.toISOString().slice(0, 10)
-  const start = new Date(today)
-  start.setDate(today.getDate() - (days - 1))
-  const from = start.toISOString().slice(0, 10)
-  fromDate.value = from
-  toDate.value = to
-  applyFilters()
-}
-
-function setThisMonth() {
-  const today = new Date()
-  const y = today.getFullYear()
-  const m = today.getMonth()
-  const from = new Date(y, m, 1).toISOString().slice(0, 10)
-  const to = new Date(y, m + 1, 0).toISOString().slice(0, 10)
-  fromDate.value = from
-  toDate.value = to
-  applyFilters()
-}
-
-function clearDates() {
-  fromDate.value = ''
-  toDate.value = ''
-  applyFilters()
-}
-
-// Dados/Opções dos gráficos
 const lineData = computed(() => ({
   labels: props.daily.labels,
   datasets: [
@@ -109,13 +53,20 @@ const lineData = computed(() => ({
     }
   ]
 }))
+watch(selectedAtt, (val) => {
+  router.get(route(DASHBOARD_ROUTE_NAME), { atendente: val || undefined }, {
+    preserveScroll: true,
+    preserveState: true,
+    replace: true,
+  })
+})
 
 const lineOptions = {
   responsive: true,
   maintainAspectRatio: false,
   layout: { padding: { top: 4, right: 8, bottom: 16, left: 8 } },
   plugins: {
-    legend: { position: 'top', labels: { boxWidth: 12, padding: 8 } },
+    legend: { position: 'top', labels: { boxWidth: 12, padding: 8 } }, // <- topo
     title: { display: false }
   },
   scales: {
@@ -171,6 +122,7 @@ const byUnitData = computed(() => ({
     backgroundColor: 'rgba(14,165,233,0.75)',
   }]
 }))
+
 const byUnitOptions = {
   responsive: true,
   maintainAspectRatio: false,
@@ -185,7 +137,7 @@ const byUnitOptions = {
 const monthlyData = computed(() => ({
   labels: props.monthly.labels,
   datasets: [{
-    label: `Faturamento ${props.monthly.year ?? ''} (R$)`,
+    label: `Faturamento ${props.monthly.year} (R$)`,
     data: props.monthly.totais,
     backgroundColor: 'rgba(99,102,241,0.7)'
   }]
@@ -195,77 +147,43 @@ const monthlyOptions = { responsive: true, maintainAspectRatio: false, plugins: 
 
 <template>
 
-  <Head title="Dashboard de Vendas" />
-
+  <Head title="Dashboard de Vendas"/>
+  
   <div class="space-y-6">
-    <!-- Filtros -->
-    <div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
+    <!-- Título + Select de Atendente -->
+    <div class="flex items-center justify-between gap-4 flex-wrap">
+
       <div class="flex items-center gap-2">
         <label for="att" class="text-sm text-gray-600">Atendente:</label>
-        <select id="att" v-model="selectedAtt" class="border rounded-lg px-3 py-2 text-sm">
+        <select id="att" v-model="selectedAtt"
+                class="border rounded-lg px-3 py-2 text-sm">
           <option :value="''">Todos</option>
           <option v-for="a in attendants" :key="a.id" :value="a.id">
             {{ a.name }}
           </option>
         </select>
       </div>
-
-      <div class="flex items-end gap-3 flex-wrap">
-        <div class="flex flex-col">
-          <label class="text-sm text-gray-600">De</label>
-          <input type="date" v-model="fromDate" class="border rounded-lg px-3 py-2 text-sm" />
-        </div>
-        <div class="flex flex-col">
-          <label class="text-sm text-gray-600">Até</label>
-          <input type="date" v-model="toDate" class="border rounded-lg px-3 py-2 text-sm" />
-        </div>
-
-        <button class="bg-blue-600 hover:bg-blue-700 text-white text-sm rounded-lg px-4 py-2" @click="applyFilters()">
-          Aplicar
-        </button>
-
-        <button class="bg-gray-200 hover:bg-gray-300 text-gray-700 text-sm rounded-lg px-3 py-2" @click="clearDates">
-          Limpar
-        </button>
-      </div>
     </div>
-
-    <!-- Presets -->
-    <div class="flex flex-wrap gap-2">
-      <span class="text-sm text-gray-500">Atalhos:</span>
-      <button class="px-3 py-1.5 text-sm rounded bg-gray-100 hover:bg-gray-200" @click="setPreset(7)">Últimos 7
-        dias</button>
-      <button class="px-3 py-1.5 text-sm rounded bg-gray-100 hover:bg-gray-200" @click="setPreset(30)">Últimos 30
-        dias</button>
-      <button class="px-3 py-1.5 text-sm rounded bg-gray-100 hover:bg-gray-200" @click="setThisMonth()">Este
-        mês</button>
-      <button class="px-3 py-1.5 text-sm rounded bg-gray-100 hover:bg-gray-200" @click="setPreset(1)">Hoje</button>
-    </div>
-
-    <!-- Cabeçalho -->
     <div class="flex items-center justify-between">
       <h1 class="text-2xl md:text-3xl font-bold">Dashboard de Vendas</h1>
-      <div v-if="unidade" class="text-sm text-gray-500">
-        Unidade: <span class="font-medium">{{ unidade }}</span>
-      </div>
+      <div v-if="unidade" class="text-sm text-gray-500">Unidade: <span class="font-medium">{{ unidade }}</span></div>
     </div>
 
-    <!-- KPIs -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
       <div class="bg-white rounded-xl shadow p-4">
-        <div class="text-sm text-gray-500">Vendas (intervalo)</div>
+        <div class="text-sm text-gray-500">Vendas (hoje)</div>
         <div class="mt-1 text-2xl font-bold">{{ props.kpis?.salesCount ?? 0 }}</div>
       </div>
 
       <div class="bg-white rounded-xl shadow p-4">
-        <div class="text-sm text-gray-500">Faturamento (intervalo)</div>
+        <div class="text-sm text-gray-500">Faturamento (hoje)</div>
         <div class="mt-1 text-2xl font-bold">
           {{ brl.format(props.kpis?.revenue ?? 0) }}
         </div>
       </div>
 
       <div class="bg-white rounded-xl shadow p-4">
-        <div class="text-sm text-gray-500">Lucro (intervalo)</div>
+        <div class="text-sm text-gray-500">Lucro (hoje)</div>
         <div class="mt-1 text-2xl font-bold">
           {{ brl.format(props.kpis?.profit ?? 0) }}
         </div>
@@ -274,19 +192,19 @@ const monthlyOptions = { responsive: true, maintainAspectRatio: false, plugins: 
 
     <!-- Linha 1 -->
     <div class="grid grid-cols-1 lg:grid-cols-6 gap-6">
-      <!-- Vendas diárias -->
+      <!-- Vendas diárias: mais estreito e mais baixo -->
       <div class="lg:col-span-2 bg-white rounded-xl shadow p-4 pb-6 h-52">
-        <div class="font-semibold mb-2">Vendas diárias</div>
+        <div class="font-semibold mb-2">Vendas diárias (30 dias)</div>
         <Line :data="lineData" :options="lineOptions" />
       </div>
 
-      <!-- Pedidos por status -->
+      <!-- Pedidos por status: um pouco maior -->
       <div class="lg:col-span-2 bg-white rounded-xl shadow p-4 h-64">
         <div class="font-semibold mb-2">Pedidos por status</div>
         <Doughnut :data="doughnutData" :options="doughnutOptions" />
       </div>
 
-      <!-- Vendas por unidade -->
+      <!-- Vendas por unidade: um pouco maior -->
       <div class="lg:col-span-2 bg-white rounded-xl shadow p-4 h-64">
         <div class="font-semibold mb-2">Vendas por unidade</div>
         <Bar :data="byUnitData" :options="byUnitOptions" />
@@ -305,5 +223,6 @@ const monthlyOptions = { responsive: true, maintainAspectRatio: false, plugins: 
         <Bar :data="monthlyData" :options="monthlyOptions" />
       </div>
     </div>
+
   </div>
 </template>

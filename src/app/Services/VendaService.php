@@ -20,44 +20,23 @@ class VendaService
 
     public function buscarProduto(?string $codigoQr = null, ?string $codigoProd = null): array
     {
-        // 1) Encontrar o produto ATIVO que corresponda ao QR ou código
-        //    e que TENHA pelo menos um lote ativo (status=1) com quantidade > 0.
         $produto = Produto::query()
-            ->where('status', 1) // produto ativo
             ->where(function ($q) use ($codigoQr, $codigoProd) {
-                if ($codigoQr) {
+                if ($codigoQr)
                     $q->orWhere('qrcode', trim($codigoQr));
-                }
-                if ($codigoProd) {
+                if ($codigoProd)
                     $q->orWhere('cod_produto', trim($codigoProd));
-                }
             })
-            ->whereExists(function ($q) {
-                $q->selectRaw(1)
-                    ->from('estoques')
-                    ->whereColumn('estoques.id_produto_fk', 'produtos.id_produto')
-                    ->where('estoques.status', 1)         // lote ativo
-                    ->where('estoques.quantidade', '>', 0); // com quantidade
-            })
-            ->firstOrFail(); // se não achar, dispara 404 e o controller devolve "Produto não encontrado!"
+            ->firstOrFail();
 
-        // 2) Preço = MAIOR preço de um lote ativo com quantidade > 0 (opcional: pode usar o último, etc.)
         $preco = Estoque::where('id_produto_fk', $produto->id_produto)
             ->where('status', 1)
-            ->where('quantidade', '>', 0)
             ->orderByDesc('preco_venda')
             ->value('preco_venda');
 
-        // 3) Quantidade disponível SOMENTE de lotes ativos (>0)
         $qtdDisponivel = (int) Estoque::where('id_produto_fk', $produto->id_produto)
             ->where('status', 1)
-            ->where('quantidade', '>', 0)
             ->sum('quantidade');
-
-        // (Segurança extra) Se por algum motivo a soma for 0, consideramos "não encontrado"
-        if ($qtdDisponivel <= 0) {
-            abort(404, 'Produto não encontrado'); // mantém o comportamento esperado no front
-        }
 
         return [
             'id_produto' => $produto->id_produto,

@@ -10,29 +10,16 @@ use Illuminate\Support\Facades\DB;
 
 class DashboardService
 {
-
     private function normalizeRange(?Carbon $from, ?Carbon $to, int $fallbackDays = 30): array
     {
-        $todayEnd = Carbon::today()->endOfDay();
-
-        if ($from && !$to) {
-            $to = $todayEnd;
-        } elseif (!$from && $to) {
-            $from = $to->copy()->startOfDay()->subDays($fallbackDays - 1);
-        } elseif (!$from && !$to) {
-            $to = $todayEnd;
+        if (!$from || !$to) {
+            $to = Carbon::today()->endOfDay();
             $from = Carbon::today()->subDays($fallbackDays - 1)->startOfDay();
         }
-
-        // Garantia de limites de dia
-        $from = $from->copy()->startOfDay();
-        $to   = $to->copy()->endOfDay();
-
         if ($from->gt($to)) {
             [$from, $to] = [$to->copy()->startOfDay(), $from->copy()->endOfDay()];
         }
-
-        return [$from, $to];
+        return [$from->copy(), $to->copy()];
     }
 
     private function vendasBase(?int $userId)
@@ -112,6 +99,7 @@ class DashboardService
     {
         [$from, $to] = $this->normalizeRange($from, $to);
 
+        // Agrupa por ano/mês dentro do range (cobre ranges跨-anos)
         $rows = $this->vendasBase($userId)
             ->whereBetween('created_at', [$from, $to])
             ->selectRaw('YEAR(created_at) as ano, MONTH(created_at) as mes,
@@ -120,10 +108,12 @@ class DashboardService
             ->orderBy('ano')->orderBy('mes')
             ->get();
 
+        // Construir labels do período mês a mês
         $labels = [];
         $totais = [];
         $byKey = $rows->keyBy(fn($r) => sprintf('%04d-%02d', $r->ano, $r->mes));
 
+        // percorre de mês em mês
         $cursor = $from->copy()->startOfMonth();
         $limit  = $to->copy()->startOfMonth();
         while ($cursor <= $limit) {
@@ -159,7 +149,7 @@ class DashboardService
 
     public function getKpis(?int $userId = null, ?Carbon $from = null, ?Carbon $to = null): array
     {
-        [$from, $to] = $this->normalizeRange($from, $to, 1); // considera hoje se não vierem datas
+        [$from, $to] = $this->normalizeRange($from, $to, 1); // se não vierem datas, considera hoje
 
         $salesCount = $this->vendasBase($userId)
             ->whereBetween('created_at', [$from, $to])

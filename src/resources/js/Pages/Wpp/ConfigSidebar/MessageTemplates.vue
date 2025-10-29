@@ -33,7 +33,7 @@
 
 <script setup>
 import { reactive } from 'vue'
-// import Sidebar from '../../../Layouts/Sidebar.vue'
+import Sidebar from '../../Layouts/Sidebar.vue'
 
 const props = defineProps({
   templates: Array
@@ -47,10 +47,10 @@ const form = reactive({
 
 function submit() {
   if (form.id) {
-    window.axios.put(`/verdurao/wpp/bot/configuracoes/modelos-mensagem/${form.id}`, form)
+    window.axios.put(`/verdurao/configuracoes/modelos-mensagem/${form.id}`, form)
       .then(() => window.location.reload())
   } else {
-    window.axios.post('/verdurao/wpp/bot/configuracoes/modelos-mensagem', form) 
+    window.axios.post('/verdurao/configuracoes/modelos-mensagem', form) 
       .then(() => window.location.reload())
   }
   form.id = null
