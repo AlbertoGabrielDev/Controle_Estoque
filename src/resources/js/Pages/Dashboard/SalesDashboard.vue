@@ -251,16 +251,26 @@ const monthlyOptions = { responsive: true, maintainAspectRatio: false, plugins: 
     </div>
 
     <!-- KPIs -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
       <div class="bg-white rounded-xl shadow p-4">
         <div class="text-sm text-gray-500">Vendas (intervalo)</div>
         <div class="mt-1 text-2xl font-bold">{{ props.kpis?.salesCount ?? 0 }}</div>
       </div>
 
       <div class="bg-white rounded-xl shadow p-4">
-        <div class="text-sm text-gray-500">Faturamento (intervalo)</div>
+        <div class="text-sm text-gray-500">Faturamento <strong>bruto</strong></div>
         <div class="mt-1 text-2xl font-bold">
-          {{ brl.format(props.kpis?.revenue ?? 0) }}
+          {{ brl.format(props.kpis?.grossRevenue ?? 0) }}
+        </div>
+      </div>
+
+      <div class="bg-white rounded-xl shadow p-4">
+        <div class="text-sm text-gray-500">Faturamento <strong>líquido</strong></div>
+        <div class="mt-1 text-2xl font-bold">
+          {{ brl.format(props.kpis?.netRevenue ?? 0) }}
+        </div>
+        <div class="text-xs text-gray-500 mt-1">
+          Impostos: {{ brl.format(props.kpis?.taxes ?? 0) }}
         </div>
       </div>
 

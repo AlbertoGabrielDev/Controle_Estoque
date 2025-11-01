@@ -37,29 +37,47 @@ class VendaSeeder extends Seeder
         for ($i = 0; $i < $this->qtd; $i++) {
             $idUnidade = ($i % 2) + 1;      // 1,2,1,2,...
             $idUsuario = ($i % 3) + 1;      // 1,2,3,1,2,3,...
-            $origem = ($i % 3) + 1;      // 1,2,3,1,2,3,...
+            $origem    = ($i % 3) + 1;      // 1,2,3,1,2,3,...
 
             $p = $produtos[$i % $produtos->count()];
 
-            $diasAtras = intdiv($i * 180, max(1, $this->qtd - 1));
-            $createdAt = $hoje->copy()->subDays($diasAtras)->setTime(rand(8, 20), rand(0, 59), rand(0, 59));
-
+            $diasAtras  = intdiv($i * 180, max(1, $this->qtd - 1));
+            $createdAt  = $hoje->copy()->subDays($diasAtras)->setTime(rand(8, 20), rand(0, 59), rand(0, 59));
             $quantidade = rand(1, 8);
-            $precoUnit = round([4.90, 7.50, 12.90, 19.90, 29.90, 49.90, 79.90][array_rand([0, 1, 2, 3, 4, 5, 6])], 2);
-            $precoVenda = round($precoUnit * $quantidade, 2);
+
+            // 🔎 Busca um estoque aleatório do mesmo produto para vincular
+            $estoque = DB::table('estoques')
+                ->where('id_produto_fk', $p->id_produto)
+                ->inRandomOrder()
+                ->select('id_estoque', 'preco_venda') // preco_venda do estoque = unitário
+                ->first();
+
+            // 💰 Define preço unitário e total da linha
+            if ($estoque) {
+                $precoUnit  = (float) $estoque->preco_venda;            // unitário do estoque
+                $precoTotal = round($precoUnit * $quantidade, 2);       // total da venda (compatível com seu dashboard)
+                $idEstoque  = (int) $estoque->id_estoque;
+            } else {
+                // Fallback antigo (caso não exista estoque para o produto)
+                $possiveis = [4.90, 7.50, 12.90, 19.90, 29.90, 49.90, 79.90];
+                $precoUnit  = (float) $possiveis[array_rand($possiveis)];
+                $precoTotal = round($precoUnit * $quantidade, 2);
+                $idEstoque  = null;
+            }
 
             $rows[] = [
-                'id_produto_fk' => $p->id_produto,
-                'id_usuario_fk' => $idUsuario,
-                'cod_produto' => $p->cod_produto ?? ('PROD-' . str_pad((string) $p->id_produto, 4, '0', STR_PAD_LEFT)),
-                'unidade_medida' => $p->unidade_medida ?? 'un',
-                'nome_produto' => $p->nome_produto,
-                'quantidade' => $quantidade,
-                'preco_venda' => $precoVenda,
-                'id_unidade_fk' => $idUnidade,
-                'origem_venda' => $origem,   // <- agora 1/2/3
-                'created_at' => $createdAt,
-                'updated_at' => $createdAt,
+                'id_produto_fk'   => $p->id_produto,
+                'id_usuario_fk'   => $idUsuario,
+                'id_unidade_fk'   => $idUnidade,
+                'id_estoque_fk'   => $idEstoque,          // ✅ novo vínculo com estoques
+                'cod_produto'     => $p->cod_produto ?? ('PROD-' . str_pad((string) $p->id_produto, 4, '0', STR_PAD_LEFT)),
+                'unidade_medida'  => $p->unidade_medida ?? 'un',
+                'nome_produto'    => $p->nome_produto,
+                'quantidade'      => $quantidade,
+                'preco_venda'     => $precoTotal,         // ⚠️ total da linha (unitário * quantidade)
+                'origem_venda'    => $origem,
+                'created_at'      => $createdAt,
+                'updated_at'      => $createdAt,
             ];
         }
 
@@ -67,6 +85,6 @@ class VendaSeeder extends Seeder
             DB::table('vendas')->insert($chunk);
         }
 
-        $this->command->info('VendaSeeder concluída: ' . count($rows) . ' vendas inseridas.');
+        $this->command->info('VendaSeeder concluída: ' . count($rows) . ' vendas inseridas (com id_estoque_fk).');
     }
 }

@@ -10,7 +10,7 @@ class Venda extends Model
     use HasFactory;
 
     protected $table = 'vendas';
-    
+
     protected $fillable = [
         'id_produto_fk',
         'id_usuario_fk',
@@ -36,4 +36,10 @@ class Venda extends Model
     {
         return $this->belongsTo(User::class, 'id_usuario_fk');
     }
+
+    public function estoque()
+    {
+        return $this->belongsTo(Estoque::class, 'id_estoque_fk', 'id_estoque');
+    }
+
 }
