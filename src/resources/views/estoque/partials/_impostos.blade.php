@@ -3,60 +3,59 @@
 @endphp
 
 @if(empty($vm))
- 
   <div class="text-slate-500">Selecione o produto e informe o preço de venda.</div>
 @else
-  <div 
-    id="impostos-wrap"
-    data-total-impostos="{{ $vm['__totais']['total_impostos'] ?? 0 }}"
-    data-total-com-impostos="{{ $vm['__totais']['total_com_impostos'] ?? 0 }}"
-  >
+  <div id="impostos-wrap" data-total-impostos="{{ $vm['__totais']['total_impostos'] ?? 0 }}"
+    data-total-com-impostos="{{ $vm['__totais']['total_com_impostos'] ?? 0 }}">
     <div class="mb-2">Preço base: <strong>{{ $fmt($vm['__totais']['preco_base'] ?? 0) }}</strong></div>
     <div class="mb-2">Somente impostos: <strong>{{ $fmt($vm['__totais']['total_impostos'] ?? 0) }}</strong></div>
     <div class="mb-3">Preço com impostos: <strong>{{ $fmt($vm['__totais']['total_com_impostos'] ?? 0) }}</strong></div>
 
     @foreach(($vm['impostos'] ?? []) as $imp)
-   
-      <div class="mb-4">
-        <div class="mb-1">
-          <span class="font-semibold">
-            {{ $imp['codigo'] }}
-            @if(!empty($imp['nome']) && $imp['nome'] !== $imp['codigo']) — {{ $imp['nome'] }} @endif
-          </span>
-          — Total: <strong>{{ $fmt($imp['total'] ?? 0) }}</strong>
+      @php
+        $codigo = $imp['imposto'] ?? $imp['codigo'] ?? '—';
+        $nome = $imp['tax_nome'] ?? $imp['nome'] ?? '';
+        $total = $imp['total'] ?? 0;
+      @endphp
+
+      <div class="border rounded p-3 mb-3">
+        <div class="flex items-center justify-between">
+          <div class="font-semibold">
+            {{ $codigo }}{{ $nome ? ' — ' . $nome : '' }}
+          </div>
+          <div class="text-right">Total: <strong>{{ $fmt($total) }}</strong></div>
         </div>
 
-        <div class="overflow-x-auto rounded border">
-          <table class="min-w-full text-xs md:text-sm">
-            <thead class="bg-slate-50">
-              <tr>
-                <th class="px-2 py-1 text-left">Regra</th>
-                <th class="px-2 py-1 text-left">Método</th>
-                <th class="px-2 py-1 text-left">Alíquota/Valor</th>
-                <th class="px-2 py-1 text-left">Base</th>
-                <th class="px-2 py-1 text-left">Imposto</th>
-                <th class="px-2 py-1 text-left">Filtros</th>
-                <th class="px-2 py-1 text-left">Vigência</th>
-              </tr>
-            </thead>
-            <tbody>
-              @foreach(($imp['linhas'] ?? []) as $l)
-                <tr class="border-t">
-                  <td class="px-2 py-1">
-                    #{{ $l['rule_id'] ?? '' }}
-                    @if(!empty($l['cumul'])) <span class="text-xs text-amber-600">(cumul.)</span>@endif
-                  </td>
-                  <td class="px-2 py-1">{{ $l['metodo'] ?? '' }}</td>
-                  <td class="px-2 py-1">{!! $l['aliqfixo'] ?? '' !!}</td>
-                  <td class="px-2 py-1">{!! $l['base'] ?? '' !!}</td>
-                  <td class="px-2 py-1 font-medium">{{ $fmt($l['valor'] ?? 0) }}</td>
-                  <td class="px-2 py-1">{{ $l['filtros'] ?? '—' }}</td>
-                  <td class="px-2 py-1">{{ $l['vig'] ?? '—' }}</td>
+        @if(!empty($imp['linhas']))
+          <div class="mt-2 overflow-x-auto">
+            <table class="min-w-full text-sm">
+              <thead class="text-slate-500">
+                <tr>
+                  <th class="text-left pr-4 py-1">Método</th>
+                  <th class="text-left pr-4 py-1">Base</th>
+                  <th class="text-left pr-4 py-1">Alíquota/Valor</th>
+                  <th class="text-right py-1">Imposto</th>
                 </tr>
-              @endforeach
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody>
+                @foreach($imp['linhas'] as $l)
+                  <tr class="border-t">
+                    <td class="pr-4 py-1">{{ $l['metodo_label'] ?? '—' }}</td>
+                    <td class="pr-4 py-1">R$ {{ number_format((float) ($l['base'] ?? 0), 2, ',', '.') }}</td>
+                    <td class="pr-4 py-1">
+                      @if(($l['metodo'] ?? 1) === 2)
+                        R$ {{ number_format((float) ($l['valor_fixo'] ?? 0), 2, ',', '.') }}
+                      @else
+                        {{ number_format((float) ($l['aliquota'] ?? 0), 2, ',', '.') }}%
+                      @endif
+                    </td>
+                    <td class="text-right py-1">R$ {{ number_format((float) ($l['valor'] ?? 0), 2, ',', '.') }}</td>
+                  </tr>
+                @endforeach
+              </tbody>
+            </table>
+          </div>
+        @endif
       </div>
     @endforeach
   </div>

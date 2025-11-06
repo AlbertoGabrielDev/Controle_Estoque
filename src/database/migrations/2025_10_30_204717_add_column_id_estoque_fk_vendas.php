@@ -16,14 +16,13 @@ return new class extends Migration
             $table->foreign('id_estoque_fk')
                 ->references('id_estoque')
                 ->on('estoques')
-                ->onDelete('set null'); // se o estoque for deletado, zera o campo na venda
+                ->onDelete('set null');
         });
     }
 
     public function down(): void
     {
         Schema::table('vendas', function (Blueprint $table) {
-            // remove a foreign key e a coluna
             $table->dropForeign(['id_estoque_fk']);
             $table->dropColumn('id_estoque_fk');
         });

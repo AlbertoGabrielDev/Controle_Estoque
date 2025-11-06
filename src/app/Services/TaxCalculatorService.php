@@ -9,118 +9,135 @@ class TaxCalculatorService
 {
     public function calcular(array $contexto): array
     {
-
         $data = data_get($contexto, 'data') ?: now()->toDateString();
-       $ignorarSegmento = (bool) data_get($contexto, 'ignorar_segmento', false);
+        $ignorarSegmento = (bool) data_get($contexto, 'ignorar_segmento', false);
         $ufCli = data_get($contexto, 'clientes.uf');
         $tipoOp = data_get($contexto, 'operacao.tipo', 'venda');
         $canal = data_get($contexto, 'operacao.canal');
         $ufO = data_get($contexto, 'operacao.uf_origem');
         $ufD = data_get($contexto, 'operacao.uf_destino', $ufCli);
-        $catId = data_get($contexto, 'produto.categoria_id');
+        $catId = data_get($contexto, 'produto.categoria_id'); // <- agora vem da pivot
         $ncm = data_get($contexto, 'produto.ncm');
         $valor = (float) data_get($contexto, 'valores.valor', 0.0);
         $desconto = (float) data_get($contexto, 'valores.desconto', 0.0);
         $frete = (float) data_get($contexto, 'valores.frete', 0.0);
-        $resultado = [];
-        $taxes = Tax::query()
-            ->where('ativo', true)
-            ->with([
-                'rules' => function ($q) use ($data) {
-                    $q->vigentes($data);
-                }
+       
+        $linhas = \DB::table('tax_rules as tr')
+            ->join('taxes as t', 't.id', '=', 'tr.tax_id')
+            ->select([
+                't.id as tax_id',
+                't.codigo',
+                't.nome',
+                't.ativo',
+                'tr.*',
             ])
+            ->where('t.ativo', true)
+            ->when($catId, function ($q) use ($catId) {
+                $q->where(function ($qq) use ($catId) {
+                    $qq->whereNull('tr.categoria_produto_id')
+                        ->orWhere('tr.categoria_produto_id', $catId);
+                });
+            })
+            ->where(function ($q) use ($data) {
+                $q->whereNull('tr.vigencia_inicio')
+                    ->orWhere('tr.vigencia_inicio', '<=', $data);
+            })
+            ->where(function ($q) use ($data) {
+                $q->whereNull('tr.vigencia_fim')
+                    ->orWhere('tr.vigencia_fim', '>=', $data);
+            })
             ->get();
 
-        foreach ($taxes as $tax) {
-            $candidatas = $tax->rules->filter(function (TaxRule $r) use ($ignorarSegmento, $catId, $ncm, $ufO, $ufD, $canal, $tipoOp) {
-                if ($this->enumInt($r->escopo) !== 1)
+        $taxes = $linhas->groupBy('tax_id');
+            
+        $resultado = [];
+        $totalImpostos = round(array_sum(array_map(fn($x) => $x['total'] ?? 0, $resultado)), 2); 
+        //Facer o tax_rule aceitar varias categorias e o estoque vai receber o id da tax_rule
+        $compact = [];
+        foreach ($taxes as $taxId => $regrasDoImposto) {
+            $meta = $regrasDoImposto->first();
+            $taxCodigo = $meta->codigo;
+            $taxNome = $meta->nome;
+
+            $candidatas = $regrasDoImposto->filter(function ($r) use ($ignorarSegmento, $catId, $ncm, $ufO, $ufD, $canal, $tipoOp) {
+                // Escopo (1 = venda/saída)
+                if ($this->enumIntRow($r->escopo) !== 1)
                     return false;
-                if (!$ignorarSegmento) {
-                    if ($r->segment_id !== null)
-                        return false;
-                }
+
+                if (!$ignorarSegmento && $r->segment_id !== null)
+                    return false;
+
                 if (!is_null($r->categoria_produto_id) && (int) $r->categoria_produto_id !== (int) $catId)
                     return false;
-                if (!is_null($r->ncm_padrao) && $r->ncm_padrao !== $ncm)
+                // if (!is_null($r->ncm_padrao) && (string) $r->ncm_padrao !== (string) $ncm)
+                //     return false;
+
+                $ufOriRegra = $this->enumStrRow($r->uf_origem);
+                $ufDesRegra = $this->enumStrRow($r->uf_destino);
+                if (!is_null($ufOriRegra) && $ufOriRegra !== $ufO)
                     return false;
-                $ufOrigemRegra = $this->enumStr($r->uf_origem);
-                $ufDestinoRegra = $this->enumStr($r->uf_destino);
-                if (!is_null($ufOrigemRegra) && $ufOrigemRegra !== $ufO)
-                    return false;
-                if (!is_null($ufDestinoRegra) && $ufDestinoRegra !== $ufD)
+                if (!is_null($ufDesRegra) && $ufDesRegra !== $ufD)
                     return false;
 
-                if (!is_null($r->canal) && $r->canal !== $canal)
-                    return false;
-                if (!is_null($r->tipo_operacao) && $r->tipo_operacao !== $tipoOp)
-                    return false;
+                // Canal / Tipo operação
+                // if (!is_null($r->canal) && (string) $r->canal !== (string) $canal)
+                //     return false;
+                // if (!is_null($r->tipo_operacao) && (string) $r->tipo_operacao !== (string) $tipoOp)
+                //     return false;
+
                 return true;
             });
-
-            if ($candidatas->isEmpty())
+       
+            if ($candidatas->isEmpty()) {
                 continue;
+            }
 
-            $candidatas = $candidatas->sort(function (TaxRule $a, TaxRule $b) {
-                $specA = $this->especificidade($a);
-                $specB = $this->especificidade($b);
-                if ($specA === $specB)
-                    return $a->prioridade <=> $b->prioridade;
-                return $specB <=> $specA;
+            $candidatas = $candidatas->sort(function ($a, $b) {
+                $sa = $this->especificidadeRow($a);
+                $sb = $this->especificidadeRow($b);
+                if ($sa === $sb) {
+                    return ((int) $a->prioridade) <=> ((int) $b->prioridade);
+                }
+                return $sb <=> $sa;
             });
 
             $aplicadas = [];
-            foreach ($candidatas as $rule) {
+            foreach ($candidatas as $ruleRow) {
+                [$base, $valorImposto, $aliq] = $this->avaliarRegraFromRow($ruleRow, $valor, $desconto, $frete);
 
-                [$base, $valorImposto, $aliq] = $this->avaliarRegra($rule, $valor, $desconto, $frete);
                 if ($valorImposto <= 0) {
-                    if (!$rule->cumulativo)
+                    if (!((bool) $ruleRow->cumulativo))
                         break;
                     continue;
                 }
-                $aplicadas[] = [
-                    'tax' => $tax->codigo,
-                    'tax_nome' => $tax->nome,
-                    'rule_id' => $rule->id,
-                    'aliquota' => $aliq,
-                    'valor' => round($valorImposto, 2),
-                    'base' => round($base, 2),
-                    'cumulativo' => (bool) $rule->cumulativo,
-                    'prioridade' => (int) $rule->prioridade,
-                    'metodo' => $this->enumInt($rule->metodo),
-                    'base_formula' => (string) $rule->base_formula,
-                    'metodo_label' => match ($this->enumInt($rule->metodo)) {
-                        1 => 'Percentual',
-                        2 => 'Valor fixo',
-                        3 => 'Fórmula',
-                        default => 'Percentual',
-                    },
-                    'valor_fixo' => (float) ($rule->valor_fixo ?? 0),
-                    'expression' => (string) ($rule->expression ?? ''),
-                    'base_label' => $this->baseLabel($rule->base_formula),
-                    'uf_origem' => $this->enumStr($rule->uf_origem),
-                    'uf_destino' => $this->enumStr($rule->uf_destino),
-                    'canal' => (string) ($rule->canal ?? ''),
-                    'tipo_operacao' => (string) ($rule->tipo_operacao ?? ''),
-                    'vigencia_inicio' => optional($rule->vigencia_inicio)->toDateString(),
-                    'vigencia_fim' => optional($rule->vigencia_fim)->toDateString(),
-                    'match' => [
-                        'segment_id' => $rule->segment_id,
-                        'categoria_produto_id' => $rule->categoria_produto_id,
-                        'ncm_padrao' => $rule->ncm_padrao,
-                    ],
+
+                $ruleDump = [
+                    'id' => (int) $ruleRow->id,
+                    'tax_id' => (int) $ruleRow->tax_id,
                 ];
 
-                if (!$rule->cumulativo)
+                $aplicadas[] = [
+                    'tax' => $taxCodigo,
+                    'tax_nome' => $taxNome,
+                    'rule_id' => (int) $ruleRow->id,
+                    'aliquota' => round((float) $aliq, 4),
+                    'valor' => round((float) $valorImposto, 2),
+                ];
+
+                if (!((bool) $ruleRow->cumulativo))
                     break;
             }
 
             if (!empty($aplicadas)) {
                 $total = array_sum(array_column($aplicadas, 'valor'));
                 $resultado[] = [
-                    'imposto' => $tax->codigo,
+                    'imposto' => $taxCodigo,
+                    'tax_nome' => $taxNome,
                     'linhas' => $aplicadas,
                     'total' => round($total, 2),
+                    'codigo' => $taxCodigo,   
+                    'nome' => $taxNome, 
+
                 ];
             }
         }
@@ -144,7 +161,7 @@ class TaxCalculatorService
 
     protected function avaliarRegra(TaxRule $r, float $valor, float $desconto, float $frete): array
     {
-        [$base, $baseFoiPersonalizada] = $this->calcularBase(
+        [$base] = $this->calcularBase(
             $r->base_formula,
             $valor,
             $desconto,
@@ -159,11 +176,11 @@ class TaxCalculatorService
         switch ($this->enumInt($r->metodo)) {
             case 1:
                 $imposto = $base * ($aliq / 100.0);
-                break;
+                break; // percentual
             case 2:
                 $imposto = $fixo;
-                break;
-            case 3:
+                break;                    // valor fixo
+            case 3:                                            // fórmula personalizada
                 $vars = [
                     'valor' => $valor,
                     'desconto' => $desconto,
@@ -173,9 +190,8 @@ class TaxCalculatorService
                     'base' => $base,
                     'imposto' => 0.0,
                 ];
-                [$base, $imposto] = $this->executarExpression($r->expression, $vars);
+                [, $imposto] = $this->executarExpression($r->expression, $vars);
                 break;
-
             default:
                 $imposto = $base * ($aliq / 100.0);
                 break;
@@ -183,6 +199,7 @@ class TaxCalculatorService
 
         return [(float) $base, (float) $imposto, (float) $aliq];
     }
+
     private function baseLabel(?string $f): string
     {
         return match ($f) {
@@ -193,6 +210,7 @@ class TaxCalculatorService
             default => (string) $f,
         };
     }
+
     protected function calcularBase(?string $baseFormula, float $valor, float $desconto, float $frete, float $aliq, ?string $expr): array
     {
         $baseFormula = $baseFormula ?: 'valor_menos_desc';
@@ -212,7 +230,7 @@ class TaxCalculatorService
                     'base' => max(0, $valor - $desconto + $frete),
                     'imposto' => 0.0,
                 ];
-                [$base, $imp] = $this->executarExpression($expr, $vars);
+                [$base,] = $this->executarExpression($expr, $vars);
                 return [$base, true];
             case 'valor_menos_desc':
             default:
@@ -235,17 +253,19 @@ class TaxCalculatorService
             [$left, $right] = array_map('trim', explode('=', $line, 2));
             if (!in_array($left, $allowed, true))
                 continue;
+
             $safe = $right;
             foreach ($allowed as $v) {
                 $safe = preg_replace('/\b' . preg_quote($v, '/') . '\b/u', (string) ($vars[$v]), $safe);
             }
             if (preg_match('/[^0-9\.\+\-\*\/\(\)\s]/', $safe))
                 continue;
+
             try {
                 $result = eval ("return (float)($safe);");
                 if (is_finite($result))
                     $vars[$left] = $result;
-            } catch (\Throwable $e) { /* ignora */
+            } catch (\Throwable $e) {
             }
         }
         return [(float) $vars['base'], (float) $vars['imposto']];
@@ -265,5 +285,66 @@ class TaxCalculatorService
             return (string) $maybeEnum->value;
         }
         return $maybeEnum !== null ? (string) $maybeEnum : null;
+    }
+
+    private function enumIntRow($v): ?int
+    {
+        return is_numeric($v) ? (int) $v : (is_null($v) ? null : null);
+    }
+
+    private function enumStrRow($v): ?string
+    {
+        return $v !== null ? (string) $v : null;
+    }
+
+    private function especificidadeRow($r): int
+    {
+        $campos = ['segment_id', 'categoria_produto_id', 'ncm_padrao', 'uf_origem', 'uf_destino', 'canal', 'tipo_operacao'];
+        $score = 0;
+        foreach ($campos as $c)
+            if (!is_null($r->{$c}))
+                $score++;
+        return $score;
+    }
+
+    private function avaliarRegraFromRow($r, float $valor, float $desconto, float $frete): array
+    {
+        [$base] = $this->calcularBase(
+            $r->base_formula,
+            $valor,
+            $desconto,
+            $frete,
+            (float) ($r->aliquota_percent ?? 0.0),
+            $r->expression
+        );
+
+        $aliq = (float) ($r->aliquota_percent ?? 0.0);
+        $fixo = (float) ($r->valor_fixo ?? 0.0);
+
+        switch ($this->enumIntRow($r->metodo)) {
+            case 1:
+                $imposto = $base * ($aliq / 100.0);
+                break; // percentual
+            case 2:
+                $imposto = $fixo;
+                break;                    // valor fixo
+            case 3:                                             // fórmula
+                $vars = [
+                    'valor' => $valor,
+                    'desconto' => $desconto,
+                    'frete' => $frete,
+                    'aliquota' => $aliq,
+                    'rate' => $aliq,
+                    'base' => $base,
+                    'imposto' => 0.0,
+                ];
+                [, $imposto] = $this->executarExpression($r->expression, $vars);
+                break;
+            default:
+                $imposto = $base * ($aliq / 100.0);
+                break;
+        }
+
+        return [(float) $base, (float) $imposto, (float) $aliq];
     }
 }
