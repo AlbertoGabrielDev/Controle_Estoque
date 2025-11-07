@@ -50,52 +50,57 @@ class EstoqueController extends Controller
     public function inserirEstoque(Request $request)
     {
         $produtoId = (int) $request->input('id_produto_fk');
-        $produto   = Produto::findOrFail($produtoId);
+        $produto = Produto::findOrFail($produtoId);
 
         $categoriaId = DB::table('categoria_produtos')
             ->where('id_produto_fk', $produtoId)
-            ->value('id_categoria_fk'); 
+            ->value('id_categoria_fk');
 
         $precoVenda = (float) $request->input('preco_venda', 0);
 
         $ctx = [
-            'data'             => now()->toDateString(),
+            'data' => now()->toDateString(),
             'ignorar_segmento' => true,
             'operacao' => [
-                'uf_origem'   => strtoupper(config('empresa.uf_origem', 'GO')),
-                'uf_destino'  => strtoupper(config('empresa.uf_origem', 'GO')),
+                'tipo' => TipoOperacao::Venda->value,
+                'canal' => Canal::Balcao->value,
+                'uf_origem' => config('empresa.uf_origem', 'GO'),
+                'uf_destino' => config('empresa.uf_origem', 'GO'),
             ],
             'produto' => [
-                'categoria_id' => $categoriaId, 
-                'ncm'          => $produto->ncm ?? null,
+                'id' => $produtoId,     // <— AQUI
+                'categoria_id' => $categoriaId,   // da pivot categoria_produtos
+                'ncm' => $produto->ncm ?? null,
             ],
             'valores' => [
-                'valor'    => $precoVenda,
+                'valor' => (float) $precoVenda,
                 'desconto' => 0,
-                'frete'    => 0,
+                'frete' => 0,
             ],
         ];
-       
+
         $calc = $this->taxCalculator->calcular($ctx);
        
         $primeiraRegraId = null;
-        $json = [];
+        $taxId = null;
         foreach ($calc as $bloco) {
-            dd($calc);
-           
-            if (!is_array(value: $bloco) || empty($bloco['linhas'])) continue;
+
+            if (!is_array(value: $bloco) || empty($bloco['linhas']))
+                continue;
             $primeiraRegraId = $bloco['linhas'][0]['rule_dump']['id'] ?? null;
-
-            $json = $bloco['linhas'];
-            if ($primeiraRegraId) break;
+            // dd($calc['_compact']);
+            $taxId = $bloco['tax_id'] ?? null;
+            if ($primeiraRegraId)
+                break;
         }
+        
         $data = $request->merge([
-            'id_users_fk'   => Auth::id(),
+            'id_users_fk' => Auth::id(),
             'imposto_total' => $calc['_total_impostos'] ?? 0.0,
-            'impostos_json' => json_encode($json, JSON_UNESCAPED_UNICODE),
-            'id_tax_fk'     => $primeiraRegraId,
+            'impostos_json' => json_encode($calc['_compact'], JSON_UNESCAPED_UNICODE),
+            'id_tax_fk' => $taxId,
         ])->all();
-
+dd($data);
         $this->estoqueRepository->inserirEstoque($data);
 
         return redirect()->route('estoque.index')->with('success', 'Inserido com sucesso');
@@ -103,7 +108,7 @@ class EstoqueController extends Controller
 
     public function editar($estoqueId)
     {
-        $editar  = $this->estoqueRepository->editar($estoqueId);
+        $editar = $this->estoqueRepository->editar($estoqueId);
         $estoque = $editar['estoque'];
 
         // Resolve categoria via pivot para preview
@@ -112,22 +117,22 @@ class EstoqueController extends Controller
             ->value('id_categoria_fk');
 
         $ctx = [
-            'data'             => now()->toDateString(),
+            'data' => now()->toDateString(),
             'ignorar_segmento' => true,
             'operacao' => [
-                'tipo'        => TipoOperacao::Venda->value,
-                'canal'       => Canal::Balcao->value,
-                'uf_origem'   => strtoupper(config('empresa.uf_origem', 'GO')),
-                'uf_destino'  => strtoupper(config('empresa.uf_origem', 'GO')),
+                'tipo' => TipoOperacao::Venda->value,
+                'canal' => Canal::Balcao->value,
+                'uf_origem' => strtoupper(config('empresa.uf_origem', 'GO')),
+                'uf_destino' => strtoupper(config('empresa.uf_origem', 'GO')),
             ],
             'produto' => [
                 'categoria_id' => $categoriaId,
-                'ncm'          => optional($estoque->produtos)->ncm,
+                'ncm' => optional($estoque->produtos)->ncm,
             ],
             'valores' => [
-                'valor'    => (float) $estoque->preco_venda,
+                'valor' => (float) $estoque->preco_venda,
                 'desconto' => 0,
-                'frete'    => 0,
+                'frete' => 0,
             ],
         ];
 
@@ -135,9 +140,9 @@ class EstoqueController extends Controller
 
         $previewVM = [
             '__totais' => [
-                'preco_base'        => (float) $estoque->preco_venda,
-                'total_impostos'    => $raw['_total_impostos'] ?? 0,
-                'total_com_impostos'=> $raw['_total_com_impostos'] ?? ((float) $estoque->preco_venda + ($raw['_total_impostos'] ?? 0)),
+                'preco_base' => (float) $estoque->preco_venda,
+                'total_impostos' => $raw['_total_impostos'] ?? 0,
+                'total_com_impostos' => $raw['_total_com_impostos'] ?? ((float) $estoque->preco_venda + ($raw['_total_impostos'] ?? 0)),
             ],
             'impostos' => array_values(array_filter(
                 $raw,
@@ -147,8 +152,8 @@ class EstoqueController extends Controller
         ];
 
         return view('estoque.editar', array_merge($editar, [
-            'previewVM'   => $previewVM,
-            'impostos_raw'=> $raw,
+            'previewVM' => $previewVM,
+            'impostos_raw' => $raw,
         ]));
     }
 
@@ -165,22 +170,22 @@ class EstoqueController extends Controller
             ->value('id_categoria_fk');
 
         $ctx = [
-            'data'             => now()->toDateString(),
+            'data' => now()->toDateString(),
             'ignorar_segmento' => true,
             'operacao' => [
-                'tipo'        => TipoOperacao::Venda->value,
-                'canal'       => Canal::Balcao->value,
-                'uf_origem'   => strtoupper(config('empresa.uf_origem', 'GO')),
-                'uf_destino'  => strtoupper(config('empresa.uf_origem', 'GO')),
+                'tipo' => TipoOperacao::Venda->value,
+                'canal' => Canal::Balcao->value,
+                'uf_origem' => strtoupper(config('empresa.uf_origem', 'GO')),
+                'uf_destino' => strtoupper(config('empresa.uf_origem', 'GO')),
             ],
             'produto' => [
                 'categoria_id' => $categoriaId,
-                'ncm'          => optional($estoque->produtos)->ncm,
+                'ncm' => optional($estoque->produtos)->ncm,
             ],
             'valores' => [
-                'valor'    => (float) ($data['preco_venda'] ?? $estoque->preco_venda ?? 0),
+                'valor' => (float) ($data['preco_venda'] ?? $estoque->preco_venda ?? 0),
                 'desconto' => 0,
-                'frete'    => 0,
+                'frete' => 0,
             ],
         ];
 
@@ -193,9 +198,11 @@ class EstoqueController extends Controller
         // opcional: atualizar id_tax_fk com 1ª regra aplicada
         $primeiraRegraId = null;
         foreach ($raw as $bloco) {
-            if (!is_array($bloco) || empty($bloco['linhas'])) continue;
+            if (!is_array($bloco) || empty($bloco['linhas']))
+                continue;
             $primeiraRegraId = $bloco['linhas'][0]['rule_dump']['id'] ?? null;
-            if ($primeiraRegraId) break;
+            if ($primeiraRegraId)
+                break;
         }
         $data['id_tax_fk'] = $primeiraRegraId;
 
@@ -207,7 +214,7 @@ class EstoqueController extends Controller
     public function calcImpostos(Request $req, TaxCalculatorService $svc)
     {
         $produto = Produto::findOrFail($req->integer('id_produto_fk'));
-        $valor   = (float) $req->input('preco_venda', 0);
+        $valor = (float) $req->input('preco_venda', 0);
 
         $categoriaId = DB::table('categoria_produtos')
             ->where('id_produto_fk', $produto->id_produto)
@@ -216,22 +223,22 @@ class EstoqueController extends Controller
         $ctx = array_replace_recursive([
             'ignorar_segmento' => true,
             'operacao' => [
-                'tipo'       => TipoOperacao::Venda->value,
-                'canal'      => Canal::Balcao->value,
-                'uf_origem'  => strtoupper(config('empresa.uf_origem', 'GO')),
+                'tipo' => TipoOperacao::Venda->value,
+                'canal' => Canal::Balcao->value,
+                'uf_origem' => strtoupper(config('empresa.uf_origem', 'GO')),
                 'uf_destino' => strtoupper($req->input('uf_destino', config('empresa.uf_origem', 'GO'))),
             ],
             'produto' => [
                 'categoria_id' => $categoriaId,
-                'ncm'          => $produto->ncm ?? null,
+                'ncm' => $produto->ncm ?? null,
             ],
             'clientes' => [
                 'uf' => strtoupper((string) $req->input('cliente.uf', $req->input('uf_destino', ''))),
             ],
             'valores' => [
-                'valor'    => $valor,
+                'valor' => $valor,
                 'desconto' => 0,
-                'frete'    => 0,
+                'frete' => 0,
             ],
         ], (array) $req->input('contexto', []));
 
@@ -239,8 +246,8 @@ class EstoqueController extends Controller
 
         $vm = [
             '__totais' => [
-                'preco_base'         => $ctx['valores']['valor'],
-                'total_impostos'     => $raw['_total_impostos'] ?? 0,
+                'preco_base' => $ctx['valores']['valor'],
+                'total_impostos' => $raw['_total_impostos'] ?? 0,
                 'total_com_impostos' => $raw['_total_com_impostos'] ?? ($ctx['valores']['valor'] + ($raw['_total_impostos'] ?? 0)),
             ],
             'impostos' => array_values(array_filter(
@@ -255,7 +262,7 @@ class EstoqueController extends Controller
         return response()->json([
             'html' => $html,
             'meta' => ['total_com_impostos' => $vm['__totais']['total_com_impostos']],
-            'raw'  => $raw,
+            'raw' => $raw,
         ]);
     }
 }

@@ -9,6 +9,8 @@ use App\Traits\HasDatatableConfig;
 use App\Traits\HasStatus;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Carbon;
 use App\Enums\Canal;
 use App\Enums\TipoOperacao;
@@ -124,5 +126,50 @@ class TaxRule extends Model
     public function tax()
     {
         return $this->belongsTo(Tax::class, 'tax_id');
+    }
+
+    public function alvos(): HasMany
+    {
+        return $this->hasMany(TaxRuleAlvo::class, 'tax_rule_id', 'id');
+    }
+
+    /** Apenas alvos de categoria */
+    public function alvosCategorias(): HasMany
+    {
+        return $this->alvos()->whereNotNull('id_categoria_fk');
+    }
+
+    /** Apenas alvos de produto */
+    public function alvosProdutos(): HasMany
+    {
+        return $this->alvos()->whereNotNull('id_produto_fk');
+    }
+    public function categorias(): BelongsToMany
+    {
+        return $this->belongsToMany(
+            Categoria::class,
+            'tax_rule_alvos',
+            'tax_rule_id',      // FK p/ esta tabela no pivô
+            'id_categoria_fk',  // FK p/ tabela relacionada no pivô
+            'id',               // PK local
+            'id_categoria'      // PK da tabela categorias
+        )
+            ->withTimestamps()
+            ->wherePivotNotNull('id_categoria_fk');
+    }
+
+    /** Produtos relacionados (via tax_rule_alvos) */
+    public function produtos(): BelongsToMany
+    {
+        return $this->belongsToMany(
+            Produto::class,
+            'tax_rule_alvos',
+            'tax_rule_id',
+            'id_produto_fk',
+            'id',
+            'id_produto'
+        )
+            ->withTimestamps()
+            ->wherePivotNotNull('id_produto_fk');
     }
 }
