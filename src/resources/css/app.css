@@ -6,18 +6,36 @@
     display: none;
 }
 
+:root {
+  --body-bg: #f0f4f8;
+  --body-text: #111827;
+}
+
+.dark {
+  color-scheme: dark;
+}
+
+.dark body {
+  --body-bg: #0f172a;
+  --body-text: #e2e8f0;
+}
+
 *{
     padding: 5px;
-   
+
 }
 
 
 body {
   font-family: 'Poppins', sans-serif;
-  background-color: #f0f4f8;
+  background-color: var(--body-bg);
+  color: var(--body-text);
 }
 .sidebar {
   background: linear-gradient(180deg, #075e54 0%, #128c7e 100%);
+}
+.dark .sidebar {
+  background: linear-gradient(180deg, #064e3b 0%, #047857 100%);
 }
 .main-content {
   height: calc(100vh - 64px);

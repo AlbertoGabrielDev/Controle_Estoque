@@ -1,6 +1,7 @@
 <script setup>
-import { ref, reactive, onMounted } from 'vue'
+import { reactive, ref, onMounted } from 'vue'
 import { Link, usePage } from '@inertiajs/vue3'
+import ThemeToggle from '@/components/ThemeToggle.vue'
 const page = usePage()
 const menus = page.props.menus ?? []
 const user = page.props.auth?.user ?? null
@@ -19,8 +20,8 @@ const linkClass = (routeName) => {
     let active = false
     try { active = route().current(routeName) } catch (_) { active = false }
     return [
-        'flex items-center p-2 text-gray-600 rounded-lg hover:bg-gray-100',
-        active ? 'bg-cyan-50 text-cyan-600' : ''
+        'flex items-center p-2 text-gray-600 rounded-lg transition-colors hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-slate-800',
+        active ? 'bg-cyan-50 text-cyan-600 dark:bg-cyan-500/20 dark:text-cyan-200' : ''
     ].join(' ')
 }
 
@@ -41,14 +42,14 @@ onMounted(() => {
 </script>
 
 <template>
-    <div class="bg-white h-screen flex flex-col">
+    <div class="flex h-screen flex-col bg-gray-50 text-gray-900 dark:bg-slate-950 dark:text-slate-100">
         <div id="toast-container" class="fixed top-4 right-4 z-50 flex flex-col gap-2"></div>
-        <nav class="bg-white shadow-sm">
+        <nav class="bg-white shadow-sm dark:bg-slate-900 dark:shadow-slate-900/40">
             <div class="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
                 <div class="relative flex h-16 items-center justify-between">
                     <div class="absolute inset-y-0 left-0 flex items-center sm:hidden">
                         <button
-                            class="inline-flex items-center justify-center p-2 rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-100 ml-2"
+                            class="ml-2 inline-flex items-center justify-center rounded-md p-2 text-gray-600 transition-colors hover:bg-gray-100 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-slate-800 dark:hover:text-white"
                             @click="sidebarOpen = !sidebarOpen">
                             <span class="sr-only">Abrir menu</span>
                             <svg v-if="!sidebarOpen" class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none"
@@ -73,24 +74,24 @@ onMounted(() => {
                         </div>
                     </div>
                     <div
-                        class="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
+                        class="absolute inset-y-0 right-0 flex items-center gap-2 pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
+                        <ThemeToggle />
                         <slot name="top-right" />
                     </div>
                 </div>
             </div>
         </nav>
-        <div class="flex-1 flex overflow-hidden">
-            <aside class="bg-white w-64 space-y-6 py-7 px-2 absolute inset-y-0 left-0
-               transition duration-200 ease-in-out h-full border-r z-20
-               md:relative md:translate-x-0" :class="[sidebarOpen ? 'translate-x-0' : '-translate-x-full']">
+        <div class="flex flex-1 overflow-hidden">
+            <aside class="absolute inset-y-0 left-0 z-20 h-full w-64 space-y-6 border-r border-gray-100 bg-white py-7 px-2 transition duration-200 ease-in-out dark:border-slate-800 dark:bg-slate-900 md:relative md:translate-x-0"
+                :class="[sidebarOpen ? 'translate-x-0' : '-translate-x-full']">
                 <nav>
-                    <div v-if="user" class="px-2 text-xs text-gray-400 mb-2">
+                    <div v-if="user" class="mb-2 px-2 text-xs text-gray-400 dark:text-gray-400">
                         Olá, {{ user.name }}
                     </div>
                     <template v-for="menu in menus" :key="menu.id">
                         <div v-if="menu.children && menu.children.length" class="relative">
                             <button @click="toggleGroup(menu.id)"
-                                class="w-full flex items-center p-2 text-gray-600 rounded-lg hover:bg-gray-100">
+                                class="flex w-full items-center rounded-lg p-2 text-gray-600 transition-colors hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-slate-800">
                                 <i :class="[menu.icon, 'mr-2']"></i>
                                 <span class="ml-1">{{ menu.name }}</span>
                                 <i class="fas fa-chevron-down ml-auto text-xs transition-transform"
@@ -116,15 +117,15 @@ onMounted(() => {
                         </div>
                     </template>
                 </nav>
-                <form @submit.prevent="$inertia.post('/logout')" class="absolute bottom-0 w-full left-0 px-2">
+                <form @submit.prevent="$inertia.post('/logout')" class="absolute bottom-0 left-0 w-full px-2">
                     <button type="submit"
-                        class="w-full flex items-center p-2 text-gray-600 rounded-lg hover:bg-gray-100">
+                        class="flex w-full items-center rounded-lg p-2 text-gray-600 transition-colors hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-slate-800">
                         <i class="fas fa-sign-out-alt mr-2"></i>
                         <span class="ml-1">Sair</span>
                     </button>
                 </form>
             </aside>
-            <main class="flex-1 p-4 overflow-auto">
+            <main class="flex-1 overflow-auto bg-gray-50 p-4 transition-colors dark:bg-slate-950">
                 <slot />
             </main>
         </div>

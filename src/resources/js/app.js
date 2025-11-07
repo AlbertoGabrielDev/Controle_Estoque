@@ -12,10 +12,14 @@ import { ZiggyVue } from 'ziggy-js'
 import SidebarLayout from './Layouts/Sidebar.vue'          // layout do módulo WPP (Vue)
 import PrincipalLayout from './Layouts/PrincipalLayout.vue'// novo layout que criamos acima
 
+import { initializeTheme } from './composables/useTheme'
+
 import $ from 'jquery';
 window.$ = window.jQuery = $;
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel'
+
+initializeTheme()
 
 // Páginas que usam o sidebar em Vue (WhatsApp)
 const USE_VUE_SIDEBAR = [

@@ -1,35 +1,38 @@
 <template>
-    <div class="h-screen flex flex-col">
-        <header class="bg-white shadow-md py-4 px-6 flex justify-between items-center">
+    <div class="h-screen flex flex-col bg-gray-50 text-gray-900 transition-colors dark:bg-slate-950 dark:text-slate-100">
+        <header class="flex items-center justify-between bg-white py-4 px-6 shadow-md dark:bg-slate-900">
             <div class="flex items-center">
                 <!-- ...logo e título... -->
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-green-600 mr-2" fill="currentColor"
+                <svg xmlns="http://www.w3.org/2000/svg" class="mr-2 h-8 w-8 text-green-600" fill="currentColor"
                     viewBox="0 0 24 24">
                     <path
                         d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.520.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
                 </svg>
-                <h1 class="text-xl font-bold text-gray-800">WhatsApp Marketing Dashboard</h1>
+                <h1 class="text-xl font-bold text-gray-800 dark:text-slate-100">WhatsApp Marketing Dashboard</h1>
             </div>
-            <!-- Botão menu mobile -->
-            <button class="md:hidden ml-4" @click="sidebarOpen = !sidebarOpen">
-                <svg class="h-8 w-8 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-                </svg>
-            </button>
-            <!-- ...usuário... -->
-            <div class="hidden md:flex items-center">
-                <div class="relative mr-4">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-600" fill="none"
-                        viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+            <div class="flex items-center gap-3">
+                <ThemeToggle />
+                <!-- Botão menu mobile -->
+                <button class="md:hidden" @click="sidebarOpen = !sidebarOpen">
+                    <svg class="h-8 w-8 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
                     </svg>
-                    <span class="notification-badge">3</span>
-                </div>
-                <div class="flex items-center">
-                    <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyMCAyMCIgZmlsbD0iY3VycmVudENvbG9yIj48cGF0aCBmaWxsLXJ1bGU9ImV2ZW5vZGQiIGQ9Ik0xOCA1djguMDA0YTMuMDEgMy4wMSAwIDAgMS0zLjAxIDMuMDFoLTYuOTczYTMuMDEgMy4wMSAwIDAgMS0zLjAxLTMuMDFWNWg3LjQ5N2wxLjUgMS41SDEzLjk5N3ptLTEwLTIuNWEuNS41IDAgMCAwLS41LjV2LjVoNS41ODZsLTEuNS0xLjVIMTMuNWEuNS41IDAgMCAwLS41LS41aC01eiIgY2xpcC1ydWxlPSJldmVub2RkIi8+PC9zdmc+"
-                        class="h-8 w-8 rounded-full bg-gray-300 p-1" alt="User">
-                    <span class="ml-2 text-gray-700 font-medium">Admin</span>
+                </button>
+                <!-- ...usuário... -->
+                <div class="hidden items-center gap-4 md:flex">
+                    <div class="relative">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-600 dark:text-gray-300" fill="none"
+                            viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                        </svg>
+                        <span class="notification-badge">3</span>
+                    </div>
+                    <div class="flex items-center">
+                        <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyMCAyMCIgZmlsbD0iY3VycmVudENvbG9yIj48cGF0aCBmaWxsLXJ1bGU9ImV2ZW5vZGQiIGQ9Ik0xOCA1djguMDA0YTMuMDEgMy4wMSAwIDAgMS0zLjAxIDMuMDFoLTYuOTczYTMuMDEgMy4wMSAwIDAgMS0zLjAxLTMuMDFWNWg3LjQ5N2wxLjUgMS41SDEzLjk5N3ptLTEwLTIuNWEuNS41IDAgMCAwLS41LjV2LjVoNS41ODZsLTEuNS0xLjVIMTMuNWEuNS41IDAgMCAwLS41LS41aC01eiIgY2xpcC1ydWxlPSJldmVub2RkIi8+PC9zdmc+"
+                            class="h-8 w-8 rounded-full bg-gray-300 p-1" alt="User">
+                        <span class="ml-2 font-medium text-gray-700 dark:text-gray-200">Admin</span>
+                    </div>
                 </div>
             </div>
         </header>
@@ -38,7 +41,7 @@
             <!-- Sidebar Desktop/Mobile Unificado -->
             <transition name="fade">
                 <div v-if="sidebarOpen || isDesktop"
-                    class="sidebar bg-green-800 text-white flex-col w-64 fixed md:static z-40 h-full"
+                    class="sidebar fixed z-40 flex h-full w-64 flex-col bg-green-800 text-white transition-colors dark:bg-emerald-900"
                     :class="{ 'hidden md:flex': !sidebarOpen && isDesktop }">
                     <!-- Botão fechar só no mobile -->
                     <button v-if="!isDesktop" class="self-end m-4" @click="sidebarOpen = false">
@@ -51,7 +54,7 @@
                         <ul>
                             <li v-for="menu in menus" :key="menu.key" class="mb-2">
                                 <button @click="handleMenuClick(menu)" :class="{ 'bg-green-700': isMenuActive(menu) }"
-                                    class="tab-btn flex items-center w-full px-4 py-2 rounded-lg hover:bg-green-700 transition-colors">
+                                    class="tab-btn flex w-full items-center rounded-lg px-4 py-2 transition-colors hover:bg-green-700">
                                     <span class="mr-2" v-html="menu.icon"></span>
                                     <span :class="isDesktop ? 'hidden md:inline' : ''">{{ menu.label }}</span>
                                     <svg v-if="menu.submenus" class="ml-auto" width="16" height="16" fill="none"
@@ -63,7 +66,7 @@
                                     <li v-for="submenu in menu.submenus" :key="submenu.key">
                                         <button @click="handleSubmenuClick(submenu)"
                                             :class="{ 'bg-green-700': isSubmenuActive(submenu) }"
-                                            class="flex items-center px-2 py-1 text-sm w-full rounded hover:bg-green-700">
+                                            class="flex w-full items-center rounded px-2 py-1 text-sm hover:bg-green-700">
                                             <span>{{ submenu.label }}</span>
                                         </button>
                                     </li>
@@ -81,7 +84,7 @@
                 </div>
             </transition>
             <!-- Conteúdo principal -->
-            <div class="flex-1 overflow-y-auto bg-gray-100">
+            <div class="flex-1 overflow-y-auto bg-gray-100 transition-colors dark:bg-slate-950">
                 <slot></slot>
             </div>
         </div>
@@ -90,8 +93,12 @@
 
 <script>
 import { router } from '@inertiajs/vue3';
+import ThemeToggle from '@/components/ThemeToggle.vue';
 
 export default {
+    components: {
+        ThemeToggle,
+    },
     props: {
         activeTab: String
     },
