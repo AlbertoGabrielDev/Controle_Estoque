@@ -13,7 +13,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 </head>
 
-<body class="font-sans antialiased">
+<body class="font-sans antialiased bg-gray-100 text-gray-900 transition-colors duration-200 dark:bg-slate-950 dark:text-slate-100">
     @inertia
 </body>
 

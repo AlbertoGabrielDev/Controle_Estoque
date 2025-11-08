@@ -4,14 +4,8 @@
 }
 
 
-@media (prefers-color-scheme: dark) {
-
-    td,
-    th {
-        background-color: #ffffff !important;
-        color: #374151 !important;
-    }
-}
+/* Removido: preferências automáticas de dark que deixavam as células brancas */
+/* Substituído por regras ativadas via classe .dark no <html> */
 
 /* Ajustes gerais do DataTables */
 .dataTables_wrapper {
@@ -98,3 +92,114 @@ table.dataTable td {
   font-size: inherit !important;
   color: inherit !important;
 } */
+
+/* ----------------------------------------
+   Dark mode (Blade) – reduz brancos e
+   melhora contraste em tabelas e formulários
+----------------------------------------- */
+html.dark body, body.dark { color-scheme: dark; }
+
+/* Superfícies claras comuns */
+html.dark .bg-white { background-color: #0b1220 !important; }
+html.dark .bg-gray-50 { background-color: #0c1322 !important; }
+html.dark .bg-gray-100 { background-color: #111827 !important; }
+html.dark .text-gray-700,
+html.dark .text-gray-800 { color: #e5e7eb !important; }
+html.dark .border-gray-200,
+html.dark .border-gray-300 { border-color: #334155 !important; }
+
+/* Inputs/selects/textarea */
+html.dark input[type="text"],
+html.dark input[type="number"],
+html.dark input[type="date"],
+html.dark input[type="email"],
+html.dark input[type="password"],
+html.dark input[type="search"],
+html.dark select,
+html.dark textarea {
+  background-color: #0b1220 !important;
+  color: #e5e7eb !important;
+  border: 1px solid #334155 !important;
+}
+html.dark ::placeholder { color: #9ca3af !important; }
+
+/* DataTables */
+html.dark .dataTables_wrapper { color: #e5e7eb !important; }
+html.dark .dataTables_wrapper thead th,
+html.dark table.dataTable thead th { background-color: #0b1220 !important; color: #e5e7eb !important; border-bottom: 1px solid #334155 !important; }
+html.dark .dataTables_wrapper .dataTables_filter input,
+html.dark .dataTables_wrapper .dataTables_length select,
+html.dark .dataTables_wrapper .dataTables_paginate .paginate_button {
+  background-color: #0b1220 !important;
+  color: #e5e7eb !important;
+  border: 1px solid #334155 !important;
+}
+html.dark .dataTables_wrapper .dataTables_paginate .paginate_button.current {
+  background-color: #0891b2 !important;
+  color: white !important;
+  border-color: #0891b2 !important;
+}
+html.dark .dataTables_wrapper .odd { background-color: #0c1322 !important; }
+html.dark .dataTables_wrapper .even { background-color: #0b1220 !important; }
+
+/* Select2 */
+html.dark .select2-container .select2-selection--single,
+html.dark .select2-container--default .select2-selection--multiple { background-color: #0b1220 !important; border-color: #334155 !important; color: #e5e7eb !important; }
+html.dark .select2-container--default .select2-selection--single .select2-selection__rendered { color: #e5e7eb !important; }
+html.dark .select2-dropdown { background-color: #0b1220 !important; color: #e5e7eb !important; border-color: #334155 !important; }
+html.dark .select2-results__option--highlighted { background-color: #1f2937 !important; color: #e5e7eb !important; }
+
+/* Cards do Dashboard em Blade (se houver) */
+html.dark .dashboard-view .bg-white.rounded,
+html.dark .dashboard-view .bg-white.rounded-md,
+html.dark .dashboard-view .bg-white.rounded-lg,
+html.dark .dashboard-view .bg-white.rounded-xl,
+html.dark .dashboard-view .bg-white.rounded-2xl,
+html.dark .dashboard-view .bg-gray-50.rounded,
+html.dark .dashboard-view .bg-gray-50.rounded-md,
+html.dark .dashboard-view .bg-gray-50.rounded-lg,
+html.dark .dashboard-view .bg-gray-50.rounded-xl,
+html.dark .dashboard-view .bg-gray-50.rounded-2xl,
+html.dark .dashboard-view .bg-gray-100.rounded,
+html.dark .dashboard-view .bg-gray-100.rounded-md,
+html.dark .dashboard-view .bg-gray-100.rounded-lg,
+html.dark .dashboard-view .bg-gray-100.rounded-xl,
+html.dark .dashboard-view .bg-gray-100.rounded-2xl { border: 1px solid #334155 !important; box-shadow: 0 0 0 1px rgba(148,163,184,0.08) inset, 0 1px 2px rgba(0,0,0,0.35); }
+
+/* Garantir que navbar e sidebar do Blade clareiem quando o tema for claro
+   (sobrescreve classes utilitárias com prefixo dark: geradas pelo Tailwind CDN) */
+html:not(.dark) nav.dark\:bg-slate-900 { background-color: #ffffff !important; box-shadow: 0 1px 2px rgba(0,0,0,.05) !important; }
+html:not(.dark) #sidebar.dark\:bg-slate-900 { background-color: #ffffff !important; }
+html:not(.dark) #sidebar.dark\:border-slate-800 { border-color: #e5e7eb !important; }
+html:not(.dark) #sidebar { border-right-color: #e5e7eb !important; }
+html:not(.dark) #sidebar nav a.text-gray-600 { color: #374151 !important; }
+html:not(.dark) #sidebar nav a.text-gray-600:hover { background-color: #f3f4f6 !important; color: #111827 !important; }
+html:not(.dark) #sidebar button.text-gray-600 { color: #374151 !important; }
+html:not(.dark) #sidebar button.text-gray-600:hover { background-color: #f3f4f6 !important; color: #111827 !important; }
+
+/* Fail-safe: neutraliza classes dark:* quando o tema está claro (Blade) */
+html:not(.dark) .dark\:bg-slate-900 { background-color: transparent !important; }
+html:not(.dark) .dark\:bg-slate-950 { background-color: transparent !important; }
+html:not(.dark) .dark\:text-slate-100 { color: inherit !important; }
+html:not(.dark) .dark\:text-gray-300 { color: inherit !important; }
+html:not(.dark) .dark\:border-slate-800 { border-color: inherit !important; }
+html:not(.dark) .dark\:shadow-slate-900\/40 { box-shadow: inherit !important; }
+
+/* Menu (Blade) no tema escuro: garantir texto legível e hover coerente */
+html.dark #sidebar nav a.text-gray-600,
+html.dark #sidebar nav a.text-gray-500,
+html.dark #sidebar nav a.text-gray-700,
+html.dark #sidebar button.text-gray-600,
+html.dark #sidebar button.text-gray-500,
+html.dark #sidebar button.text-gray-700 {
+  color: #cbd5e1 !important; /* slate-300 */
+}
+html.dark #sidebar nav a.text-gray-600:hover,
+html.dark #sidebar nav a.text-gray-500:hover,
+html.dark #sidebar nav a.text-gray-700:hover,
+html.dark #sidebar button.text-gray-600:hover,
+html.dark #sidebar button.text-gray-500:hover,
+html.dark #sidebar button.text-gray-700:hover {
+  background-color: #1f2937 !important; /* gray-800 */
+  color: #e5e7eb !important;             /* slate-200 */
+}
