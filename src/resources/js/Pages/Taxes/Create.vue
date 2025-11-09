@@ -20,7 +20,9 @@ const form = useForm({
   origin_uf: '',
   dest_uf: '',
   customer_segment_id: '',
-  product_segment_id: '',
+  product_segment_ids: Array.isArray(props.rule.product_segment_ids)
+    ? [...props.rule.product_segment_ids]
+    : [],
   base: 'price',            // price | price+freight | subtotal ...
   method: 'percent',        // percent | fixed | formula
   rate: null,               // %
@@ -35,6 +37,7 @@ function submit() {
 </script>
 
 <template>
+
   <Head title="Nova Regra de Taxa" />
 
   <div class="flex items-center justify-between mb-6">
@@ -43,12 +46,7 @@ function submit() {
   </div>
 
   <div class="bg-white rounded shadow p-4">
-    <TaxRuleForm
-      :form="form"
-      :ufs="ufs"
-      :customer-segments="customerSegments"
-      :product-segments="productSegments"
-      @submit="submit"
-    />
+    <TaxRuleForm :form="form" :ufs="ufs" :customer-segments="customerSegments" :product-segments="productSegments"
+      @submit="submit" />
   </div>
 </template>
