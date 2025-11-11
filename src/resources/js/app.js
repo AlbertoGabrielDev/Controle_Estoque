@@ -25,8 +25,6 @@ const appName = import.meta.env.VITE_APP_NAME || 'Laravel'
 
 initializeTheme()
 
-initializeTheme()
-
 // Regras de layout
 const USE_VUE_SIDEBAR = [/^Wpp\//, /^Bot\//]
 const USE_PRINCIPAL   = [
