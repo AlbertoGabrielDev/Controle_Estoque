@@ -32,7 +32,7 @@ class TaxCalculatorService
         $dataRef = $data;
 
         // === SUBQUERY: calcula o melhor alvo por regra (1 linha por tr.id) ===
-        $sub = \DB::table('tax_rules as tr')
+        $sub = \DB::table('tax_rules as tr') //Mudar isso, evitar usar DB
             ->leftJoin('tax_rule_alvos as tra', 'tra.tax_rule_id', '=', 'tr.id')
             ->where(function ($q) use ($dataRef) {
                 $q->whereNull('tr.vigencia_inicio')
@@ -62,7 +62,7 @@ class TaxCalculatorService
         ', [$produtoId, $catId]);
 
         // === SELECT principal (sem GROUP BY) ===
-        $linhas = \DB::table('tax_rules as tr')
+        $linhas = \DB::table('tax_rules as tr') //Mudar isso, evitar usar DB
             ->joinSub($sub, 'm', function ($join) {
                 $join->on('m.rule_id', '=', 'tr.id');
             })

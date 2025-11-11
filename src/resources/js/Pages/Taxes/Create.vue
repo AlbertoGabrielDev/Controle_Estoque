@@ -9,7 +9,9 @@ const toast = useToast()
 const props = defineProps({
   ufs: Array,                 // ['SP','RJ',...]
   customerSegments: Array,    // [{id,nome}]
-  productSegments: Array      // [{id_categoria, nome_categoria}] se você usar
+  productSegments: Array,      // [{id_categoria, nome_categoria}] se você usar
+  channels: { type: Array, default: () => [] },
+  operationTypes: { type: Array, default: () => [] },
 })
 
 // helpers
@@ -69,6 +71,8 @@ function submit() {
       :ufs="ufs"
       :customer-segments="customerSegments"
       :product-segments="productSegments"
+      :channels="channels"
+      :operation-types="operationTypes"
       @submit="submit"
     />
   </div>

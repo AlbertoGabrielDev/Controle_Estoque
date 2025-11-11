@@ -100,7 +100,7 @@ class EstoqueController extends Controller
             'impostos_json' => json_encode($calc['_compact'], JSON_UNESCAPED_UNICODE),
             'id_tax_fk' => $taxId,
         ])->all();
-dd($data);
+
         $this->estoqueRepository->inserirEstoque($data);
 
         return redirect()->route('estoque.index')->with('success', 'Inserido com sucesso');

@@ -95,15 +95,13 @@ class TaxRuleController extends Controller
             'canal' => null,
         ];
 
-        return Inertia::render('Taxes/Create', [
+        return Inertia::render('Taxes/Create', array_merge([
             'ufs' => UF::cases(),
             'customerSegments' => CustomerSegment::select('id', 'nome')->orderBy('nome')->get(),
             'productSegments' => Categoria::select('id_categoria', 'nome_categoria')->orderBy('nome_categoria')->get(),
             'taxes' => ['codigo' => '', 'nome' => ''],
             'rule' => $defaultRule,
-            'channels' => Canal::options(),
-            'operationTypes' => TipoOperacao::options(),
-        ]);
+        ], $this->enumSelectOptions()));
     }
 
     public function store(TaxRuleRequest $request)
@@ -218,15 +216,21 @@ class TaxRuleController extends Controller
 
         $tax = $rule->tax()->select('id', 'codigo', 'nome')->first();
 
-        return Inertia::render('Taxes/Edit', [
+        return Inertia::render('Taxes/Edit', array_merge([
             'taxes' => $tax ?: ['codigo' => '', 'nome' => ''],
             'rule' => $ruleUi,
             'ufs' => UF::cases(),
             'customerSegments' => CustomerSegment::select('id', 'nome')->orderBy('nome')->get(),
             'productSegments' => Categoria::select('id_categoria', 'nome_categoria')->orderBy('nome_categoria')->get(),
+        ], $this->enumSelectOptions()));
+    }
+
+    private function enumSelectOptions(): array
+    {
+        return [
             'channels' => Canal::options(),
             'operationTypes' => TipoOperacao::options(),
-        ]);
+        ];
     }
 
     private function resolveTaxId(array $data): int
