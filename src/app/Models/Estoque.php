@@ -28,6 +28,7 @@ class Estoque extends Model
         'preco_custo',
         'preco_venda',
         'lote',
+        'id_tax_fk',
         'validade',
         'data_chegada',
         'id_produto_fk',
@@ -131,6 +132,11 @@ class Estoque extends Model
     public function marcas(): BelongsTo
     {
         return $this->belongsTo(Marca::class, 'id_marca_fk', 'id_marca');
+    }
+
+      public function tax(): BelongsTo
+    {
+        return $this->belongsTo(TaxRule::class, 'id_tax_fk', 'id');
     }
     use HasFactory;
 }

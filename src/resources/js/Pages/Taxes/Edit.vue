@@ -1,6 +1,7 @@
 <script setup>
 import { Head, Link, useForm } from '@inertiajs/vue3'
 import TaxRuleForm from './TaxRuleForm.vue'
+import { useToast } from 'vue-toastification'
 
 const props = defineProps({
   rule: Object,
@@ -11,6 +12,19 @@ const props = defineProps({
   channels: { type: Array, default: () => [] },
   operationTypes: { type: Array, default: () => [] },
 })
+const toast = useToast()
+const toOptions = (segments) =>
+  (segments || []).map(s => ({ value: Number(s.id_categoria), label: s.nome_categoria }))
+
+const productOptions = toOptions(props.productSegments)
+
+// ids vindos do backend (ex.: [1, 3, 5])
+const selectedIds = Array.isArray(props.rule?.product_segment_ids)
+  ? props.rule.product_segment_ids.map(Number)
+  : []
+
+// objetos selecionados para o multiselect
+const selectedObjects = productOptions.filter(o => selectedIds.includes(o.value))
 function dbBaseToUi(baseFormula) {
   switch (baseFormula) {
     case 'valor_menos_desc': return 'price'
@@ -47,7 +61,7 @@ const form = useForm({
   origin_uf: props.rule?.uf_origem ?? '',
   dest_uf: props.rule?.uf_destino ?? '',
   customer_segment_id: props.rule?.segment_id ?? '',
-  product_segment_id: props.rule?.categoria_produto_id ?? '',
+  product_segment_ids: selectedObjects,
   base: dbBaseToUi(props.rule?.base_formula ?? 'valor_menos_desc'),
   method: dbMethodToUi(props.rule?.metodo ?? 1),
   rate: props.rule?.aliquota_percent ?? null,
@@ -64,8 +78,13 @@ function submit() {
       ...data,
       rate: normalizeDecimal(data.rate),
       amount: normalizeDecimal(data.amount),
+      // Se o multiselect está com objetos {value,label}, converta para IDs:
+      product_segment_ids: (data.product_segment_ids || []).map(o => o?.value ?? o),
     }))
-    .put(route('taxes.update', props.rule.id))
+    .put(route('taxes.update', props.rule.id), {
+      onSuccess: () => toast.success('Regra salva com sucesso!'),
+      onError: () => toast.error('Não foi possível salvar. Verifique os campos.'),
+    })
 }
 </script>
 

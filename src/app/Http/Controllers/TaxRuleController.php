@@ -17,7 +17,7 @@ use App\Http\Requests\TaxRuleRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Blade;
 use Inertia\Inertia;
-use App\Enums\TaxMethod; 
+use App\Enums\TaxMethod;
 
 class TaxRuleController extends Controller
 {
@@ -85,6 +85,7 @@ class TaxRuleController extends Controller
             'segment_id' => null,
             'categoria_produto_id' => null,
             'base_formula' => 'valor_menos_desc',
+            'product_segment_ids' => [],
             'metodo' => 1,
             'aliquota_percent' => null,
             'valor_fixo' => null,
@@ -94,21 +95,23 @@ class TaxRuleController extends Controller
             'canal' => null,
         ];
 
-        return Inertia::render('Taxes/Create', [
+        return Inertia::render('Taxes/Create', array_merge([
             'ufs' => UF::cases(),
             'customerSegments' => CustomerSegment::select('id', 'nome')->orderBy('nome')->get(),
             'productSegments' => Categoria::select('id_categoria', 'nome_categoria')->orderBy('nome_categoria')->get(),
             'taxes' => ['codigo' => '', 'nome' => ''],
             'rule' => $defaultRule,
-            'channels'        => Canal::options(), 
-            'operationTypes'  => TipoOperacao::options(),
-        ]);
+        ], $this->enumSelectOptions()));
     }
 
     public function store(TaxRuleRequest $request)
     {
         $payload = $this->mapFormToDb($request->validated());
+        unset($payload['categoria_produto_id']);
         $rule = TaxRule::create($payload);
+        $catIds = collect($request->input('product_segment_ids', []))
+            ->filter()->map(fn($v) => (int) $v)->unique()->values()->all();
+        $rule->categorias()->sync($catIds);
         return redirect()
             ->route('taxes.edit', $rule->id)
             ->with('success', 'Regra de taxa criada com sucesso.');
@@ -117,11 +120,18 @@ class TaxRuleController extends Controller
     public function update(TaxRuleRequest $request, TaxRule $rule)
     {
         $payload = $this->mapFormToDb($request->validated());
+        unset($payload['categoria_produto_id']);
+
         $rule->update($payload);
+
+        $catIds = collect($request->input('product_segment_ids', []))
+            ->filter()->map(fn($v) => (int) $v)->unique()->values()->all();
+
+        $rule->categorias()->sync($catIds);
 
         return redirect()
             ->route('taxes.index')
-            ->with('success', 'Regra atualizada com sucesso.'); 
+            ->with('success', 'Regra atualizada com sucesso.');
     }
 
     private function mapFormToDb(array $data): array
@@ -135,17 +145,20 @@ class TaxRuleController extends Controller
         $out['prioridade'] = (int) ($data['priority'] ?? 100);
         $out['vigencia_inicio'] = $data['starts_at'] ?? null;
         $out['vigencia_fim'] = $data['ends_at'] ?? null;
+
         $normalize = fn($v) => ($v === '' ? null : $v);
         $out['uf_origem'] = $normalize($data['origin_uf'] ?? null);
         $out['uf_destino'] = $normalize($data['dest_uf'] ?? null);
         $out['segment_id'] = $normalize($data['customer_segment_id'] ?? null);
-        $out['categoria_produto_id'] = $normalize($data['product_segment_id'] ?? null);
+        // $out['categoria_produto_id'] = $normalize($data['product_segment_id'] ?? null); // ❌ REMOVER
         $out['ncm_padrao'] = $normalize($data['ncm'] ?? null);
         $out['canal'] = $normalize($data['canal'] ?? null);
         $out['tipo_operacao'] = $normalize($data['tipo_operacao'] ?? null);
+
         $out['aliquota_percent'] = null;
         $out['valor_fixo'] = null;
         $out['expression'] = null;
+
         switch ($out['metodo']) {
             case TaxMethod::Percent->value:
                 $out['aliquota_percent'] = $data['rate'] ?? null;
@@ -155,9 +168,8 @@ class TaxRuleController extends Controller
                 break;
             case TaxMethod::Formula->value:
                 $out['expression'] = $data['formula'] ?? null;
-                if (!empty($data['rate'])) {
+                if (!empty($data['rate']))
                     $out['aliquota_percent'] = $data['rate'];
-                }
                 break;
         }
 
@@ -165,8 +177,18 @@ class TaxRuleController extends Controller
     }
     public function edit(TaxRule $rule)
     {
+        $rule->load([
+            'alvos:id,tax_rule_id,id_categoria_fk,id_produto_fk',
+            'alvosCategorias:id,tax_rule_id,id_categoria_fk',
+            'alvosProdutos:id,tax_rule_id,id_produto_fk',
+            'tax:id,codigo,nome',
+        ]);
+
         $metodoVal = is_object($rule->metodo) ? $rule->metodo->value : (int) $rule->metodo;
         $escopoVal = is_object($rule->escopo) ? $rule->escopo->value : (int) $rule->escopo;
+
+        // 👇 agora é um ARRAY de categorias
+        $categoriaIds = $rule->alvosCategorias->pluck('id_categoria_fk')->filter()->values();
 
         $ruleUi = [
             'id' => $rule->id,
@@ -177,7 +199,8 @@ class TaxRuleController extends Controller
             'uf_origem' => $rule->uf_origem,
             'uf_destino' => $rule->uf_destino,
             'segment_id' => $rule->segment_id,
-            'categoria_produto_id' => $rule->categoria_produto_id,
+            // ⚠️ não use mais 'categoria_produto_id' único
+            'product_segment_ids' => $categoriaIds, // 👈 múltiplas categorias selecionadas
             'base_formula' => $rule->base_formula,
             'metodo' => $metodoVal,
             'aliquota_percent' => $rule->aliquota_percent,
@@ -187,22 +210,27 @@ class TaxRuleController extends Controller
             'amount' => $rule->valor_fixo,
             'formula' => $rule->expression,
             'cumulativo' => (bool) $rule->cumulativo,
-            'canal'         => $rule->canal?->value,
+            'canal' => $rule->canal?->value,
             'tipo_operacao' => $rule->tipo_operacao?->value,
-
         ];
 
         $tax = $rule->tax()->select('id', 'codigo', 'nome')->first();
 
-        return Inertia::render('Taxes/Edit', [
+        return Inertia::render('Taxes/Edit', array_merge([
             'taxes' => $tax ?: ['codigo' => '', 'nome' => ''],
             'rule' => $ruleUi,
             'ufs' => UF::cases(),
             'customerSegments' => CustomerSegment::select('id', 'nome')->orderBy('nome')->get(),
             'productSegments' => Categoria::select('id_categoria', 'nome_categoria')->orderBy('nome_categoria')->get(),
-            'channels'       => Canal::options(),
+        ], $this->enumSelectOptions()));
+    }
+
+    private function enumSelectOptions(): array
+    {
+        return [
+            'channels' => Canal::options(),
             'operationTypes' => TipoOperacao::options(),
-        ]);
+        ];
     }
 
     private function resolveTaxId(array $data): int

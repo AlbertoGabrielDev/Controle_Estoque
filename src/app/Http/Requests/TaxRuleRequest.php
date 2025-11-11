@@ -26,7 +26,7 @@ class TaxRuleRequest extends FormRequest
             'origin_uf' => 'nullable|string|size:2',
             'dest_uf' => 'nullable|string|size:2',
             'customer_segment_id' => 'nullable|integer|exists:customer_segments,id',
-            'product_segment_id' => 'nullable|integer',
+            'product_segment_ids.*' => ['integer', 'exists:categorias,id_categoria'],
             'base' => ['required', Rule::in(['price', 'price+freight', 'subtotal'])],
             'method' => ['required', Rule::in(['percent', 'fixed', 'formula'])],
             'rate' => ['nullable', 'decimal:0,4', 'gte:0', 'lte:100', 'required_if:method,percent'],

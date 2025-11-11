@@ -24,7 +24,7 @@ return new class extends Migration {
 
                 // Escopo/condições (nullable = wildcard)
                 $table->foreignId('segment_id')->nullable()->constrained('customer_segments')->nullOnDelete();
-                $table->unsignedBigInteger('categoria_produto_id')->nullable(); // se você usar categorias
+                $table->unsignedBigInteger('id_categoria_fk')->nullable(); // se você usar categorias
                 $table->string('ncm_padrao', 32)->nullable();
                 $table->string('uf_origem', 2)->nullable();
                 $table->string('uf_destino', 2)->nullable();

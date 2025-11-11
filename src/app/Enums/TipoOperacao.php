@@ -12,6 +12,7 @@ enum TipoOperacao:string
     case Complementar  = 'complementar';
     case Ajuste        = 'ajuste';
     case Consignacao   = 'consignacao';
+    case Compra        = 'compra';
 
     public function label(): string
     {
@@ -24,6 +25,7 @@ enum TipoOperacao:string
             self::Complementar  => 'Complementar',
             self::Ajuste        => 'Ajuste',
             self::Consignacao   => 'Consignação',
+            self::Compra        => 'Compra',
         };
     }
 

@@ -6,8 +6,12 @@ import '@fortawesome/fontawesome-free/css/solid.min.css'
 import { createApp, h } from 'vue'
 import { createInertiaApp, Link } from '@inertiajs/vue3'
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers'
-
 import { ZiggyVue } from 'ziggy-js'
+
+// ✅ Toasts (Vue 3)
+import Toast from 'vue-toastification'
+import 'vue-toastification/dist/index.css'
+
 
 import SidebarLayout from './Layouts/Sidebar.vue'          // layout do módulo WPP (Vue)
 import PrincipalLayout from './Layouts/PrincipalLayout.vue'// novo layout que criamos acima
@@ -21,41 +25,24 @@ const appName = import.meta.env.VITE_APP_NAME || 'Laravel'
 
 initializeTheme()
 
-// Páginas que usam o sidebar em Vue (WhatsApp)
-const USE_VUE_SIDEBAR = [
-  /^Wpp\//,
-  /^Bot\//,
+initializeTheme()
+
+// Regras de layout
+const USE_VUE_SIDEBAR = [/^Wpp\//, /^Bot\//]
+const USE_PRINCIPAL   = [
+  /^Dashboard\//, /^Calendar\//, /^Vendas\//, /^Estoque\//, /^Categoria\//,
+  /^Fornecedor\//, /^Marca\//, /^Usuario\//, /^Unidade\//, /^Roles\//,
+  /^Clients\//, /^Segments\//, /^Taxes\//,
 ]
 
-// Páginas que devem usar o "principal" (antigo Blade) em Vue
-const USE_PRINCIPAL = [
-  /^Dashboard\//,
-  /^Calendar\//,
-  /^Vendas\//,
-  /^Estoque\//,
-  /^Categoria\//,
-  /^Fornecedor\//,
-  /^Marca\//,
-  /^Usuario\//,
-  /^Unidade\//,
-  /^Roles\//,
-  /^Clients\//,
-  /^Segments\//,
-  /^Taxes\//, // Módulo de Imposto (Taxas)
-]
-
-// IMPORTANTe: rotas tratadas como Inertia Link (sem full reload)
-// além de 'wpp.' e 'bot.', incluí 'taxes.' para o módulo de imposto
+// Navegação Inertia por prefixo de rota
 const INERTIA_PREFIXES = ['wpp.', 'bot.', 'taxes.']
-
 const isInertiaMenu = (item) => {
   if (typeof item?.inertia === 'boolean') return item.inertia
   const name = item?.route || ''
   return !!name && INERTIA_PREFIXES.some(p => name.startsWith(p))
 }
-
 const tagFor = (item) => (isInertiaMenu(item) ? Link : 'a')
-
 const linkClass = (routeName) => {
   let active = false
   try { active = route().current(routeName) } catch (_) { active = false }
@@ -72,39 +59,62 @@ createInertiaApp({
     const pages = import.meta.glob('./Pages/**/*.vue')
     return resolvePageComponent(`./Pages/${name}.vue`, pages).then((mod) => {
       const page = mod.default || mod
-
       const isWpp = USE_VUE_SIDEBAR.some(rx => rx.test(name))
       const isDash = USE_PRINCIPAL.some(rx => rx.test(name))
 
-      if (isWpp) {
-        page.layout = page.layout || SidebarLayout
-      } else if (isDash) {
-        page.layout = page.layout || PrincipalLayout
-      } else {
-        // página sem layout específico → usa o próprio
-      }
+      if (isWpp)       page.layout = page.layout || SidebarLayout
+      else if (isDash) page.layout = page.layout || PrincipalLayout
 
       return mod
     })
   },
 
   setup({ el, App, props, plugin }) {
-    return createApp({ render: () => h(App, props) })
+    const app = createApp({ render: () => h(App, props) })
       .use(plugin)
-      // ✅ Registra o plugin do Ziggy passando o objeto de rotas
       .use(ZiggyVue, Ziggy)
-      .mount(el)
+      // ✅ registra o plugin de Toast
+      .use(Toast, {
+        position: 'top-right',
+        timeout: 3000,
+        closeOnClick: true,
+        pauseOnFocusLoss: true,
+        pauseOnHover: true,
+        draggable: true,
+        draggablePercent: 0.2,
+        showCloseButtonOnHover: false,
+        hideProgressBar: false,
+        closeButton: 'button',
+        icon: true,
+        rtl: false,
+      })
+
+    // ✅ deixa um helper global de toast (para usar fora de componentes)
+    window.showToast = (message, type = 'success') => {
+      const t = app.config.globalProperties.$toast
+      if (!t) return console.warn('Toast não disponível:', message)
+      switch ((type || 'success').toLowerCase()) {
+        case 'error':   t.error(message); break
+        case 'info':    t.info(message); break
+        case 'warning': t.warning(message); break
+        default:        t.success(message); break
+      }
+    }
+
+    app.mount(el)
+    return app
   },
 
   progress: { color: '#4B5563' },
 })
 
+// ===== util =====
 function getCsrf() {
   const meta = document.querySelector('meta[name="csrf-token"]');
   return meta?.content || '';
 }
 
-// Handler para botões .toggle-status (mantido e com fix no catch)
+// ===== handler global para .toggle-status (agora usando showToast global) =====
 document.addEventListener('click', async (ev) => {
   const btn = ev.target.closest('.toggle-status');
   if (!btn) return;
@@ -116,7 +126,7 @@ document.addEventListener('click', async (ev) => {
   try {
     const res = await fetch(btn.dataset.url, {
       method: 'POST',
-      credentials: 'same-origin',              // manda os cookies
+      credentials: 'same-origin',
       headers: {
         'Accept': 'application/json',
         'X-Requested-With': 'XMLHttpRequest',
@@ -128,7 +138,6 @@ document.addEventListener('click', async (ev) => {
     if (!res.ok) throw new Error('HTTP ' + res.status);
     const data = await res.json();
 
-    // Atualiza UI
     const active = Number(data.new_status) === 1;
     btn.dataset.active = active ? '1' : '0';
     btn.setAttribute('aria-pressed', active ? 'true' : 'false');
@@ -139,38 +148,12 @@ document.addEventListener('click', async (ev) => {
     btn.classList.toggle('hover:bg-red-500', !active);
 
     const message = active ? 'Status ativado com sucesso!' : 'Status desativado com sucesso!';
-    showToast(message, active ? 'success' : 'error');
+    window.showToast(message, active ? 'success' : 'warning');
 
   } catch (err) {
     console.error('toggle-status failed', err);
-    // FIX: 'data' não existe no catch; usar a mensagem do erro
-    showToast(err?.message || 'Erro ao atualizar status.', 'error');
+    window.showToast(err?.message || 'Erro ao atualizar status.', 'error');
   } finally {
     btn.dataset.processing = '0';
   }
 });
-
-function showToast(message, type = 'success') {
-  const container = document.getElementById('toast-container') || (() => {
-    const d = document.createElement('div');
-    d.id = 'toast-container';
-    d.className = 'fixed top-4 right-4 z-50 flex flex-col gap-2';
-    document.body.appendChild(d);
-    return d;
-  })();
-
-  const toast = document.createElement('div');
-  toast.className = `toast flex items-center w-full max-w-xs p-4 rounded-lg shadow-sm text-sm fade-in gap-3
-    ${type === 'success' ? 'bg-green-400 text-white' : ''}
-    ${type === 'error' ? 'bg-red-400 text-white' : ''}`;
-
-  toast.innerHTML = `<span class="flex-1">${message}</span>
-    <button type="button" class="ml-2 text-white/80 hover:text-white" onclick="this.closest('.toast').remove()">✕</button>`;
-
-  container.appendChild(toast);
-
-  setTimeout(() => {
-    toast.classList.add('fade-out');
-    setTimeout(() => toast.remove(), 500);
-  }, 3000);
-}
