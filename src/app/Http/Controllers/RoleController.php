@@ -189,7 +189,7 @@ class RoleController extends Controller
         return redirect()->route('roles.editar', $role->id)->with('success', 'Permissoes atualizadas com sucesso!');
     }
 
-    public function updateStatus($rolesId)
+    public function updateStatus($model, $id)
     {
         return response()->json([
             'status' => 422,

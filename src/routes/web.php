@@ -181,7 +181,7 @@ Route::middleware([
         Route::get('/buscar-unidade', [RoleController::class, 'buscar'])->name('roles.buscar');
         Route::get('/editar/{roleId}', [RoleController::class, 'editar'])->name('roles.editar')->middleware('check.permission:edit_post,permissao');
         Route::put('/editar/{roleId}', [RoleController::class, 'salvarEditar'])->name('roles.salvarEditar')->middleware('check.permission:edit_post,permissao');
-        Route::post('/status/{roleId}', [RoleController::class, 'updateStatus'])->name('roles.status');
+        Route::post('/status/{modelName}/{id}', [RoleController::class, 'updateStatus'])->name('roles.status');
     });
 
     Route::prefix('/vendas')->group(function () {
