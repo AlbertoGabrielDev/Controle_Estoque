@@ -48,7 +48,7 @@ return new class extends Migration {
                 $table->timestamps();
 
                 // Índices úteis para busca de regra
-                $table->index(['segment_id','categoria_produto_id','ncm_padrao']);
+                $table->index(['segment_id','id_categoria_fk','ncm_padrao']);
                 $table->index(['uf_origem','uf_destino','canal','tipo_operacao']);
                 $table->index(['vigencia_inicio','vigencia_fim']);
                 $table->index(['prioridade']);
