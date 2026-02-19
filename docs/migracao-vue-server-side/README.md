@@ -14,14 +14,25 @@ Migrar todos os modulos de UI de Blade para Vue + Inertia, mantendo o visual atu
   - Padronizar query server-side com `DataTableService` + `HasDatatableConfig`.
 
 ## Estado Atual (resumo tecnico)
-- Ja em Inertia/Vue:
-  - `Clients/*`, `Taxes/*`, `Segments/*`, `Dashboard/*`, `Calendar/*`, `Wpp/*`, `Auth/*`, `Profile/*`.
-- Ainda em Blade (modulos de negocio):
-  - `categorias/*`, `produtos/*`, `estoque/*`, `fornecedor/*`, `marca/*`, `usuario/*`, `unidades/*`, `role/*`, `vendas/*`, `spreadsheets/*`.
-- Referencias tecnicas existentes:
+- Modulos de negocio migrados para Inertia/Vue:
+  - `categorias` (incluindo `Products` por categoria)
+  - `marca`
+  - `unidades`
+  - `produtos`
+  - `estoque` (incluindo `History`)
+  - `vendas`
+  - `spreadsheets`
+  - `clientes`
+  - `segmentos`
+  - `taxes`
+- Modulos ainda legados (Blade) e fora do cutover final ate o momento:
+  - `fornecedor`
+  - `usuario`
+  - `role`
+- Referencias tecnicas:
   - Front: `src/resources/js/components/DataTable.vue`
   - Back: `src/app/Services/DataTableService.php`
-  - Modelo pronto: `src/resources/js/Pages/Clients/Index.vue`
+  - Base de pagina: `src/resources/js/Pages/Clients/Index.vue`
 
 ## Regras de Implementacao
 1. Toda `Index` deve usar `DataTable.vue` com `serverSide: true`.
@@ -31,6 +42,34 @@ Migrar todos os modulos de UI de Blade para Vue + Inertia, mantendo o visual atu
 5. Filtros de tela devem refletir em querystring e recarregar DataTable sem perder estado.
 6. Preservar visual atual (classes/tokens e hierarquia de layout).
 7. Toda fase deve incluir execucao de testes com PHPUnit e registro do resultado.
+
+## Guia Rapido Para Novos Modulos
+1. Backend:
+   - Controller `index/create/edit` com `Inertia::render(...)`.
+   - Endpoint `*.data` com `DataTableService`.
+   - Modelo com `HasDatatableConfig` (`dtColumns` e `dtFilters`).
+2. Frontend:
+   - `Pages/<Modulo>/Index.vue` com `DataTable.vue` (`serverSide`).
+   - `Pages/<Modulo>/Create.vue`, `Edit.vue` e `<Modulo>Form.vue`.
+   - Filtros sincronizados via `useQueryFilters`.
+3. Acoes de tabela:
+   - Editar e status via `DataTableActions` no backend.
+   - `ButtonStatus.vue` no frontend para toggles pontuais.
+4. Testes:
+   - Criar grupo dedicado da fase/modulo no PHPUnit.
+   - Cobrir contrato de componentes Inertia + contratos de arquivo/rotas.
+
+## Fluxo Padrao Pos-Migracao
+1. Usuario acessa rota protegida (`/verdurao/...`) com middleware de permissao.
+2. Controller retorna `Inertia::render(...)`.
+3. Vue renderiza via `PrincipalLayout` e menu compartilhado (`HandleInertiaRequests`).
+4. Listagens usam DataTable server-side e filtros por querystring.
+5. Mutacoes (create/edit/status) retornam redirect com flash ou JSON padronizado.
+
+## Dividas Tecnicas Remanescentes
+- Migrar `fornecedor`, `usuario` e `role` para remover dependencia de Blade no dominio de negocio.
+- Revisar e reduzir `public/js/app.js` legada, mantendo apenas o necessario para telas Blade ainda ativas.
+- Executar gate final de PHPUnit em ambiente com `php` + `vendor` disponiveis e registrar resultado verde.
 
 ## Ordem das Fases
 1. `fase-00-diagnostico.md`

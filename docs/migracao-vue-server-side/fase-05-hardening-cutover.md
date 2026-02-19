@@ -4,14 +4,14 @@
 Finalizar a migracao com estabilidade, remover legados obsoletos e consolidar o padrao.
 
 ## Checklist Tecnico
-- [ ] Revisar todos os controllers de modulos de negocio:
-  - sem `return view(...)` nas telas migradas.
-- [ ] Revisar todas as rotas:
-  - remover rotas Blade antigas ou redirecionar para rotas Inertia.
-- [ ] Excluir os arquivos `.blade.php` obsoletos dos modulos de negocio ja migrados (apos validacao final).
+- [x] Revisar todos os controllers de modulos de negocio migrados:
+  - sem `return view(...)` nas telas migradas (`categoria.produto` e `estoque.historico` migrados para Inertia).
+- [x] Revisar todas as rotas migradas:
+  - rotas legadas de historico de vendas redirecionadas para rota Inertia principal.
+- [x] Excluir os arquivos `.blade.php` obsoletos dos modulos de negocio ja migrados.
 - [ ] Remover/neutralizar scripts legados nao usados (`public/js/app.js`) para modulos migrados.
-- [ ] Revisar imports/caminhos de paginas Vue para evitar divergencias de naming.
-- [ ] Revisar permissao e menu para todos os modulos migrados.
+- [x] Revisar imports/caminhos de paginas Vue para evitar divergencias de naming.
+- [x] Revisar permissao e menu para modulos migrados no Inertia share.
 
 ## Regressao Manual por Modulo
 - [ ] Index carrega e pagina corretamente.
@@ -22,9 +22,9 @@ Finalizar a migracao com estabilidade, remover legados obsoletos e consolidar o 
 - [ ] Permissoes aplicadas corretamente.
 
 ## Pos-Migracao
-- [ ] Atualizar README tecnico do projeto com novo fluxo padrao.
-- [ ] Criar guia rapido para novos modulos seguirem o padrao server-side.
-- [ ] Registrar dividas tecnicas remanescentes.
+- [x] Atualizar README tecnico do projeto com novo fluxo padrao.
+- [x] Criar guia rapido para novos modulos seguirem o padrao server-side.
+- [x] Registrar dividas tecnicas remanescentes.
 
 ## Criterio de Saida
 - Migracao concluida sem regressao funcional critica.
@@ -32,6 +32,11 @@ Finalizar a migracao com estabilidade, remover legados obsoletos e consolidar o 
 - Blade mantido apenas para layout raiz Inertia, emails e arquivos do ecossistema Jetstream/Fortify que nao fazem parte dos modulos de negocio.
 
 ## Testes PHPUnit
+- [x] Criar suite dedicada da fase 5 com grupo `phase5` em:
+  - `src/tests/Unit/Phase5CutoverContractsTest.php`
+  - `src/tests/Feature/Phase5InertiaHardeningTest.php`
+- [x] Definir comando de execucao isolada da fase 5:
+  - `docker compose exec -T app sh -lc 'cd /var/www/html && php vendor/bin/phpunit --group phase5'`
 - [ ] Executar `cd src && ./vendor/bin/phpunit` como gate final da migracao.
 - [ ] Garantir suite verde (ou documentar testes legados fora de escopo).
 - [ ] Registrar resultado final em `registro-andamento.md`.

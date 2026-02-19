@@ -3,12 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Models\Categoria;
+use App\Models\Produto;
 use App\Services\DataTableService;
 use App\Support\DataTableActions;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
+use Inertia\Response as InertiaResponse;
 
 class CategoriaController extends Controller
 {
@@ -96,14 +98,44 @@ class CategoriaController extends Controller
         return redirect()->route('categoria.index')->with('success', 'Inserido com sucesso');
     }
 
-    public function produto($categoriaId)
+    public function produto(int|string $categoriaId): InertiaResponse
     {
-        $categoria = Categoria::findOrFail($categoriaId)->nome_categoria;
-        $produtos = Gate::allows('view_post')
-            ? Categoria::findOrFail($categoriaId)->produtos()->paginate(10)
-            : Categoria::findOrFail($categoriaId)->produtos()->where('status', 1)->paginate(10);
+        return Inertia::render('Categories/Products', [
+            'categoriaId' => (int) $categoriaId,
+            'categoria' => fn () => (string) Categoria::query()
+                ->whereKey($categoriaId)
+                ->value('nome_categoria'),
+            'produtos' => function () use ($categoriaId) {
+                $categoria = Categoria::query()->findOrFail($categoriaId);
+                $query = $categoria->produtos()
+                    ->select([
+                        'produtos.id_produto',
+                        'produtos.cod_produto',
+                        'produtos.nome_produto',
+                        'produtos.descricao',
+                        'produtos.unidade_medida',
+                        'produtos.inf_nutriente',
+                        'produtos.status',
+                    ])
+                    ->orderBy('produtos.nome_produto');
 
-        return view('categorias.produto', compact('categoria', 'produtos'));
+                if (!Gate::allows('permissao')) {
+                    $query->where('produtos.status', 1);
+                }
+
+                return $query->paginate(10)->through(function (Produto $produto): array {
+                    return [
+                        'id_produto' => (int) $produto->id_produto,
+                        'cod_produto' => (string) $produto->cod_produto,
+                        'nome_produto' => (string) $produto->nome_produto,
+                        'descricao' => (string) $produto->descricao,
+                        'unidade_medida' => (string) $produto->unidade_medida,
+                        'inf_nutriente' => $this->normalizeNutrition($produto->inf_nutriente),
+                        'status' => (int) $produto->status,
+                    ];
+                });
+            },
+        ]);
     }
 
     public function editar($categoriaId)
@@ -126,5 +158,23 @@ class CategoriaController extends Controller
             ]);
 
         return redirect()->route('categoria.index')->with('success', 'Editado com sucesso');
+    }
+
+    private function normalizeNutrition(mixed $value): mixed
+    {
+        if (is_array($value)) {
+            return $value;
+        }
+
+        if (is_string($value)) {
+            $decoded = json_decode($value, true);
+            if (json_last_error() === JSON_ERROR_NONE) {
+                return $decoded;
+            }
+
+            return trim($value);
+        }
+
+        return $value;
     }
 }

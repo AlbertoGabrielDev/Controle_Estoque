@@ -6,6 +6,7 @@ use App\Enums\Canal;
 use App\Enums\TipoOperacao;
 use App\Http\Requests\ValidacaoEstoque;
 use App\Models\Estoque;
+use App\Models\Historico;
 use App\Models\Produto;
 use App\Repositories\EstoqueRepository;
 use App\Services\DataTableService;
@@ -15,6 +16,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
+use Inertia\Response as InertiaResponse;
 
 class EstoqueController extends Controller
 {
@@ -77,10 +79,32 @@ class EstoqueController extends Controller
         );
     }
 
-    public function historico()
+    public function historico(): InertiaResponse
     {
-        $historicos = $this->estoqueRepository->historico();
-        return view('estoque.historico', compact('historicos'));
+        return Inertia::render('Stock/History', [
+            'historicos' => fn () => Historico::query()
+                ->with([
+                    'estoques.produtos:id_produto,nome_produto',
+                    'estoques.marcas:id_marca,nome_marca',
+                    'estoques.fornecedores:id_fornecedor,nome_fornecedor',
+                ])
+                ->orderByDesc('historico_id')
+                ->paginate(20)
+                ->through(function (Historico $historico): array {
+                    $estoque = $historico->estoques;
+
+                    return [
+                        'id' => (int) $historico->historico_id,
+                        'produto' => (string) optional(optional($estoque)->produtos)->nome_produto,
+                        'marca' => (string) optional(optional($estoque)->marcas)->nome_marca,
+                        'fornecedor' => (string) optional(optional($estoque)->fornecedores)->nome_fornecedor,
+                        'quantidade_retirada' => (int) $historico->quantidade_diminuida,
+                        'quantidade' => (int) $historico->quantidade_historico,
+                        'venda' => (float) $historico->venda,
+                        'data_alteracao' => optional($historico->updated_at)->format('d/m/Y H:i:s'),
+                    ];
+                }),
+        ]);
     }
 
     public function cadastro()

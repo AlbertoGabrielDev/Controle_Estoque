@@ -8,7 +8,15 @@ const user = page.props.auth?.user ?? null
 const sidebarOpen = ref(false)
 const open = reactive({})
 
-const INERTIA_PREFIXES = ['wpp.', 'bot.']
+const INERTIA_PREFIXES = [
+    'wpp.', 'bot.', 'taxes.',
+    'categoria.', 'categorias.',
+    'clientes.', 'segmentos.',
+    'produtos.', 'estoque.',
+    'marca.', 'unidade.', 'unidades.',
+    'vendas.', 'dashboard.',
+    'spreadsheet.', 'calendar.',
+]
 const isInertiaMenu = (item) => {
     if (typeof item?.inertia === 'boolean') return item.inertia
     const name = item?.route || ''

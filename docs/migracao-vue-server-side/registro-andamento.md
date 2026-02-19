@@ -38,6 +38,51 @@
 
 ### 2026-02-19
 ### Fase
+05
+### Modulo
+hardening-cutover-inicial
+### Concluido
+- Hardening de controllers migrados concluido para eliminar `return view(...)` remanescente em:
+  - `CategoriaController::produto` -> `Inertia::render('Categories/Products')`
+  - `EstoqueController::historico` -> `Inertia::render('Stock/History')`
+- Novas paginas Vue adicionadas para cobrir os fluxos migrados:
+  - `src/resources/js/Pages/Categories/Products.vue`
+  - `src/resources/js/Pages/Stock/History.vue`
+- Filtro de menus/permissoes aplicado no share do Inertia:
+  - `src/app/Http/Middleware/HandleInertiaRequests.php`
+  - renderiza apenas menus que o usuario pode visualizar (`hasPermission(..., 'view_post')`).
+- Navegacao Inertia por prefixo de rotas expandida para modulos migrados:
+  - `src/resources/js/app.js`
+  - `src/resources/js/Layouts/PrincipalLayout.vue`
+- Blades obsoletos removidos dos modulos de negocio ja migrados:
+  - `categorias/*`
+  - `produtos/*`
+  - `estoque/{index,cadastro,editar,historico}.blade.php`
+  - `marca/*`
+  - `unidades/*`
+  - `vendas/*`
+  - `spreadsheets/index.blade.php`
+- Suite PHPUnit dedicada da fase 5 criada (grupo `phase5`):
+  - `src/tests/Unit/Phase5CutoverContractsTest.php`
+  - `src/tests/Feature/Phase5InertiaHardeningTest.php`
+- Documentacao da fase 5 atualizada com checklist tecnico/pos-migracao:
+  - `docs/migracao-vue-server-side/fase-05-hardening-cutover.md`
+  - `docs/migracao-vue-server-side/README.md`
+  - `docs/migracao-vue-server-side/modulos-matriz.md`
+### Em progresso
+- Validacao funcional manual dos fluxos `Categories/Products` e `Stock/History` no browser.
+### Bloqueios
+- Execucao do PHPUnit bloqueada neste host por indisponibilidade do binario local:
+  - `cd src; ./vendor/bin/phpunit --group phase5`
+  - retorno esperado neste host: comando nao encontrado no PowerShell.
+### Decisoes tecnicas
+- Cutover nesta etapa limitado aos modulos ja migrados; `fornecedor`, `usuario` e `role` permanecem como divida tecnica registrada.
+- Remocao de blades foi feita apenas onde o backend ja nao referencia mais `view(...)`.
+### Proximo passo imediato
+- Executar suite `phase5` em ambiente com PHP/vendor disponivel e fechar regressao manual dos fluxos migrados.
+
+### 2026-02-19
+### Fase
 04
 ### Modulo
 vendas-spreadsheets-migracao-inicial

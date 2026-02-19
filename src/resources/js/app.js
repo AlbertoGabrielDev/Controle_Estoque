@@ -36,7 +36,15 @@ const USE_PRINCIPAL   = [
 ]
 
 // Navegação Inertia por prefixo de rota
-const INERTIA_PREFIXES = ['wpp.', 'bot.', 'taxes.']
+const INERTIA_PREFIXES = [
+  'wpp.', 'bot.', 'taxes.',
+  'categoria.', 'categorias.',
+  'clientes.', 'segmentos.',
+  'produtos.', 'estoque.',
+  'marca.', 'unidade.', 'unidades.',
+  'vendas.', 'dashboard.',
+  'spreadsheet.', 'calendar.',
+]
 const isInertiaMenu = (item) => {
   if (typeof item?.inertia === 'boolean') return item.inertia
   const name = item?.route || ''
