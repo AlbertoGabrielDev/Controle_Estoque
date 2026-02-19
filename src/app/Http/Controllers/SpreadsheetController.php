@@ -6,21 +6,31 @@ use App\Jobs\ImportSpreadsheetJob;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
 use Maatwebsite\Excel\Imports\HeadingRowFormatter;
-use Illuminate\Support\Facades\Storage;
+use Inertia\Inertia;
+use Inertia\Response as InertiaResponse;
 
 class SpreadsheetController extends Controller
 {
-    public function index()
+    public function index(): InertiaResponse
     {
-        return view('spreadsheets.index');
+        return Inertia::render('Spreadsheets/Index', [
+            'maxPreviewRows' => 10000,
+            'maxUploadSizeMb' => 20,
+            'operators' => [
+                ['value' => 'igual', 'label' => 'Igual'],
+                ['value' => 'maior', 'label' => 'Maior que'],
+                ['value' => 'menor', 'label' => 'Menor que'],
+                ['value' => 'diferenca', 'label' => 'Diferenca de valor'],
+            ],
+        ]);
     }
 
     // Função para upload dos arquivos
     public function upload(Request $request)
     {
         $request->validate([
-            'file1' => 'required|mimes:xlsx,csv',
-            'file2' => 'required|mimes:xlsx,csv',
+            'file1' => 'required|file|mimes:xlsx,csv|max:20480',
+            'file2' => 'required|file|mimes:xlsx,csv|max:20480',
         ]);
 
         // Salva os arquivos no storage
@@ -31,6 +41,7 @@ class SpreadsheetController extends Controller
         ImportSpreadsheetJob::dispatch($path2, 'file2');
 
         return response()->json([
+            'success' => true,
             'message' => 'Arquivos enviados e processamento iniciado!',
             'file1' => $path1,
             'file2' => $path2

@@ -38,6 +38,50 @@
 
 ### 2026-02-19
 ### Fase
+04
+### Modulo
+vendas-spreadsheets-migracao-inicial
+### Concluido
+- Migrado `VendaController::vendas()` para `Inertia::render('Sales/Index')` com payload paginado de vendas recentes.
+- Fluxo de vendas migrado para Vue componentizado:
+  - `src/resources/js/Pages/Sales/Index.vue`
+  - `src/resources/js/Pages/Sales/ClientSelector.vue`
+  - `src/resources/js/Pages/Sales/ManualCodeInput.vue`
+  - `src/resources/js/Pages/Sales/QrScanner.vue`
+  - `src/resources/js/Pages/Sales/CartTable.vue`
+  - `src/resources/js/Pages/Sales/RecentSalesTable.vue`
+- Script inline legado de vendas migrado para composable:
+  - `src/resources/js/composables/useCart.js`
+- `SpreadsheetController@index` migrado para `Inertia::render('Spreadsheets/Index')`.
+- Fluxo de spreadsheets migrado para Vue componentizado:
+  - `src/resources/js/Pages/Spreadsheets/Index.vue`
+  - `src/resources/js/Pages/Spreadsheets/FileInputCard.vue`
+  - `src/resources/js/Pages/Spreadsheets/SpreadsheetPreviewTable.vue`
+  - `src/resources/js/Pages/Spreadsheets/ComparisonPanel.vue`
+- Rotas de spreadsheet nomeadas para consumo Vue:
+  - `spreadsheet.index`
+  - `spreadsheet.upload`
+  - `spreadsheet.data`
+  - `spreadsheet.compare`
+- Suite PHPUnit dedicada da fase 4 criada (grupo `phase4`):
+  - `src/tests/Unit/Phase4ComponentContractsTest.php`
+  - `src/tests/Feature/Phase4InertiaComponentsTest.php`
+- Build frontend validado com sucesso:
+  - `cd src && cmd /c npm run -s build`
+### Em progresso
+- Validacao funcional manual dos fluxos de venda (codigo manual/QR/carrinho/finalizacao) e spreadsheet (upload/preview/compare) no browser.
+### Bloqueios
+- Execucao do PHPUnit bloqueada neste host por indisponibilidade do binario local:
+  - `cd src; ./vendor/bin/phpunit --group phase4`
+  - retorno: comando nao encontrado no PowerShell (caminho `vendor/bin/phpunit` indisponivel).
+### Decisoes tecnicas
+- Centralizacao do estado de carrinho em `useCart` para remover acoplamento do script inline e facilitar manutencao por componente.
+- Leitura de QR no frontend baseada em `BarcodeDetector` + camera nativa; fallback orientado para entrada manual quando recurso nao estiver disponivel.
+### Proximo passo imediato
+- Executar suite `phase4` em ambiente com PHP/vendor disponivel e corrigir eventuais falhas de contrato.
+
+### 2026-02-19
+### Fase
 03
 ### Modulo
 produtos-estoque-migracao-inicial

@@ -6,37 +6,37 @@ Migrar telas com alto acoplamento em JavaScript legacy para Vue componentizado, 
 ## Vendas
 
 ### Frontend
-- [ ] Criar `Pages/Sales/Index.vue` para registro de venda.
-- [ ] Quebrar fluxo em componentes:
-  - [ ] `ClientSelector.vue`
-  - [ ] `ManualCodeInput.vue`
-  - [ ] `QrScanner.vue`
-  - [ ] `CartTable.vue`
-  - [ ] `RecentSalesTable.vue`
-- [ ] Migrar script inline (atual em Blade) para composable `useCart`.
+- [x] Criar `Pages/Sales/Index.vue` para registro de venda.
+- [x] Quebrar fluxo em componentes:
+  - [x] `ClientSelector.vue`
+  - [x] `ManualCodeInput.vue`
+  - [x] `QrScanner.vue`
+  - [x] `CartTable.vue`
+  - [x] `RecentSalesTable.vue`
+- [x] Migrar script inline (atual em Blade) para composable `useCart`.
 
 ### Backend
-- [ ] Converter `vendas()` para `Inertia::render`.
-- [ ] Manter endpoints de carrinho/produto/finalizacao existentes.
-- [ ] Revisar padrao de resposta JSON para consistencia de erros/sucesso.
+- [x] Converter `vendas()` para `Inertia::render`.
+- [x] Manter endpoints de carrinho/produto/finalizacao existentes.
+- [x] Revisar padrao de resposta JSON para consistencia de erros/sucesso.
 
 ### Requisitos funcionais
-- [ ] Leitura por codigo manual.
-- [ ] Leitura por QR code.
-- [ ] Carrinho com incremento/decremento/remocao.
-- [ ] Finalizacao de venda com validacao de estoque.
+- [x] Leitura por codigo manual.
+- [x] Leitura por QR code.
+- [x] Carrinho com incremento/decremento/remocao.
+- [x] Finalizacao de venda com validacao de estoque.
 
 ## Spreadsheets
 
 ### Frontend
-- [ ] Criar `Pages/Spreadsheets/Index.vue`.
-- [ ] Migrar upload duplo, preview de colunas e comparador para componentes Vue.
-- [ ] Remover dependencia de script inline jQuery nesta tela.
+- [x] Criar `Pages/Spreadsheets/Index.vue`.
+- [x] Migrar upload duplo, preview de colunas e comparador para componentes Vue.
+- [x] Remover dependencia de script inline jQuery nesta tela.
 
 ### Backend
-- [ ] Converter `SpreadsheetController@index` para Inertia.
-- [ ] Manter endpoints de upload/read/compare.
-- [ ] Validar limites de carga e experiencia em arquivos grandes.
+- [x] Converter `SpreadsheetController@index` para Inertia.
+- [x] Manter endpoints de upload/read/compare.
+- [x] Validar limites de carga e experiencia em arquivos grandes.
 
 ## Criterio de Saida
 - Vendas e Spreadsheets operando em Vue/Inertia.
@@ -44,6 +44,11 @@ Migrar telas com alto acoplamento em JavaScript legacy para Vue componentizado, 
 - Fluxos complexos preservados com mesma regra de negocio.
 
 ## Testes PHPUnit
+- [x] Criar suite dedicada da fase 4 com grupo `phase4` em:
+  - `src/tests/Unit/Phase4ComponentContractsTest.php`
+  - `src/tests/Feature/Phase4InertiaComponentsTest.php`
+- [x] Definir comando de execucao isolada da fase 4:
+  - `docker compose exec -T app sh -lc 'cd /var/www/html && php vendor/bin/phpunit --group phase4'`
 - [ ] Executar `cd src && ./vendor/bin/phpunit` ao final da fase.
 - [ ] Corrigir falhas relacionadas aos fluxos de vendas/spreadsheets.
-- [ ] Registrar resultado da execucao em `registro-andamento.md`.
+- [x] Registrar progresso tecnico em `registro-andamento.md`.

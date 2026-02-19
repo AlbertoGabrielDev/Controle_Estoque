@@ -195,11 +195,11 @@ Route::middleware([
         Route::get('/calendar', [CalendarController::class, 'index'])->name('vendas.calendar');
     });
 
-    Route::prefix('/spreadsheet')->group(function () {
-        Route::post('/upload', [SpreadsheetController::class, 'upload']);
-        Route::get('/data/{filename}', [SpreadsheetController::class, 'readFile']);
-        Route::get('/', [SpreadsheetController::class, 'index']);
-        Route::post('/compare', [SpreadsheetController::class, 'compare']);
+    Route::prefix('/spreadsheet')->name('spreadsheet.')->group(function () {
+        Route::post('/upload', [SpreadsheetController::class, 'upload'])->name('upload');
+        Route::get('/data/{filename}', [SpreadsheetController::class, 'readFile'])->name('data');
+        Route::get('/', [SpreadsheetController::class, 'index'])->name('index');
+        Route::post('/compare', [SpreadsheetController::class, 'compare'])->name('compare');
     });
 
 

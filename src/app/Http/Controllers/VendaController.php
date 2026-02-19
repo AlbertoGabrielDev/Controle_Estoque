@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Venda;
 use App\Services\VendaService;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
+use Inertia\Response as InertiaResponse;
 
 class VendaController extends Controller
 {
@@ -13,10 +15,28 @@ class VendaController extends Controller
         //
     }
 
-    public function vendas()
+    public function vendas(): InertiaResponse
     {
-        $vendas = Venda::with('usuario')->paginate(10);
-        return view('vendas.venda', compact('vendas'));
+        return Inertia::render('Sales/Index', [
+            'vendas' => fn () => Venda::query()
+                ->with([
+                    'usuario:id,name',
+                    'produto:id_produto,nome_produto,cod_produto',
+                ])
+                ->latest()
+                ->paginate(10)
+                ->through(function (Venda $venda): array {
+                    return [
+                        'id' => $venda->id,
+                        'nome_produto' => (string) ($venda->nome_produto ?: optional($venda->produto)->nome_produto),
+                        'preco_venda' => (float) $venda->preco_venda,
+                        'cod_produto' => (string) ($venda->cod_produto ?: optional($venda->produto)->cod_produto),
+                        'quantidade' => (int) $venda->quantidade,
+                        'vendedor' => (string) optional($venda->usuario)->name,
+                        'data' => optional($venda->created_at)->format('Y-m-d H:i:s'),
+                    ];
+                }),
+        ]);
     }
 
     public function buscarProduto(Request $request)
@@ -204,6 +224,6 @@ class VendaController extends Controller
 
     public function historicoVendas()
     {
-        return view('vendas.historico_vendas');
+        return redirect()->route('vendas.venda');
     }
 }

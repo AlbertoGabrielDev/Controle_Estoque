@@ -28,7 +28,7 @@ initializeTheme()
 // Regras de layout
 const USE_VUE_SIDEBAR = [/^Wpp\//, /^Bot\//]
 const USE_PRINCIPAL   = [
-  /^Dashboard\//, /^Calendar\//, /^Vendas\//, /^Estoque\//, /^Categoria\//,
+  /^Dashboard\//, /^Calendar\//, /^Vendas\//, /^Sales\//, /^Spreadsheets\//, /^Estoque\//, /^Categoria\//,
   /^Fornecedor\//, /^Marca\//, /^Usuario\//, /^Unidade\//, /^Roles\//,
   /^Brands\//, /^Units\//, /^Categories\//,
   /^Products\//, /^Stock\//,
