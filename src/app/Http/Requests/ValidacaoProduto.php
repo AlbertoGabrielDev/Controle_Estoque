@@ -6,31 +6,32 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class ValidacaoProduto extends FormRequest
 {
-
     public function authorize(): bool
     {
         return true;
     }
+
     public function rules(): array
     {
-      
         return [
-            'nome_produto' => 'required|unique:produto,nome_produto|max:60',
-            'descricao'  => 'required|max:255',
-            'unidade_medida'  => 'required',
-            'cod_produto'  => 'required|unique:produto,cod_produto|max:60',
-            'inf_nutrientes'  => 'required|max:255',
-            'nome_categoria'  => 'required',
+            'cod_produto' => 'required|string|max:60|unique:produtos,cod_produto',
+            'nome_produto' => 'required|string|max:60|unique:produtos,nome_produto',
+            'descricao' => 'required|string|max:255',
+            'unidade_medida' => 'required|string|max:10',
+            'inf_nutriente' => 'nullable|string',
+            'id_categoria_fk' => 'required|integer|exists:categorias,id_categoria',
         ];
     }
 
     public function messages(): array
     {
         return [
-            'nome_produto.required' =>'O campo "Nome do produto" é obrigatorio',
-            'nome_produto.unique' => 'O nome do produto já está cadastrado',
-            'nome_produto.max' => 'Máximo de caracteres excedido',
-            'cod_produto.unique' => 'Código de Produto já cadastrado'
+            'nome_produto.required' => 'O campo "Nome do produto" é obrigatório.',
+            'nome_produto.unique' => 'O nome do produto já está cadastrado.',
+            'cod_produto.required' => 'O campo "Código do produto" é obrigatório.',
+            'cod_produto.unique' => 'Código de produto já cadastrado.',
+            'id_categoria_fk.required' => 'Selecione uma categoria.',
+            'id_categoria_fk.exists' => 'Categoria inválida.',
         ];
     }
 }

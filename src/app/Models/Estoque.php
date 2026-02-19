@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Traits\HasDatatableConfig;
 use App\Traits\HasStatus;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -15,6 +16,7 @@ use Illuminate\Support\Facades\Gate;
 class Estoque extends Model
 {
     use HasStatus;
+    use HasDatatableConfig;
 
     protected $table = 'estoques';
     protected $primaryKey = 'id_estoque';
@@ -134,9 +136,108 @@ class Estoque extends Model
         return $this->belongsTo(Marca::class, 'id_marca_fk', 'id_marca');
     }
 
-      public function tax(): BelongsTo
+    public function tax(): BelongsTo
     {
         return $this->belongsTo(TaxRule::class, 'id_tax_fk', 'id');
     }
+
+    public static function dtColumns(): array
+    {
+        $t = (new static)->getTable();
+
+        $joinProduto = ['produtos', 'produtos.id_produto', '=', "{$t}.id_produto_fk", 'left'];
+        $joinFornecedor = ['fornecedores', 'fornecedores.id_fornecedor', '=', "{$t}.id_fornecedor_fk", 'left'];
+        $joinMarca = ['marcas', 'marcas.id_marca', '=', "{$t}.id_marca_fk", 'left'];
+
+        return [
+            'id' => ['db' => "{$t}.id_estoque", 'label' => '#', 'order' => true, 'search' => false],
+            'c1' => ['db' => 'produtos.cod_produto', 'label' => 'Código', 'order' => true, 'search' => true, 'join' => $joinProduto],
+            'c2' => ['db' => 'produtos.nome_produto', 'label' => 'Produto', 'order' => true, 'search' => true, 'join' => $joinProduto],
+            'c3' => ['db' => 'fornecedores.nome_fornecedor', 'label' => 'Fornecedor', 'order' => true, 'search' => true, 'join' => $joinFornecedor],
+            'c4' => ['db' => "{$t}.preco_custo", 'label' => 'Custo', 'order' => true, 'search' => false],
+            'c5' => ['db' => "{$t}.preco_venda", 'label' => 'Venda', 'order' => true, 'search' => false],
+            'c6' => ['db' => "{$t}.quantidade", 'label' => 'Quantidade', 'order' => true, 'search' => false],
+            'c7' => ['db' => "{$t}.lote", 'label' => 'Lote', 'order' => true, 'search' => true],
+            'c8' => ['db' => "{$t}.localizacao", 'label' => 'Localização', 'order' => true, 'search' => true],
+            'c9' => ['db' => "{$t}.validade", 'label' => 'Validade', 'order' => true, 'search' => false],
+            'c10' => ['db' => 'marcas.nome_marca', 'label' => 'Marca', 'order' => true, 'search' => true, 'join' => $joinMarca],
+            'st' => ['db' => "{$t}.status", 'label' => 'Status', 'order' => true, 'search' => false],
+            'acoes' => ['computed' => true],
+        ];
+    }
+
+    public static function dtFilters(): array
+    {
+        $t = (new static)->getTable();
+
+        return [
+            'q' => [
+                'type' => 'text',
+                'columns' => [
+                    'produtos.cod_produto',
+                    'produtos.nome_produto',
+                    'fornecedores.nome_fornecedor',
+                    'marcas.nome_marca',
+                    "{$t}.lote",
+                    "{$t}.localizacao",
+                ],
+            ],
+            'status' => [
+                'type' => 'select',
+                'column' => "{$t}.status",
+                'cast' => 'int',
+                'operator' => '=',
+                'nullable' => true,
+            ],
+            'cod_produto' => [
+                'type' => 'text',
+                'columns' => ['produtos.cod_produto'],
+            ],
+            'nome_produto' => [
+                'type' => 'text',
+                'columns' => ['produtos.nome_produto'],
+            ],
+            'nome_fornecedor' => [
+                'type' => 'text',
+                'columns' => ['fornecedores.nome_fornecedor'],
+            ],
+            'nome_marca' => [
+                'type' => 'text',
+                'columns' => ['marcas.nome_marca'],
+            ],
+            'lote' => [
+                'type' => 'text',
+                'columns' => ["{$t}.lote"],
+            ],
+            'localizacao' => [
+                'type' => 'text',
+                'columns' => ["{$t}.localizacao"],
+            ],
+            'quantidade' => [
+                'type' => 'number',
+                'column' => "{$t}.quantidade",
+                'operator' => '=',
+            ],
+            'preco_custo' => [
+                'type' => 'number',
+                'column' => "{$t}.preco_custo",
+                'operator' => '=',
+            ],
+            'preco_venda' => [
+                'type' => 'number',
+                'column' => "{$t}.preco_venda",
+                'operator' => '=',
+            ],
+            'validade' => [
+                'type' => 'date',
+                'column' => "{$t}.validade",
+            ],
+            'data_chegada' => [
+                'type' => 'date',
+                'column' => "{$t}.data_chegada",
+            ],
+        ];
+    }
+
     use HasFactory;
 }

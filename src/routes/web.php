@@ -102,22 +102,23 @@ Route::middleware([
 
 
     Route::prefix('/produtos')->group(function () {
-        Route::get('/index', [ProdutoController::class, 'Index'])->name('produtos.index')->middleware('check.permission:view_post,Produtos');
+        Route::get('/index', [ProdutoController::class, 'index'])->name('produtos.index')->middleware('check.permission:view_post,Produtos');
+        Route::get('/data', [ProdutoController::class, 'data'])->name('produtos.data')->middleware(['web', 'auth']);
         Route::get('/cadastro', [ProdutoController::class, 'cadastro'])->name('produtos.cadastro')->middleware('check.permission:create_post,Produtos');
         Route::post('/salvar-cadastro', [ProdutoController::class, 'inserirCadastro'])->name('produtos.salvarCadastro');
         Route::get('/buscar-produto', [ProdutoController::class, 'buscarProduto'])->name('produtos.buscar');
         Route::get('/editar/{produtoId}', [ProdutoController::class, 'editar'])->name('produtos.editar')->middleware('check.permission:edit_post,Produtos');
         Route::post('/editar/{produtoId}', [ProdutoController::class, 'salvarEditar'])->name('produtos.salvarEditar');
         Route::post('/status/{modelName}/{id}', [ProdutoController::class, 'updateStatus'])->name('produto.status');
-        Route::get('/produtos/data', [ProdutoController::class, 'data'])->name('produtos.data')->middleware(['web', 'auth']);
     });
 
     Route::prefix('/estoque')->group(function () {
-        Route::get('/', [EstoqueController::class, 'Index'])->name('estoque.index')->middleware('check.permission:view_post,estoque');
-        Route::get('/cadastro', [EstoqueController::class, 'Cadastro'])->name('estoque.cadastro')->middleware('check.permission:create_post,estoque');
+        Route::get('/', [EstoqueController::class, 'index'])->name('estoque.index')->middleware('check.permission:view_post,estoque');
+        Route::get('/data', [EstoqueController::class, 'data'])->name('estoque.data')->middleware('check.permission:view_post,estoque');
+        Route::get('/cadastro', [EstoqueController::class, 'cadastro'])->name('estoque.cadastro')->middleware('check.permission:create_post,estoque');
         Route::post('/cadastro', [EstoqueController::class, 'inserirEstoque'])->name('estoque.inserirEstoque');
         Route::get('/buscar-estoque', [EstoqueController::class, 'buscar'])->name('estoque.buscar');
-        Route::post('/estoque/calc-impostos', [EstoqueController::class, 'calcImpostos'])->name('estoque.calcImpostos');
+        Route::post('/calc-impostos', [EstoqueController::class, 'calcImpostos'])->name('estoque.calcImpostos');
         Route::get('/editar/{estoqueId}', [EstoqueController::class, 'editar'])->name('estoque.editar')->middleware('check.permission:edit_post,estoque');
         Route::put('/editar/{estoqueId}', [EstoqueController::class, 'salvarEditar'])->name('estoque.salvarEditar');
         Route::post('/status/{modelName}/{id}', [EstoqueController::class, 'updateStatus'])->middleware('check.permission:status,estoque')->name('estoque.status');

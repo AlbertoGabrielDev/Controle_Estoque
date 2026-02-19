@@ -6,7 +6,6 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class ValidacaoEstoque extends FormRequest
 {
-
     public function authorize(): bool
     {
         return true;
@@ -15,6 +14,9 @@ class ValidacaoEstoque extends FormRequest
     public function rules(): array
     {
         return [
+            'id_produto_fk' => 'required|integer|exists:produtos,id_produto',
+            'id_fornecedor_fk' => 'required|integer|exists:fornecedores,id_fornecedor',
+            'id_marca_fk' => 'required|integer|exists:marcas,id_marca',
             'localizacao' => 'nullable|string|max:10',
             'preco_custo' => 'nullable|numeric',
             'preco_venda' => 'nullable|numeric',
@@ -23,20 +25,21 @@ class ValidacaoEstoque extends FormRequest
             'lote' => 'nullable|string|max:20',
             'quantidade' => 'required|numeric|min:0|lte:10000',
             'quantidade_aviso' => 'nullable|numeric|min:0|lte:10000',
-
         ];
     }
+
     public function messages(): array
     {
-        return[
-            'localizacao.max' => 'Maximo de número permitido no campo Localização e 10',
-            'preco_custo.max' => 'Maximo de número permitido no campo Preço Custo e 10',
-            'preco_venda' => 'Maximo de número permitido no campo Preço Venda e 10',
-            'data_chegada.date' => 'Formato de data errado',
-            'validade.date' => 'Formato de data errado',
-            'quantidade.max' => 'Maximo de número permitido no campo Quantidade e 10000',
-            'lote' => 'Maximo de número permitido no campo Lote e 20',
-          
+        return [
+            'id_produto_fk.required' => 'Selecione um produto.',
+            'id_fornecedor_fk.required' => 'Selecione um fornecedor.',
+            'id_marca_fk.required' => 'Selecione uma marca.',
+            'localizacao.max' => 'Máximo de número permitido no campo Localização é 10.',
+            'data_chegada.date' => 'Formato de data inválido.',
+            'validade.date' => 'Formato de data inválido.',
+            'quantidade.lte' => 'Quantidade máxima permitida é 10000.',
+            'quantidade_aviso.lte' => 'Quantidade de aviso máxima permitida é 10000.',
+            'lote.max' => 'Máximo de caracteres para lote é 20.',
         ];
     }
 }

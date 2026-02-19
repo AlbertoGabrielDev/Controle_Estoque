@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Traits\HasDatatableConfig;
 use App\Traits\HasStatus;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -16,6 +17,7 @@ class Produto extends Model implements Transformable
     use TransformableTrait;
     use HasFactory;
     use HasStatus;
+    use HasDatatableConfig;
     protected $table = 'produtos';
     protected $primaryKey = 'id_produto';
 
@@ -83,5 +85,45 @@ class Produto extends Model implements Transformable
             'id'
         )
             ->withTimestamps();
+    }
+
+    public static function dtColumns(): array
+    {
+        $t = (new static)->getTable();
+
+        return [
+            'id' => ['db' => "{$t}.id_produto", 'label' => '#', 'order' => true, 'search' => false],
+            'c1' => ['db' => "{$t}.cod_produto", 'label' => 'Código', 'order' => true, 'search' => true],
+            'c2' => ['db' => "{$t}.nome_produto", 'label' => 'Nome', 'order' => true, 'search' => true],
+            'c3' => ['db' => "{$t}.descricao", 'label' => 'Descrição', 'order' => true, 'search' => true],
+            'c4' => ['db' => "{$t}.unidade_medida", 'label' => 'Unidade', 'order' => true, 'search' => true],
+            'c5' => ['db' => "{$t}.inf_nutriente", 'label' => 'Nutrição', 'order' => false, 'search' => false],
+            'st' => ['db' => "{$t}.status", 'label' => 'Status', 'order' => true, 'search' => false],
+            'acoes' => ['computed' => true],
+        ];
+    }
+
+    public static function dtFilters(): array
+    {
+        $t = (new static)->getTable();
+
+        return [
+            'q' => [
+                'type' => 'text',
+                'columns' => [
+                    "{$t}.cod_produto",
+                    "{$t}.nome_produto",
+                    "{$t}.descricao",
+                    "{$t}.unidade_medida",
+                ],
+            ],
+            'status' => [
+                'type' => 'select',
+                'column' => "{$t}.status",
+                'cast' => 'int',
+                'operator' => '=',
+                'nullable' => true,
+            ],
+        ];
     }
 }

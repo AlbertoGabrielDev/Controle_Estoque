@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class ValidacaoProdutoEditar extends FormRequest
 {
@@ -10,20 +11,41 @@ class ValidacaoProdutoEditar extends FormRequest
     {
         return true;
     }
+
     public function rules(): array
     {
-        return [
-            'descricao' => 'required|max:255',
-            'inf_nutriente' => ['nullable', 'json'],
+        $produtoId = (int) $this->route('produtoId');
 
+        return [
+            'cod_produto' => [
+                'required',
+                'string',
+                'max:60',
+                Rule::unique('produtos', 'cod_produto')->ignore($produtoId, 'id_produto'),
+            ],
+            'nome_produto' => [
+                'required',
+                'string',
+                'max:60',
+                Rule::unique('produtos', 'nome_produto')->ignore($produtoId, 'id_produto'),
+            ],
+            'descricao' => 'required|string|max:255',
+            'unidade_medida' => 'required|string|max:10',
+            'inf_nutriente' => 'nullable|string',
+            'qrcode' => 'nullable|string|max:255',
+            'id_categoria_fk' => 'required|integer|exists:categorias,id_categoria',
         ];
     }
 
     public function messages(): array
     {
         return [
-            'descricao.max' => 'Máximo de caracteres para o Descrição excedido. Max:60',
-            'inf_nutrientes.max' => 'Máximo de caracteres para o Inf. Nutrientes excedido. Max:255',
+            'nome_produto.required' => 'O campo "Nome do produto" é obrigatório.',
+            'nome_produto.unique' => 'O nome do produto já está cadastrado.',
+            'cod_produto.required' => 'O campo "Código do produto" é obrigatório.',
+            'cod_produto.unique' => 'Código de produto já cadastrado.',
+            'id_categoria_fk.required' => 'Selecione uma categoria.',
+            'id_categoria_fk.exists' => 'Categoria inválida.',
         ];
     }
 }

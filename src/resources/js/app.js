@@ -31,6 +31,7 @@ const USE_PRINCIPAL   = [
   /^Dashboard\//, /^Calendar\//, /^Vendas\//, /^Estoque\//, /^Categoria\//,
   /^Fornecedor\//, /^Marca\//, /^Usuario\//, /^Unidade\//, /^Roles\//,
   /^Brands\//, /^Units\//, /^Categories\//,
+  /^Products\//, /^Stock\//,
   /^Clients\//, /^Segments\//, /^Taxes\//,
 ]
 

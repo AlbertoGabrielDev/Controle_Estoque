@@ -38,6 +38,46 @@
 
 ### 2026-02-19
 ### Fase
+03
+### Modulo
+produtos-estoque-migracao-inicial
+### Concluido
+- Migrado `ProdutoController` para Inertia/Vue com:
+  - `Products/Index`, `Products/Create`, `Products/Edit`
+  - endpoint `produtos.data` via `DataTableService` + `HasDatatableConfig`
+  - normalizacao de `inf_nutriente` e persistencia da categoria via pivot `categoria_produtos`
+- Migrado `EstoqueController` para Inertia/Vue com:
+  - `Stock/Index`, `Stock/Create`, `Stock/Edit`
+  - endpoint `estoque.data` via `DataTableService` + `HasDatatableConfig`
+  - endpoint `estoque.calcImpostos` adaptado para retornar `vm` + `raw` para consumo Vue
+  - fluxo de gravacao mantendo `imposto_total`, `impostos_json` e `id_tax_fk`
+- Criados componentes Vue da fase 3:
+  - `src/resources/js/Pages/Products/*`
+  - `src/resources/js/Pages/Stock/*`
+- Adicionado componente de preview de impostos em Vue:
+  - `src/resources/js/Pages/Stock/StockTaxPreview.vue`
+- Modelos preparados para server-side padrao:
+  - `Produto`: `HasDatatableConfig` + `dtColumns/dtFilters`
+  - `Estoque`: `HasDatatableConfig` + `dtColumns/dtFilters`
+- Rotas atualizadas para fase 3:
+  - `produtos.data`
+  - `estoque.data`
+  - ajuste de path de `estoque.calcImpostos` para `/estoque/calc-impostos`
+- Criada suite PHPUnit dedicada da fase 3 (grupo `phase3`):
+  - `src/tests/Unit/Phase3DatatableContractsTest.php`
+  - `src/tests/Feature/Phase3InertiaComponentsTest.php`
+### Em progresso
+- Validacao funcional manual de fluxos de produto/estoque no browser.
+### Bloqueios
+- Host local sem runtime PHP para executar PHPUnit (`php` indisponivel).
+### Decisoes tecnicas
+- Fase 3 segue o mesmo padrao de governanca da fase 1/2 com grupo de testes dedicado por fase.
+- Preview de impostos migrou de partial Blade para componente Vue com contrato JSON do backend.
+### Proximo passo imediato
+- Validar a onda inicial da fase 3 e seguir para hardening de regras de negocio (impostos/edicao/historico).
+
+### 2026-02-19
+### Fase
 02
 ### Modulo
 crud-baixo-risco-testes-phase2

@@ -2,59 +2,124 @@
 
 namespace App\Http\Controllers;
 
-use App\Services\VendaService;
-use Illuminate\Http\Request;
 use App\Http\Requests\ValidacaoProduto;
 use App\Http\Requests\ValidacaoProdutoEditar;
-use App\Repositories\ProdutoRepository;
+use App\Models\Categoria;
+use App\Models\Produto;
+use App\Services\DataTableService;
+use App\Support\DataTableActions;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
+use Inertia\Inertia;
 
 class ProdutoController extends Controller
 {
-    protected $produtoRepository;
-    protected $venda;
-    public function __construct(ProdutoRepository $produtoRepository, VendaService $venda)
-    {
-        $this->produtoRepository = $produtoRepository;
-        $this->venda = $venda;
-    }
-    public function index()
-    {
-        return view('produtos.index');
+    public function __construct(
+        private DataTableService $dt
+    ) {
     }
 
-    public function data()
+    public function index(Request $request)
     {
-        return $this->produtoRepository->getData();
+        return Inertia::render('Products/Index', [
+            'filters' => [
+                'q' => (string) $request->query('q', ''),
+                'status' => (string) $request->query('status', ''),
+            ],
+        ]);
+    }
+
+    public function data(Request $request)
+    {
+        [$query, $columnsMap] = Produto::makeDatatableQuery($request);
+
+        return $this->dt->make(
+            $query,
+            $columnsMap,
+            rawColumns: ['acoes'],
+            decorate: function ($dt) {
+                $dt->addColumn('acoes', function ($row) {
+                    return DataTableActions::wrap([
+                        DataTableActions::edit('produtos.editar', $row->id),
+                        DataTableActions::status('produto.status', 'produto', $row->id, (bool) $row->st),
+                    ], 'end');
+                });
+            }
+        );
     }
 
     public function cadastro()
     {
-        $categorias = $this->produtoRepository->Cadastro();
-        return view('produtos.cadastro', compact('categorias'));
+        return Inertia::render('Products/Create', [
+            'categorias' => Categoria::query()
+                ->select('id_categoria', 'nome_categoria')
+                ->orderBy('nome_categoria')
+                ->get(),
+        ]);
     }
 
     public function inserirCadastro(ValidacaoProduto $request)
     {
-        $this->produtoRepository->inserirCadastro($request);
+        $validated = $request->validated();
+        $nutrition = $this->normalizeNutrition($validated['inf_nutriente'] ?? null);
+
+        $produto = Produto::create([
+            'nome_produto' => $validated['nome_produto'],
+            'cod_produto' => $validated['cod_produto'],
+            'descricao' => $validated['descricao'],
+            'unidade_medida' => $validated['unidade_medida'],
+            'inf_nutriente' => $nutrition,
+            'qrcode' => (string) Str::uuid(),
+            'id_users_fk' => Auth::id(),
+        ]);
+
+        $produto->categorias()->sync([$validated['id_categoria_fk']]);
+
         return redirect()->route('produtos.index')->with('success', 'Inserido com sucesso');
     }
 
     public function buscarProduto(Request $request)
     {
-        $produtos = $this->produtoRepository->buscar($request);
-        return view('produtos.index', compact('produtos'));
+        return redirect()->route('produtos.index', [
+            'q' => (string) $request->input('nome_produto', ''),
+        ]);
     }
 
     public function editar($produtoId)
     {
-        $data = $this->produtoRepository->editarView($produtoId);
-        return view('produtos.editar', $data); 
+        $produto = Produto::query()
+            ->with('categorias:id_categoria,nome_categoria')
+            ->findOrFail($produtoId);
+
+        return Inertia::render('Products/Edit', [
+            'produto' => $produto,
+            'categorias' => Categoria::query()
+                ->select('id_categoria', 'nome_categoria')
+                ->orderBy('nome_categoria')
+                ->get(),
+            'categoriaSelecionada' => optional($produto->categorias->first())->id_categoria,
+        ]);
     }
 
     public function salvarEditar(ValidacaoProdutoEditar $request, $produtoId)
     {
-        $this->produtoRepository->update($request, $produtoId);
+        $produto = Produto::query()->findOrFail($produtoId);
+        $validated = $request->validated();
+        $nutrition = $this->normalizeNutrition($validated['inf_nutriente'] ?? null);
+
+        $produto->update([
+            'cod_produto' => $validated['cod_produto'],
+            'nome_produto' => $validated['nome_produto'],
+            'descricao' => $validated['descricao'],
+            'unidade_medida' => $validated['unidade_medida'],
+            'qrcode' => $validated['qrcode'] ?? $produto->qrcode,
+            'inf_nutriente' => $nutrition,
+        ]);
+
+        $produto->categorias()->sync([$validated['id_categoria_fk']]);
+
         return redirect()->route('produtos.index')->with('success', 'Editado com sucesso');
     }
 
@@ -98,9 +163,9 @@ class ProdutoController extends Controller
             });
             $orderSql = "CASE
             WHEN p.nome_produto COLLATE {$collation} = ?  THEN 400
-            WHEN p.nome_produto COLLATE {$collation} LIKE ? THEN 300   -- começa com
-            WHEN p.nome_produto COLLATE {$collation} LIKE ? THEN 200   -- contém
-            WHEN p.cod_produto   COLLATE {$collation} LIKE ? THEN 150  -- SKU contém
+            WHEN p.nome_produto COLLATE {$collation} LIKE ? THEN 300
+            WHEN p.nome_produto COLLATE {$collation} LIKE ? THEN 200
+            WHEN p.cod_produto   COLLATE {$collation} LIKE ? THEN 150
             ELSE 0 END DESC, p.nome_produto ASC";
 
             $orderBindings = [
@@ -114,6 +179,7 @@ class ProdutoController extends Controller
         } else {
             $query->orderBy('p.nome_produto');
         }
+
         $rows = $query->limit(25)->get()->map(function ($r) {
             $r->preco_venda = (float) $r->preco_venda;
             $r->qtd_disponivel = (int) $r->qtd_disponivel;
@@ -123,12 +189,17 @@ class ProdutoController extends Controller
         return response()->json($rows);
     }
 
-    // public function show(string $sku)
-    // {
-    //     $p = $this->venda->getProductBySku($sku);
-    //     if (!$p)
-    //         return response()->json(['message' => 'Produto não encontrado'], 404);
-    //     return response()->json($p);
-    // }
+    private function normalizeNutrition(string|null $value): array|null
+    {
+        if ($value === null || trim($value) === '') {
+            return null;
+        }
 
+        $decoded = json_decode($value, true);
+        if (json_last_error() === JSON_ERROR_NONE) {
+            return $decoded;
+        }
+
+        return ['texto' => trim($value)];
+    }
 }
