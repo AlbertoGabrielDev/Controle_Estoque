@@ -2,109 +2,131 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Support\Facades\Gate;
-use Illuminate\Http\Request;
-use Illuminate\Pagination\Paginator;
-use App\Models\User;
-use App\Http\Requests\ValidacaoUsuario;
 use App\Models\Role;
 use App\Models\Unidades;
-use App\Models\Usuario;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
+use App\Models\User;
+use App\Services\DataTableService;
+use App\Support\DataTableActions;
+use Carbon\Carbon;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
+use Inertia\Inertia;
 
 class UsuarioController extends Controller
 {
-    public function Index()
-    {
-        $usuarios = User::select([
-            'users.id',
-            'users.name',
-            'users.email',
-            'users.created_at',
-            'users.profile_photo_path',
-            'users.status',
-            DB::raw("GROUP_CONCAT(roles.name ORDER BY roles.name ASC SEPARATOR ', ') as role_names")
-        ])
-            ->leftJoin('user_roles', 'user_roles.user_id', '=', 'users.id')
-            ->leftJoin('roles', 'user_roles.role_id', '=', 'roles.id')
-            ->groupBy('users.id', 'users.name', 'users.email', 'users.created_at', 'users.profile_photo_path', 'users.status')
-            ->paginate(10);
-
-        return view('usuario.index', compact('usuarios'));
+    public function __construct(
+        private DataTableService $dt
+    ) {
     }
 
-    public function Cadastro()
+    public function index(Request $request)
     {
-        $roles = Role::all();
-        $units = Unidades::all();
-        return view('usuario.cadastro', compact('units', 'roles'))->with('success', 'Usuario inserido com sucesso');
+        return Inertia::render('Users/Index', [
+            'filters' => [
+                'q' => (string) $request->query('q', ''),
+                'status' => (string) $request->query('status', ''),
+            ],
+        ]);
+    }
+
+    public function data(Request $request)
+    {
+        [$query, $columnsMap] = User::makeDatatableQuery($request);
+
+        $query->addSelect([
+            'users.profile_photo_path as avatar',
+            'users.created_at as created_at',
+            DB::raw("(SELECT GROUP_CONCAT(roles.name ORDER BY roles.name ASC SEPARATOR ', ') FROM user_roles LEFT JOIN roles ON roles.id = user_roles.role_id WHERE user_roles.user_id = users.id) as roles"),
+        ]);
+
+        return $this->dt->make(
+            $query,
+            $columnsMap,
+            rawColumns: ['acoes'],
+            decorate: function ($dt) {
+                $dt->addColumn('roles', fn ($row) => trim((string) ($row->roles ?? '')) ?: '-');
+                $dt->addColumn('avatar', fn ($row) => $this->resolveAvatarPath($row->avatar ?? null));
+                $dt->addColumn('created_at_fmt', function ($row) {
+                    if (empty($row->created_at)) {
+                        return '-';
+                    }
+
+                    return Carbon::parse($row->created_at)->format('d/m/Y');
+                });
+                $dt->addColumn('acoes', function ($row) {
+                    return DataTableActions::wrap([
+                        DataTableActions::edit('usuario.editar', $row->id),
+                        DataTableActions::status('usuario.status', 'usuario', $row->id, (bool) $row->st),
+                    ]);
+                });
+            }
+        );
+    }
+
+    public function cadastro()
+    {
+        return Inertia::render('Users/Create', [
+            'roles' => Role::query()->orderBy('name')->get(['id', 'name']),
+            'units' => Unidades::query()->orderBy('nome')->get(['id_unidade', 'nome']),
+        ]);
     }
 
     public function buscar(Request $request)
     {
-        $usuarios = User::where('name', 'like', '%' . $request->input('name') . '%')
-            ->where('id', '!=', 1)
-            ->paginate(10);
-        return view('usuario.index', compact('usuarios'));
+        return redirect()->route('usuario.index', [
+            'q' => (string) $request->input('name', ''),
+        ]);
     }
 
     public function editar($usuarioId)
     {
         $usuario = User::with(['unidade', 'roles'])->findOrFail($usuarioId);
-        $units = Unidades::all();
-        $roles = Role::all();
 
-        return view('usuario.editar', compact('usuario', 'units', 'roles'));
+        return Inertia::render('Users/Edit', [
+            'usuario' => $usuario,
+            'units' => Unidades::query()->orderBy('nome')->get(['id_unidade', 'nome']),
+            'roles' => Role::query()->orderBy('name')->get(['id', 'name']),
+        ]);
     }
+
     public function salvarEditar(Request $request, $userId)
     {
-        $request->validate([
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => ['required', 'email', Rule::unique('users', 'email')->ignore($userId)],
+            'id_unidade' => 'required|integer|exists:unidades,id_unidade',
             'roles' => 'required|array',
-            'roles.*' => 'integer|exists:roles,id'
+            'roles.*' => 'integer|exists:roles,id',
+            'password' => 'nullable|string|min:6',
+            'photo' => 'nullable|image|max:4096',
         ]);
 
-        $usuario = User::find($userId);
+        $usuario = User::query()->findOrFail($userId);
 
         if ($request->hasFile('photo') && $request->file('photo')->isValid()) {
-            $requestImage = $request->photo;
+            $requestImage = $request->file('photo');
             $extension = $requestImage->extension();
-            $imageName = md5($requestImage->getClientOriginalName() . strtotime("now")) . "." . $extension;
+            $imageName = md5($requestImage->getClientOriginalName() . strtotime('now')) . '.' . $extension;
             $requestImage->move(public_path('img/usuario'), $imageName);
         }
 
         $updateData = [
-            'name'  => $request->name,
-            'email' => $request->email,
-            'id_unidade_fk' => $request->id_unidade,
-            'profile_photo_path' => isset($imageName) ? $imageName : $usuario->profile_photo_path,
+            'name' => $validated['name'],
+            'email' => $validated['email'],
+            'id_unidade_fk' => $validated['id_unidade'],
+            'profile_photo_path' => $imageName ?? $usuario->profile_photo_path,
         ];
 
-        if ($request->filled('password')) {
-            $updateData['password'] = Hash::make($request->password);
+        if (!empty($validated['password'])) {
+            $updateData['password'] = Hash::make($validated['password']);
         }
 
         $usuario->update($updateData);
-
-        $usuario->roles()->sync($request->roles);
+        $usuario->roles()->sync($validated['roles']);
 
         return redirect()->route('usuario.index')->with('success', 'Editado com sucesso');
-    }
-
-    public function status($statusId)
-    {
-        $status = User::findOrFail($statusId);
-        $status->status = ($status->status == 1) ? 0 : 1;
-        $status->save();
-        return response()->json([
-            'status' => 200,
-            'message' => 'Status atualizado com sucesso!',
-            'type' => 'success'
-        ]);
     }
 
     public function unidade()
@@ -112,6 +134,7 @@ class UsuarioController extends Controller
         $units = Unidades::all();
         return view('auth.login', compact('units'));
     }
+
     public function unidadeRegister()
     {
         $units = Unidades::all();
@@ -120,28 +143,46 @@ class UsuarioController extends Controller
 
     public function inserirUsuario(Request $request)
     {
-        try {
-            if ($request->hasFile('photo') && $request->file('photo')->isValid()) {
-                $requestImage = $request->photo;
-                $extension = $requestImage->extension();
-                $imageName = md5($requestImage->getClientOriginalName() . strtotime("now")) . "." . $extension;
-                $requestImage->move(public_path('img/usuario'), $imageName);
-            }
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email',
+            'password' => 'required|string|min:6',
+            'id_unidade' => 'required|integer|exists:unidades,id_unidade',
+            'roles' => 'required|array',
+            'roles.*' => 'integer|exists:roles,id',
+            'photo' => 'nullable|image|max:4096',
+        ]);
 
-            User::create([
-                'name' => $request->name,
-                'email' => $request->email,
-                'password' => Hash::make($request->password),
-                'id_unidade_fk' => $request->id_unidade,
-                'profile_photo_path' => isset($imageName) ? $imageName : null,
-            ]);
-
-            $usuario = User::where('email', $request->email)->first();
-            $usuario->roles()->sync($request->roles);
-
-            return redirect()->route('usuario.index')->with('success', 'Inserido com sucesso');
-        } catch (\Exception $e) {
-            return redirect()->back()->withErrors(['error' => 'Erro ao inserir usuário: ' . $e->getMessage()]);
+        if ($request->hasFile('photo') && $request->file('photo')->isValid()) {
+            $requestImage = $request->file('photo');
+            $extension = $requestImage->extension();
+            $imageName = md5($requestImage->getClientOriginalName() . strtotime('now')) . '.' . $extension;
+            $requestImage->move(public_path('img/usuario'), $imageName);
         }
+
+        $usuario = User::create([
+            'name' => $validated['name'],
+            'email' => $validated['email'],
+            'password' => Hash::make($validated['password']),
+            'id_unidade_fk' => $validated['id_unidade'],
+            'profile_photo_path' => $imageName ?? null,
+        ]);
+
+        $usuario->roles()->sync($validated['roles']);
+
+        return redirect()->route('usuario.index')->with('success', 'Inserido com sucesso');
+    }
+
+    private function resolveAvatarPath(?string $avatar): string
+    {
+        if (!$avatar) {
+            return asset('img/default-avatar.png');
+        }
+
+        if (str_starts_with($avatar, 'http://') || str_starts_with($avatar, 'https://') || str_starts_with($avatar, '/')) {
+            return $avatar;
+        }
+
+        return asset('img/usuario/' . ltrim($avatar, '/'));
     }
 }

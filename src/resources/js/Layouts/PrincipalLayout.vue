@@ -14,6 +14,7 @@ const INERTIA_PREFIXES = [
     'clientes.', 'segmentos.',
     'produtos.', 'estoque.',
     'marca.', 'unidade.', 'unidades.',
+    'fornecedor.', 'usuario.', 'roles.',
     'vendas.', 'dashboard.',
     'spreadsheet.', 'calendar.',
 ]

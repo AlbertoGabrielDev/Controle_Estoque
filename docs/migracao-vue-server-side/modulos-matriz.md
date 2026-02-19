@@ -8,9 +8,9 @@
 | Marca | Vue/Inertia + server-side | Consolidado | 02 |
 | Unidades | Vue/Inertia + server-side | Consolidado | 02 |
 | Categorias | Vue/Inertia + server-side | Consolidado | 02 |
-| Fornecedor | Blade | Vue/Inertia + server-side | 02 (pendente) |
-| Role | Blade | Vue/Inertia + server-side | 02 (pendente) |
-| Usuario | Blade | Vue/Inertia + server-side | 02 (pendente) |
+| Fornecedor | Vue/Inertia + server-side | Consolidado | 02 |
+| Role | Vue/Inertia + server-side | Consolidado | 02 |
+| Usuario | Vue/Inertia + server-side | Consolidado | 02 |
 | Produtos | Vue/Inertia + server-side padrao | Consolidado | 03 |
 | Estoque | Vue/Inertia + server-side padrao | Consolidado | 03 |
 | Vendas | Vue/Inertia componentizado | Consolidado | 04 |
@@ -19,4 +19,4 @@
 ## Observacoes
 - Auth/Profile/Wpp ja estao em Inertia e nao entram como foco principal da migracao de modulos de negocio.
 - Blade de componentes Jetstream/Fortify e emails permanece fora do escopo de remocao nesta operacao.
-- Na fase 05 foi iniciado o cutover com limpeza de blades obsoletos dos modulos ja migrados.
+- Na fase 05 foi concluido o cutover com limpeza dos blades obsoletos de todos os modulos de negocio migrados.

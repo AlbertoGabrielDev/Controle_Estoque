@@ -12,31 +12,31 @@ Migrar modulos CRUD mais simples para validar o processo completo com baixo risc
 - `usuario`
 
 ## Padrao de Entrega por Modulo
-- [ ] `Pages/<Modulo>/Index.vue` com DataTable server-side.
-- [ ] `Pages/<Modulo>/Create.vue`.
-- [ ] `Pages/<Modulo>/Edit.vue`.
-- [ ] `Pages/<Modulo>/<Modulo>Form.vue` (quando aplicavel).
-- [ ] Controller migrado para `Inertia::render`.
-- [ ] Endpoint `*.data` implementado com `DataTableService`.
-- [ ] Coluna `acoes` com `EditButton` + `ButtonStatus`.
+- [x] `Pages/<Modulo>/Index.vue` com DataTable server-side.
+- [x] `Pages/<Modulo>/Create.vue`.
+- [x] `Pages/<Modulo>/Edit.vue`.
+- [x] `Pages/<Modulo>/<Modulo>Form.vue` (quando aplicavel).
+- [x] Controller migrado para `Inertia::render`.
+- [x] Endpoint `*.data` implementado com `DataTableService`.
+- [x] Coluna `acoes` com `EditButton` + `ButtonStatus` (exceto `role`, que nao possui status).
 
 ## Ajustes de Backend por Modulo
 
 ### Marca / Unidades / Categorias
-- [ ] Adicionar `HasDatatableConfig` e `dtColumns/dtFilters` nos modelos.
-- [ ] Ajustar controllers para fluxo Inertia.
+- [x] Adicionar `HasDatatableConfig` e `dtColumns/dtFilters` nos modelos.
+- [x] Ajustar controllers para fluxo Inertia.
 
 ### Fornecedor
-- [ ] Levar busca/filtros da Index para querystring server-side.
-- [ ] Validar edicao de telefones sem perda de comportamento.
+- [x] Levar busca/filtros da Index para querystring server-side.
+- [x] Validar edicao de telefones sem perda de comportamento.
 
 ### Usuario
-- [ ] Migrar upload de foto para fluxo Inertia (`multipart/form-data`).
-- [ ] Preservar associacao de roles/unidades.
+- [x] Migrar upload de foto para fluxo Inertia (`multipart/form-data`).
+- [x] Preservar associacao de roles/unidades.
 
 ### Role
-- [ ] Migrar matriz de permissoes para Vue mantendo logica de persistencia.
-- [ ] Revisar UX de toggles de permissao global/status.
+- [x] Migrar matriz de permissoes para Vue mantendo logica de persistencia.
+- [x] Revisar UX de toggles de permissao global/status.
 
 ## Criterio de Saida
 - Todos os modulos desta fase sem uso de Blade nas telas principais.

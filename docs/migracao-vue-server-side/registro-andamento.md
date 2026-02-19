@@ -40,6 +40,73 @@
 ### Fase
 05
 ### Modulo
+hardening-cutover-finalizacao
+### Concluido
+- Cutover finalizado para os ultimos modulos da fase 2 (`fornecedor`, `usuario`, `role`) com renderizacao Inertia nas telas principais.
+- Prefixos de rota Inertia atualizados para navegacao de menu:
+  - `fornecedor.`
+  - `usuario.`
+  - `roles.`
+- Testes de contrato atualizados:
+  - `src/tests/Feature/Phase2InertiaComponentsTest.php`
+  - `src/tests/Unit/Phase2DatatableContractsTest.php`
+  - `src/tests/Unit/Phase5CutoverContractsTest.php`
+- Blades legados removidos:
+  - `src/resources/views/fornecedor/*`
+  - `src/resources/views/usuario/*`
+  - `src/resources/views/role/*`
+- Matriz de modulos e README atualizados para refletir 100% dos modulos de negocio em Vue/Inertia.
+- Build frontend validado com sucesso:
+  - `cd src && cmd /c npm run -s build`
+### Em progresso
+- Validacao manual funcional dos fluxos `fornecedor`, `usuario` e `role` no browser.
+### Bloqueios
+- Execucao do PHPUnit segue bloqueada por indisponibilidade de runtime PHP/vendor no host:
+  - `cd src; ./vendor/bin/phpunit --group phase2` -> comando nao reconhecido
+  - `cd src; ./vendor/bin/phpunit --group phase5` -> comando nao reconhecido
+  - `php -v` -> `php` nao reconhecido no PowerShell
+### Decisoes tecnicas
+- `role` permanece sem toggle de status por ausencia de coluna de status no dominio.
+- `fornecedor` manteve foco de edicao em telefone para preservar comportamento legado.
+### Proximo passo imediato
+- Executar suites `phase2` e `phase5` em ambiente com PHP ativo e registrar resultado final.
+
+### 2026-02-19
+### Fase
+02
+### Modulo
+crud-baixo-risco-wave2-fornecedor-usuario-role
+### Concluido
+- `FornecedorController` migrado para Inertia com:
+  - `Suppliers/Index`, `Suppliers/Create`, `Suppliers/Edit`
+  - endpoint `fornecedor.data` via `DataTableService` + `HasDatatableConfig`
+  - fluxo de create/edit preservando telefone principal/whatsapp/telegram
+- `UsuarioController` migrado para Inertia com:
+  - `Users/Index`, `Users/Create`, `Users/Edit`
+  - endpoint `usuario.data` via `DataTableService` + aliases de avatar/perfis/data
+  - upload de foto em `multipart/form-data` com `forceFormData`
+  - associacao de roles/unidade preservada no create/edit
+- `RoleController` migrado para Inertia com:
+  - `Roles/Index`, `Roles/Create`, `Roles/Edit`
+  - endpoint `roles.data` via `DataTableService`
+  - matriz de permissoes global/status e por menu preservada
+- Rotas da fase 2 onda 2 atualizadas:
+  - `fornecedor.data`
+  - `usuario.data`
+  - `roles.data`
+### Em progresso
+- Ajustes finais de hardening/cutover da fase 5 para consolidar remocao de legado.
+### Bloqueios
+- PHPUnit nao executado neste host por indisponibilidade de runtime/dependencias PHP.
+### Decisoes tecnicas
+- Padrao de datatable/filtros da onda 1 reaproveitado integralmente na onda 2 para manter consistencia de UX e manutencao.
+### Proximo passo imediato
+- Consolidar fechamento da fase 5 com limpeza de blades e atualizacao de documentacao matriz/README.
+
+### 2026-02-19
+### Fase
+05
+### Modulo
 hardening-cutover-inicial
 ### Concluido
 - Hardening de controllers migrados concluido para eliminar `return view(...)` remanescente em:

@@ -12,10 +12,12 @@ class Phase5CutoverContractsTest extends TestCase
     {
         $controllers = [
             app_path('Http/Controllers/CategoriaController.php'),
+            app_path('Http/Controllers/FornecedorController.php'),
             app_path('Http/Controllers/MarcaController.php'),
             app_path('Http/Controllers/UnidadeController.php'),
             app_path('Http/Controllers/ProdutoController.php'),
             app_path('Http/Controllers/EstoqueController.php'),
+            app_path('Http/Controllers/RoleController.php'),
             app_path('Http/Controllers/VendaController.php'),
             app_path('Http/Controllers/SpreadsheetController.php'),
         ];
@@ -38,6 +40,9 @@ class Phase5CutoverContractsTest extends TestCase
             resource_path('views/estoque/editar.blade.php'),
             resource_path('views/estoque/historico.blade.php'),
             resource_path('views/estoque/index.blade.php'),
+            resource_path('views/fornecedor/cadastro.blade.php'),
+            resource_path('views/fornecedor/editar.blade.php'),
+            resource_path('views/fornecedor/index.blade.php'),
             resource_path('views/marca/cadastro.blade.php'),
             resource_path('views/marca/editar.blade.php'),
             resource_path('views/marca/index.blade.php'),
@@ -45,10 +50,16 @@ class Phase5CutoverContractsTest extends TestCase
             resource_path('views/produtos/editar.blade.php'),
             resource_path('views/produtos/index.blade.php'),
             resource_path('views/produtos/partials/acoes.blade.php'),
+            resource_path('views/role/cadastro.blade.php'),
+            resource_path('views/role/editar.blade.php'),
+            resource_path('views/role/index.blade.php'),
             resource_path('views/spreadsheets/index.blade.php'),
             resource_path('views/unidades/cadastro.blade.php'),
             resource_path('views/unidades/editar.blade.php'),
             resource_path('views/unidades/index.blade.php'),
+            resource_path('views/usuario/cadastro.blade.php'),
+            resource_path('views/usuario/editar.blade.php'),
+            resource_path('views/usuario/index.blade.php'),
             resource_path('views/vendas/venda.blade.php'),
             resource_path('views/vendas/historico_vendas.blade.php'),
             resource_path('views/vendas/qrcode.blade.php'),
@@ -65,7 +76,7 @@ class Phase5CutoverContractsTest extends TestCase
         $principalLayout = file_get_contents(resource_path('js/Layouts/PrincipalLayout.vue'));
         $middleware = file_get_contents(app_path('Http/Middleware/HandleInertiaRequests.php'));
 
-        foreach (['categoria.', 'produtos.', 'estoque.', 'marca.', 'unidades.', 'vendas.', 'spreadsheet.'] as $prefix) {
+        foreach (['categoria.', 'produtos.', 'estoque.', 'marca.', 'unidades.', 'fornecedor.', 'usuario.', 'roles.', 'vendas.', 'spreadsheet.'] as $prefix) {
             $this->assertStringContainsString($prefix, $appJs, "app.js sem prefixo {$prefix}");
             $this->assertStringContainsString($prefix, $principalLayout, "PrincipalLayout.vue sem prefixo {$prefix}");
         }

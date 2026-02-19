@@ -6,124 +6,195 @@ use App\Models\Menu;
 use App\Models\Permission;
 use App\Models\Role;
 use App\Models\RoleMenuPermission;
-use App\Repositories\RoleRepository;
+use App\Services\DataTableService;
+use App\Support\DataTableActions;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 class RoleController extends Controller
 {
-    protected $roleRepository;
-    public function __construct(RoleRepository $roleRepository)
-    {
-        $this->roleRepository = $roleRepository;
+    public function __construct(
+        private DataTableService $dt
+    ) {
     }
 
-    public function index()
+    public function index(Request $request)
     {
-        $roles = $this->roleRepository->index();
+        return Inertia::render('Roles/Index', [
+            'filters' => [
+                'q' => (string) $request->query('q', ''),
+            ],
+        ]);
+    }
 
-        return view('role.index', compact('roles'));
+    public function data(Request $request)
+    {
+        [$query, $columnsMap] = Role::makeDatatableQuery($request);
+
+        return $this->dt->make(
+            $query,
+            $columnsMap,
+            rawColumns: ['acoes'],
+            decorate: function ($dt) {
+                $dt->addColumn('acoes', function ($row) {
+                    return DataTableActions::wrap([
+                        DataTableActions::edit('roles.editar', $row->id),
+                    ]);
+                });
+            }
+        );
     }
 
     public function cadastro()
     {
-        $cadastro = $this->roleRepository->cadastro();
-        return view('role.cadastro', $cadastro);
+        return Inertia::render('Roles/Create');
+    }
+
+    public function buscar(Request $request)
+    {
+        return redirect()->route('roles.index', [
+            'q' => (string) $request->input('name', ''),
+        ]);
     }
 
     public function inserirRole(Request $request)
     {
-        $data = $request->all();
-        $post = $this->roleRepository->create($data);
+        $validated = $request->validate([
+            'name' => 'required|string|max:255|unique:roles,name',
+        ]);
+
+        Role::create([
+            'name' => $validated['name'],
+        ]);
+
         return redirect()->route('roles.index')->with('success', 'Inserido com sucesso');
     }
 
     public function editar($id)
     {
-        // Corrigir o nome da relação para roleMenuPermissions
-        $role = Role::with(['roleMenuPermissions' => function ($query) {
-            $query->select('menu_id', 'permission_id');
-        }])->findOrFail($id);
+        $role = Role::query()->findOrFail($id, ['id', 'name']);
+        $statusPermission = Permission::firstOrCreate(['name' => 'status']);
 
-        $permissions = Permission::where('name', '!=', 'status')->get();
-        $menus = Menu::with('roles')->whereNotNull('slug')->where('slug', '!=', '')->get();
+        $permissions = Permission::query()
+            ->where('name', '!=', 'status')
+            ->orderBy('name')
+            ->get(['id', 'name']);
 
-        // Acessar através da relação correta
-        $rolePermissions = $role->roleMenuPermissions->mapWithKeys(function ($item) {
-            return ["{$item->menu_id}-{$item->permission_id}" => true];
-        });
+        $menus = Menu::query()
+            ->whereNotNull('slug')
+            ->where('slug', '!=', '')
+            ->orderBy('order')
+            ->get(['id', 'name', 'slug']);
 
-        return view('role.editar', [
+        $currentPermissions = RoleMenuPermission::query()
+            ->where('role_id', $role->id)
+            ->get(['menu_id', 'permission_id']);
+
+        $selectedPermissions = $currentPermissions
+            ->where('permission_id', '!=', $statusPermission->id)
+            ->groupBy('menu_id')
+            ->map(fn ($group) => $group->pluck('permission_id')->map(fn ($id) => (int) $id)->values())
+            ->toArray();
+
+        $statusEnabled = $currentPermissions
+            ->contains(fn ($item) => (int) $item->permission_id === (int) $statusPermission->id);
+
+        return Inertia::render('Roles/Edit', [
             'role' => $role,
             'permissions' => $permissions,
             'menus' => $menus,
-            'rolePermissions' => $rolePermissions
+            'selectedPermissions' => $selectedPermissions,
+            'statusEnabled' => $statusEnabled,
         ]);
     }
 
     public function salvarEditar(Request $request, $roleId)
     {
-        $role = Role::findOrFail($roleId);
-        $menus = Menu::whereNotNull('slug')->where('slug', '!=', '')->get();
+        $validated = $request->validate([
+            'global_permissions.status' => 'nullable|boolean',
+            'permissions' => 'nullable|array',
+            'permissions.*' => 'array',
+            'permissions.*.*' => 'integer|exists:permissions,id',
+        ]);
 
-        $toggleStatus = $request->input('global_permissions.status', '0') === '1';
-        $permissionStatus = Permission::firstOrCreate(['name' => 'status']);
+        $role = Role::query()->findOrFail($roleId);
+        $menus = Menu::query()
+            ->whereNotNull('slug')
+            ->where('slug', '!=', '')
+            ->get(['id']);
+
+        $statusPermission = Permission::firstOrCreate(['name' => 'status']);
+        $toggleStatus = (bool) data_get($validated, 'global_permissions.status', false);
+
         if ($toggleStatus) {
             foreach ($menus as $menu) {
                 RoleMenuPermission::updateOrCreate(
                     [
                         'role_id' => $role->id,
                         'menu_id' => $menu->id,
-                        'permission_id' => $permissionStatus->id
+                        'permission_id' => $statusPermission->id,
                     ],
                     []
                 );
             }
         } else {
-            RoleMenuPermission::where('role_id', $role->id)
-                ->where('permission_id', $permissionStatus->id)
+            RoleMenuPermission::query()
+                ->where('role_id', $role->id)
+                ->where('permission_id', $statusPermission->id)
                 ->delete();
         }
 
-        // Lógica para demais permissões
-        $inputPermissions = $request->input('permissions', []);
-        $currentPermissions = RoleMenuPermission::where('role_id', $role->id)->get();
-
-        // Mapas para comparação
-        $currentMap = $currentPermissions->map(function ($item) {
-            return "{$item->menu_id}_{$item->permission_id}";
-        })->toArray();
+        $inputPermissions = data_get($validated, 'permissions', []);
+        $currentPermissions = RoleMenuPermission::query()
+            ->where('role_id', $role->id)
+            ->get();
 
         $newMap = [];
 
         foreach ($inputPermissions as $menuId => $permissionIds) {
-            foreach ($permissionIds as $permissionId) {
-                // Ignorar "status" que já está sendo tratado separadamente
-                if ($permissionId == $permissionStatus->id) continue;
-
-                $key = "{$menuId}_{$permissionId}";
-                $newMap[] = $key;
-
-                // Criar se não existir
-                if (!in_array($key, $currentMap)) {
-                    RoleMenuPermission::create([
-                        'role_id' => $role->id,
-                        'menu_id' => $menuId,
-                        'permission_id' => $permissionId
-                    ]);
+            foreach ((array) $permissionIds as $permissionId) {
+                if ((int) $permissionId === (int) $statusPermission->id) {
+                    continue;
                 }
+
+                $key = $menuId . '_' . $permissionId;
+                $newMap[$key] = true;
+
+                RoleMenuPermission::updateOrCreate(
+                    [
+                        'role_id' => $role->id,
+                        'menu_id' => (int) $menuId,
+                        'permission_id' => (int) $permissionId,
+                    ],
+                    []
+                );
             }
         }
-        // Remover permissões que não estão mais no formulário (exceto "status")
+
         foreach ($currentPermissions as $perm) {
-            $key = "{$perm->menu_id}_{$perm->permission_id}";
-            if (!in_array($key, $newMap) && $perm->permission_id != $permissionStatus->id) {
-                RoleMenuPermission::where('role_id', $perm->role_id)
+            if ((int) $perm->permission_id === (int) $statusPermission->id) {
+                continue;
+            }
+
+            $key = $perm->menu_id . '_' . $perm->permission_id;
+            if (!isset($newMap[$key])) {
+                RoleMenuPermission::query()
+                    ->where('role_id', $perm->role_id)
                     ->where('menu_id', $perm->menu_id)
                     ->where('permission_id', $perm->permission_id)
-                    ->delete(); 
+                    ->delete();
             }
         }
 
-        return redirect()->back()->with('success', 'Permissões atualizadas com sucesso!');
+        return redirect()->route('roles.editar', $role->id)->with('success', 'Permissoes atualizadas com sucesso!');
+    }
+
+    public function updateStatus($rolesId)
+    {
+        return response()->json([
+            'status' => 422,
+            'message' => 'Role nao possui status para alternancia.',
+            'type' => 'warning',
+        ], 422);
     }
 }

@@ -30,7 +30,7 @@ const USE_VUE_SIDEBAR = [/^Wpp\//, /^Bot\//]
 const USE_PRINCIPAL   = [
   /^Dashboard\//, /^Calendar\//, /^Vendas\//, /^Sales\//, /^Spreadsheets\//, /^Estoque\//, /^Categoria\//,
   /^Fornecedor\//, /^Marca\//, /^Usuario\//, /^Unidade\//, /^Roles\//,
-  /^Brands\//, /^Units\//, /^Categories\//,
+  /^Brands\//, /^Units\//, /^Categories\//, /^Suppliers\//, /^Users\//,
   /^Products\//, /^Stock\//,
   /^Clients\//, /^Segments\//, /^Taxes\//,
 ]
@@ -42,6 +42,7 @@ const INERTIA_PREFIXES = [
   'clientes.', 'segmentos.',
   'produtos.', 'estoque.',
   'marca.', 'unidade.', 'unidades.',
+  'fornecedor.', 'usuario.', 'roles.',
   'vendas.', 'dashboard.',
   'spreadsheet.', 'calendar.',
 ]

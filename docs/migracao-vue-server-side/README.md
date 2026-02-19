@@ -16,8 +16,11 @@ Migrar todos os modulos de UI de Blade para Vue + Inertia, mantendo o visual atu
 ## Estado Atual (resumo tecnico)
 - Modulos de negocio migrados para Inertia/Vue:
   - `categorias` (incluindo `Products` por categoria)
+  - `fornecedor`
   - `marca`
+  - `role`
   - `unidades`
+  - `usuario`
   - `produtos`
   - `estoque` (incluindo `History`)
   - `vendas`
@@ -25,10 +28,8 @@ Migrar todos os modulos de UI de Blade para Vue + Inertia, mantendo o visual atu
   - `clientes`
   - `segmentos`
   - `taxes`
-- Modulos ainda legados (Blade) e fora do cutover final ate o momento:
-  - `fornecedor`
-  - `usuario`
-  - `role`
+- Modulos de negocio ainda legados (Blade):
+  - nenhum modulo pendente
 - Referencias tecnicas:
   - Front: `src/resources/js/components/DataTable.vue`
   - Back: `src/app/Services/DataTableService.php`
@@ -67,7 +68,6 @@ Migrar todos os modulos de UI de Blade para Vue + Inertia, mantendo o visual atu
 5. Mutacoes (create/edit/status) retornam redirect com flash ou JSON padronizado.
 
 ## Dividas Tecnicas Remanescentes
-- Migrar `fornecedor`, `usuario` e `role` para remover dependencia de Blade no dominio de negocio.
 - Revisar e reduzir `public/js/app.js` legada, mantendo apenas o necessario para telas Blade ainda ativas.
 - Executar gate final de PHPUnit em ambiente com `php` + `vendor` disponiveis e registrar resultado verde.
 

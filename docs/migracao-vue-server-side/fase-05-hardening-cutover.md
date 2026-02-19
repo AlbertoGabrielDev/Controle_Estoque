@@ -5,10 +5,10 @@ Finalizar a migracao com estabilidade, remover legados obsoletos e consolidar o 
 
 ## Checklist Tecnico
 - [x] Revisar todos os controllers de modulos de negocio migrados:
-  - sem `return view(...)` nas telas migradas (`categoria.produto` e `estoque.historico` migrados para Inertia).
+  - sem `return view(...)` nas telas migradas (incluindo `fornecedor`, `usuario`, `role`, `categoria.produto` e `estoque.historico`).
 - [x] Revisar todas as rotas migradas:
   - rotas legadas de historico de vendas redirecionadas para rota Inertia principal.
-- [x] Excluir os arquivos `.blade.php` obsoletos dos modulos de negocio ja migrados.
+- [x] Excluir os arquivos `.blade.php` obsoletos dos modulos de negocio migrados.
 - [ ] Remover/neutralizar scripts legados nao usados (`public/js/app.js`) para modulos migrados.
 - [x] Revisar imports/caminhos de paginas Vue para evitar divergencias de naming.
 - [x] Revisar permissao e menu para modulos migrados no Inertia share.
