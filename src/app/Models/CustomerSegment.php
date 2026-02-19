@@ -26,6 +26,13 @@ class CustomerSegment extends Model
     public static function dtFilters(): array
     {
         $t = (new static)->getTable();
-        return [];
+        return [
+            'q' => [
+                'type' => 'text',
+                'columns' => [
+                    "{$t}.nome",
+                ],
+            ],
+        ];
     }
 }

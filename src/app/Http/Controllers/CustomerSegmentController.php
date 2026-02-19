@@ -5,9 +5,9 @@ namespace App\Http\Controllers;
 use App\Http\Requests\CustomerSegmentRequest;
 use App\Models\CustomerSegment;
 use App\Services\DataTableService;
-use Blade;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use App\Support\DataTableActions;
 
 class CustomerSegmentController extends Controller
 {
@@ -18,17 +18,10 @@ class CustomerSegmentController extends Controller
     }
     public function index(Request $request)
     {
-        $q = $request->string('q')->toString();
-
-        $segmentos = CustomerSegment::query()
-            ->when($q, fn($qry) => $qry->where('nome', 'like', "%{$q}%"))
-            ->orderBy('nome')
-          
-           ;
-
         return Inertia::render('Segments/Index', [
-            'segmentos' => $segmentos,
-            'q' => $q,
+            'filters' => [
+                'q' => (string) $request->query('q', ''),
+            ],
         ]);
     }
 
@@ -43,16 +36,9 @@ class CustomerSegmentController extends Controller
             rawColumns: ['acoes'],
             decorate: function ($dt) {
                 $dt->addColumn('acoes', function ($row) {
-                    $editBtn = Blade::render(
-                        '<x-edit-button :route="$route" :model-id="$id" />',
-                        ['route' => 'segmentos.edit', 'id' => $row->id]
-                    );
-                  
-                    $html = trim($editBtn);
-                    if ($html === '') {
-                        $html = '<span class="inline-block w-8 h-8 opacity-0" aria-hidden="true">&nbsp;</span>';
-                    }
-                    return '<div class="flex gap-2 justify-start items-center">' . $html . '</div>';
+                    return DataTableActions::wrap([
+                        DataTableActions::edit('segmentos.edit', $row->id),
+                    ]);
                 });
             }
         );
@@ -60,7 +46,7 @@ class CustomerSegmentController extends Controller
 
     public function create()
     {
-        return Inertia::render('Segmentos/Create');
+        return Inertia::render('Segments/Create');
     }
 
     public function store(CustomerSegmentRequest $request)
@@ -71,7 +57,7 @@ class CustomerSegmentController extends Controller
 
     public function edit(CustomerSegment $segment)
     {
-        return Inertia::render('Segmentos/Edit', ['segmento' => $segment]);
+        return Inertia::render('Segments/Edit', ['segmento' => $segment]);
     }
 
     public function update(CustomerSegmentRequest $request, CustomerSegment $segment)

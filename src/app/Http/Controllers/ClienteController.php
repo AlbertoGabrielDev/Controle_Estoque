@@ -10,8 +10,8 @@ use App\Models\CustomerSegment;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use App\Services\DataTableService;
-use Illuminate\Support\Facades\Blade;
-use Illuminate\Support\Facades\DB;
+use App\Support\DataTableActions;
+
 class ClienteController extends Controller
 {
 
@@ -25,7 +25,7 @@ class ClienteController extends Controller
     {
         return Inertia::render('Clients/Index', [
             'filters' => [
-                // 'q' => (string) $request->query('q', ''),
+                'q' => (string) $request->query('q', ''),
                 'uf' => (string) $request->query('uf', ''),
                 'segment_id' => (string) $request->query('segment_id', ''),
                 'status' => (string) $request->query('status', ''),
@@ -46,19 +46,10 @@ class ClienteController extends Controller
             rawColumns: ['acoes'],
             decorate: function ($dt) {
                 $dt->addColumn('acoes', function ($row) {
-                    $editBtn = Blade::render(
-                        '<x-edit-button :route="$route" :model-id="$id" />',
-                        ['route' => 'clientes.edit', 'id' => $row->id]
-                    );
-                    $statusBtn = Blade::render(
-                        '<x-button-status :model-id="$id" :status="$st" model-name="cliente" />',
-                        ['id' => $row->id, 'st' => (bool) $row->st]
-                    );
-                    $html = trim($editBtn . $statusBtn);
-                    if ($html === '') {
-                        $html = '<span class="inline-block w-8 h-8 opacity-0" aria-hidden="true">&nbsp;</span>';
-                    }
-                    return '<div class="flex gap-2 justify-start items-center">' . $html . '</div>';
+                    return DataTableActions::wrap([
+                        DataTableActions::edit('clientes.edit', $row->id),
+                        DataTableActions::status('cliente.status', 'cliente', $row->id, (bool) $row->st),
+                    ]);
                 });
             }
         );

@@ -96,7 +96,6 @@ function init() {
     dt = $table.DataTable({
       ...common,
       serverSide: true,
-      searching: true,
       ajax: {
         url: props.ajaxUrl,
         type: 'GET',
@@ -109,7 +108,6 @@ function init() {
     dt = $table.DataTable({
       ...common,
       serverSide: false,
-      searching: true,
     })
   }
 
@@ -135,14 +133,20 @@ onMounted(async () => {
 })
 onBeforeUnmount(() => destroy())
 
-watch(() => JSON.stringify(props.ajaxParams), async () => {
-  if (dt && !props.enhanceOnly) dt.ajax.reload(null, false)
-  else {
+watch(
+  () => props.ajaxParams,
+  async () => {
+    if (dt && !props.enhanceOnly && dt.ajax) {
+      dt.ajax.reload(null, false)
+      return
+    }
+
     destroy()
     await nextTick()
     init()
-  }
-})
+  },
+  { deep: true }
+)
 
 watch(() => props.reinitKey, async () => {
   destroy()

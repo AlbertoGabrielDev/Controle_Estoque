@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Traits\HasDatatableConfig;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -9,6 +10,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 class Role extends Model
 {
     use HasFactory;
+    use HasDatatableConfig;
     protected $table = 'roles';
     protected $fillable = ['name'];
 
@@ -57,5 +59,28 @@ class Role extends Model
     {
         return $this->belongsToMany(Menu::class, 'role_menu_permissions', 'role_id', 'menu_id')
             ->withPivot('permission_id');
+    }
+
+    public static function dtColumns(): array
+    {
+        $t = (new static)->getTable();
+        return [
+            'id' => ['db' => "{$t}.id", 'label' => '#', 'order' => true, 'search' => false],
+            'c1' => ['db' => "{$t}.name", 'label' => 'Perfil', 'order' => true, 'search' => true],
+            'acoes' => ['computed' => true],
+        ];
+    }
+
+    public static function dtFilters(): array
+    {
+        $t = (new static)->getTable();
+        return [
+            'q' => [
+                'type' => 'text',
+                'columns' => [
+                    "{$t}.name",
+                ],
+            ],
+        ];
     }
 }

@@ -10,14 +10,13 @@ use App\Models\Categoria;
 use App\Models\Tax;
 use App\Models\TaxRule;
 use App\Models\CustomerSegment;
-use App\Models\ProductSegment;
 use App\Repositories\TaxRuleRepository;
 use App\Services\DataTableService;
 use App\Http\Requests\TaxRuleRequest;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Blade;
 use Inertia\Inertia;
 use App\Enums\TaxMethod;
+use App\Support\DataTableActions;
 
 class TaxRuleController extends Controller
 {
@@ -44,29 +43,10 @@ class TaxRuleController extends Controller
             rawColumns: ['acoes'],
             decorate: function ($dt) {
                 $dt->addColumn('acoes', function ($row) {
-                    $editBtn = Blade::render(
-                        '<x-edit-button :route="$route" :model-id="$id" />',
-                        ['route' => 'taxes.edit', 'id' => $row->id]
-                    );
-
-                    // excluir (form simples com csrf/method delete)
-                    $deleteUrl = route('taxes.destroy', $row->id);
-                    $deleteBtn = Blade::render(<<<'BLADE'
-                        <form method="POST" action="{{ $action }}" onsubmit="return confirm('Excluir esta regra?');" class="inline-block">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit"
-                                class="px-2 py-1 text-sm rounded bg-red-50 hover:bg-red-100 text-red-700">
-                                Excluir
-                            </button>
-                        </form>
-                    BLADE, ['action' => $deleteUrl]);
-
-                    $html = trim($editBtn . $deleteBtn);
-                    if ($html === '') {
-                        $html = '<span class="inline-block w-8 h-8 opacity-0" aria-hidden="true">&nbsp;</span>';
-                    }
-                    return '<div class="flex gap-2 justify-start items-center">' . $html . '</div>';
+                    return DataTableActions::wrap([
+                        DataTableActions::edit('taxes.edit', $row->id),
+                        DataTableActions::delete('taxes.destroy', $row->id, 'Excluir', 'Excluir esta regra?'),
+                    ]);
                 });
             }
         );

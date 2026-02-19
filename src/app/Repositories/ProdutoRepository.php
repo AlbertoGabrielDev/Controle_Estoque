@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Gate;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Yajra\DataTables\Facades\DataTables;
-use Illuminate\Support\Facades\Blade;
+use App\Support\DataTableActions;
 /**
  * Interface ProdutoRepository.
  *
@@ -68,16 +68,10 @@ class ProdutoRepository
             ->filterColumn('c4', fn($q, $k) => $q->where('unidade_medida', 'like', "%{$k}%"))
 
             ->addColumn('acoes', function ($p) {
-                $editBtn = \Illuminate\Support\Facades\Blade::render(
-                    '<x-edit-button :route="$route" :model-id="$modelId" />',
-                    ['route' => 'produtos.editar', 'modelId' => $p->id]
-                );
-                $statusBtn = \Illuminate\Support\Facades\Blade::render(
-                    '<x-button-status :model-id="$modelId" :status="$status" model-name="produto" />',
-                    ['modelId' => $p->id, 'status' => (bool) $p->st]
-                );
-                $html = trim($editBtn . $statusBtn) ?: '<span class="inline-block w-8 h-8 opacity-0">&nbsp;</span>';
-                return '<div class="flex gap-2 justify-end items-center">' . $html . '</div>';
+                return DataTableActions::wrap([
+                    DataTableActions::edit('produtos.editar', $p->id),
+                    DataTableActions::status('produto.status', 'produto', $p->id, (bool) $p->st),
+                ], 'end');
             })
             ->rawColumns(['acoes']);
 

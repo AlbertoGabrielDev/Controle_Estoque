@@ -27,7 +27,7 @@ class WhatsAppContactsController extends Controller
         $contacts = $this->getJson("{$this->base}/contacts-with-dialog", []);
         $labels = $this->getJson("{$this->base}/labels", []);
 
-        return Inertia::render('Contacts/Contacts', [
+        return Inertia::render('Wpp/Contacts/Contacts', [
             'contacts' => $contacts,
             'labels' => $labels,
         ]);

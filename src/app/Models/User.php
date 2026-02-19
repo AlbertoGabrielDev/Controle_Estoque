@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Traits\HasDatatableConfig;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -14,7 +15,7 @@ use Illuminate\Support\Facades\DB;
 
 class User extends Authenticatable
 {
-    use HasApiTokens, HasFactory, HasProfilePhoto, Notifiable, TwoFactorAuthenticatable;
+    use HasApiTokens, HasFactory, HasProfilePhoto, Notifiable, TwoFactorAuthenticatable, HasDatatableConfig;
 
     protected $fillable = [
         'id',
@@ -87,5 +88,38 @@ class User extends Authenticatable
     public function vendas()
     {
         return $this->hasMany(Venda::class, 'id_usuario_fk');
+    }
+
+    public static function dtColumns(): array
+    {
+        $t = (new static)->getTable();
+        return [
+            'id' => ['db' => "{$t}.id", 'label' => '#', 'order' => true, 'search' => false],
+            'c1' => ['db' => "{$t}.name", 'label' => 'Nome', 'order' => true, 'search' => true],
+            'c2' => ['db' => "{$t}.email", 'label' => 'E-mail', 'order' => true, 'search' => true],
+            'st' => ['db' => "{$t}.status", 'label' => 'Status', 'order' => true, 'search' => false],
+            'acoes' => ['computed' => true],
+        ];
+    }
+
+    public static function dtFilters(): array
+    {
+        $t = (new static)->getTable();
+        return [
+            'q' => [
+                'type' => 'text',
+                'columns' => [
+                    "{$t}.name",
+                    "{$t}.email",
+                ],
+            ],
+            'status' => [
+                'type' => 'select',
+                'column' => "{$t}.status",
+                'cast' => 'int',
+                'operator' => '=',
+                'nullable' => true,
+            ],
+        ];
     }
 }

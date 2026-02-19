@@ -1,13 +1,11 @@
 <script setup>
-import { Head, Link, router } from '@inertiajs/vue3'
-import { reactive, watch, ref } from 'vue'
-import EditButton from '@/Components/EditButton.vue'
-import ButtonStatus from '@/Components/ButtonStatus.vue'
-import DataTable, { linkify } from '../../components/DataTable.vue'
+import { Head, Link } from '@inertiajs/vue3'
+import { onBeforeUnmount, reactive } from 'vue'
+import DataTable, { linkify } from '@/components/DataTable.vue'
+import { useQueryFilters } from '@/composables/useQueryFilters'
 
 const props = defineProps({
   filters: Object,
-  clientes: Object,
   segmentos: Array,
   ufs: Array
 })
@@ -34,15 +32,8 @@ const dtColumns = [
   { data: 'acoes', title: 'Ações', orderable: false, searchable: false }
 ]
 
-const reinitKey = ref(0)
-
-watch(form, () => {
-  router.get(route('clientes.index'), form, {
-    preserveState: true,
-    replace: true,
-    onSuccess: () => { reinitKey.value++ }
-  })
-})
+const stopSyncFilters = useQueryFilters(form, 'clientes.index')
+onBeforeUnmount(() => stopSyncFilters())
 </script>
 
 <template>
