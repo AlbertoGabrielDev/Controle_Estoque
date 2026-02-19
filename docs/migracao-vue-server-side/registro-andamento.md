@@ -38,6 +38,66 @@
 
 ### 2026-02-19
 ### Fase
+02
+### Modulo
+crud-baixo-risco-testes-phase2
+### Concluido
+- Criada suite dedicada da fase 2 com grupo `phase2`:
+  - `src/tests/Unit/Phase2DatatableContractsTest.php`
+  - `src/tests/Feature/Phase2InertiaComponentsTest.php`
+- Cobertura adicionada para:
+  - contrato `dtColumns/dtFilters` dos modelos da onda 1 (`Categoria`, `Marca`, `Unidades`)
+  - contrato de componentes Inertia (`Brands/*`, `Units/*`, `Categories/*`)
+  - contrato de rotas server-side DataTable (`marca.data`, `unidade.data`, `categoria.data`)
+  - existencia dos componentes Vue criados na fase 2 (onda 1)
+- Plano da fase 2 atualizado com bloco explicito de testes e comando isolado `--group phase2`.
+### Em progresso
+- Execucao efetiva da suite `phase2` pendente neste host.
+### Bloqueios
+- Ambiente local sem runtime/dependencias PHP para executar PHPUnit.
+### Decisoes tecnicas
+- Testes da fase 2 seguem o mesmo padrao de governanca da fase 1 (`Group` dedicado por fase).
+### Proximo passo imediato
+- Rodar `phpunit --group phase2` em ambiente com PHP/vendor disponivel e corrigir eventuais falhas.
+
+### 2026-02-19
+### Fase
+02
+### Modulo
+crud-baixo-risco-wave1-marca-unidades-categorias
+### Concluido
+- Migrados os controllers `MarcaController`, `UnidadeController` e `CategoriaController` para `Inertia::render(...)` nas telas principais (`index`, `cadastro`, `editar`).
+- Implementados endpoints server-side DataTable:
+  - `marca.data`
+  - `unidade.data`
+  - `categoria.data`
+- Padronizado backend das listagens para `DataTableService` + `HasDatatableConfig` + `DataTableActions`.
+- Criadas paginas Vue da onda 1 da fase 2:
+  - `src/resources/js/Pages/Brands/*`
+  - `src/resources/js/Pages/Units/*`
+  - `src/resources/js/Pages/Categories/*`
+- `categoria.inicio` migrado para Vue (`Categories/Home`) mantendo grid/listagem de categorias com contador de produtos.
+- Rotas web atualizadas para conectar as novas telas e rotas `*.data`, mantendo nomenclatura legada de `route name`.
+- Build frontend validado com sucesso:
+  - comando executado: `cd src && cmd /c npm run -s build`
+### Em progresso
+- Fase 2 segue aberta para migracao de:
+  - `fornecedor`
+  - `role`
+  - `usuario`
+### Bloqueios
+- PHPUnit nao executado neste host por indisponibilidade de runtime/dependencias PHP no ambiente atual.
+- Tentativas locais no Windows atual:
+  - `./vendor/bin/phpunit` (comando nao encontrado no PowerShell)
+  - `cmd /c vendor\\bin\\phpunit.bat` (caminho inexistente; `vendor/` indisponivel no ambiente)
+### Decisoes tecnicas
+- Iniciar a fase 2 por onda de menor risco (`marca`, `unidades`, `categorias`) para estabilizar o fluxo antes de `fornecedor/role/usuario`.
+- Manter nomes de rotas legados e introduzir apenas endpoints `*.data` para minimizar regressao em menus/permissoes.
+### Proximo passo imediato
+- Iniciar onda 2 da fase 2 com migracao de `fornecedor`, seguida de `role` e `usuario`.
+
+### 2026-02-19
+### Fase
 00
 ### Modulo
 baseline-geral

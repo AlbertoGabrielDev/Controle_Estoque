@@ -30,6 +30,7 @@ const USE_VUE_SIDEBAR = [/^Wpp\//, /^Bot\//]
 const USE_PRINCIPAL   = [
   /^Dashboard\//, /^Calendar\//, /^Vendas\//, /^Estoque\//, /^Categoria\//,
   /^Fornecedor\//, /^Marca\//, /^Usuario\//, /^Unidade\//, /^Roles\//,
+  /^Brands\//, /^Units\//, /^Categories\//,
   /^Clients\//, /^Segments\//, /^Taxes\//,
 ]
 

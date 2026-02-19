@@ -44,6 +44,11 @@ Migrar modulos CRUD mais simples para validar o processo completo com baixo risc
 - Fluxo Create/Edit funcionando com validacao backend atual.
 
 ## Testes PHPUnit
+- [x] Criar suite dedicada da fase 2 com grupo `phase2` em:
+  - `src/tests/Unit/Phase2DatatableContractsTest.php`
+  - `src/tests/Feature/Phase2InertiaComponentsTest.php`
+- [x] Definir comando de execucao isolada da fase 2:
+  - `docker compose exec -T app sh -lc 'cd /var/www/html && php vendor/bin/phpunit --group phase2'`
 - [ ] Executar `cd src && ./vendor/bin/phpunit` ao final da fase.
 - [ ] Corrigir falhas relacionadas aos CRUDs migrados nesta fase.
 - [ ] Registrar resultado da execucao em `registro-andamento.md`.

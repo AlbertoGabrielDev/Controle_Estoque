@@ -2,60 +2,98 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\Marca;
-use App\Models\User;
-use Illuminate\Support\Facades\Gate;
-use Illuminate\Pagination\Paginator;
+use App\Services\DataTableService;
+use App\Support\DataTableActions;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use App\Http\Requests\ValidacaoMarca;
+use Illuminate\Validation\Rule;
+use Inertia\Inertia;
+
 class MarcaController extends Controller
 {
-    public function index()
+    public function __construct(
+        private DataTableService $dt
+    ) {
+    }
+
+    public function index(Request $request)
     {
-        $marcas = Marca::get();
-        return view('marca.index', compact('marcas'));
+        return Inertia::render('Brands/Index', [
+            'filters' => [
+                'q' => (string) $request->query('q', ''),
+                'status' => (string) $request->query('status', ''),
+            ],
+        ]);
+    }
+
+    public function data(Request $request)
+    {
+        [$query, $columnsMap] = Marca::makeDatatableQuery($request);
+
+        return $this->dt->make(
+            $query,
+            $columnsMap,
+            rawColumns: ['acoes'],
+            decorate: function ($dt) {
+                $dt->addColumn('acoes', function ($row) {
+                    return DataTableActions::wrap([
+                        DataTableActions::edit('marca.editar', $row->id),
+                        DataTableActions::status('marca.status', 'marca', $row->id, (bool) $row->st),
+                    ]);
+                });
+            }
+        );
     }
 
     public function cadastro()
-    {   
-        return view('marca.cadastro');
+    {
+        return Inertia::render('Brands/Create');
     }
 
-    public function buscar(Request $request) 
+    public function buscar(Request $request)
     {
-        if (Gate::allows('permissao')) {
-            $marcas = Marca::where('nome_marca', 'like', '%' . $request->input('nome_marca') . '%')->paginate(15);
-        } else {
-            $marcas = Marca::where('nome_marca', 'like', '%' . $request->input('nome_marca') . '%')->where('status',1)->paginate(15);
-        }
-        
-        return view('marca.index', compact('marcas'));
-    } 
-
-    public function editar(Request $request, $marcaId)
-    {
-        $marcas = Marca::where('id_marca' , $marcaId)->get();
-        return view('marca.editar',compact('marcas'));
-    }
-
-    public function salvarEditar(ValidacaoMarca $request, $marcaId)
-    {
-        $marcas = Marca::where('id_marca' , $marcaId)
-        ->update([
-           'nome_marca' => $request->nome_marca 
+        return redirect()->route('marca.index', [
+            'q' => (string) $request->input('nome_marca', ''),
         ]);
+    }
+
+    public function editar($marcaId)
+    {
+        return Inertia::render('Brands/Edit', [
+            'marca' => Marca::query()->findOrFail($marcaId),
+        ]);
+    }
+
+    public function salvarEditar(Request $request, $marcaId)
+    {
+        $marca = Marca::query()->findOrFail($marcaId);
+        $validated = $request->validate([
+            'nome_marca' => [
+                'required',
+                'max:20',
+                Rule::unique('marcas', 'nome_marca')->ignore($marca->id_marca, 'id_marca'),
+            ],
+        ]);
+
+        $marca->update([
+            'nome_marca' => $validated['nome_marca'],
+        ]);
+
         return redirect()->route('marca.index')->with('success', 'Editado com sucesso');
     }
 
-    public function inserirMarca(ValidacaoMarca $request)
+    public function inserirMarca(Request $request)
     {
-        $marca = Marca::create([
-            'nome_marca' => $request->nome_marca,
-            'id_users_fk' => Auth::id()
+        $validated = $request->validate([
+            'nome_marca' => 'required|max:20|unique:marcas,nome_marca',
         ]);
+
+        Marca::create([
+            'nome_marca' => $validated['nome_marca'],
+            'id_users_fk' => Auth::id(),
+        ]);
+
         return redirect()->route('marca.index')->with('success', 'Inserido com sucesso');
     }
-
-
 }

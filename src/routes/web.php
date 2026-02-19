@@ -63,8 +63,9 @@ Route::middleware([
 ])->prefix('/verdurao')->group(function () {
 
     Route::prefix('/categoria')->group(function () {
-        Route::get('/', [CategoriaController::class, 'Inicio'])->name('categoria.inicio')->middleware('check.permission:view_post,categoria');
-        Route::get('/index', [CategoriaController::class, 'Index'])->name('categoria.index')->middleware('check.permission:view_post,categoria');
+        Route::get('/', [CategoriaController::class, 'inicio'])->name('categoria.inicio')->middleware('check.permission:view_post,categoria');
+        Route::get('/index', [CategoriaController::class, 'index'])->name('categoria.index')->middleware('check.permission:view_post,categoria');
+        Route::get('/data', [CategoriaController::class, 'data'])->name('categoria.data')->middleware('check.permission:view_post,categoria');
         Route::get('/cadastro', [CategoriaController::class, 'cadastro'])->name('categoria.cadastro')->middleware('check.permission:create_post,categoria');
         Route::post('/cadastro', [CategoriaController::class, 'inserirCategoria'])->name('categoria.inserirCategoria');
         Route::get('/produto/{categoria}', [CategoriaController::class, 'produto'])->name('categorias.produto');
@@ -140,9 +141,10 @@ Route::middleware([
 
     Route::prefix('/marca')->group(function () {
         Route::get('/index', [MarcaController::class, 'index'])->name('marca.index')->middleware('check.permission:view_post,marca');
+        Route::get('/data', [MarcaController::class, 'data'])->name('marca.data')->middleware('check.permission:view_post,marca');
         Route::get('/cadastro', [MarcaController::class, 'cadastro'])->name('marca.cadastro')->middleware('check.permission:create_post,marca');
         Route::post('/cadastro', [MarcaController::class, 'inserirMarca'])->name('marca.inserirMarca');
-        Route::get('/buscar-marca', [MarcaController::class, 'Buscar'])->name('marca.buscar');
+        Route::get('/buscar-marca', [MarcaController::class, 'buscar'])->name('marca.buscar');
         Route::get('/editar/{marcaId}', [MarcaController::class, 'editar'])->name('marca.editar')->middleware('check.permission:edit_post,marca');
         Route::post('/editar/{marcaId}', [MarcaController::class, 'salvarEditar'])->name('marca.salvarEditar');
         Route::post('/status/{modelName}/{id}', [MarcaController::class, 'updateStatus'])->name('marca.status')->middleware('check.permission:status,marca');
@@ -159,9 +161,10 @@ Route::middleware([
     });
     Route::prefix('/unidades')->group(function () {
         Route::get('/index', [UnidadeController::class, 'index'])->name('unidade.index')->middleware('check.permission:view_post,unidades');
+        Route::get('/data', [UnidadeController::class, 'data'])->name('unidade.data')->middleware('check.permission:view_post,unidades');
         Route::get('/cadastro', [UnidadeController::class, 'cadastro'])->name('unidades.cadastro')->middleware('check.permission:create_post,unidades');
         Route::post('/cadastro', [UnidadeController::class, 'inserirUnidade'])->name('unidades.inserirUnidade');
-        Route::get('/buscar-unidade', [UnidadeController::class, 'Buscar'])->name('unidade.buscar');
+        Route::get('/buscar-unidade', [UnidadeController::class, 'buscar'])->name('unidade.buscar');
         Route::get('/editar/{unidadeId}', [UnidadeController::class, 'editar'])->name('unidades.editar')->middleware('check.permission:edit_post,unidades');
         Route::post('/editar/{unidadeId}', [UnidadeController::class, 'salvarEditar'])->name('unidades.salvarEditar');
         Route::post('/status/{modelName}/{id}', [UnidadeController::class, 'updateStatus'])->name('unidades.status');

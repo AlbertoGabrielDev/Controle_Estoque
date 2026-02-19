@@ -1,66 +1,130 @@
 <?php
+
 namespace App\Http\Controllers;
 
 use App\Models\Categoria;
-use App\Models\Produto;
-use App\Models\CategoriaProduto;
-use App\Repositories\CategoriaRepository;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Pagination\Paginator;
+use App\Services\DataTableService;
+use App\Support\DataTableActions;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
+use Inertia\Inertia;
+
 class CategoriaController extends Controller
 {
-
-    protected $categoriaRepository;
-    public function __construct(CategoriaRepository $categoriaRepository)
-    {
-        $this->categoriaRepository = $categoriaRepository;
+    public function __construct(
+        private DataTableService $dt
+    ) {
     }
+
     public function inicio()
     {
-        $categorias = $this->categoriaRepository->getAll();
-        return view('categorias.categoria',compact('categorias'));
+        $query = Categoria::query()->withCount('produtos');
+
+        if (!Gate::allows('permissao')) {
+            $query->where('status', 1);
+        }
+
+        $categorias = $query
+            ->orderBy('nome_categoria')
+            ->get(['id_categoria', 'nome_categoria', 'imagem']);
+
+        return Inertia::render('Categories/Home', [
+            'categorias' => $categorias,
+        ]);
     }
-    public function index()
+
+    public function index(Request $request)
     {
-        $categorias =$this->categoriaRepository->index();
-        return view('categorias.index',compact('categorias'));
+        return Inertia::render('Categories/Index', [
+            'filters' => [
+                'q' => (string) $request->query('q', ''),
+                'status' => (string) $request->query('status', ''),
+            ],
+        ]);
+    }
+
+    public function data(Request $request)
+    {
+        [$query, $columnsMap] = Categoria::makeDatatableQuery($request);
+
+        return $this->dt->make(
+            $query,
+            $columnsMap,
+            rawColumns: ['acoes'],
+            decorate: function ($dt) {
+                $dt->addColumn('acoes', function ($row) {
+                    return DataTableActions::wrap([
+                        DataTableActions::edit('categorias.editar', $row->id),
+                        DataTableActions::status('categoria.status', 'categoria', $row->id, (bool) $row->st),
+                    ]);
+                });
+            }
+        );
     }
 
     public function cadastro()
     {
-        return view('categorias.cadastro');
+        return Inertia::render('Categories/Create');
     }
 
     public function inserirCategoria(Request $request)
     {
-        $this->categoriaRepository->inserirCategoria($request);
+        $request->merge([
+            'nome_categoria' => (string) $request->input('nome_categoria', $request->input('categoria', '')),
+        ]);
+
+        $validated = $request->validate([
+            'nome_categoria' => 'required|max:255',
+            'imagem' => 'required|image|max:4096',
+        ]);
+
+        $imageName = null;
+        if ($request->hasFile('imagem') && $request->file('imagem')->isValid()) {
+            $requestImage = $request->file('imagem');
+            $extension = $requestImage->extension();
+            $imageName = md5($requestImage->getClientOriginalName() . strtotime('now')) . '.' . $extension;
+            $requestImage->move(public_path('img/categorias'), $imageName);
+        }
+
+        Categoria::create([
+            'nome_categoria' => $validated['nome_categoria'],
+            'id_users_fk' => Auth::id(),
+            'imagem' => $imageName,
+        ]);
+
         return redirect()->route('categoria.index')->with('success', 'Inserido com sucesso');
     }
 
     public function produto($categoriaId)
     {
-        $categoria = Categoria::find($categoriaId)->nome_categoria; 
-        $produtos =  Gate::allows('view_post') ? Categoria::find($categoriaId)->produtos()->paginate(10) : Categoria::find($categoriaId)->produtos()->where('status', 1)->paginate(10);
-        return view('categorias.produto',compact('categoria','produtos'));
+        $categoria = Categoria::findOrFail($categoriaId)->nome_categoria;
+        $produtos = Gate::allows('view_post')
+            ? Categoria::findOrFail($categoriaId)->produtos()->paginate(10)
+            : Categoria::findOrFail($categoriaId)->produtos()->where('status', 1)->paginate(10);
 
+        return view('categorias.produto', compact('categoria', 'produtos'));
     }
 
     public function editar($categoriaId)
     {
-        $categorias = $this->categoriaRepository->editar($categoriaId);
-        return view('categorias.editar', compact('categorias'));
+        return Inertia::render('Categories/Edit', [
+            'categoria' => Categoria::query()->findOrFail($categoriaId),
+        ]);
     }
 
-    public function salvarEditar(Request $request,$categoriaId)
+    public function salvarEditar(Request $request, $categoriaId)
     {
-        $this->categoriaRepository->salvarEditar($request,$categoriaId);
-        return redirect()->route('categoria.index')->with('success', 'Editado com sucesso');
-    }
+        $validated = $request->validate([
+            'nome_categoria' => 'required|max:255',
+        ]);
 
-    public function status($statusId)
-    {   
-        $this->categoriaRepository->editar($statusId);
+        Categoria::query()
+            ->where('id_categoria', $categoriaId)
+            ->update([
+                'nome_categoria' => $validated['nome_categoria'],
+            ]);
+
+        return redirect()->route('categoria.index')->with('success', 'Editado com sucesso');
     }
 }
