@@ -3,15 +3,16 @@ set -e
 cd /var/www/html
 
 # --- Garantir diretórios e permissões ---
-mkdir -p bootstrap/cache \
-         storage/framework/{cache,data,sessions,testing,views} \
-         storage/logs
+mkdir -p \
+  bootstrap/cache \
+  storage/framework/cache \
+  storage/framework/data \
+  storage/framework/sessions \
+  storage/framework/testing \
+  storage/framework/views \
+  storage/logs
 chown -R www-data:www-data storage bootstrap/cache || true
-chmod -R 775 storage bootstrap/cache || true
-
-mkdir -p storage/framework/{cache,sessions,views} bootstrap/cache
-chown -R www-data:www-data storage bootstrap/cache
-chmod -R ug+rwX storage bootstrap/cache
+chmod -R ug+rwX storage bootstrap/cache || true
 
 
 if [ ! -f ".env" ] && [ -f ".env.example" ]; then
@@ -42,7 +43,7 @@ DB_WAIT_SLEEP="${DB_WAIT_SLEEP:-2}"
 
 echo "Aguardando banco em ${DB_HOST}:${DB_PORT} ..."
 i=0
-until (echo > /dev/tcp/${DB_HOST}/${DB_PORT}) 2>/dev/null; do
+until php -r '$host=getenv("DB_HOST") ?: "db"; $port=(int)(getenv("DB_PORT") ?: 3306); $fp=@fsockopen($host,$port,$errno,$errstr,1); if($fp){fclose($fp); exit(0);} exit(1);' 2>/dev/null; do
   i=$((i+1))
   if [ "$i" -ge "$DB_WAIT_RETRIES" ]; then
     echo "Banco não respondeu após $((DB_WAIT_RETRIES*DB_WAIT_SLEEP))s"; break

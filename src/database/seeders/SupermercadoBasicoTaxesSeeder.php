@@ -146,14 +146,16 @@ class SupermercadoBasicoTaxesSeeder extends Seeder
         bool $cumulativo = false,
         string $tipoOperacao = 'venda'
     ): void {
-        $exists = DB::table('tax_rules')->where([
-            'tax_id'               => $taxId,
-            'escopo'               => 1, // 1 = Item
-            'categoria_produto_id' => $categoriaId,
-            'uf_origem'            => $ufOrigem,
-            'uf_destino'           => $ufDestino,
-            'tipo_operacao'        => $tipoOperacao,
-        ])->first();
+        $exists = DB::table('tax_rules as tr')
+            ->join('tax_rule_alvos as tra', 'tra.tax_rule_id', '=', 'tr.id')
+            ->where('tr.tax_id', $taxId)
+            ->where('tr.escopo', 1) // 1 = Item
+            ->where('tra.id_categoria_fk', $categoriaId)
+            ->where('tr.uf_origem', $ufOrigem)
+            ->where('tr.uf_destino', $ufDestino)
+            ->where('tr.tipo_operacao', $tipoOperacao)
+            ->select('tr.id')
+            ->first();
 
         $payload = [
             'segment_id'           => null,
@@ -175,17 +177,26 @@ class SupermercadoBasicoTaxesSeeder extends Seeder
 
         if ($exists) {
             DB::table('tax_rules')->where('id', $exists->id)->update($payload);
+            DB::table('tax_rule_alvos')->updateOrInsert(
+                ['tax_rule_id' => $exists->id, 'id_categoria_fk' => $categoriaId],
+                ['updated_at' => now(), 'created_at' => now()]
+            );
         } else {
             $payload = array_merge($payload, [
-                'tax_id'               => $taxId,
-                'escopo'               => 1,
-                'categoria_produto_id' => $categoriaId,
-                'uf_origem'            => $ufOrigem,
-                'uf_destino'           => $ufDestino,
-                'tipo_operacao'        => $tipoOperacao,
-                'created_at'           => now(),
+                'tax_id'        => $taxId,
+                'escopo'        => 1,
+                'uf_origem'     => $ufOrigem,
+                'uf_destino'    => $ufDestino,
+                'tipo_operacao' => $tipoOperacao,
+                'created_at'    => now(),
             ]);
-            DB::table('tax_rules')->insert($payload);
+            $ruleId = (int) DB::table('tax_rules')->insertGetId($payload);
+            DB::table('tax_rule_alvos')->insert([
+                'tax_rule_id'     => $ruleId,
+                'id_categoria_fk' => $categoriaId,
+                'created_at'      => now(),
+                'updated_at'      => now(),
+            ]);
         }
     }
 
