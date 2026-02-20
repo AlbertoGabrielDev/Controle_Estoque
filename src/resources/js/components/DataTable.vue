@@ -43,7 +43,7 @@ const props = defineProps({
   pageLength: { type: Number, default: 10 },
   lengthMenu: { type: Array, default: () => [[10, 25, 50, 100], [10, 25, 50, 100]] },
   responsive: { type: Boolean, default: false },
-  dom: { type: String, default: '<"flex justify-between items-center mb-4"lfr>t<"flex justify-between items-center mt-4"ip>' },
+  dom: { type: String, default: '<"erp-dt-toolbar flex flex-col gap-3 md:flex-row md:items-center md:justify-between mb-4"lfr>t<"erp-dt-footer flex flex-col gap-3 md:flex-row md:items-center md:justify-between mt-4"ip>' },
   languageUrl: { type: String, default: 'https://cdn.datatables.net/plug-ins/1.13.6/i18n/pt-BR.json' },
   reinitKey: { type: [String, Number], default: 0 },
   actionsColIndex: { type: Number, default: -1 },
@@ -80,11 +80,11 @@ function init() {
     headerCallback: (thead) => {
       window.jQuery(thead)
         .find('th')
-        .addClass('px-4 py-3 text-left text-sm font-medium text-gray-700 bg-gray-50')
+        .addClass('px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-600 bg-slate-50')
     },
     createdRow: (row) => {
-      window.jQuery(row).find('td, th').addClass('px-4 py-3 text-sm text-gray-700')
-      window.jQuery(row).addClass('hover:bg-gray-50')
+      window.jQuery(row).find('td, th').addClass('px-4 py-3 text-sm text-slate-700')
+      window.jQuery(row).addClass('hover:bg-slate-50/80 transition-colors')
     },
     columnDefs: [
       { targets: '_all', createdCell: (td) => td.classList.add('px-4', 'py-3') },
@@ -156,14 +156,14 @@ watch(() => props.reinitKey, async () => {
 </script>
 
 <template>
-  <div class="dt-tailwind overflow-x-auto rounded-lg border">
-    <table :id="tableId" ref="tableRef" class="w-full">
-      <thead class="bg-gray-50">
+  <div class="dt-tailwind overflow-x-auto rounded-2xl border border-slate-200/80 bg-white/85 p-3 md:p-4 shadow-sm dark:border-slate-700 dark:bg-slate-900/70">
+    <table :id="tableId" ref="tableRef" class="w-full text-sm">
+      <thead class="bg-slate-50/90 dark:bg-slate-800/70">
         <tr>
           <slot name="thead" />
         </tr>
       </thead>
-      <tbody v-if="enhanceOnly" class="divide-y divide-gray-200">
+      <tbody v-if="enhanceOnly" class="divide-y divide-slate-200 dark:divide-slate-700">
         <slot name="tbody" />
       </tbody>
     </table>

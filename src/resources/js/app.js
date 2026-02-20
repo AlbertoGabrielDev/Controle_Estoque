@@ -24,6 +24,92 @@ const appName = import.meta.env.VITE_APP_NAME || 'Laravel'
 
 initializeTheme()
 
+const ERP_TOAST_CONTAINER_ID = 'erp-toast-container'
+
+function ensureFallbackToastContainer() {
+  if (typeof document === 'undefined') return null
+
+  let container = document.getElementById(ERP_TOAST_CONTAINER_ID)
+  if (!container) {
+    container = document.createElement('div')
+    container.id = ERP_TOAST_CONTAINER_ID
+    container.className = 'erp-toast-container fixed right-4 flex flex-col gap-2'
+    document.body.appendChild(container)
+  }
+
+  container.style.zIndex = '12000'
+  container.style.top = 'var(--erp-toast-top-offset, 84px)'
+  container.style.maxWidth = 'calc(100vw - 2rem)'
+  return container
+}
+
+function fallbackToast(message, type = 'success') {
+  if (typeof document === 'undefined') return
+
+  const container = ensureFallbackToastContainer()
+  if (!container) return
+
+  const palette = {
+    success: 'bg-green-500 text-white',
+    warning: 'bg-amber-500 text-white',
+    error: 'bg-rose-500 text-white',
+    info: 'bg-sky-500 text-white',
+  }
+
+  const level = String(type || 'success').toLowerCase()
+  const tone = palette[level] || palette.success
+
+  const toast = document.createElement('div')
+  toast.className = `toast pointer-events-auto flex items-center w-full max-w-sm gap-3 rounded-xl px-4 py-3 text-sm shadow-lg ${tone}`
+
+  const text = document.createElement('span')
+  text.className = 'flex-1'
+  text.textContent = String(message ?? '')
+
+  const closeButton = document.createElement('button')
+  closeButton.type = 'button'
+  closeButton.className = 'opacity-80 hover:opacity-100'
+  closeButton.setAttribute('aria-label', 'Fechar')
+  closeButton.textContent = 'x'
+  closeButton.addEventListener('click', () => toast.remove())
+
+  toast.appendChild(text)
+  toast.appendChild(closeButton)
+
+  container.appendChild(toast)
+  toast.style.opacity = '0'
+
+  requestAnimationFrame(() => {
+    toast.style.transition = 'opacity .2s ease'
+    toast.style.opacity = '1'
+  })
+
+  setTimeout(() => {
+    toast.style.transition = 'opacity .35s ease'
+    toast.style.opacity = '0'
+    setTimeout(() => toast.remove(), 350)
+  }, 2800)
+}
+
+function safeShowToast(message, type = 'success') {
+  if (typeof window === 'undefined') return
+
+  if (typeof window.showToast === 'function') {
+    try {
+      window.showToast(message, type)
+      return
+    } catch (_) {
+      // fallback below
+    }
+  }
+
+  fallbackToast(message, type)
+}
+
+if (typeof window !== 'undefined' && typeof window.showToast !== 'function') {
+  window.showToast = fallbackToast
+}
+
 // Regras de layout
 const USE_VUE_SIDEBAR = [/^Wpp\//, /^Bot\//]
 const USE_PRINCIPAL = [
@@ -72,7 +158,10 @@ createInertiaApp({
 
     window.showToast = (message, type = 'success') => {
       const t = app.config.globalProperties.$toast
-      if (!t) return console.warn('Toast nao disponivel:', message)
+      if (!t) {
+        fallbackToast(message, type)
+        return
+      }
 
       switch ((type || 'success').toLowerCase()) {
         case 'error':
@@ -106,12 +195,15 @@ document.addEventListener('click', async (ev) => {
   const btn = ev.target.closest('.toggle-status')
   if (!btn) return
 
+  const url = btn.dataset.url
+  if (!url) return
+
   ev.preventDefault()
   if (btn.dataset.processing === '1') return
   btn.dataset.processing = '1'
 
   try {
-    const res = await fetch(btn.dataset.url, {
+    const res = await fetch(url, {
       method: 'POST',
       credentials: 'same-origin',
       headers: {
@@ -136,14 +228,15 @@ document.addEventListener('click', async (ev) => {
     btn.classList.toggle('bg-red-400', !active)
     btn.classList.toggle('hover:bg-red-500', !active)
 
-    const message = active
+    const message = data?.message || (active
       ? 'Status ativado com sucesso!'
-      : 'Status desativado com sucesso!'
+      : 'Status desativado com sucesso!')
 
-    window.showToast(message, active ? 'success' : 'warning')
+    const type = data?.type || (active ? 'success' : 'warning')
+    safeShowToast(message, type)
   } catch (err) {
     console.error('toggle-status failed', err)
-    window.showToast(err?.message || 'Erro ao atualizar status.', 'error')
+    safeShowToast(err?.message || 'Erro ao atualizar status.', 'error')
   } finally {
     btn.dataset.processing = '0'
   }

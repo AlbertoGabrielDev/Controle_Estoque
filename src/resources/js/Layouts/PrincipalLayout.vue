@@ -11,10 +11,14 @@ const displayName = computed(() => String(user.value?.name ?? 'Usuario'))
 const firstName = computed(() => displayName.value.split(' ')[0] || 'Usuario')
 
 const sidebarOpen = ref(false)
+const sidebarCollapsed = ref(false)
+const isDesktopViewport = ref(false)
 const openGroups = reactive({})
 let resizeHandler = null
+const SIDEBAR_COLLAPSE_KEY = 'controle-estoque:sidebar-collapsed'
 
 const isDesktop = () => window.innerWidth >= 768
+const compactSidebar = computed(() => isDesktopViewport.value && sidebarCollapsed.value)
 
 const hasChildren = (item) => Array.isArray(item?.children) && item.children.length > 0
 
@@ -40,6 +44,26 @@ const resolveHref = (item) => {
 }
 
 const hasRoute = (item) => !!resolveHref(item)
+
+const readSidebarPreference = () => {
+    if (typeof window === 'undefined') return false
+
+    try {
+        return window.localStorage.getItem(SIDEBAR_COLLAPSE_KEY) === '1'
+    } catch (_) {
+        return false
+    }
+}
+
+const writeSidebarPreference = (value) => {
+    if (typeof window === 'undefined') return
+
+    try {
+        window.localStorage.setItem(SIDEBAR_COLLAPSE_KEY, value ? '1' : '0')
+    } catch (_) {
+        // Ignora erro de armazenamento (modo privado ou bloqueio de localStorage).
+    }
+}
 
 const isMenuActive = (item) => {
     if (routeIsActive(item?.route)) return true
@@ -93,7 +117,27 @@ const syncOpenGroupsWithRoute = () => {
 }
 
 const toggleGroup = (menuId) => {
+    if (compactSidebar.value) {
+        sidebarCollapsed.value = false
+        writeSidebarPreference(false)
+        openGroups[menuId] = true
+        return
+    }
+
     openGroups[menuId] = !openGroups[menuId]
+}
+
+const toggleSidebarCollapse = () => {
+    if (!isDesktopViewport.value) return
+
+    sidebarCollapsed.value = !sidebarCollapsed.value
+    writeSidebarPreference(sidebarCollapsed.value)
+
+    if (sidebarCollapsed.value) {
+        Object.keys(openGroups).forEach((menuId) => {
+            openGroups[menuId] = false
+        })
+    }
 }
 
 const closeMobileSidebar = () => {
@@ -103,11 +147,21 @@ const closeMobileSidebar = () => {
 }
 
 onMounted(() => {
-    sidebarOpen.value = isDesktop()
+    isDesktopViewport.value = isDesktop()
+    sidebarOpen.value = isDesktopViewport.value
+    sidebarCollapsed.value = isDesktopViewport.value ? readSidebarPreference() : false
     syncOpenGroupsWithRoute()
 
     resizeHandler = () => {
-        sidebarOpen.value = isDesktop()
+        isDesktopViewport.value = isDesktop()
+        sidebarOpen.value = isDesktopViewport.value
+
+        if (!isDesktopViewport.value) {
+            sidebarCollapsed.value = false
+            return
+        }
+
+        sidebarCollapsed.value = readSidebarPreference()
     }
 
     window.addEventListener('resize', resizeHandler)
@@ -143,8 +197,6 @@ watch(
         <div class="pointer-events-none absolute -bottom-28 -left-16 h-72 w-72 rounded-full bg-emerald-300/25 blur-3xl dark:bg-emerald-500/15"></div>
 
         <div class="relative flex min-h-screen flex-col">
-            <div id="toast-container" class="fixed right-4 top-4 z-50 flex flex-col gap-2"></div>
-
             <header class="sticky top-0 z-50 border-b border-slate-200/80 bg-white/90 backdrop-blur dark:border-slate-800 dark:bg-slate-900/80">
                 <div class="mx-auto flex h-16 max-w-[1600px] items-center gap-3 px-3 md:h-[72px] md:gap-4 md:px-5">
                     <button
@@ -202,29 +254,52 @@ watch(
 
                 <aside
                     class="absolute inset-y-0 left-0 z-30 w-72 transition-transform duration-300 ease-out md:relative md:inset-auto md:w-72 md:translate-x-0"
-                    :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full'"
+                    :class="[sidebarOpen ? 'translate-x-0' : '-translate-x-full', compactSidebar ? 'md:w-20' : 'md:w-72']"
                 >
                     <div class="flex h-full flex-col overflow-hidden rounded-2xl border border-slate-200/70 bg-white/90 shadow-xl shadow-slate-200/60 backdrop-blur dark:border-slate-800 dark:bg-slate-900/90 dark:shadow-none">
-                        <div class="border-b border-slate-200/80 px-4 py-4 dark:border-slate-800">
-                            <p class="text-[11px] uppercase tracking-[0.14em] text-slate-500 dark:text-slate-400">Menu principal</p>
-                            <p v-if="user" class="mt-1 text-sm font-medium text-slate-700 dark:text-slate-200">Ola, {{ displayName }}</p>
+                        <div class="border-b border-slate-200/80 px-3 py-4 dark:border-slate-800">
+                            <div class="flex items-center" :class="compactSidebar ? 'flex-col justify-center gap-2' : 'justify-between'">
+                                <div v-if="compactSidebar" class="flex h-9 w-9 items-center justify-center rounded-xl bg-slate-900 text-white dark:bg-slate-800">
+                                    <i class="fas fa-cubes text-sm"></i>
+                                </div>
+
+                                <div v-else>
+                                    <p class="text-[11px] uppercase tracking-[0.14em] text-slate-500 dark:text-slate-400">Menu principal</p>
+                                    <p v-if="user" class="mt-1 text-sm font-medium text-slate-700 dark:text-slate-200">Ola, {{ displayName }}</p>
+                                </div>
+
+                                <button
+                                    type="button"
+                                    class="hidden h-8 w-8 items-center justify-center rounded-lg border border-slate-200 text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-700 md:inline-flex dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800"
+                                    :title="compactSidebar ? 'Expandir menu lateral' : 'Colapsar menu lateral'"
+                                    @click="toggleSidebarCollapse"
+                                >
+                                    <i :class="compactSidebar ? 'fas fa-angle-right text-sm' : 'fas fa-angle-left text-sm'"></i>
+                                </button>
+                            </div>
                         </div>
 
-                        <nav class="erp-nav-scroll flex-1 space-y-1 overflow-y-auto p-3">
+                        <nav class="erp-nav-scroll flex-1 space-y-1 overflow-y-auto p-3" :class="compactSidebar ? 'px-2' : 'px-3'">
                             <template v-if="menus.length">
                                 <template v-for="menu in menus" :key="menu.id">
                                     <div v-if="hasChildren(menu)" class="space-y-1">
-                                        <button type="button" :class="menuItemClass(menu)" @click="toggleGroup(menu.id)">
+                                        <button
+                                            type="button"
+                                            :class="[menuItemClass(menu), compactSidebar ? 'justify-center px-2' : '']"
+                                            :title="compactSidebar ? menu.name : undefined"
+                                            @click="toggleGroup(menu.id)"
+                                        >
                                             <i :class="iconClass(menu)"></i>
-                                            <span class="truncate">{{ menu.name }}</span>
+                                            <span v-if="!compactSidebar" class="truncate">{{ menu.name }}</span>
                                             <i
+                                                v-if="!compactSidebar"
                                                 class="fas fa-chevron-down ml-auto text-[11px] text-slate-400 transition-transform duration-200"
                                                 :class="{ 'rotate-180': openGroups[menu.id] }"
                                             ></i>
                                         </button>
 
                                         <transition name="submenu">
-                                            <div v-if="openGroups[menu.id]" class="ml-3 space-y-1 border-l border-slate-200/90 pl-3 dark:border-slate-700">
+                                            <div v-if="!compactSidebar && openGroups[menu.id]" class="ml-3 space-y-1 border-l border-slate-200/90 pl-3 dark:border-slate-700">
                                                 <template v-for="child in menu.children" :key="child.id">
                                                     <Link
                                                         v-if="hasRoute(child)"
@@ -243,11 +318,12 @@ watch(
                                     <Link
                                         v-else-if="hasRoute(menu)"
                                         :href="resolveHref(menu)"
-                                        :class="menuItemClass(menu)"
+                                        :class="[menuItemClass(menu), compactSidebar ? 'justify-center px-2' : '']"
+                                        :title="compactSidebar ? menu.name : undefined"
                                         @click="closeMobileSidebar"
                                     >
                                         <i :class="iconClass(menu)"></i>
-                                        <span class="truncate">{{ menu.name }}</span>
+                                        <span v-if="!compactSidebar" class="truncate">{{ menu.name }}</span>
                                     </Link>
                                 </template>
                             </template>
@@ -260,17 +336,19 @@ watch(
                         <form class="border-t border-slate-200/80 p-3 dark:border-slate-800" @submit.prevent="$inertia.post('/logout')">
                             <button
                                 type="submit"
-                                class="flex w-full items-center gap-2 rounded-xl px-3 py-2.5 text-sm font-medium text-slate-700 transition-colors hover:bg-rose-50 hover:text-rose-700 dark:text-slate-200 dark:hover:bg-rose-500/10 dark:hover:text-rose-200"
+                                class="flex w-full items-center rounded-xl py-2.5 text-sm font-medium text-slate-700 transition-colors hover:bg-rose-50 hover:text-rose-700 dark:text-slate-200 dark:hover:bg-rose-500/10 dark:hover:text-rose-200"
+                                :class="compactSidebar ? 'justify-center px-2' : 'gap-2 px-3'"
+                                :title="compactSidebar ? 'Sair da sessao' : undefined"
                             >
                                 <i class="fas fa-sign-out-alt shrink-0 w-4 text-center text-sm"></i>
-                                <span class="truncate">Sair da sessao</span>
+                                <span v-if="!compactSidebar" class="truncate">Sair da sessao</span>
                             </button>
                         </form>
                     </div>
                 </aside>
 
                 <main class="min-w-0 flex-1 overflow-hidden">
-                    <section class="h-full overflow-auto rounded-2xl border border-slate-200/80 bg-white/90 p-4 shadow-xl shadow-slate-200/50 backdrop-blur transition-colors dark:border-slate-800 dark:bg-slate-900/80 dark:shadow-none md:p-6">
+                    <section class="erp-workspace h-full overflow-auto rounded-2xl border border-slate-200/80 bg-white/90 p-4 shadow-xl shadow-slate-200/50 backdrop-blur transition-colors dark:border-slate-800 dark:bg-slate-900/80 dark:shadow-none md:p-6">
                         <slot />
                     </section>
                 </main>
@@ -320,5 +398,171 @@ watch(
 .submenu-leave-to {
     opacity: 0;
     transform: translateY(-4px);
+}
+
+:deep(.erp-workspace .bg-white.rounded),
+:deep(.erp-workspace .bg-white.rounded-md),
+:deep(.erp-workspace .bg-white.rounded-lg),
+:deep(.erp-workspace .bg-white.rounded-xl),
+:deep(.erp-workspace .bg-white.rounded-2xl),
+:deep(.erp-workspace .bg-gray-50.rounded),
+:deep(.erp-workspace .bg-gray-50.rounded-md),
+:deep(.erp-workspace .bg-gray-50.rounded-lg),
+:deep(.erp-workspace .bg-gray-50.rounded-xl),
+:deep(.erp-workspace .bg-gray-50.rounded-2xl) {
+    border: 1px solid #e2e8f0;
+    border-radius: 1rem;
+    background-color: rgba(255, 255, 255, 0.92);
+    box-shadow: 0 14px 32px rgba(15, 23, 42, 0.06);
+}
+
+:deep(.dark .erp-workspace .bg-white.rounded),
+:deep(.dark .erp-workspace .bg-white.rounded-md),
+:deep(.dark .erp-workspace .bg-white.rounded-lg),
+:deep(.dark .erp-workspace .bg-white.rounded-xl),
+:deep(.dark .erp-workspace .bg-white.rounded-2xl),
+:deep(.dark .erp-workspace .bg-gray-50.rounded),
+:deep(.dark .erp-workspace .bg-gray-50.rounded-md),
+:deep(.dark .erp-workspace .bg-gray-50.rounded-lg),
+:deep(.dark .erp-workspace .bg-gray-50.rounded-xl),
+:deep(.dark .erp-workspace .bg-gray-50.rounded-2xl) {
+    border-color: #334155;
+    background-color: rgba(15, 23, 42, 0.82);
+    box-shadow: none;
+}
+
+:deep(.erp-workspace label) {
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+    color: #334155;
+}
+
+:deep(.dark .erp-workspace label) {
+    color: #cbd5e1;
+}
+
+:deep(.erp-workspace input:not([type='checkbox']):not([type='radio']):not([type='file']):not([type='range'])),
+:deep(.erp-workspace select),
+:deep(.erp-workspace textarea) {
+    min-height: 2.65rem;
+    width: 100%;
+    border: 1px solid #cbd5e1;
+    border-radius: 0.75rem;
+    background-color: rgba(255, 255, 255, 0.95);
+    color: #0f172a;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05);
+    transition: border-color 0.18s ease, box-shadow 0.18s ease, background-color 0.18s ease;
+}
+
+:deep(.erp-workspace textarea) {
+    min-height: 6rem;
+}
+
+:deep(.erp-workspace input:not([type='checkbox']):not([type='radio']):not([type='file']):not([type='range']):focus),
+:deep(.erp-workspace select:focus),
+:deep(.erp-workspace textarea:focus) {
+    outline: none;
+    border-color: #06b6d4;
+    box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.2);
+}
+
+:deep(.dark .erp-workspace input:not([type='checkbox']):not([type='radio']):not([type='file']):not([type='range'])),
+:deep(.dark .erp-workspace select),
+:deep(.dark .erp-workspace textarea) {
+    border-color: #475569;
+    background-color: rgba(15, 23, 42, 0.9);
+    color: #e2e8f0;
+    box-shadow: none;
+}
+
+:deep(.dark .erp-workspace input::placeholder),
+:deep(.dark .erp-workspace textarea::placeholder) {
+    color: #94a3b8;
+}
+
+:deep(.erp-workspace button) {
+    transition: transform 0.14s ease, box-shadow 0.14s ease, background-color 0.14s ease;
+}
+
+:deep(.erp-workspace button:hover) {
+    transform: translateY(-1px);
+}
+
+:deep(.erp-workspace table) {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+:deep(.erp-workspace table thead th) {
+    border-bottom: 1px solid #dbe4ee;
+    background-color: #f8fafc;
+    color: #475569;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+}
+
+:deep(.erp-workspace table tbody td) {
+    border-bottom: 1px solid #eef2f7;
+    color: #334155;
+}
+
+:deep(.erp-workspace table tbody tr:hover td) {
+    background-color: #f8fafc;
+}
+
+:deep(.dark .erp-workspace table thead th) {
+    border-bottom-color: #334155;
+    background-color: #0f172a;
+    color: #94a3b8;
+}
+
+:deep(.dark .erp-workspace table tbody td) {
+    border-bottom-color: #1e293b;
+    color: #cbd5e1;
+}
+
+:deep(.dark .erp-workspace table tbody tr:hover td) {
+    background-color: #111827;
+}
+
+:deep(.erp-workspace .dt-tailwind) {
+    border: 1px solid #dbe4ee;
+    border-radius: 1rem;
+    background-color: rgba(255, 255, 255, 0.88);
+    box-shadow: 0 10px 24px rgba(15, 23, 42, 0.06);
+    overflow: hidden;
+}
+
+:deep(.erp-workspace .dataTables_wrapper .dataTables_length select),
+:deep(.erp-workspace .dataTables_wrapper .dataTables_filter input),
+:deep(.erp-workspace .dataTables_wrapper .dataTables_paginate .paginate_button) {
+    border-radius: 0.7rem !important;
+    border: 1px solid #cbd5e1 !important;
+    background-color: #ffffff !important;
+    color: #334155 !important;
+}
+
+:deep(.erp-workspace .dataTables_wrapper .dataTables_paginate .paginate_button.current) {
+    border-color: #0891b2 !important;
+    background-color: #0891b2 !important;
+    color: #ffffff !important;
+}
+
+:deep(.dark .erp-workspace .dt-tailwind) {
+    border-color: #334155;
+    background-color: rgba(15, 23, 42, 0.72);
+    box-shadow: none;
+}
+
+:deep(.dark .erp-workspace .dataTables_wrapper .dataTables_length select),
+:deep(.dark .erp-workspace .dataTables_wrapper .dataTables_filter input),
+:deep(.dark .erp-workspace .dataTables_wrapper .dataTables_paginate .paginate_button) {
+    border-color: #475569 !important;
+    background-color: #0b1220 !important;
+    color: #e2e8f0 !important;
 }
 </style>

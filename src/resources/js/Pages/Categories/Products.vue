@@ -67,14 +67,16 @@ function formatNutrition(value) {
       <div class="flex gap-2">
         <Link
           :href="route('categoria.inicio')"
-          class="rounded bg-gray-100 px-4 py-2 text-gray-700 hover:bg-gray-200"
+          class="flex items-center rounded-md bg-gray-100 px-4 py-2 text-gray-800 transition-colors hover:bg-gray-200"
         >
+          <i class="fas fa-angle-left mr-2"></i>
           Voltar
         </Link>
         <Link
           :href="route('produtos.cadastro')"
-          class="rounded bg-cyan-600 px-4 py-2 text-white hover:bg-cyan-700"
+          class="flex items-center rounded-md bg-gray-100 px-4 py-2 text-gray-800 transition-colors hover:bg-gray-200"
         >
+          <i class="fas fa-plus mr-2"></i>
           Cadastrar Produto
         </Link>
       </div>
@@ -107,8 +109,12 @@ function formatNutrition(value) {
               {{ formatNutrition(produto.inf_nutriente) }}
             </td>
             <td class="px-4 py-3">
-              <Link :href="route('produtos.editar', produto.id_produto)" class="text-cyan-700 hover:underline">
-                Editar
+              <Link
+                :href="route('produtos.editar', produto.id_produto)"
+                class="inline-flex items-center justify-center rounded-md p-2 text-cyan-600 transition hover:bg-cyan-50"
+                title="Editar"
+              >
+                <i class="fas fa-edit"></i>
               </Link>
             </td>
             <td class="px-4 py-3">

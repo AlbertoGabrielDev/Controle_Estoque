@@ -9,6 +9,9 @@ use App\Models\RoleMenuPermission;
 use App\Services\DataTableService;
 use App\Support\DataTableActions;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Str;
 use Inertia\Inertia;
 
 class RoleController extends Controller
@@ -74,6 +77,7 @@ class RoleController extends Controller
     {
         $role = Role::query()->findOrFail($id, ['id', 'name']);
         $statusPermission = Permission::firstOrCreate(['name' => 'status']);
+        $viewPermission = Permission::firstOrCreate(['name' => 'view_post']);
 
         $permissions = Permission::query()
             ->where('name', '!=', 'status')
@@ -84,17 +88,31 @@ class RoleController extends Controller
             ->whereNotNull('slug')
             ->where('slug', '!=', '')
             ->orderBy('order')
-            ->get(['id', 'name', 'slug']);
+            ->get(['id', 'name', 'slug', 'route']);
+
+        [$crudMenus, $nonCrudMenus] = $this->splitMenusByCrudCapability($menus);
 
         $currentPermissions = RoleMenuPermission::query()
             ->where('role_id', $role->id)
             ->get(['menu_id', 'permission_id']);
 
+        $crudMenuIds = $crudMenus->pluck('id')->map(fn ($id) => (int) $id)->all();
+
         $selectedPermissions = $currentPermissions
             ->where('permission_id', '!=', $statusPermission->id)
+            ->whereIn('menu_id', $crudMenuIds)
             ->groupBy('menu_id')
             ->map(fn ($group) => $group->pluck('permission_id')->map(fn ($id) => (int) $id)->values())
             ->toArray();
+
+        $nonCrudAccess = [];
+        foreach ($nonCrudMenus as $menu) {
+            $nonCrudAccess[$menu->id] = $currentPermissions
+                ->contains(fn ($item) =>
+                    (int) $item->menu_id === (int) $menu->id
+                    && (int) $item->permission_id === (int) $viewPermission->id
+                );
+        }
 
         $statusEnabled = $currentPermissions
             ->contains(fn ($item) => (int) $item->permission_id === (int) $statusPermission->id);
@@ -102,7 +120,9 @@ class RoleController extends Controller
         return Inertia::render('Roles/Edit', [
             'role' => $role,
             'permissions' => $permissions,
-            'menus' => $menus,
+            'permissionMenus' => $crudMenus->values(),
+            'nonCrudMenus' => $nonCrudMenus->values(),
+            'nonCrudAccess' => $nonCrudAccess,
             'selectedPermissions' => $selectedPermissions,
             'statusEnabled' => $statusEnabled,
         ]);
@@ -112,6 +132,8 @@ class RoleController extends Controller
     {
         $validated = $request->validate([
             'global_permissions.status' => 'nullable|boolean',
+            'global_permissions.non_crud' => 'nullable|array',
+            'global_permissions.non_crud.*' => 'nullable|boolean',
             'permissions' => 'nullable|array',
             'permissions.*' => 'array',
             'permissions.*.*' => 'integer|exists:permissions,id',
@@ -124,6 +146,18 @@ class RoleController extends Controller
             ->get(['id']);
 
         $statusPermission = Permission::firstOrCreate(['name' => 'status']);
+        $viewPermission = Permission::firstOrCreate(['name' => 'view_post']);
+
+        $fullMenus = Menu::query()
+            ->whereNotNull('slug')
+            ->where('slug', '!=', '')
+            ->orderBy('order')
+            ->get(['id', 'name', 'slug', 'route']);
+
+        [$crudMenus, $nonCrudMenus] = $this->splitMenusByCrudCapability($fullMenus);
+        $crudMenuIds = $crudMenus->pluck('id')->map(fn ($id) => (int) $id)->all();
+        $nonCrudMenuIds = $nonCrudMenus->pluck('id')->map(fn ($id) => (int) $id)->all();
+
         $toggleStatus = (bool) data_get($validated, 'global_permissions.status', false);
 
         if ($toggleStatus) {
@@ -144,6 +178,39 @@ class RoleController extends Controller
                 ->delete();
         }
 
+        $nonCrudInput = data_get($validated, 'global_permissions.non_crud', []);
+        foreach ($nonCrudMenuIds as $menuId) {
+            $enabled = filter_var(
+                data_get($nonCrudInput, (string) $menuId, data_get($nonCrudInput, $menuId, false)),
+                FILTER_VALIDATE_BOOLEAN
+            );
+
+            if ($enabled) {
+                RoleMenuPermission::query()
+                    ->where('role_id', $role->id)
+                    ->where('menu_id', $menuId)
+                    ->whereNotIn('permission_id', [$statusPermission->id, $viewPermission->id])
+                    ->delete();
+
+                RoleMenuPermission::updateOrCreate(
+                    [
+                        'role_id' => $role->id,
+                        'menu_id' => $menuId,
+                        'permission_id' => $viewPermission->id,
+                    ],
+                    []
+                );
+
+                continue;
+            }
+
+            RoleMenuPermission::query()
+                ->where('role_id', $role->id)
+                ->where('menu_id', $menuId)
+                ->where('permission_id', '!=', $statusPermission->id)
+                ->delete();
+        }
+
         $inputPermissions = data_get($validated, 'permissions', []);
         $currentPermissions = RoleMenuPermission::query()
             ->where('role_id', $role->id)
@@ -152,6 +219,11 @@ class RoleController extends Controller
         $newMap = [];
 
         foreach ($inputPermissions as $menuId => $permissionIds) {
+            $menuId = (int) $menuId;
+            if (!in_array($menuId, $crudMenuIds, true)) {
+                continue;
+            }
+
             foreach ((array) $permissionIds as $permissionId) {
                 if ((int) $permissionId === (int) $statusPermission->id) {
                     continue;
@@ -176,6 +248,10 @@ class RoleController extends Controller
                 continue;
             }
 
+            if (in_array((int) $perm->menu_id, $nonCrudMenuIds, true)) {
+                continue;
+            }
+
             $key = $perm->menu_id . '_' . $perm->permission_id;
             if (!isset($newMap[$key])) {
                 RoleMenuPermission::query()
@@ -187,6 +263,100 @@ class RoleController extends Controller
         }
 
         return redirect()->route('roles.editar', $role->id)->with('success', 'Permissoes atualizadas com sucesso!');
+    }
+
+    private function splitMenusByCrudCapability(Collection $menus): array
+    {
+        $namedRoutes = collect(Route::getRoutes()->getRoutesByName());
+        $moduleCrudMap = $this->buildModuleCrudMap($namedRoutes);
+
+        $crudMenus = collect();
+        $nonCrudMenus = collect();
+
+        foreach ($menus as $menu) {
+            $routeName = (string) ($menu->route ?? '');
+            $route = $routeName !== '' ? $namedRoutes->get($routeName) : null;
+            $moduleKey = $route ? $this->extractModuleKeyFromUri($route->uri()) : null;
+            $isCrudMenu = $moduleKey ? (bool) ($moduleCrudMap[$moduleKey] ?? false) : false;
+
+            if ($isCrudMenu) {
+                $crudMenus->push($menu);
+                continue;
+            }
+
+            $nonCrudMenus->push($menu);
+        }
+
+        return [$crudMenus, $nonCrudMenus];
+    }
+
+    private function buildModuleCrudMap(Collection $namedRoutes): array
+    {
+        $map = [];
+
+        foreach ($namedRoutes as $name => $route) {
+            if (!$route) {
+                continue;
+            }
+
+            $moduleKey = $this->extractModuleKeyFromUri($route->uri());
+            if (!$moduleKey) {
+                continue;
+            }
+
+            if (!isset($map[$moduleKey])) {
+                $map[$moduleKey] = false;
+            }
+
+            if ($this->routeLooksCrud((string) $name, $route->uri())) {
+                $map[$moduleKey] = true;
+            }
+        }
+
+        return $map;
+    }
+
+    private function extractModuleKeyFromUri(string $uri): ?string
+    {
+        $segments = array_values(array_filter(explode('/', trim($uri, '/'))));
+        if (empty($segments)) {
+            return null;
+        }
+
+        if (($segments[0] ?? null) === 'verdurao') {
+            return $segments[1] ?? null;
+        }
+
+        return $segments[0] ?? null;
+    }
+
+    private function routeLooksCrud(string $routeName, string $uri): bool
+    {
+        $name = Str::lower($routeName);
+        $normalizedUri = Str::lower(trim($uri, '/'));
+
+        if (preg_match('/\.(create|store|edit|update|destroy)$/', $name)) {
+            return true;
+        }
+
+        if (preg_match('/\.(cadastro|editar|salvareditar)$/', $name)) {
+            return true;
+        }
+
+        if (preg_match('/\.inserir[a-z0-9_]*$/', $name)) {
+            return true;
+        }
+
+        if (
+            Str::contains($normalizedUri, '/create')
+            || Str::contains($normalizedUri, '/edit/')
+            || Str::contains($normalizedUri, '/cadastro')
+            || Str::contains($normalizedUri, '/editar/')
+        ) {
+            return true;
+        }
+
+        return false;
     }
 
     public function updateStatus($model, $id)

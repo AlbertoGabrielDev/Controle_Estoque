@@ -31,13 +31,14 @@ const url = computed(() => {
   if (props.toggleRouteName) {
     return route(props.toggleRouteName, { modelName: props.modelName, id: props.modelId })
   }
+
   return route(`${props.modelName}.status`, { modelName: props.modelName, id: props.modelId })
 })
 
 function cls(active) {
   return [
-    'toggle-status',
-    'flex items-center px-3 py-1 rounded-full text-sm transition-colors gap-1',
+    'erp-toggle-status',
+    'inline-flex h-10 w-10 items-center justify-center rounded-full transition-colors',
     active ? 'bg-green-500 hover:bg-green-600' : 'bg-red-400 hover:bg-red-500',
   ].join(' ')
 }
@@ -46,6 +47,7 @@ async function toggle() {
   if (processing.value || !props.canToggle) return
 
   processing.value = true
+
   try {
     const { data } = await axios.post(
       url.value,
@@ -62,10 +64,13 @@ async function toggle() {
     if (data?.status === 200) {
       localStatus.value = Number(data.new_status) === 1 || data.new_status === true
       emit('toggled', localStatus.value)
-      showToast(
-        localStatus.value ? 'Status ativado com sucesso!' : 'Status desativado com sucesso!',
-        localStatus.value ? 'success' : 'warning'
-      )
+
+      const message = data?.message || (localStatus.value
+        ? 'Status ativado com sucesso!'
+        : 'Status desativado com sucesso!')
+      const type = data?.type || (localStatus.value ? 'success' : 'warning')
+
+      showToast(message, type)
       return
     }
 
@@ -84,28 +89,50 @@ function showToast(message, type = 'success') {
     return
   }
 
-  const id = 'toast-container'
+  const id = 'erp-toast-container'
   let container = document.getElementById(id)
+
   if (!container) {
     container = document.createElement('div')
     container.id = id
-    container.className = 'fixed top-4 right-4 z-50 flex flex-col gap-2'
+    container.className = 'erp-toast-container fixed right-4 flex flex-col gap-2'
     document.body.appendChild(container)
   }
+  container.style.zIndex = '12000'
+  container.style.top = 'var(--erp-toast-top-offset, 84px)'
+  container.style.maxWidth = 'calc(100vw - 2rem)'
+
+  const tone = {
+    success: 'bg-green-500 text-white',
+    warning: 'bg-amber-500 text-white',
+    error: 'bg-rose-500 text-white',
+    info: 'bg-sky-500 text-white',
+  }[String(type || 'success').toLowerCase()] || 'bg-green-500 text-white'
+
   const toast = document.createElement('div')
-  toast.className = `toast flex items-center w-full max-w-xs p-4 rounded-lg shadow-sm text-sm gap-3 ${
-    type === 'success' ? 'bg-green-400 text-white' : 'bg-red-400 text-white'
-  }`
-  toast.innerHTML = `
-    <span class="flex-1">${message}</span>
-    <button type="button" class="ml-2 text-white/80 hover:text-white" onclick="this.closest('.toast')?.remove()">✕</button>
-  `
+  toast.className = `toast pointer-events-auto flex items-center w-full max-w-xs p-4 rounded-lg shadow-sm text-sm gap-3 ${tone}`
+
+  const text = document.createElement('span')
+  text.className = 'flex-1'
+  text.textContent = String(message ?? '')
+
+  const closeButton = document.createElement('button')
+  closeButton.type = 'button'
+  closeButton.className = 'ml-2 text-white/80 hover:text-white'
+  closeButton.textContent = 'x'
+  closeButton.addEventListener('click', () => toast.remove())
+
+  toast.appendChild(text)
+  toast.appendChild(closeButton)
+
   container.appendChild(toast)
   toast.style.opacity = '0'
+
   requestAnimationFrame(() => {
     toast.style.transition = 'opacity .3s'
     toast.style.opacity = '1'
   })
+
   setTimeout(() => {
     toast.style.transition = 'opacity .5s'
     toast.style.opacity = '0'
@@ -122,6 +149,6 @@ function showToast(message, type = 'success') {
     :disabled="processing"
     @click="toggle"
   >
-    <i class="fa-solid fa-power-off text-xs text-white"></i>
+    <i class="fa-solid fa-power-off text-white"></i>
   </button>
 </template>

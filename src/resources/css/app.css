@@ -9,6 +9,7 @@
 :root {
   --body-bg: #f0f4f8;
   --body-text: #111827;
+  --erp-toast-top-offset: 84px;
 }
 
 .dark {
@@ -25,6 +26,31 @@ body {
   background-color: var(--body-bg);
   color: var(--body-text);
 }
+
+@media (max-width: 767px) {
+  :root {
+    --erp-toast-top-offset: 74px;
+  }
+}
+
+.erp-toast-container {
+  pointer-events: none;
+}
+
+.erp-toast-container .toast {
+  pointer-events: auto;
+}
+
+.Vue-Toastification__container {
+  z-index: 12000 !important;
+}
+
+.Vue-Toastification__container.top-left,
+.Vue-Toastification__container.top-center,
+.Vue-Toastification__container.top-right {
+  top: var(--erp-toast-top-offset, 84px) !important;
+}
+
 .sidebar {
   background: linear-gradient(180deg, #075e54 0%, #128c7e 100%);
 }

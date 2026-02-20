@@ -52,8 +52,25 @@ class User extends Authenticatable
         return $this->roles()->where('name', $roleName)->exists();
     }
 
+    public function isSuperAdmin(): bool
+    {
+        if ($this->relationLoaded('roles')) {
+            return $this->roles->contains(function ($role) {
+                return mb_strtolower((string) ($role->name ?? '')) === 'admin';
+            });
+        }
+
+        return $this->roles()
+            ->whereRaw('LOWER(name) = ?', ['admin'])
+            ->exists();
+    }
+
     public function canToggleStatus()
     {
+        if ($this->isSuperAdmin()) {
+            return true;
+        }
+
         return $this->roles()->whereHas('permissions', function ($query) {
             $query->where('name', 'status');
         })->exists();
@@ -61,9 +78,10 @@ class User extends Authenticatable
 
     public function hasPermission(string $menuSlug, string $permissionName): bool
     {
-        if ((int) $this->id === 1) {
+        if ($this->isSuperAdmin()) {
             return true;
         }
+
         $roleIds = $this->roles()->pluck('roles.id');
         if ($roleIds->isEmpty()) {
             return false;
