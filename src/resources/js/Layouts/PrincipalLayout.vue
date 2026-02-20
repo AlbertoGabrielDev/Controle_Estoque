@@ -253,7 +253,7 @@ watch(
                 />
 
                 <aside
-                    class="absolute inset-y-0 left-0 z-30 w-72 transition-transform duration-300 ease-out md:relative md:inset-auto md:w-72 md:translate-x-0"
+                    class="absolute inset-y-0 left-0 z-30 w-72 transition-transform duration-300 ease-out md:relative md:inset-auto md:translate-x-0"
                     :class="[sidebarOpen ? 'translate-x-0' : '-translate-x-full', compactSidebar ? 'md:w-20' : 'md:w-72']"
                 >
                     <div class="flex h-full flex-col overflow-hidden rounded-2xl border border-slate-200/70 bg-white/90 shadow-xl shadow-slate-200/60 backdrop-blur dark:border-slate-800 dark:bg-slate-900/90 dark:shadow-none">
