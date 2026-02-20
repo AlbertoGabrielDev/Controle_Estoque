@@ -7,6 +7,8 @@ const page = usePage()
 
 const user = computed(() => page.props.auth?.user ?? null)
 const menus = computed(() => page.props.menus ?? [])
+const displayName = computed(() => String(user.value?.name ?? 'Usuario'))
+const firstName = computed(() => displayName.value.split(' ')[0] || 'Usuario')
 
 const sidebarOpen = ref(false)
 const openGroups = reactive({})
@@ -46,12 +48,31 @@ const isMenuActive = (item) => {
     return item.children.some((child) => routeIsActive(child?.route))
 }
 
-const itemClass = (item) => {
+const iconClass = (item) => {
+    const raw = String(item?.icon ?? '')
+        .replace(/\bmr-\d+\b/g, '')
+        .trim()
+
+    return [raw || 'fas fa-circle', 'shrink-0 w-4 text-center text-sm'].join(' ')
+}
+
+const menuItemClass = (item, child = false) => {
     const active = isMenuActive(item)
 
+    if (child) {
+        return [
+            'group flex w-full items-center gap-2 rounded-xl px-3 py-2 text-[13px] font-medium transition-colors duration-150',
+            active
+                ? 'bg-cyan-50 text-cyan-700 shadow-sm shadow-cyan-100 dark:bg-cyan-500/15 dark:text-cyan-100 dark:shadow-none'
+                : 'text-slate-600 hover:bg-slate-100/80 dark:text-slate-300 dark:hover:bg-slate-800/70',
+        ].join(' ')
+    }
+
     return [
-        'flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-gray-600 transition-colors hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-slate-800',
-        active ? 'bg-cyan-50 text-cyan-600 dark:bg-cyan-500/20 dark:text-cyan-200' : '',
+        'group flex w-full items-center gap-2 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-200',
+        active
+            ? 'bg-slate-900 text-white shadow-lg shadow-slate-900/20 dark:bg-cyan-500/20 dark:text-cyan-100 dark:shadow-none'
+            : 'text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800/80',
     ].join(' ')
 }
 
@@ -88,6 +109,7 @@ onMounted(() => {
     resizeHandler = () => {
         sidebarOpen.value = isDesktop()
     }
+
     window.addEventListener('resize', resizeHandler)
 })
 
@@ -109,118 +131,150 @@ watch(
     menus,
     () => {
         syncOpenGroupsWithRoute()
-    }
+    },
+    { immediate: true }
 )
 </script>
 
 <template>
-    <div class="flex min-h-screen flex-col bg-gray-50 text-gray-900 dark:bg-slate-950 dark:text-slate-100">
-        <div id="toast-container" class="fixed right-4 top-4 z-50 flex flex-col gap-2"></div>
+    <div class="relative min-h-screen overflow-hidden bg-slate-100 text-slate-900 transition-colors dark:bg-slate-950 dark:text-slate-100">
+        <div class="erp-grid-bg pointer-events-none absolute inset-0"></div>
+        <div class="pointer-events-none absolute -right-20 -top-24 h-72 w-72 rounded-full bg-cyan-300/30 blur-3xl dark:bg-cyan-500/20"></div>
+        <div class="pointer-events-none absolute -bottom-28 -left-16 h-72 w-72 rounded-full bg-emerald-300/25 blur-3xl dark:bg-emerald-500/15"></div>
 
-        <nav class="sticky top-0 z-40 border-b border-gray-100 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900 dark:shadow-slate-900/40">
-            <div class="mx-auto max-w-7xl px-3 sm:px-6 lg:px-8">
-                <div class="relative flex h-16 items-center justify-between">
-                    <div class="absolute inset-y-0 left-0 flex items-center md:hidden">
-                        <button
-                            class="ml-2 inline-flex items-center justify-center rounded-md p-2 text-gray-600 transition-colors hover:bg-gray-100 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-slate-800 dark:hover:text-white"
-                            @click="sidebarOpen = !sidebarOpen"
-                        >
-                            <span class="sr-only">Abrir menu</span>
-                            <svg v-if="!sidebarOpen" class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-                            </svg>
-                            <svg v-else class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                            </svg>
-                        </button>
-                    </div>
+        <div class="relative flex min-h-screen flex-col">
+            <div id="toast-container" class="fixed right-4 top-4 z-50 flex flex-col gap-2"></div>
 
-                    <div class="flex flex-1 items-center justify-center md:justify-start">
-                        <div class="ml-6 flex shrink-0 items-center md:ml-0">
-                            <span class="text-lg font-semibold tracking-tight text-cyan-700 dark:text-cyan-300">Controle Estoque</span>
+            <header class="sticky top-0 z-50 border-b border-slate-200/80 bg-white/90 backdrop-blur dark:border-slate-800 dark:bg-slate-900/80">
+                <div class="mx-auto flex h-16 max-w-[1600px] items-center gap-3 px-3 md:h-[72px] md:gap-4 md:px-5">
+                    <button
+                        type="button"
+                        class="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-700 shadow-sm transition-colors hover:bg-slate-50 md:hidden dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700"
+                        @click="sidebarOpen = !sidebarOpen"
+                    >
+                        <span class="sr-only">Abrir menu</span>
+                        <svg v-if="!sidebarOpen" class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                        </svg>
+                        <svg v-else class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+
+                    <div class="flex min-w-0 items-center gap-3">
+                        <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-cyan-600 text-white shadow-lg shadow-cyan-600/30 dark:bg-cyan-500 dark:shadow-cyan-500/20">
+                            <i class="fas fa-boxes-stacked text-sm"></i>
                         </div>
 
-                        <div class="hidden md:ml-6 md:block">
+                        <div class="min-w-0">
+                            <p class="truncate text-lg font-semibold tracking-tight text-slate-900 dark:text-slate-100">Controle Estoque</p>
+                            <p class="truncate text-xs text-slate-500 dark:text-slate-400">ERP de operacoes e inventario</p>
+                        </div>
+                    </div>
+
+                    <div class="hidden min-w-0 flex-1 md:block">
+                        <div class="rounded-xl border border-slate-200/80 bg-slate-50/80 px-2 py-1 dark:border-slate-700 dark:bg-slate-800/40">
                             <slot name="search" />
                         </div>
                     </div>
 
-                    <div class="absolute inset-y-0 right-0 flex items-center gap-2 pr-2 md:static md:inset-auto md:ml-6 md:pr-0">
+                    <div class="ml-auto flex items-center gap-2">
+                        <div
+                            v-if="user"
+                            class="hidden items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs text-slate-600 lg:flex dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300"
+                        >
+                            <span class="h-2 w-2 rounded-full bg-emerald-500"></span>
+                            <span class="max-w-[140px] truncate">{{ firstName }}</span>
+                        </div>
+
                         <ThemeToggle />
                         <slot name="top-right" />
                     </div>
                 </div>
-            </div>
-        </nav>
+            </header>
 
-        <div class="relative flex flex-1 overflow-hidden">
-            <div
-                v-if="sidebarOpen"
-                class="absolute inset-0 z-20 bg-slate-900/40 md:hidden"
-                @click="sidebarOpen = false"
-            />
+            <div class="relative flex flex-1 gap-3 p-3 md:gap-4 md:p-4">
+                <div
+                    v-if="sidebarOpen"
+                    class="absolute inset-0 z-20 bg-slate-950/40 md:hidden"
+                    @click="sidebarOpen = false"
+                />
 
-            <aside
-                class="absolute inset-y-0 left-0 z-30 flex h-full w-64 flex-col border-r border-gray-100 bg-white px-2 pt-0 pb-4 transition-transform duration-200 ease-in-out dark:border-slate-800 dark:bg-slate-900 md:static md:translate-x-0"
-                :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full'"
-            >
-                <div v-if="user" class="mb-3 border-b border-gray-100 px-2 pt-2 pb-3 text-xs text-gray-500 dark:border-slate-800 dark:text-gray-400">
-                    Ola, {{ user.name }}
-                </div>
-
-                <nav class="flex-1 space-y-1 overflow-y-auto pr-1">
-                    <template v-for="menu in menus" :key="menu.id">
-                        <div v-if="hasChildren(menu)" class="space-y-1">
-                            <button :class="itemClass(menu)" @click="toggleGroup(menu.id)">
-                                <i :class="[menu.icon, 'w-4 text-center']"></i>
-                                <span class="truncate">{{ menu.name }}</span>
-                                <i
-                                    class="fas fa-chevron-down ml-auto text-xs text-gray-400 transition-transform"
-                                    :class="{ 'rotate-180': openGroups[menu.id] }"
-                                ></i>
-                            </button>
-
-                            <div v-show="openGroups[menu.id]" class="ml-3 space-y-1 border-l border-gray-100 pl-2 dark:border-slate-800">
-                                <template v-for="child in menu.children" :key="child.id">
-                                    <Link
-                                        v-if="hasRoute(child)"
-                                        :href="resolveHref(child)"
-                                        :class="itemClass(child)"
-                                        @click="closeMobileSidebar"
-                                    >
-                                        <i :class="[child.icon, 'w-4 text-center']"></i>
-                                        <span class="truncate">{{ child.name }}</span>
-                                    </Link>
-                                </template>
-                            </div>
+                <aside
+                    class="absolute inset-y-0 left-0 z-30 w-72 transition-transform duration-300 ease-out md:relative md:inset-auto md:w-72 md:translate-x-0"
+                    :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full'"
+                >
+                    <div class="flex h-full flex-col overflow-hidden rounded-2xl border border-slate-200/70 bg-white/90 shadow-xl shadow-slate-200/60 backdrop-blur dark:border-slate-800 dark:bg-slate-900/90 dark:shadow-none">
+                        <div class="border-b border-slate-200/80 px-4 py-4 dark:border-slate-800">
+                            <p class="text-[11px] uppercase tracking-[0.14em] text-slate-500 dark:text-slate-400">Menu principal</p>
+                            <p v-if="user" class="mt-1 text-sm font-medium text-slate-700 dark:text-slate-200">Ola, {{ displayName }}</p>
                         </div>
 
-                        <Link
-                            v-else-if="hasRoute(menu)"
-                            :href="resolveHref(menu)"
-                            :class="itemClass(menu)"
-                            @click="closeMobileSidebar"
-                        >
-                            <i :class="[menu.icon, 'w-4 text-center']"></i>
-                            <span class="truncate">{{ menu.name }}</span>
-                        </Link>
-                    </template>
-                </nav>
+                        <nav class="erp-nav-scroll flex-1 space-y-1 overflow-y-auto p-3">
+                            <template v-if="menus.length">
+                                <template v-for="menu in menus" :key="menu.id">
+                                    <div v-if="hasChildren(menu)" class="space-y-1">
+                                        <button type="button" :class="menuItemClass(menu)" @click="toggleGroup(menu.id)">
+                                            <i :class="iconClass(menu)"></i>
+                                            <span class="truncate">{{ menu.name }}</span>
+                                            <i
+                                                class="fas fa-chevron-down ml-auto text-[11px] text-slate-400 transition-transform duration-200"
+                                                :class="{ 'rotate-180': openGroups[menu.id] }"
+                                            ></i>
+                                        </button>
 
-                <form class="mt-3 border-t border-gray-100 px-2 pt-3 dark:border-slate-800" @submit.prevent="$inertia.post('/logout')">
-                    <button
-                        type="submit"
-                        class="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-gray-600 transition-colors hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-slate-800"
-                    >
-                        <i class="fas fa-sign-out-alt w-4 text-center"></i>
-                        <span class="truncate">Sair</span>
-                    </button>
-                </form>
-            </aside>
+                                        <transition name="submenu">
+                                            <div v-if="openGroups[menu.id]" class="ml-3 space-y-1 border-l border-slate-200/90 pl-3 dark:border-slate-700">
+                                                <template v-for="child in menu.children" :key="child.id">
+                                                    <Link
+                                                        v-if="hasRoute(child)"
+                                                        :href="resolveHref(child)"
+                                                        :class="menuItemClass(child, true)"
+                                                        @click="closeMobileSidebar"
+                                                    >
+                                                        <i :class="iconClass(child)"></i>
+                                                        <span class="truncate">{{ child.name }}</span>
+                                                    </Link>
+                                                </template>
+                                            </div>
+                                        </transition>
+                                    </div>
 
-            <main class="flex-1 overflow-auto bg-gray-50 px-4 pb-4 pt-0 transition-colors dark:bg-slate-950">
-                <slot />
-            </main>
+                                    <Link
+                                        v-else-if="hasRoute(menu)"
+                                        :href="resolveHref(menu)"
+                                        :class="menuItemClass(menu)"
+                                        @click="closeMobileSidebar"
+                                    >
+                                        <i :class="iconClass(menu)"></i>
+                                        <span class="truncate">{{ menu.name }}</span>
+                                    </Link>
+                                </template>
+                            </template>
+
+                            <div v-else class="rounded-xl border border-dashed border-slate-300 px-3 py-4 text-xs text-slate-500 dark:border-slate-700 dark:text-slate-400">
+                                Nenhum menu disponivel para este usuario.
+                            </div>
+                        </nav>
+
+                        <form class="border-t border-slate-200/80 p-3 dark:border-slate-800" @submit.prevent="$inertia.post('/logout')">
+                            <button
+                                type="submit"
+                                class="flex w-full items-center gap-2 rounded-xl px-3 py-2.5 text-sm font-medium text-slate-700 transition-colors hover:bg-rose-50 hover:text-rose-700 dark:text-slate-200 dark:hover:bg-rose-500/10 dark:hover:text-rose-200"
+                            >
+                                <i class="fas fa-sign-out-alt shrink-0 w-4 text-center text-sm"></i>
+                                <span class="truncate">Sair da sessao</span>
+                            </button>
+                        </form>
+                    </div>
+                </aside>
+
+                <main class="min-w-0 flex-1 overflow-hidden">
+                    <section class="h-full overflow-auto rounded-2xl border border-slate-200/80 bg-white/90 p-4 shadow-xl shadow-slate-200/50 backdrop-blur transition-colors dark:border-slate-800 dark:bg-slate-900/80 dark:shadow-none md:p-6">
+                        <slot />
+                    </section>
+                </main>
+            </div>
         </div>
     </div>
 </template>
@@ -228,5 +282,43 @@ watch(
 <style scoped>
 .rotate-180 {
     transform: rotate(180deg);
+}
+
+.erp-grid-bg {
+    background-image:
+        radial-gradient(circle at 10% 20%, rgba(14, 165, 233, 0.14), transparent 34%),
+        radial-gradient(circle at 85% 90%, rgba(16, 185, 129, 0.11), transparent 32%),
+        linear-gradient(to right, rgba(148, 163, 184, 0.09) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(148, 163, 184, 0.09) 1px, transparent 1px);
+    background-size: auto, auto, 26px 26px, 26px 26px;
+}
+
+.erp-nav-scroll {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(148, 163, 184, 0.7) transparent;
+}
+
+.erp-nav-scroll::-webkit-scrollbar {
+    width: 8px;
+}
+
+.erp-nav-scroll::-webkit-scrollbar-thumb {
+    border-radius: 9999px;
+    background: rgba(148, 163, 184, 0.7);
+}
+
+.erp-nav-scroll::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.submenu-enter-active,
+.submenu-leave-active {
+    transition: all 0.2s ease;
+}
+
+.submenu-enter-from,
+.submenu-leave-to {
+    opacity: 0;
+    transform: translateY(-4px);
 }
 </style>
