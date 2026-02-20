@@ -20,12 +20,6 @@
   --body-text: #e2e8f0;
 }
 
-*{
-    padding: 5px;
-
-}
-
-
 body {
   font-family: 'Poppins', sans-serif;
   background-color: var(--body-bg);

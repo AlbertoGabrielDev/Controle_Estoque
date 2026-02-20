@@ -70,18 +70,24 @@ class Phase5CutoverContractsTest extends TestCase
         }
     }
 
-    public function test_inertia_menu_prefixes_cover_migrated_modules_contract(): void
+    public function test_inertia_menu_is_consumed_from_database_contract(): void
     {
         $appJs = file_get_contents(resource_path('js/app.js'));
         $principalLayout = file_get_contents(resource_path('js/Layouts/PrincipalLayout.vue'));
         $middleware = file_get_contents(app_path('Http/Middleware/HandleInertiaRequests.php'));
 
-        foreach (['categoria.', 'produtos.', 'estoque.', 'marca.', 'unidades.', 'fornecedor.', 'usuario.', 'roles.', 'vendas.', 'spreadsheet.'] as $prefix) {
-            $this->assertStringContainsString($prefix, $appJs, "app.js sem prefixo {$prefix}");
-            $this->assertStringContainsString($prefix, $principalLayout, "PrincipalLayout.vue sem prefixo {$prefix}");
-        }
+        $this->assertStringNotContainsString('INERTIA_PREFIXES', $appJs);
+        $this->assertStringNotContainsString('isInertiaMenu', $appJs);
 
         $this->assertStringContainsString('resolveInertiaMenus', $middleware);
         $this->assertStringContainsString('hasPermission', $middleware);
+        $this->assertStringContainsString('resolveRouteHref', $middleware);
+        $this->assertStringContainsString("'href' =>", $middleware);
+
+        $this->assertStringContainsString('page.props.menus', $principalLayout);
+        $this->assertStringContainsString('resolveHref', $principalLayout);
+        $this->assertStringContainsString('<Link', $principalLayout);
+        $this->assertStringNotContainsString('INERTIA_PREFIXES', $principalLayout);
+        $this->assertStringNotContainsString('tagFor', $principalLayout);
     }
 }

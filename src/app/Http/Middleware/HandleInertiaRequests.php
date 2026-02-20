@@ -5,6 +5,7 @@ namespace App\Http\Middleware;
 use App\Models\Menu;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Route;
 use Inertia\Middleware;
 
 class HandleInertiaRequests extends Middleware
@@ -53,9 +54,12 @@ class HandleInertiaRequests extends Middleware
 
         $menus = Menu::query()
             ->with(['children' => function ($query) {
-                $query->orderBy('order');
+                $query
+                    ->where('status', 1)
+                    ->orderBy('order');
             }])
             ->whereNull('parent_id')
+            ->where('status', 1)
             ->orderBy('order')
             ->get(['id', 'name', 'slug', 'icon', 'route', 'parent_id', 'order']);
 
@@ -92,15 +96,33 @@ class HandleInertiaRequests extends Middleware
 
     private function serializeMenu(Menu $menu, array $children): array
     {
+        $routeName = is_string($menu->route) && trim($menu->route) !== ''
+            ? trim($menu->route)
+            : null;
+
         return [
             'id' => $menu->id,
             'name' => $menu->name,
             'slug' => $menu->slug,
             'icon' => $menu->icon,
-            'route' => $menu->route,
+            'route' => $routeName,
+            'href' => $this->resolveRouteHref($routeName),
             'parent_id' => $menu->parent_id,
             'order' => $menu->order,
             'children' => $children,
         ];
+    }
+
+    private function resolveRouteHref(?string $routeName): ?string
+    {
+        if (!$routeName || !Route::has($routeName)) {
+            return null;
+        }
+
+        try {
+            return route($routeName);
+        } catch (\Throwable) {
+            return null;
+        }
     }
 }
