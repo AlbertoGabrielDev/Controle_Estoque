@@ -19,6 +19,12 @@ use App\Http\Controllers\UsuarioController;
 use App\Http\Controllers\MarcaController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UnidadeController;
+use App\Http\Controllers\UnidadeMedidaController;
+use App\Http\Controllers\ItemController;
+use App\Http\Controllers\TabelaPrecoController;
+use App\Http\Controllers\ImpostoController;
+use App\Http\Controllers\CentroCustoController;
+use App\Http\Controllers\ContaContabilController;
 use App\Http\Controllers\VendaController;
 use App\Http\Controllers\SpreadsheetController;
 use Illuminate\Foundation\Application;
@@ -71,6 +77,7 @@ Route::middleware([
         Route::get('/produto/{categoria}', [CategoriaController::class, 'produto'])->name('categorias.produto');
         Route::get('/editar/{categoriaId}', [CategoriaController::class, 'editar'])->name('categorias.editar')->middleware('check.permission:edit_post,categoria');
         Route::post('/editar/{categoriaId}', [CategoriaController::class, 'salvarEditar'])->name('categorias.salvarEditar');
+        Route::delete('/{categoriaId}', [CategoriaController::class, 'destroy'])->name('categorias.destroy')->middleware('check.permission:edit_post,categoria');
         Route::post('/status/{modelName}/{id}', [CategoriaController::class, 'updateStatus'])->name('categoria.status');
         Route::post('/produto/status/{produtoId}', [ProdutoController::class, 'status'])->name('produtos.status');
     });
@@ -138,6 +145,7 @@ Route::middleware([
         Route::get('/buscar-fornecedor', [FornecedorController::class, 'buscar'])->name('fornecedor.buscar');
         Route::get('/editar/{fornecedorId}', [FornecedorController::class, 'editar'])->name('fornecedor.editar')->middleware('check.permission:edit_post,fornecedores');
         Route::post('/editar/{fornecedorId}', [FornecedorController::class, 'salvarEditar'])->name('fornecedor.salvarEditar')->middleware('check.permission:edit_post,fornecedores');
+        Route::delete('/{fornecedorId}', [FornecedorController::class, 'destroy'])->name('fornecedor.destroy')->middleware('check.permission:edit_post,fornecedores');
         Route::post('/status/{modelName}/{id}', [FornecedorController::class, 'updateStatus'])->middleware('check.permission:status,fornecedores')->name('fornecedor.status');
     });
 
@@ -171,6 +179,74 @@ Route::middleware([
         Route::get('/editar/{unidadeId}', [UnidadeController::class, 'editar'])->name('unidades.editar')->middleware('check.permission:edit_post,unidades');
         Route::post('/editar/{unidadeId}', [UnidadeController::class, 'salvarEditar'])->name('unidades.salvarEditar');
         Route::post('/status/{modelName}/{id}', [UnidadeController::class, 'updateStatus'])->name('unidades.status');
+    });
+
+    Route::prefix('/cadastros')->group(function () {
+        Route::prefix('/unidades-medida')->name('unidades_medida.')->group(function () {
+            Route::get('/', [UnidadeMedidaController::class, 'index'])->name('index');
+            Route::get('/data', [UnidadeMedidaController::class, 'data'])->name('data');
+            Route::get('/create', [UnidadeMedidaController::class, 'create'])->name('create');
+            Route::post('/', [UnidadeMedidaController::class, 'store'])->name('store');
+            Route::get('/{unidade_medida}/edit', [UnidadeMedidaController::class, 'edit'])->name('edit');
+            Route::put('/{unidade_medida}', [UnidadeMedidaController::class, 'update'])->name('update');
+            Route::delete('/{unidade_medida}', [UnidadeMedidaController::class, 'destroy'])->name('destroy');
+            Route::post('/status/{modelName}/{id}', [UnidadeMedidaController::class, 'updateStatus'])->name('status');
+        });
+
+        Route::prefix('/itens')->name('itens.')->group(function () {
+            Route::get('/', [ItemController::class, 'index'])->name('index');
+            Route::get('/data', [ItemController::class, 'data'])->name('data');
+            Route::get('/create', [ItemController::class, 'create'])->name('create');
+            Route::post('/', [ItemController::class, 'store'])->name('store');
+            Route::get('/{item}/edit', [ItemController::class, 'edit'])->name('edit');
+            Route::put('/{item}', [ItemController::class, 'update'])->name('update');
+            Route::delete('/{item}', [ItemController::class, 'destroy'])->name('destroy');
+            Route::post('/status/{modelName}/{id}', [ItemController::class, 'updateStatus'])->name('status');
+        });
+
+        Route::prefix('/tabelas-preco')->name('tabelas_preco.')->group(function () {
+            Route::get('/', [TabelaPrecoController::class, 'index'])->name('index');
+            Route::get('/data', [TabelaPrecoController::class, 'data'])->name('data');
+            Route::get('/create', [TabelaPrecoController::class, 'create'])->name('create');
+            Route::post('/', [TabelaPrecoController::class, 'store'])->name('store');
+            Route::get('/{tabela_preco}/edit', [TabelaPrecoController::class, 'edit'])->name('edit');
+            Route::put('/{tabela_preco}', [TabelaPrecoController::class, 'update'])->name('update');
+            Route::delete('/{tabela_preco}', [TabelaPrecoController::class, 'destroy'])->name('destroy');
+            Route::post('/status/{modelName}/{id}', [TabelaPrecoController::class, 'updateStatus'])->name('status');
+        });
+
+        Route::prefix('/impostos')->name('impostos.')->group(function () {
+            Route::get('/', [ImpostoController::class, 'index'])->name('index');
+            Route::get('/data', [ImpostoController::class, 'data'])->name('data');
+            Route::get('/create', [ImpostoController::class, 'create'])->name('create');
+            Route::post('/', [ImpostoController::class, 'store'])->name('store');
+            Route::get('/{imposto}/edit', [ImpostoController::class, 'edit'])->name('edit');
+            Route::put('/{imposto}', [ImpostoController::class, 'update'])->name('update');
+            Route::delete('/{imposto}', [ImpostoController::class, 'destroy'])->name('destroy');
+            Route::post('/status/{modelName}/{id}', [ImpostoController::class, 'updateStatus'])->name('status');
+        });
+
+        Route::prefix('/centros-custo')->name('centros_custo.')->group(function () {
+            Route::get('/', [CentroCustoController::class, 'index'])->name('index');
+            Route::get('/data', [CentroCustoController::class, 'data'])->name('data');
+            Route::get('/create', [CentroCustoController::class, 'create'])->name('create');
+            Route::post('/', [CentroCustoController::class, 'store'])->name('store');
+            Route::get('/{centro_custo}/edit', [CentroCustoController::class, 'edit'])->name('edit');
+            Route::put('/{centro_custo}', [CentroCustoController::class, 'update'])->name('update');
+            Route::delete('/{centro_custo}', [CentroCustoController::class, 'destroy'])->name('destroy');
+            Route::post('/status/{modelName}/{id}', [CentroCustoController::class, 'updateStatus'])->name('status');
+        });
+
+        Route::prefix('/contas-contabeis')->name('contas_contabeis.')->group(function () {
+            Route::get('/', [ContaContabilController::class, 'index'])->name('index');
+            Route::get('/data', [ContaContabilController::class, 'data'])->name('data');
+            Route::get('/create', [ContaContabilController::class, 'create'])->name('create');
+            Route::post('/', [ContaContabilController::class, 'store'])->name('store');
+            Route::get('/{conta_contabil}/edit', [ContaContabilController::class, 'edit'])->name('edit');
+            Route::put('/{conta_contabil}', [ContaContabilController::class, 'update'])->name('update');
+            Route::delete('/{conta_contabil}', [ContaContabilController::class, 'destroy'])->name('destroy');
+            Route::post('/status/{modelName}/{id}', [ContaContabilController::class, 'updateStatus'])->name('status');
+        });
     });
 
     Route::prefix('/roles')->group(function () {

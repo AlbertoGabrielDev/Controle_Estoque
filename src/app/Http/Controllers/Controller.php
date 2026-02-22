@@ -25,10 +25,15 @@ class Controller extends BaseController
         $record = $modelClass::findOrFail($id);
         $record->toggleStatus();
 
+        $statusColumn = method_exists($record, 'statusColumnName')
+            ? $record->statusColumnName()
+            : 'status';
+        $newStatus = (int) ((bool) ($record->{$statusColumn} ?? 0));
+
         return response()->json([
             'status' => 200,
             'message' => 'Status atualizado com sucesso!',
-            'new_status' => $record->status,
+            'new_status' => $newStatus,
             'type' => 'success'
         ]);
     }

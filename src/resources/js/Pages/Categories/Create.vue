@@ -2,8 +2,16 @@
 import { Head, Link, useForm } from '@inertiajs/vue3'
 import CategoryForm from './CategoryForm.vue'
 
+const props = defineProps({
+  categoriasPai: { type: Array, default: () => [] },
+})
+
 const form = useForm({
+  codigo: '',
   nome_categoria: '',
+  tipo: 'produto',
+  categoria_pai_id: '',
+  ativo: true,
   imagem: null,
 })
 
@@ -22,5 +30,11 @@ function submit() {
     <Link :href="route('categoria.index')" class="text-blue-600">Voltar</Link>
   </div>
 
-  <CategoryForm :form="form" :show-image="true" submit-label="Criar Categoria" @submit="submit" />
+  <CategoryForm
+    :form="form"
+    :categorias-pai="props.categoriasPai"
+    :show-image="true"
+    submit-label="Criar Categoria"
+    @submit="submit"
+  />
 </template>

@@ -7,6 +7,8 @@ use App\Http\Requests\ClienteUpdateRequest;
 use App\Models\Cliente;
 use App\Repositories\ClienteRepository;
 use App\Models\CustomerSegment;
+use App\Models\Imposto;
+use App\Models\TabelaPreco;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use App\Services\DataTableService;
@@ -28,7 +30,7 @@ class ClienteController extends Controller
                 'q' => (string) $request->query('q', ''),
                 'uf' => (string) $request->query('uf', ''),
                 'segment_id' => (string) $request->query('segment_id', ''),
-                'status' => (string) $request->query('status', ''),
+                'ativo' => (string) $request->query('ativo', ''),
             ],
             'segmentos' => CustomerSegment::select('id', 'nome')->orderBy('nome')->get(),
             'ufs' => ['AC', 'AL', 'AP', 'AM', 'BA', 'CE', 'DF', 'ES', 'GO', 'MA', 'MT', 'MS', 'MG', 'PA', 'PB', 'PR', 'PE', 'PI', 'RJ', 'RN', 'RS', 'RO', 'RR', 'SC', 'SP', 'SE', 'TO'],
@@ -49,6 +51,7 @@ class ClienteController extends Controller
                     return DataTableActions::wrap([
                         DataTableActions::edit('clientes.edit', $row->id),
                         DataTableActions::status('cliente.status', 'cliente', $row->id, (bool) $row->st),
+                        DataTableActions::delete('clientes.destroy', $row->id),
                     ]);
                 });
             }
@@ -61,6 +64,14 @@ class ClienteController extends Controller
         return Inertia::render('Clients/Create', [
             'segmentos' => $this->clientes->getSegments(),
             'ufs' => $this->clientes->ufs(),
+            'tabelasPreco' => TabelaPreco::query()
+                ->select('id', 'codigo', 'nome')
+                ->orderBy('nome')
+                ->get(),
+            'impostos' => Imposto::query()
+                ->select('id', 'codigo', 'nome')
+                ->orderBy('nome')
+                ->get(),
         ]);
     }
 
@@ -93,6 +104,14 @@ class ClienteController extends Controller
             'cliente' => $this->clientes->findWithRelations($cliente->id_cliente),
             'segmentos' => $this->clientes->getSegments(),
             'ufs' => $this->clientes->ufs(),
+            'tabelasPreco' => TabelaPreco::query()
+                ->select('id', 'codigo', 'nome')
+                ->orderBy('nome')
+                ->get(),
+            'impostos' => Imposto::query()
+                ->select('id', 'codigo', 'nome')
+                ->orderBy('nome')
+                ->get(),
         ]);
     }
 

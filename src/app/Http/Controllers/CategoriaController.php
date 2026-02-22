@@ -6,6 +6,8 @@ use App\Models\Categoria;
 use App\Models\Produto;
 use App\Services\DataTableService;
 use App\Support\DataTableActions;
+use App\Http\Requests\CategoriaStoreRequest;
+use App\Http\Requests\CategoriaUpdateRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
@@ -24,7 +26,7 @@ class CategoriaController extends Controller
         $query = Categoria::query()->withCount('produtos');
 
         if (!Gate::allows('permissao')) {
-            $query->where('status', 1);
+            $query->where('ativo', 1);
         }
 
         $categorias = $query
@@ -41,7 +43,7 @@ class CategoriaController extends Controller
         return Inertia::render('Categories/Index', [
             'filters' => [
                 'q' => (string) $request->query('q', ''),
-                'status' => (string) $request->query('status', ''),
+                'ativo' => (string) $request->query('ativo', ''),
             ],
         ]);
     }
@@ -59,6 +61,7 @@ class CategoriaController extends Controller
                     return DataTableActions::wrap([
                         DataTableActions::edit('categorias.editar', $row->id),
                         DataTableActions::status('categoria.status', 'categoria', $row->id, (bool) $row->st),
+                        DataTableActions::delete('categorias.destroy', $row->id),
                     ]);
                 });
             }
@@ -67,19 +70,17 @@ class CategoriaController extends Controller
 
     public function cadastro()
     {
-        return Inertia::render('Categories/Create');
+        return Inertia::render('Categories/Create', [
+            'categoriasPai' => Categoria::query()
+                ->select('id_categoria', 'nome_categoria')
+                ->orderBy('nome_categoria')
+                ->get(),
+        ]);
     }
 
-    public function inserirCategoria(Request $request)
+    public function inserirCategoria(CategoriaStoreRequest $request)
     {
-        $request->merge([
-            'nome_categoria' => (string) $request->input('nome_categoria', $request->input('categoria', '')),
-        ]);
-
-        $validated = $request->validate([
-            'nome_categoria' => 'required|max:255',
-            'imagem' => 'required|image|max:4096',
-        ]);
+        $validated = $request->validated();
 
         $imageName = null;
         if ($request->hasFile('imagem') && $request->file('imagem')->isValid()) {
@@ -90,9 +91,13 @@ class CategoriaController extends Controller
         }
 
         Categoria::create([
+            'codigo' => $validated['codigo'],
             'nome_categoria' => $validated['nome_categoria'],
+            'tipo' => $validated['tipo'],
+            'categoria_pai_id' => $validated['categoria_pai_id'] ?? null,
             'id_users_fk' => Auth::id(),
             'imagem' => $imageName,
+            'ativo' => (bool) $validated['ativo'],
         ]);
 
         return redirect()->route('categoria.index')->with('success', 'Inserido com sucesso');
@@ -142,22 +147,58 @@ class CategoriaController extends Controller
     {
         return Inertia::render('Categories/Edit', [
             'categoria' => Categoria::query()->findOrFail($categoriaId),
+            'categoriasPai' => Categoria::query()
+                ->where('id_categoria', '<>', $categoriaId)
+                ->select('id_categoria', 'nome_categoria')
+                ->orderBy('nome_categoria')
+                ->get(),
         ]);
     }
 
-    public function salvarEditar(Request $request, $categoriaId)
+    public function salvarEditar(CategoriaUpdateRequest $request, $categoriaId)
     {
-        $validated = $request->validate([
-            'nome_categoria' => 'required|max:255',
-        ]);
+        $validated = $request->validated();
 
-        Categoria::query()
-            ->where('id_categoria', $categoriaId)
-            ->update([
-                'nome_categoria' => $validated['nome_categoria'],
-            ]);
+        $imageName = null;
+        if ($request->hasFile('imagem') && $request->file('imagem')->isValid()) {
+            $requestImage = $request->file('imagem');
+            $extension = $requestImage->extension();
+            $imageName = md5($requestImage->getClientOriginalName() . strtotime('now')) . '.' . $extension;
+            $requestImage->move(public_path('img/categorias'), $imageName);
+        }
+
+        $data = [
+            'codigo' => $validated['codigo'],
+            'nome_categoria' => $validated['nome_categoria'],
+            'tipo' => $validated['tipo'],
+            'categoria_pai_id' => $validated['categoria_pai_id'] ?? null,
+            'ativo' => (bool) $validated['ativo'],
+        ];
+
+        if ($imageName) {
+            $data['imagem'] = $imageName;
+        }
+
+        Categoria::query()->where('id_categoria', $categoriaId)->update($data);
 
         return redirect()->route('categoria.index')->with('success', 'Editado com sucesso');
+    }
+
+    public function destroy($categoriaId)
+    {
+        $categoria = Categoria::query()
+            ->withCount(['produtos', 'filhas'])
+            ->findOrFail($categoriaId);
+
+        if ($categoria->produtos_count > 0 || $categoria->filhas_count > 0) {
+            return redirect()
+                ->route('categoria.index')
+                ->with('error', 'Não é possível remover: há produtos ou subcategorias vinculadas.');
+        }
+
+        $categoria->delete();
+
+        return redirect()->route('categoria.index')->with('success', 'Categoria removida.');
     }
 
     private function normalizeNutrition(mixed $value): mixed

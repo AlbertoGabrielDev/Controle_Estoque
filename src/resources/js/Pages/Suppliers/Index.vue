@@ -10,17 +10,18 @@ const props = defineProps({
 
 const form = reactive({
   q: props.filters?.q ?? '',
-  status: props.filters?.status ?? '',
+  ativo: props.filters?.ativo ?? '',
 })
 
 const dtColumns = [
-  { data: 'c1', title: 'Fornecedor' },
-  { data: 'c2', title: 'CNPJ', className: 'hidden lg:table-cell' },
-  { data: 'c3', title: 'Cidade' },
-  { data: 'c4', title: 'UF' },
+  { data: 'c1', title: 'Código' },
+  { data: 'c2', title: 'Fornecedor' },
+  { data: 'c3', title: 'NIF/CIF', className: 'hidden lg:table-cell' },
+  { data: 'c4', title: 'Cidade' },
+  { data: 'c5', title: 'UF' },
   {
     data: 'st',
-    title: 'Status',
+    title: 'Ativo',
     render: (data) => data
       ? '<span class="text-green-700">Ativo</span>'
       : '<span class="text-gray-500">Inativo</span>',
@@ -52,10 +53,10 @@ onBeforeUnmount(() => stopSyncFilters())
       v-model="form.q"
       type="text"
       class="px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500"
-      placeholder="Buscar por nome, CNPJ ou cidade"
+      placeholder="Buscar por código, nome ou NIF/CIF"
     >
-    <select v-model="form.status" class="px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500">
-      <option value="">Status</option>
+    <select v-model="form.ativo" class="px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500">
+      <option value="">Ativo</option>
       <option :value="1">Ativo</option>
       <option :value="0">Inativo</option>
     </select>
@@ -68,7 +69,6 @@ onBeforeUnmount(() => stopSyncFilters())
     :columns="dtColumns"
     :order="[[0, 'asc']]"
     :page-length="10"
-    :actions-col-index="5"
+    :actions-col-index="6"
   />
 </template>
-

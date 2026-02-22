@@ -6,6 +6,8 @@ use App\Models\Fornecedor;
 use App\Models\Telefone;
 use App\Services\DataTableService;
 use App\Support\DataTableActions;
+use App\Http\Requests\FornecedorStoreRequest;
+use App\Http\Requests\FornecedorUpdateRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
@@ -22,7 +24,7 @@ class FornecedorController extends Controller
         return Inertia::render('Suppliers/Index', [
             'filters' => [
                 'q' => (string) $request->query('q', ''),
-                'status' => (string) $request->query('status', ''),
+                'ativo' => (string) $request->query('ativo', ''),
             ],
         ]);
     }
@@ -40,6 +42,7 @@ class FornecedorController extends Controller
                     return DataTableActions::wrap([
                         DataTableActions::edit('fornecedor.editar', $row->id),
                         DataTableActions::status('fornecedor.status', 'fornecedor', $row->id, (bool) $row->st),
+                        DataTableActions::delete('fornecedor.destroy', $row->id),
                     ]);
                 });
             }
@@ -58,28 +61,16 @@ class FornecedorController extends Controller
         ]);
     }
 
-    public function inserirCadastro(Request $request)
+    public function inserirCadastro(FornecedorStoreRequest $request)
     {
-        $validated = $request->validate([
-            'nome_fornecedor' => 'required|unique:fornecedores,nome_fornecedor|max:60',
-            'cnpj' => 'required|unique:fornecedores,cnpj|max:18|min:14',
-            'cep' => 'required|max:10|min:8',
-            'logradouro' => 'required|max:50',
-            'bairro' => 'required|max:50',
-            'numero_casa' => 'required|max:15',
-            'email' => 'required|email|max:60',
-            'cidade' => 'required|max:50',
-            'uf' => 'required|max:2',
-            'ddd' => 'required|max:2',
-            'telefone' => 'required|max:100',
-            'principal' => 'nullable|boolean',
-            'whatsapp' => 'nullable|boolean',
-            'telegram' => 'nullable|boolean',
-        ]);
+        $validated = $request->validated();
 
         $fornecedor = Fornecedor::create([
+            'codigo' => $validated['codigo'],
+            'razao_social' => $validated['razao_social'] ?? null,
             'nome_fornecedor' => $validated['nome_fornecedor'],
             'cnpj' => $validated['cnpj'],
+            'nif_cif' => $validated['nif_cif'] ?? null,
             'cep' => $validated['cep'],
             'logradouro' => $validated['logradouro'],
             'bairro' => $validated['bairro'],
@@ -88,6 +79,10 @@ class FornecedorController extends Controller
             'id_users_fk' => Auth::id(),
             'cidade' => $validated['cidade'],
             'uf' => strtoupper((string) $validated['uf']),
+            'endereco' => $validated['endereco'] ?? null,
+            'prazo_entrega_dias' => $validated['prazo_entrega_dias'] ?? 0,
+            'condicao_pagamento' => $validated['condicao_pagamento'] ?? null,
+            'ativo' => (bool) $validated['ativo'],
         ]);
 
         Telefone::create([
@@ -116,15 +111,30 @@ class FornecedorController extends Controller
         ]);
     }
 
-    public function salvarEditar(Request $request, $fornecedorId)
+    public function salvarEditar(FornecedorUpdateRequest $request, $fornecedorId)
     {
-        $validated = $request->validate([
-            'ddd' => 'required|max:2',
-            'telefone' => 'required|max:100',
-            'principal' => 'nullable|boolean',
-            'whatsapp' => 'nullable|boolean',
-            'telegram' => 'nullable|boolean',
-        ]);
+        $validated = $request->validated();
+
+        Fornecedor::query()
+            ->where('id_fornecedor', $fornecedorId)
+            ->update([
+                'codigo' => $validated['codigo'],
+                'razao_social' => $validated['razao_social'] ?? null,
+                'nome_fornecedor' => $validated['nome_fornecedor'],
+                'cnpj' => $validated['cnpj'],
+                'nif_cif' => $validated['nif_cif'] ?? null,
+                'cep' => $validated['cep'],
+                'logradouro' => $validated['logradouro'],
+                'bairro' => $validated['bairro'],
+                'numero_casa' => $validated['numero_casa'],
+                'email' => $validated['email'] ?? null,
+                'cidade' => $validated['cidade'],
+                'uf' => strtoupper((string) $validated['uf']),
+                'endereco' => $validated['endereco'] ?? null,
+                'prazo_entrega_dias' => $validated['prazo_entrega_dias'] ?? 0,
+                'condicao_pagamento' => $validated['condicao_pagamento'] ?? null,
+                'ativo' => (bool) $validated['ativo'],
+            ]);
 
         Telefone::query()->updateOrCreate(
             ['id_fornecedor_fk' => $fornecedorId],
@@ -138,6 +148,21 @@ class FornecedorController extends Controller
         );
 
         return redirect()->route('fornecedor.index')->with('success', 'Editado com sucesso');
+    }
+
+    public function destroy($fornecedorId)
+    {
+        $fornecedor = Fornecedor::query()->findOrFail($fornecedorId);
+
+        if (method_exists($fornecedor, 'produtos') && $fornecedor->produtos()->exists()) {
+            return redirect()
+                ->route('fornecedor.index')
+                ->with('error', 'Não é possível remover: há produtos vinculados a este fornecedor.');
+        }
+
+        $fornecedor->delete();
+
+        return redirect()->route('fornecedor.index')->with('success', 'Fornecedor removido.');
     }
 
     public function getCidade(string $estado)

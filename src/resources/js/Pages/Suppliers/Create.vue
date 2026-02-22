@@ -3,8 +3,11 @@ import { Head, Link, useForm } from '@inertiajs/vue3'
 import SupplierForm from './SupplierForm.vue'
 
 const form = useForm({
+  codigo: '',
+  razao_social: '',
   nome_fornecedor: '',
   cnpj: '',
+  nif_cif: '',
   cep: '',
   logradouro: '',
   bairro: '',
@@ -12,11 +15,15 @@ const form = useForm({
   email: '',
   cidade: '',
   uf: '',
+  endereco: '',
+  prazo_entrega_dias: 0,
+  condicao_pagamento: '',
   ddd: '',
   telefone: '',
   principal: false,
   whatsapp: false,
   telegram: false,
+  ativo: true,
 })
 
 function submit() {
@@ -34,4 +41,3 @@ function submit() {
 
   <SupplierForm :form="form" submit-label="Cadastrar Fornecedor" @submit="submit" />
 </template>
-

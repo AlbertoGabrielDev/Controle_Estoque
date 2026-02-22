@@ -8,6 +8,8 @@ use App\Traits\HasStatus;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use App\Models\Imposto;
+use App\Models\TabelaPreco;
 
 class Cliente extends Model
 {
@@ -17,13 +19,16 @@ class Cliente extends Model
 
     protected $table = 'clientes';
     protected $primaryKey = 'id_cliente';
+    protected $statusColumn = 'ativo';
 
     protected $fillable = [
+        'codigo',
         'tipo_pessoa',
         'documento',
         'inscricao_estadual',
         'razao_social',
         'nome_fantasia',
+        'nif_cif',
         'nome',
         'email',
         'whatsapp',
@@ -37,18 +42,25 @@ class Cliente extends Model
         'cidade',
         'uf',
         'pais',
+        'endereco_faturacao',
+        'endereco_entrega',
         'segment_id',
         'limite_credito',
         'bloqueado',
         'tabela_preco',
+        'condicao_pagamento',
+        'tabela_preco_id',
+        'imposto_padrao_id',
         'id_users_fk',
         'status',
+        'ativo',
         'observacoes'
     ];
 
     protected $casts = [
         'bloqueado' => 'boolean',
         'status' => 'integer',
+        'ativo' => 'boolean',
         'limite_credito' => 'decimal:2',
     ];
 
@@ -57,12 +69,31 @@ class Cliente extends Model
         return $this->belongsTo(CustomerSegment::class, 'segment_id');
     }
 
+    public function tabelaPreco(): BelongsTo
+    {
+        return $this->belongsTo(TabelaPreco::class, 'tabela_preco_id');
+    }
+
+    public function impostoPadrao(): BelongsTo
+    {
+        return $this->belongsTo(Imposto::class, 'imposto_padrao_id');
+    }
 
     protected static function booted(): void
     {
         static::creating(function (Cliente $model) {
             if (empty($model->id_users_fk) && auth()->check()) {
                 $model->id_users_fk = auth()->id();
+            }
+        });
+
+        static::saving(function (Cliente $model) {
+            if (!is_null($model->ativo)) {
+                $model->status = $model->ativo ? 1 : 0;
+                return;
+            }
+            if (!is_null($model->status)) {
+                $model->ativo = (int) $model->status === 1;
             }
         });
     }
@@ -94,7 +125,8 @@ class Cliente extends Model
 
     public function scopeAtivos($q)
     {
-        return $q->where('status', 1)->where('bloqueado', false);
+        $column = property_exists($this, 'statusColumn') ? $this->statusColumn : 'status';
+        return $q->where($column, 1)->where('bloqueado', false);
     }
 
     public function scopePorDocumento($q, ?string $doc)
@@ -173,10 +205,11 @@ class Cliente extends Model
         $t = (new static)->getTable();
         return [
             'id' => ['db' => "{$t}.id_cliente", 'label' => '#', 'order' => true, 'search' => false],
-            'c1' => ['db' => "{$t}.nome", 'label' => 'Nome', 'order' => true, 'search' => true],
-            'c2' => ['db' => "{$t}.documento", 'label' => 'Documento', 'order' => true, 'search' => true],
-            'c3' => ['db' => "{$t}.whatsapp", 'label' => 'WhatsApp', 'order' => false, 'search' => true],
-            'c4' => ['db' => "{$t}.uf", 'label' => 'UF', 'order' => true, 'search' => true],
+            'c1' => ['db' => "{$t}.codigo", 'label' => 'Código', 'order' => true, 'search' => true],
+            'c2' => ['db' => "COALESCE({$t}.nome_fantasia, {$t}.razao_social, {$t}.nome)", 'label' => 'Nome', 'order' => true, 'search' => true],
+            'c3' => ['db' => "COALESCE({$t}.nif_cif, {$t}.documento)", 'label' => 'NIF/CIF', 'order' => true, 'search' => true],
+            'c4' => ['db' => "{$t}.whatsapp", 'label' => 'WhatsApp', 'order' => false, 'search' => true],
+            'c5' => ['db' => "{$t}.uf", 'label' => 'UF', 'order' => true, 'search' => true],
             'seg' => [
                 'db' => "customer_segments.nome",
                 'label' => 'Segmento',
@@ -184,7 +217,7 @@ class Cliente extends Model
                 'search' => true,
                 'join' => ['customer_segments', 'customer_segments.id', "=", "{$t}.segment_id", 'left'],
             ],
-            'st' => ['db' => "{$t}.status", 'label' => 'Status', 'order' => true, 'search' => false],
+            'st' => ['db' => "{$t}.ativo", 'label' => 'Ativo', 'order' => true, 'search' => false],
             'acoes' => ['computed' => true],
         ];
     }
@@ -197,10 +230,12 @@ class Cliente extends Model
             'q' => [
                 'type' => 'text', //Fazer isso sumir 
                 'columns' => [
+                    "{$t}.codigo",
                     "{$t}.nome",
                     "{$t}.nome_fantasia",
                     "{$t}.razao_social",
                     "{$t}.documento",
+                    "{$t}.nif_cif",
                     "{$t}.whatsapp",
                     "{$t}.email",
                 ],
@@ -219,9 +254,9 @@ class Cliente extends Model
                 'operator' => '=',
                 'nullable' => true,
             ],
-            'status' => [
+            'ativo' => [
                 'type' => 'select',
-                'column' => "{$t}.status",
+                'column' => "{$t}.ativo",
                 'cast' => 'int',
                 'operator' => '=',
                 'nullable' => true,

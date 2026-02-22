@@ -4,15 +4,19 @@ import ClienteForm from './ClienteForm.vue'
 
 const props = defineProps({
   segmentos: Array,
-  ufs: Array
+  ufs: Array,
+  tabelasPreco: Array,
+  impostos: Array,
 })
 
 const form = useForm({
+  codigo: '',
   tipo_pessoa: 'PJ',
   documento: '',
   inscricao_estadual: '',
   razao_social: '',
   nome_fantasia: '',
+  nif_cif: '',
   nome: '',
   email: '',
   whatsapp: '',
@@ -26,11 +30,15 @@ const form = useForm({
   cidade: '',
   uf: '',
   pais: 'Brasil',
+  endereco_faturacao: '',
+  endereco_entrega: '',
   segment_id: '',
   limite_credito: '',
   bloqueado: false,
-  tabela_preco: '',
-  status: 1,
+  tabela_preco_id: '',
+  imposto_padrao_id: '',
+  condicao_pagamento: '',
+  ativo: true,
   observacoes: '',
 })
 
@@ -46,5 +54,12 @@ function submit() {
     <Link :href="route('clientes.index')" class="text-blue-600">Voltar</Link>
   </div>
 
-  <ClienteForm :form="form" :ufs="ufs" :segmentos="segmentos" @submit="submit" />
+  <ClienteForm
+    :form="form"
+    :ufs="ufs"
+    :segmentos="segmentos"
+    :tabelas-preco="tabelasPreco"
+    :impostos="impostos"
+    @submit="submit"
+  />
 </template>

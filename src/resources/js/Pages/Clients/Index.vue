@@ -14,17 +14,18 @@ const form = reactive({
   q: props.filters.q ?? '',
   uf: props.filters.uf ?? '',
   segment_id: props.filters.segment_id ?? '',
-  status: props.filters.status ?? ''
+  ativo: props.filters.ativo ?? ''
 })
 const dtColumns = [
-  linkify({ data: 'c1', title: 'Nome' }, { routeName: 'clientes.show', idField: 'id' }),
-  { data: 'c2',  title: 'Documento', className: 'hidden md:table-cell' },
-  { data: 'c3',  title: 'WhatsApp',  className: 'hidden lg:table-cell' },
-  { data: 'c4',  title: 'UF' },
+  { data: 'c1', title: 'Código' },
+  linkify({ data: 'c2', title: 'Nome' }, { routeName: 'clientes.show', idField: 'id' }),
+  { data: 'c3',  title: 'NIF/CIF', className: 'hidden md:table-cell' },
+  { data: 'c4',  title: 'WhatsApp',  className: 'hidden lg:table-cell' },
+  { data: 'c5',  title: 'UF' },
   { data: 'seg', title: 'Segmento',  className: 'hidden xl:table-cell', orderable: false },
   {
     data: 'st',
-    title: 'Status',
+    title: 'Ativo',
     render: (data) => data
       ? '<span class="text-green-700">Ativo</span>'
       : '<span class="text-gray-500">Inativo</span>'
@@ -54,7 +55,13 @@ onBeforeUnmount(() => stopSyncFilters())
   </div>
 
   <div class="mb-6">
-    <div class="mt-3 grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-2">
+    <div class="mt-3 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2">
+      <input
+        v-model="form.q"
+        type="text"
+        class="px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500"
+        placeholder="Buscar por código, nome ou documento"
+      >
       <select v-model="form.uf" class="px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500">
         <option value="">UF</option>
         <option v-for="u in ufs" :key="u" :value="u">{{ u }}</option>
@@ -64,9 +71,9 @@ onBeforeUnmount(() => stopSyncFilters())
         <option value="">Segmento</option>
         <option v-for="s in segmentos" :key="s.id" :value="s.id">{{ s.nome }}</option>
       </select>
-      <select v-model="form.status"
+      <select v-model="form.ativo"
         class="px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500">
-        <option value="">Status</option>
+        <option value="">Ativo</option>
         <option :value="1">Ativo</option>
         <option :value="0">Inativo</option>
       </select>
@@ -81,7 +88,7 @@ onBeforeUnmount(() => stopSyncFilters())
   :order="[[0,'asc']]"
   :page-length="10"
   :columns="dtColumns"
-  :actions-col-index="6"
+  :actions-col-index="7"
 />
 
 </template>

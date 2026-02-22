@@ -72,7 +72,7 @@ class ClienteRepositoryEloquent extends BaseRepository implements ClienteReposit
 
     public function findWithRelations(int|string $id): Cliente
     {
-        $cliente = $this->with(['segmento:id,nome'])->find($id);
+        $cliente = $this->with(['segmento:id,nome', 'tabelaPreco:id,codigo,nome', 'impostoPadrao:id,codigo,nome'])->find($id);
         return $cliente;
     }
 

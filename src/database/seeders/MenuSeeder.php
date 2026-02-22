@@ -118,8 +118,8 @@ class MenuSeeder extends Seeder
                 'name' => 'Clientes',
                 'slug' => 'clientes',
                 'icon' => 'fas fa-users mr-2',
-                'parent_id' => null,
                 'route' => 'clientes.index',
+                'parent_id' => null,
                 'order' => 10,
             ]
         );
@@ -240,6 +240,110 @@ class MenuSeeder extends Seeder
                 'parent_id' => $configuracoes->id,
                 'order' => 1,
                 // força Link Inertia no seu Sidebar.vue
+            ]
+        );
+
+        /**
+         * =========================
+         * NOVO: Cadastros (MDM)
+         * =========================
+         */
+        $cadastros = Menu::updateOrCreate(
+            ['slug' => 'cadastros'],
+            [
+                'name' => 'Cadastros',
+                'slug' => 'cadastros',
+                'icon' => 'fas fa-clipboard-list mr-2',
+                'route' => null,
+                'parent_id' => null,
+                'order' => 12,
+            ]
+        );
+
+        $clientes->update(['parent_id' => $cadastros->id, 'order' => 1]);
+        $fornecedor->update(['parent_id' => $cadastros->id, 'order' => 2]);
+
+        Menu::updateOrCreate(
+            ['slug' => 'categoria'],
+            [
+                'name' => 'Categorias',
+                'slug' => 'categoria',
+                'icon' => 'fas fa-tags mr-2',
+                'route' => 'categoria.index',
+                'parent_id' => $cadastros->id,
+                'order' => 3,
+            ]
+        );
+
+        Menu::updateOrCreate(
+            ['slug' => 'itens'],
+            [
+                'name' => 'Itens',
+                'slug' => 'itens',
+                'icon' => 'fas fa-box mr-2',
+                'route' => 'itens.index',
+                'parent_id' => $cadastros->id,
+                'order' => 4,
+            ]
+        );
+
+        Menu::updateOrCreate(
+            ['slug' => 'unidades_medida'],
+            [
+                'name' => 'Unidades de Medida',
+                'slug' => 'unidades_medida',
+                'icon' => 'fas fa-ruler mr-2',
+                'route' => 'unidades_medida.index',
+                'parent_id' => $cadastros->id,
+                'order' => 5,
+            ]
+        );
+
+        Menu::updateOrCreate(
+            ['slug' => 'tabelas_preco'],
+            [
+                'name' => 'Tabelas de Preço',
+                'slug' => 'tabelas_preco',
+                'icon' => 'fas fa-table mr-2',
+                'route' => 'tabelas_preco.index',
+                'parent_id' => $cadastros->id,
+                'order' => 6,
+            ]
+        );
+
+        Menu::updateOrCreate(
+            ['slug' => 'impostos'],
+            [
+                'name' => 'Impostos',
+                'slug' => 'impostos',
+                'icon' => 'fas fa-percent mr-2',
+                'route' => 'impostos.index',
+                'parent_id' => $cadastros->id,
+                'order' => 7,
+            ]
+        );
+
+        Menu::updateOrCreate(
+            ['slug' => 'centros_custo'],
+            [
+                'name' => 'Centros de Custo',
+                'slug' => 'centros_custo',
+                'icon' => 'fas fa-sitemap mr-2',
+                'route' => 'centros_custo.index',
+                'parent_id' => $cadastros->id,
+                'order' => 8,
+            ]
+        );
+
+        Menu::updateOrCreate(
+            ['slug' => 'contas_contabeis'],
+            [
+                'name' => 'Contas Contábeis',
+                'slug' => 'contas_contabeis',
+                'icon' => 'fas fa-book mr-2',
+                'route' => 'contas_contabeis.index',
+                'parent_id' => $cadastros->id,
+                'order' => 9,
             ]
         );
     }
