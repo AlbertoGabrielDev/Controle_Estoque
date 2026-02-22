@@ -279,6 +279,7 @@ class EstoqueController extends Controller
                 'uf_origem' => $ufOrigem,
                 'uf_destino' => $destino,
             ],
+            'escopos' => [1], // Estoque usa apenas regra por item para estimativa de imposto do produto.
             'produto' => [
                 'id' => $produtoId,
                 'categoria_id' => $categoriaId,
@@ -296,7 +297,7 @@ class EstoqueController extends Controller
     {
         return [
             '__totais' => [
-                'preco_base' => $precoBase,
+                'preco_base' => $raw['_total_sem_impostos'] ?? $precoBase,
                 'total_impostos' => $raw['_total_impostos'] ?? 0,
                 'total_com_impostos' => $raw['_total_com_impostos'] ?? ($precoBase + ($raw['_total_impostos'] ?? 0)),
             ],
@@ -316,7 +317,7 @@ class EstoqueController extends Controller
             }
 
             foreach ($bloco['linhas'] as $linha) {
-                $ruleId = (int) data_get($linha, 'rule_dump.id', 0);
+                $ruleId = (int) data_get($linha, 'rule_id', data_get($linha, 'rule_dump.id', 0));
                 if ($ruleId > 0) {
                     return $ruleId;
                 }

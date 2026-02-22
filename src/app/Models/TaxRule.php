@@ -104,7 +104,9 @@ class TaxRule extends Model
             'can' => ['db' => "{$t}.canal", 'label' => 'Canal', 'order' => true, 'search' => true],
             'op' => ['db' => "{$t}.tipo_operacao", 'label' => 'Operação', 'order' => true, 'search' => true],
 
+            'met' => ['db' => "{$t}.metodo", 'label' => 'Método', 'order' => true, 'search' => false],
             'aliq' => ['db' => "{$t}.aliquota_percent", 'label' => '% Alíquota', 'order' => true, 'search' => false],
+            'vfx' => ['db' => "{$t}.valor_fixo", 'label' => 'Valor Fixo', 'order' => true, 'search' => false],
             'prio' => ['db' => "{$t}.prioridade", 'label' => 'Prioridade', 'order' => true, 'search' => false],
             'cum' => ['db' => "{$t}.cumulativo", 'label' => 'Cumul.', 'order' => true, 'search' => false],
 

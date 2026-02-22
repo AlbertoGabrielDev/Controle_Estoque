@@ -16,14 +16,14 @@ const props = defineProps({
 defineEmits(['submit'])
 
 const hints = {
-  name: 'Nome amigável da regra (uso interno).',
-  tax_code: 'Código curto do imposto (ICMS, PIS, COFINS, etc).',
+  name: 'Nome do imposto exibido no sistema (ex.: IVA, VAT, GST, ICMS).',
+  tax_code: 'Código curto do imposto (ex.: VAT, GST, ICMS, PIS).',
   scope: '1=Item, 2=Frete, 3=Pedido.',
   priority: 'Menor número roda antes dentro do mesmo imposto.',
   starts_at: 'Início de vigência (inclusive).',
   ends_at: 'Fim de vigência (inclusive).',
-  origin_uf: 'UF de origem. Vazio = qualquer.',
-  dest_uf: 'UF de destino. Vazio = qualquer.',
+  origin_uf: 'Código de origem (2 letras, ex.: GO, SP, US, FR). Vazio = qualquer.',
+  dest_uf: 'Código de destino (2 letras). Vazio = qualquer.',
   customer_segment_id: 'Segmento do cliente. Vazio = todos.',
   product_segment_id: 'Categorias do produto (múltiplas).',
   base: 'Base de cálculo da regra.',
@@ -56,7 +56,7 @@ const productOptions = computed(() =>
     <!-- Nome + Código -->
     <div class="col-span-1 md:col-span-2">
       <label class="block text-sm font-medium text-gray-700 mb-1">
-        Nome <span class="ml-1 text-gray-400 cursor-help" :title="hints.name">ⓘ</span>
+        Nome do Imposto <span class="ml-1 text-gray-400 cursor-help" :title="hints.name">ⓘ</span>
       </label>
       <input v-model="form.name" type="text" class="w-full border rounded px-3 py-2" />
       <div v-if="form.errors?.name" class="text-sm text-red-600 mt-1">{{ form.errors.name }}</div>
@@ -64,7 +64,7 @@ const productOptions = computed(() =>
 
     <div>
       <label class="block text-sm font-medium text-gray-700 mb-1">
-        Código (ex.: ICMS)
+        Código (ex.: VAT, GST, ICMS)
         <span class="ml-1 text-gray-400 cursor-help" :title="hints.tax_code">ⓘ</span>
       </label>
       <input v-model="form.tax_code" type="text" class="w-full border rounded px-3 py-2" />
@@ -112,22 +112,30 @@ const productOptions = computed(() =>
     <!-- Filtros -->
     <div>
       <label class="block text-sm font-medium text-gray-700 mb-1">
-        UF Origem <span class="ml-1 text-gray-400 cursor-help" :title="hints.origin_uf">ⓘ</span>
+        Origem (código) <span class="ml-1 text-gray-400 cursor-help" :title="hints.origin_uf">ⓘ</span>
       </label>
-      <select v-model="form.origin_uf" class="w-full border rounded px-3 py-2">
-        <option value="">—</option>
-        <option v-for="u in ufs" :key="u" :value="u">{{ u }}</option>
-      </select>
+      <input
+        v-model="form.origin_uf"
+        type="text"
+        maxlength="2"
+        list="tax-origin-codes"
+        class="w-full border rounded px-3 py-2 uppercase"
+        placeholder="Ex.: GO ou US"
+      >
     </div>
 
     <div>
       <label class="block text-sm font-medium text-gray-700 mb-1">
-        UF Destino <span class="ml-1 text-gray-400 cursor-help" :title="hints.dest_uf">ⓘ</span>
+        Destino (código) <span class="ml-1 text-gray-400 cursor-help" :title="hints.dest_uf">ⓘ</span>
       </label>
-      <select v-model="form.dest_uf" class="w-full border rounded px-3 py-2">
-        <option value="">—</option>
-        <option v-for="u in ufs" :key="u" :value="u">{{ u }}</option>
-      </select>
+      <input
+        v-model="form.dest_uf"
+        type="text"
+        maxlength="2"
+        list="tax-dest-codes"
+        class="w-full border rounded px-3 py-2 uppercase"
+        placeholder="Ex.: SP ou FR"
+      >
     </div>
 
     <div>
@@ -253,6 +261,13 @@ const productOptions = computed(() =>
         {{ form.processing ? 'Salvando...' : 'Salvar' }}
       </button>
     </div>
+
+    <datalist id="tax-origin-codes">
+      <option v-for="u in ufs" :key="`orig-${u}`" :value="u" />
+    </datalist>
+    <datalist id="tax-dest-codes">
+      <option v-for="u in ufs" :key="`dest-${u}`" :value="u" />
+    </datalist>
   </form>
 </template>
 

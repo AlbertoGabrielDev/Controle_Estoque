@@ -1,11 +1,24 @@
 <script setup>
 import { Head, Link } from '@inertiajs/vue3'
-import DataTable from '@/components/DataTable.vue'
+import DataTable, { esc } from '@/components/DataTable.vue'
 
 function fmtDate(iso) {
   if (!iso) return '—'
   const [y,m,d] = String(iso).split('-')
   return d && m && y ? `${d}/${m}/${y}` : iso
+}
+
+function money(v) {
+  return Number(v ?? 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
+}
+
+function methodLabel(value) {
+  switch (Number(value)) {
+    case 1: return 'Percentual'
+    case 2: return 'Valor fixo'
+    case 3: return 'Fórmula'
+    default: return '—'
+  }
 }
 
 const dtColumns = [
@@ -16,7 +29,7 @@ const dtColumns = [
       const label = [row?.c2, row?.c1].filter(Boolean).join(' - ') || '—'
       if (type !== 'display') return label
       const url = route('taxes.edit', row?.id)
-      return `<a href="${url}" class="text-blue-600 hover:underline">${label}</a>`
+      return `<a href="${url}" class="text-blue-600 hover:underline">${esc(label)}</a>`
     }
   },
   { data: 'seg',  title: 'Segmento',   className: 'hidden lg:table-cell' },
@@ -25,8 +38,24 @@ const dtColumns = [
   { data: 'can',  title: 'Canal',      className: 'hidden xl:table-cell' },
   { data: 'op',   title: 'Operação',   className: 'hidden xl:table-cell' },
   {
-    data: 'aliq', title: '% Alíquota',
-    render: (v,t)=> t==='display' ? `${(Number(v ?? 0)).toFixed(2)}%` : v
+    data: 'met', title: 'Método',
+    render: (v, t) => t === 'display' ? methodLabel(v) : v
+  },
+  {
+    data: null, title: 'Valor Regra', orderable: false, searchable: false,
+    render: (d, t, row)=> {
+      if (t !== 'display') return row?.aliq ?? row?.vfx ?? ''
+      const metodo = Number(row?.met)
+      if (metodo === 2) {
+        if (row?.vfx === null || row?.vfx === undefined || row?.vfx === '') return '—'
+        return money(row.vfx)
+      }
+      if (metodo === 3) {
+        return '<span class="text-indigo-600">Fórmula</span>'
+      }
+      if (row?.aliq === null || row?.aliq === undefined || row?.aliq === '') return '—'
+      return `${Number(row.aliq).toFixed(2)}%`
+    }
   },
   { data: 'prio', title: 'Prioridade' },
   {

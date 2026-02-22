@@ -28,6 +28,8 @@ const applyTheme = (value) => {
     if (typeof document === 'undefined') return;
     const isDark = value === 'dark';
     document.documentElement.classList.toggle('dark', isDark);
+    document.documentElement.dataset.theme = value;
+    document.documentElement.style.colorScheme = isDark ? 'dark' : 'light';
 
     if (!document.body) {
         document.addEventListener(
@@ -40,6 +42,7 @@ const applyTheme = (value) => {
 
     document.body.classList.toggle('dark', isDark);
     document.body.dataset.theme = value;
+    document.body.style.colorScheme = isDark ? 'dark' : 'light';
 };
 
 const setTheme = (value, persist = true) => {
@@ -105,4 +108,3 @@ export default function useTheme() {
         toggleTheme,
     };
 }
-

@@ -14,6 +14,7 @@ use App\Repositories\TaxRuleRepository;
 use App\Services\DataTableService;
 use App\Http\Requests\TaxRuleRequest;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 use App\Enums\TaxMethod;
 use App\Support\DataTableActions;
@@ -86,12 +87,19 @@ class TaxRuleController extends Controller
 
     public function store(TaxRuleRequest $request)
     {
-        $payload = $this->mapFormToDb($request->validated());
-        unset($payload['categoria_produto_id']);
-        $rule = TaxRule::create($payload);
         $catIds = collect($request->input('product_segment_ids', []))
             ->filter()->map(fn($v) => (int) $v)->unique()->values()->all();
-        $rule->categorias()->sync($catIds);
+
+        $rule = DB::transaction(function () use ($request, $catIds) {
+            $payload = $this->mapFormToDb($request->validated());
+            unset($payload['categoria_produto_id']);
+
+            $rule = TaxRule::create($payload);
+            $rule->categorias()->sync($catIds);
+
+            return $rule;
+        });
+
         return redirect()
             ->route('taxes.edit', $rule->id)
             ->with('success', 'Regra de taxa criada com sucesso.');
@@ -99,15 +107,16 @@ class TaxRuleController extends Controller
 
     public function update(TaxRuleRequest $request, TaxRule $rule)
     {
-        $payload = $this->mapFormToDb($request->validated());
-        unset($payload['categoria_produto_id']);
-
-        $rule->update($payload);
-
         $catIds = collect($request->input('product_segment_ids', []))
             ->filter()->map(fn($v) => (int) $v)->unique()->values()->all();
 
-        $rule->categorias()->sync($catIds);
+        DB::transaction(function () use ($request, $rule, $catIds) {
+            $payload = $this->mapFormToDb($request->validated());
+            unset($payload['categoria_produto_id']);
+
+            $rule->update($payload);
+            $rule->categorias()->sync($catIds);
+        });
 
         return redirect()
             ->route('taxes.index')
@@ -215,8 +224,8 @@ class TaxRuleController extends Controller
 
     private function resolveTaxId(array $data): int
     {
-        $code = trim($data['tax_code'] ?? '');
-        $name = trim($data['name'] ?? $code);
+        $code = strtoupper(trim((string) ($data['tax_code'] ?? '')));
+        $name = trim((string) ($data['name'] ?? $code));
         if ($code === '') {
             abort(422, 'Código do imposto (tax_code) é obrigatório.');
         }
