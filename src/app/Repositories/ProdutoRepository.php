@@ -14,6 +14,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Yajra\DataTables\Facades\DataTables;
 use App\Support\DataTableActions;
+use Illuminate\Support\Facades\DB;
+use App\Models\UnidadeMedida;
 /**
  * Interface ProdutoRepository.
  *
@@ -52,20 +54,25 @@ class ProdutoRepository
             'cod_produto       as c1',
             'nome_produto      as c2',
             'descricao         as c3',
-            'unidade_medida    as c4',
+            DB::raw('COALESCE(um.codigo, produtos.unidade_medida) as c4'),
             'inf_nutriente     as c5',
             'status            as st',
-        ]);
+        ])->leftJoin('unidades_medida as um', 'um.id', '=', 'produtos.unidade_medida_id');
 
         $dt = DataTables::eloquent($query)
             ->orderColumn('c1', 'cod_produto $1')
             ->orderColumn('c2', 'nome_produto $1')
             ->orderColumn('c3', 'descricao $1')
-            ->orderColumn('c4', 'unidade_medida $1')
+            ->orderColumn('c4', 'COALESCE(um.codigo, produtos.unidade_medida) $1')
             ->filterColumn('c1', fn($q, $k) => $q->where('cod_produto', 'like', "%{$k}%"))
             ->filterColumn('c2', fn($q, $k) => $q->where('nome_produto', 'like', "%{$k}%"))
             ->filterColumn('c3', fn($q, $k) => $q->where('descricao', 'like', "%{$k}%"))
-            ->filterColumn('c4', fn($q, $k) => $q->where('unidade_medida', 'like', "%{$k}%"))
+            ->filterColumn('c4', function ($q, $k) {
+                $q->where(function ($w) use ($k) {
+                    $w->where('um.codigo', 'like', "%{$k}%")
+                        ->orWhere('produtos.unidade_medida', 'like', "%{$k}%");
+                });
+            })
 
             ->addColumn('acoes', function ($p) {
                 return DataTableActions::wrap([
@@ -90,12 +97,17 @@ class ProdutoRepository
 
     public function inserirCadastro(ValidacaoProduto $request)
     {
+        $unidade = UnidadeMedida::query()->find($request->unidade_medida_id);
+        $unidadeCodigo = $unidade?->codigo;
+
         $produto = Produto::create([
             'nome_produto' => $request->nome_produto,
             'cod_produto' => $request->cod_produto,
             'descricao' => $request->descricao,
-            'unidade_medida' => $request->unidade_medida,
-            'inf_nutrientes' => json_encode($request->inf_nutrientes),
+            'unidade_medida' => $unidadeCodigo,
+            'unidade_medida_id' => $request->unidade_medida_id,
+            'item_id' => $request->item_id,
+            'inf_nutriente' => $request->inf_nutriente ? json_encode($request->inf_nutriente) : null,
             'qrcode' => Str::uuid(),
             'id_users_fk' => Auth::id()
         ]);
@@ -129,6 +141,8 @@ class ProdutoRepository
     public function update(ValidacaoProdutoEditar $request, $produtoId)
     {
         $produto = Produto::findOrFail($produtoId);
+        $unidade = UnidadeMedida::query()->find($request->unidade_medida_id);
+        $unidadeCodigo = $unidade?->codigo;
 
         // Normaliza o JSON vindo do textarea (string -> array) por segurança:
         $inf = $request->input('inf_nutriente');
@@ -144,6 +158,9 @@ class ProdutoRepository
             'nome_produto' => $request->nome_produto,
             'qrcode' => $request->qrcode,
             'descricao' => $request->descricao,
+            'unidade_medida' => $unidadeCodigo,
+            'unidade_medida_id' => $request->unidade_medida_id,
+            'item_id' => $request->item_id,
             'inf_nutriente' => $decoded, // <-- coluna JSON no banco
         ]);
 

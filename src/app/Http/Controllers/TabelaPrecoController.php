@@ -4,7 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\TabelaPrecoStoreRequest;
 use App\Http\Requests\TabelaPrecoUpdateRequest;
+use App\Models\Fornecedor;
 use App\Models\Item;
+use App\Models\Marca;
+use App\Models\Produto;
 use App\Models\TabelaPreco;
 use App\Services\DataTableService;
 use App\Services\TabelaPrecoService;
@@ -57,6 +60,18 @@ class TabelaPrecoController extends Controller
                 ->select('id', 'sku', 'nome', 'preco_base')
                 ->orderBy('nome')
                 ->get(),
+            'produtos' => Produto::query()
+                ->select('id_produto', 'cod_produto', 'nome_produto')
+                ->orderBy('nome_produto')
+                ->get(),
+            'marcas' => Marca::query()
+                ->select('id_marca', 'nome_marca')
+                ->orderBy('nome_marca')
+                ->get(),
+            'fornecedores' => Fornecedor::query()
+                ->select('id_fornecedor', 'nome_fornecedor')
+                ->orderBy('nome_fornecedor')
+                ->get(),
         ]);
     }
 
@@ -73,13 +88,25 @@ class TabelaPrecoController extends Controller
 
     public function edit(TabelaPreco $tabela_preco)
     {
-        $tabela_preco->load('itens');
+        $tabela_preco->load(['itens', 'produtos']);
 
         return Inertia::render('PriceTables/Edit', [
             'tabela' => $tabela_preco,
             'itens' => Item::query()
                 ->select('id', 'sku', 'nome', 'preco_base')
                 ->orderBy('nome')
+                ->get(),
+            'produtos' => Produto::query()
+                ->select('id_produto', 'cod_produto', 'nome_produto')
+                ->orderBy('nome_produto')
+                ->get(),
+            'marcas' => Marca::query()
+                ->select('id_marca', 'nome_marca')
+                ->orderBy('nome_marca')
+                ->get(),
+            'fornecedores' => Fornecedor::query()
+                ->select('id_fornecedor', 'nome_fornecedor')
+                ->orderBy('nome_fornecedor')
                 ->get(),
         ]);
     }

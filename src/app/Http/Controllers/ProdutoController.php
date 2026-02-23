@@ -6,6 +6,8 @@ use App\Http\Requests\ValidacaoProduto;
 use App\Http\Requests\ValidacaoProdutoEditar;
 use App\Models\Categoria;
 use App\Models\Produto;
+use App\Models\UnidadeMedida;
+use App\Models\Item;
 use App\Services\DataTableService;
 use App\Support\DataTableActions;
 use Illuminate\Http\Request;
@@ -57,6 +59,14 @@ class ProdutoController extends Controller
                 ->select('id_categoria', 'nome_categoria')
                 ->orderBy('nome_categoria')
                 ->get(),
+            'unidades' => UnidadeMedida::query()
+                ->select('id', 'codigo', 'descricao')
+                ->orderBy('codigo')
+                ->get(),
+            'itens' => Item::query()
+                ->select('id', 'sku', 'nome')
+                ->orderBy('nome')
+                ->get(),
         ]);
     }
 
@@ -64,12 +74,16 @@ class ProdutoController extends Controller
     {
         $validated = $request->validated();
         $nutrition = $this->normalizeNutrition($validated['inf_nutriente'] ?? null);
+        $unidade = UnidadeMedida::query()->find($validated['unidade_medida_id']);
+        $unidadeCodigo = $unidade?->codigo;
 
         $produto = Produto::create([
             'nome_produto' => $validated['nome_produto'],
             'cod_produto' => $validated['cod_produto'],
             'descricao' => $validated['descricao'],
-            'unidade_medida' => $validated['unidade_medida'],
+            'unidade_medida' => $unidadeCodigo,
+            'unidade_medida_id' => $validated['unidade_medida_id'],
+            'item_id' => $validated['item_id'] ?? null,
             'inf_nutriente' => $nutrition,
             'qrcode' => (string) Str::uuid(),
             'id_users_fk' => Auth::id(),
@@ -99,6 +113,14 @@ class ProdutoController extends Controller
                 ->select('id_categoria', 'nome_categoria')
                 ->orderBy('nome_categoria')
                 ->get(),
+            'unidades' => UnidadeMedida::query()
+                ->select('id', 'codigo', 'descricao')
+                ->orderBy('codigo')
+                ->get(),
+            'itens' => Item::query()
+                ->select('id', 'sku', 'nome')
+                ->orderBy('nome')
+                ->get(),
             'categoriaSelecionada' => optional($produto->categorias->first())->id_categoria,
         ]);
     }
@@ -108,12 +130,16 @@ class ProdutoController extends Controller
         $produto = Produto::query()->findOrFail($produtoId);
         $validated = $request->validated();
         $nutrition = $this->normalizeNutrition($validated['inf_nutriente'] ?? null);
+        $unidade = UnidadeMedida::query()->find($validated['unidade_medida_id']);
+        $unidadeCodigo = $unidade?->codigo;
 
         $produto->update([
             'cod_produto' => $validated['cod_produto'],
             'nome_produto' => $validated['nome_produto'],
             'descricao' => $validated['descricao'],
-            'unidade_medida' => $validated['unidade_medida'],
+            'unidade_medida' => $unidadeCodigo,
+            'unidade_medida_id' => $validated['unidade_medida_id'],
+            'item_id' => $validated['item_id'] ?? null,
             'qrcode' => $validated['qrcode'] ?? $produto->qrcode,
             'inf_nutriente' => $nutrition,
         ]);

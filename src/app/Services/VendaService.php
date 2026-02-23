@@ -4,11 +4,14 @@ namespace App\Services;
 
 use App\Models\Cart;
 use App\Models\CartItem;
+use App\Models\Cliente;
 use App\Models\Estoque;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Produto;
+use App\Models\TabelaPreco;
 use App\Models\Venda;                 // <--- inclui Venda
+use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
@@ -23,6 +26,7 @@ class VendaService
         // 1) Encontrar o produto ATIVO que corresponda ao QR ou código
         //    e que TENHA pelo menos um lote ativo (status=1) com quantidade > 0.
         $produto = Produto::query()
+            ->with('unidadeMedida:id,codigo')
             ->where('status', 1) // produto ativo
             ->where(function ($q) use ($codigoQr, $codigoProd) {
                 if ($codigoQr) {
@@ -59,11 +63,13 @@ class VendaService
             abort(404, 'Produto não encontrado'); // mantém o comportamento esperado no front
         }
 
+        $unidadeCodigo = $produto->unidadeMedida?->codigo ?? $produto->unidade_medida;
+
         return [
             'id_produto' => $produto->id_produto,
             'nome_produto' => $produto->nome_produto,
             'cod_produto' => $produto->cod_produto,
-            'unidade_medida' => $produto->unidade_medida,
+            'unidade_medida' => $unidadeCodigo,
             'qrcode' => $produto->qrcode,
             'preco_venda' => (float) ($preco ?? 0),
             'estoque_atual' => $qtdDisponivel,
@@ -119,10 +125,7 @@ class VendaService
 
         $produto = Produto::findOrFail($idProduto);
 
-        $precoUnit = (float) (Estoque::where('id_produto_fk', $idProduto)
-            ->where('status', 1)
-            ->orderByDesc('preco_venda')
-            ->value('preco_venda') ?? 0);
+        $tabelaPreco = $this->resolveTabelaPrecoPorCliente($client);
 
         $cart = $this->obterOuCriarCarrinho($client);
 
@@ -130,10 +133,11 @@ class VendaService
 
         if ($item) {
             $item->quantidade += $quantidade;
-            $item->preco_unit = $precoUnit;
+            $item->preco_unit = $this->resolvePrecoUnitario($produto, $item->quantidade, $tabelaPreco);
             $item->subtotal_valor = $item->quantidade * $item->preco_unit;
             $item->save();
         } else {
+            $precoUnit = $this->resolvePrecoUnitario($produto, $quantidade, $tabelaPreco);
             $cart->items()->create([
                 'cod_produto' => $produto->cod_produto,
                 'nome_produto' => $produto->nome_produto,
@@ -158,7 +162,14 @@ class VendaService
         if ($quantidade < 1) {
             $item->delete();
         } else {
+            $produto = Produto::query()
+                ->where('cod_produto', $item->cod_produto)
+                ->first();
+            $tabelaPreco = $this->resolveTabelaPrecoPorCliente($client);
             $item->quantidade = $quantidade;
+            if ($produto) {
+                $item->preco_unit = $this->resolvePrecoUnitario($produto, $quantidade, $tabelaPreco);
+            }
             $item->subtotal_valor = $item->quantidade * $item->preco_unit;
             $item->save();
         }
@@ -233,7 +244,13 @@ class VendaService
                 $oi->save();
 
                 // ===== Também grava na tabela VENDAS (uma linha por item) =====
-                $unidade = Produto::where('cod_produto', $ci->cod_produto)->value('unidade_medida');
+                $produtoVenda = Produto::query()
+                    ->with('unidadeMedida:id,codigo')
+                    ->where('cod_produto', $ci->cod_produto)
+                    ->first();
+                $unidade = $produtoVenda?->unidadeMedida?->codigo
+                    ?? $produtoVenda?->unidade_medida
+                    ?? null;
 
                 $venda = new Venda();
                 $venda->id_produto_fk = $produtoId;
@@ -241,7 +258,7 @@ class VendaService
                 $venda->quantidade = $ci->quantidade;
                 $venda->preco_venda = $ci->preco_unit;
                 $venda->cod_produto = $ci->cod_produto;
-                $venda->unidade_medida = $unidade;
+                $venda->unidade_medida = $unidade ?? 'UN';
                 $venda->nome_produto = $ci->nome_produto;
                 $venda->id_unidade_fk = current_unidade()->id_unidade;
                 $venda->save();
@@ -301,5 +318,137 @@ class VendaService
     {
         $produto = Produto::where('cod_produto', $codProduto)->firstOrFail();
         return (int) $produto->id_produto;
+    }
+
+    private function resolveTabelaPrecoPorCliente(?string $client): ?TabelaPreco
+    {
+        $client = trim((string) $client);
+        if ($client === '') {
+            return null;
+        }
+
+        $cliente = Cliente::query()
+            ->where('whatsapp', $client)
+            ->first();
+
+        if (!$cliente) {
+            $digits = preg_replace('/\D+/', '', $client);
+            if ($digits !== '') {
+                $cliente = Cliente::query()
+                    ->whereRaw(
+                        "REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(whatsapp,'+',''),'-',''),' ',''),'(',''),')','') = ?",
+                        [$digits]
+                    )
+                    ->first();
+            }
+        }
+
+        if (!$cliente) {
+            return null;
+        }
+
+        $tabelaId = $cliente->tabela_preco_id;
+        if (!$tabelaId && !empty($cliente->tabela_preco)) {
+            $tabelaId = TabelaPreco::query()
+                ->where('codigo', $cliente->tabela_preco)
+                ->value('id');
+        }
+
+        if (!$tabelaId) {
+            return null;
+        }
+
+        $hoje = Carbon::today()->toDateString();
+
+        return TabelaPreco::query()
+            ->whereKey($tabelaId)
+            ->where('ativo', true)
+            ->where(function ($q) use ($hoje) {
+                $q->whereNull('inicio_vigencia')
+                    ->orWhereDate('inicio_vigencia', '<=', $hoje);
+            })
+            ->where(function ($q) use ($hoje) {
+                $q->whereNull('fim_vigencia')
+                    ->orWhereDate('fim_vigencia', '>=', $hoje);
+            })
+            ->first();
+    }
+
+    private function resolvePrecoUnitario(Produto $produto, int $quantidade, ?TabelaPreco $tabelaPreco): float
+    {
+        $precoEstoque = (float) (Estoque::where('id_produto_fk', $produto->id_produto)
+            ->where('status', 1)
+            ->orderByDesc('preco_venda')
+            ->value('preco_venda') ?? 0);
+
+        if (!$tabelaPreco) {
+            return $precoEstoque;
+        }
+
+        if ($tabelaPreco->tipo_alvo === 'produto') {
+            $context = $this->resolveContextoProduto($produto);
+            $marcaId = $context['marca_id'] ?? null;
+            $fornecedorId = $context['fornecedor_id'] ?? null;
+
+            $row = DB::table('tabela_preco_itens')
+                ->where('tabela_preco_id', $tabelaPreco->id)
+                ->where('produto_id', $produto->id_produto)
+                ->where(function ($q) use ($marcaId) {
+                    if ($marcaId) {
+                        $q->whereNull('marca_id')->orWhere('marca_id', $marcaId);
+                        return;
+                    }
+                    $q->whereNull('marca_id');
+                })
+                ->where(function ($q) use ($fornecedorId) {
+                    if ($fornecedorId) {
+                        $q->whereNull('fornecedor_id')->orWhere('fornecedor_id', $fornecedorId);
+                        return;
+                    }
+                    $q->whereNull('fornecedor_id');
+                })
+                ->orderByRaw('(marca_id IS NOT NULL) + (fornecedor_id IS NOT NULL) DESC')
+                ->first();
+        } else {
+            if (empty($produto->item_id)) {
+                return $precoEstoque;
+            }
+            $row = DB::table('tabela_preco_itens')
+                ->where('tabela_preco_id', $tabelaPreco->id)
+                ->where('item_id', $produto->item_id)
+                ->whereNull('marca_id')
+                ->whereNull('fornecedor_id')
+                ->first();
+        }
+
+        if (!$row) {
+            return $precoEstoque;
+        }
+
+        $preco = (float) $row->preco;
+        $quantidadeMinima = (int) ($row->quantidade_minima ?? 1);
+        $desconto = (float) ($row->desconto_percent ?? 0);
+
+        if ($quantidadeMinima > 0 && $quantidade >= $quantidadeMinima && $desconto > 0) {
+            $preco = $preco * (1 - ($desconto / 100));
+        }
+
+        return round($preco, 2);
+    }
+
+    private function resolveContextoProduto(Produto $produto): array
+    {
+        $lote = Estoque::query()
+            ->where('id_produto_fk', $produto->id_produto)
+            ->where('status', 1)
+            ->where('quantidade', '>', 0)
+            ->orderBy('data_chegada')
+            ->orderBy('id_estoque')
+            ->first(['id_marca_fk', 'id_fornecedor_fk']);
+
+        return [
+            'marca_id' => $lote?->id_marca_fk,
+            'fornecedor_id' => $lote?->id_fornecedor_fk,
+        ];
     }
 }

@@ -7,10 +7,13 @@ use App\Traits\HasStatus;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Prettus\Repository\Contracts\Transformable;
 use Prettus\Repository\Traits\TransformableTrait;
+use App\Models\UnidadeMedida;
+use App\Models\Item;
 
 class Produto extends Model implements Transformable
 {
@@ -26,6 +29,8 @@ class Produto extends Model implements Transformable
         'nome_produto',
         'descricao',
         'unidade_medida',
+        'unidade_medida_id',
+        'item_id',
         'inf_nutriente',
         'id_users_fk',
         'qrcode',
@@ -87,16 +92,33 @@ class Produto extends Model implements Transformable
             ->withTimestamps();
     }
 
+    public function unidadeMedida(): BelongsTo
+    {
+        return $this->belongsTo(UnidadeMedida::class, 'unidade_medida_id');
+    }
+
+    public function item(): BelongsTo
+    {
+        return $this->belongsTo(Item::class, 'item_id');
+    }
+
     public static function dtColumns(): array
     {
         $t = (new static)->getTable();
+        $joinUnidade = ['unidades_medida', 'unidades_medida.id', '=', "{$t}.unidade_medida_id", 'left'];
 
         return [
             'id' => ['db' => "{$t}.id_produto", 'label' => '#', 'order' => true, 'search' => false],
             'c1' => ['db' => "{$t}.cod_produto", 'label' => 'Código', 'order' => true, 'search' => true],
             'c2' => ['db' => "{$t}.nome_produto", 'label' => 'Nome', 'order' => true, 'search' => true],
             'c3' => ['db' => "{$t}.descricao", 'label' => 'Descrição', 'order' => true, 'search' => true],
-            'c4' => ['db' => "{$t}.unidade_medida", 'label' => 'Unidade', 'order' => true, 'search' => true],
+            'c4' => [
+                'db' => "COALESCE(unidades_medida.codigo, {$t}.unidade_medida)",
+                'label' => 'Unidade',
+                'order' => true,
+                'search' => true,
+                'join' => $joinUnidade,
+            ],
             'c5' => ['db' => "{$t}.inf_nutriente", 'label' => 'Nutrição', 'order' => false, 'search' => false],
             'st' => ['db' => "{$t}.status", 'label' => 'Status', 'order' => true, 'search' => false],
             'acoes' => ['computed' => true],
@@ -115,6 +137,8 @@ class Produto extends Model implements Transformable
                     "{$t}.nome_produto",
                     "{$t}.descricao",
                     "{$t}.unidade_medida",
+                    "unidades_medida.codigo",
+                    "unidades_medida.descricao",
                 ],
             ],
             'status' => [

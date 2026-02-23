@@ -10,6 +10,7 @@ use App\Http\Requests\CategoriaStoreRequest;
 use App\Http\Requests\CategoriaUpdateRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 use Inertia\Response as InertiaResponse;
@@ -118,10 +119,11 @@ class CategoriaController extends Controller
                         'produtos.cod_produto',
                         'produtos.nome_produto',
                         'produtos.descricao',
-                        'produtos.unidade_medida',
+                        DB::raw('COALESCE(unidades_medida.codigo, produtos.unidade_medida) as unidade_medida'),
                         'produtos.inf_nutriente',
                         'produtos.status',
                     ])
+                    ->leftJoin('unidades_medida', 'unidades_medida.id', '=', 'produtos.unidade_medida_id')
                     ->orderBy('produtos.nome_produto');
 
                 if (!Gate::allows('permissao')) {

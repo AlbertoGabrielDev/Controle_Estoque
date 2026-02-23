@@ -12,6 +12,7 @@ return new class extends Migration
             $table->id();
             $table->string('codigo', 30)->unique();
             $table->string('nome', 120);
+            $table->enum('tipo_alvo', ['item', 'produto'])->default('item');
             $table->string('moeda', 10)->default('EUR');
             $table->date('inicio_vigencia')->nullable();
             $table->date('fim_vigencia')->nullable();

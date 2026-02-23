@@ -5,6 +5,8 @@ import ProductForm from './ProductForm.vue'
 const props = defineProps({
   produto: { type: Object, required: true },
   categorias: { type: Array, default: () => [] },
+  unidades: { type: Array, default: () => [] },
+  itens: { type: Array, default: () => [] },
   categoriaSelecionada: { type: [String, Number, null], default: null },
 })
 
@@ -22,7 +24,8 @@ const form = useForm({
   cod_produto: props.produto?.cod_produto ?? '',
   nome_produto: props.produto?.nome_produto ?? '',
   descricao: props.produto?.descricao ?? '',
-  unidade_medida: props.produto?.unidade_medida ?? '',
+  unidade_medida_id: props.produto?.unidade_medida_id ?? '',
+  item_id: props.produto?.item_id ?? '',
   qrcode: props.produto?.qrcode ?? '',
   inf_nutriente: stringifyNutrition(props.produto?.inf_nutriente),
   id_categoria_fk: props.categoriaSelecionada ?? '',
@@ -44,6 +47,8 @@ function submit() {
   <ProductForm
     :form="form"
     :categorias="props.categorias"
+    :unidades="props.unidades"
+    :itens="props.itens"
     :show-qrcode="true"
     submit-label="Salvar Alterações"
     @submit="submit"

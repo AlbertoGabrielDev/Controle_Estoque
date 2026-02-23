@@ -2,6 +2,8 @@
 const props = defineProps({
   form: { type: Object, required: true },
   categorias: { type: Array, default: () => [] },
+  unidades: { type: Array, default: () => [] },
+  itens: { type: Array, default: () => [] },
   showQrcode: { type: Boolean, default: false },
   submitLabel: { type: String, default: 'Salvar' },
 })
@@ -34,8 +36,13 @@ defineEmits(['submit'])
 
       <div>
         <label class="block text-sm font-medium">Unidade de Medida</label>
-        <input v-model="props.form.unidade_medida" class="mt-1 border rounded px-3 py-2 w-full">
-        <div v-if="props.form.errors.unidade_medida" class="text-red-600 text-sm mt-1">{{ props.form.errors.unidade_medida }}</div>
+        <select v-model="props.form.unidade_medida_id" class="mt-1 border rounded px-3 py-2 w-full">
+          <option value="">Selecione uma unidade</option>
+          <option v-for="u in props.unidades" :key="u.id" :value="u.id">
+            {{ u.codigo }} - {{ u.descricao }}
+          </option>
+        </select>
+        <div v-if="props.form.errors.unidade_medida_id" class="text-red-600 text-sm mt-1">{{ props.form.errors.unidade_medida_id }}</div>
       </div>
     </div>
 
@@ -56,6 +63,17 @@ defineEmits(['submit'])
           </option>
         </select>
         <div v-if="props.form.errors.id_categoria_fk" class="text-red-600 text-sm mt-1">{{ props.form.errors.id_categoria_fk }}</div>
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium">Item (Tabela de Preço)</label>
+        <select v-model="props.form.item_id" class="mt-1 border rounded px-3 py-2 w-full">
+          <option value="">—</option>
+          <option v-for="item in props.itens" :key="item.id" :value="item.id">
+            {{ item.sku }} - {{ item.nome }}
+          </option>
+        </select>
+        <div v-if="props.form.errors.item_id" class="text-red-600 text-sm mt-1">{{ props.form.errors.item_id }}</div>
       </div>
     </div>
 

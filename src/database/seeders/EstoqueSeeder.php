@@ -14,9 +14,40 @@ use App\Models\Marca;       // table: marcas,    PK: id_marca
 
 class EstoqueSeeder extends Seeder
 {
+    private function pickRandom(array $source, int $count): array
+    {
+        $count = max(0, $count);
+        if ($count === 0) {
+            return [];
+        }
+
+        $source = array_values($source);
+        if ($count >= count($source)) {
+            return $source;
+        }
+
+        $keys = array_rand($source, $count);
+        if (!is_array($keys)) {
+            $keys = [$keys];
+        }
+
+        $picked = [];
+        foreach ($keys as $k) {
+            $picked[] = $source[$k];
+        }
+
+        return $picked;
+    }
+
     public function run(): void
     {
-        $produtoIds    = Produto::query()->pluck('id_produto')->all();
+        $produtoIds    = Produto::query()
+            ->whereNotNull('unidade_medida_id')
+            ->pluck('id_produto')
+            ->all();
+        if (empty($produtoIds)) {
+            $produtoIds = Produto::query()->pluck('id_produto')->all();
+        }
         $fornecedorIds = Fornecedor::query()->pluck('id_fornecedor')->all();
         $marcaIds      = Marca::query()->pluck('id_marca')->all();
 
@@ -28,10 +59,18 @@ class EstoqueSeeder extends Seeder
         $now  = Carbon::now();
         $rows = [];
 
-        // Para cada produto, criar 1 estoque para CADA fornecedor (80 x 31 = 2480 registros)
+        // Para cada produto, criar no maximo 3 fornecedores e 3 marcas diferentes (sem repetir)
         foreach ($produtoIds as $idProduto) {
-            foreach ($fornecedorIds as $idFornecedor) {
-                $idMarca = $marcaIds[array_rand($marcaIds)];
+            $maxFornecedores = min(3, count($fornecedorIds));
+            $maxMarcas = min(3, count($marcaIds));
+
+            $fornecedoresProduto = $this->pickRandom($fornecedorIds, $maxFornecedores);
+            $marcasProduto = $this->pickRandom($marcaIds, $maxMarcas);
+            $maxComb = min(count($fornecedoresProduto), count($marcasProduto));
+
+            for ($i = 0; $i < $maxComb; $i++) {
+                $idFornecedor = $fornecedoresProduto[$i];
+                $idMarca = $marcasProduto[$i];
 
                 $quantidade   = rand(5, 120);
                 $precoCusto   = round(mt_rand(100, 10000) / 100, 2); // 1,00 a 100,00
@@ -98,6 +137,6 @@ class EstoqueSeeder extends Seeder
             );
         }
 
-        $this->command->info('EstoqueSeeder concluída: ' . count($rows) . ' registros (um por fornecedor para cada produto).');
+        $this->command->info('EstoqueSeeder concluída: ' . count($rows) . ' registros (até 3 combinações por produto).');
     }
 }

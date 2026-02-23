@@ -20,7 +20,8 @@ class VendaSeeder extends Seeder
     {
         // Pegamos até 80 produtos reais, com os campos que precisamos
         $produtos = Produto::query()
-            ->select(['id_produto', 'cod_produto', 'nome_produto', 'unidade_medida'])
+            ->with('unidadeMedida:id,codigo')
+            ->select(['id_produto', 'cod_produto', 'nome_produto', 'unidade_medida', 'unidade_medida_id'])
             ->orderBy('id_produto')
             ->take(80)
             ->get()
@@ -71,7 +72,7 @@ class VendaSeeder extends Seeder
                 'id_unidade_fk'   => $idUnidade,
                 'id_estoque_fk'   => $idEstoque,          // ✅ novo vínculo com estoques
                 'cod_produto'     => $p->cod_produto ?? ('PROD-' . str_pad((string) $p->id_produto, 4, '0', STR_PAD_LEFT)),
-                'unidade_medida'  => $p->unidade_medida ?? 'un',
+                'unidade_medida'  => $p->unidadeMedida?->codigo ?? $p->unidade_medida ?? 'UN',
                 'nome_produto'    => $p->nome_produto,
                 'quantidade'      => $quantidade,
                 'preco_venda'     => $precoTotal,         // ⚠️ total da linha (unitário * quantidade)

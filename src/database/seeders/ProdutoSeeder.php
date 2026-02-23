@@ -4,6 +4,8 @@ namespace Database\Seeders;
 
 use App\Models\Produto;
 use App\Models\Categoria;
+use App\Models\UnidadeMedida;
+use App\Models\Item;
 use Database\Factories\ProdutoFactory;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Str;
@@ -14,10 +16,27 @@ class ProdutoSeeder extends Seeder
     {
         $base  = ProdutoFactory::baseList();   // ← reaproveitando a lista da factory
         $total = 80;
+        $unidades = UnidadeMedida::query()
+            ->select(['id', 'codigo'])
+            ->orderBy('codigo')
+            ->get()
+            ->values();
+        $itens = Item::query()
+            ->select(['id'])
+            ->orderBy('id')
+            ->get()
+            ->values();
 
         for ($i = 1; $i <= $total; $i++) {
             $p   = $base[($i - 1) % count($base)];
             $cod = sprintf('PROD-%04d', $i);
+            $unidade = $unidades->isNotEmpty()
+                ? $unidades[$i % $unidades->count()]
+                : null;
+            $unidadeCodigo = $unidade?->codigo ?? ['KG', 'G', 'ML', 'L'][($i - 1) % 4];
+            $item = $itens->isNotEmpty()
+                ? $itens[$i % $itens->count()]
+                : null;
 
             $produto = Produto::firstOrCreate(
                 ['cod_produto' => $cod],
@@ -25,7 +44,9 @@ class ProdutoSeeder extends Seeder
                     'nome_produto'   => $p['nome'],
                     'descricao'      => mb_substr($p['descricao'], 0, 50),
                     'inf_nutriente'  => json_encode($p['inf_nutriente']),
-                    'unidade_medida' => ['kg','g','ml','L'][($i - 1) % 4],
+                    'unidade_medida' => $unidadeCodigo,
+                    'unidade_medida_id' => $unidade?->id,
+                    'item_id'        => $item?->id,
                     'status'         => 1,
                     'qrcode'         => (string) Str::uuid(),
                     'id_users_fk'    => 1,

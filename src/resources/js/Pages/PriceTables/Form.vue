@@ -1,19 +1,38 @@
 <script setup>
-import { computed } from 'vue'
+import { computed, watch } from 'vue'
 
 const props = defineProps({
   form: { type: Object, required: true },
   itens: { type: Array, default: () => [] },
+  produtos: { type: Array, default: () => [] },
+  marcas: { type: Array, default: () => [] },
+  fornecedores: { type: Array, default: () => [] },
   submitLabel: { type: String, default: 'Salvar' },
 })
 
 defineEmits(['submit'])
 
-const itensOptions = computed(() => props.itens ?? [])
+const options = computed(() => {
+  if (props.form.tipo_alvo === 'produto') {
+    return (props.produtos ?? []).map((p) => ({
+      id: p.id_produto,
+      label: `${p.cod_produto} - ${p.nome_produto}`,
+    }))
+  }
+
+  return (props.itens ?? []).map((i) => ({
+    id: i.id,
+    label: `${i.sku} - ${i.nome}`,
+  }))
+})
+
+const filteredOptions = () => options.value
 
 function addItem() {
   props.form.itens.push({
     item_id: '',
+    marca_id: '',
+    fornecedor_id: '',
     preco: 0,
     desconto_percent: 0,
     quantidade_minima: 1,
@@ -23,6 +42,15 @@ function addItem() {
 function removeItem(index) {
   props.form.itens.splice(index, 1)
 }
+
+watch(
+  () => props.form.tipo_alvo,
+  (novo, antigo) => {
+    if (antigo && novo !== antigo) {
+      props.form.itens = []
+    }
+  }
+)
 </script>
 
 <template>
@@ -61,26 +89,46 @@ function removeItem(index) {
       </div>
     </div>
 
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div>
+        <label class="block text-sm font-medium">Tipo da Tabela</label>
+        <select v-model="props.form.tipo_alvo" class="mt-1 border rounded px-3 py-2 w-full">
+          <option value="item">Itens</option>
+          <option value="produto">Produtos</option>
+        </select>
+        <div v-if="props.form.errors.tipo_alvo" class="text-red-600 text-sm mt-1">{{ props.form.errors.tipo_alvo }}</div>
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium">Ativo</label>
+        <select v-model="props.form.ativo" class="mt-1 border rounded px-3 py-2 w-full">
+          <option :value="true">Ativo</option>
+          <option :value="false">Inativo</option>
+        </select>
+        <div v-if="props.form.errors.ativo" class="text-red-600 text-sm mt-1">{{ props.form.errors.ativo }}</div>
+      </div>
+    </div>
+
     <div>
-      <label class="block text-sm font-medium">Ativo</label>
-      <select v-model="props.form.ativo" class="mt-1 border rounded px-3 py-2 w-full">
-        <option :value="true">Ativo</option>
-        <option :value="false">Inativo</option>
-      </select>
-      <div v-if="props.form.errors.ativo" class="text-red-600 text-sm mt-1">{{ props.form.errors.ativo }}</div>
+      <button type="button" class="px-3 py-2 rounded bg-gray-100 hover:bg-gray-200" @click="addItem">
+        Adicionar {{ props.form.tipo_alvo === 'produto' ? 'Produto' : 'Item' }}
+      </button>
     </div>
 
     <div class="border-t pt-4">
       <div class="flex items-center justify-between mb-3">
-        <h3 class="font-semibold">Itens e Preços</h3>
-        <button type="button" class="px-3 py-2 rounded bg-gray-100 hover:bg-gray-200" @click="addItem">Adicionar Item</button>
+        <h3 class="font-semibold">
+          {{ props.form.tipo_alvo === 'produto' ? 'Produtos e Preços' : 'Itens e Preços' }}
+        </h3>
       </div>
 
       <div class="overflow-x-auto">
         <table class="w-full text-sm border">
           <thead class="bg-slate-50">
             <tr>
-              <th class="px-3 py-2 text-left">Item</th>
+              <th class="px-3 py-2 text-left">{{ props.form.tipo_alvo === 'produto' ? 'Produto' : 'Item' }}</th>
+              <th v-if="props.form.tipo_alvo === 'produto'" class="px-3 py-2 text-left">Marca</th>
+              <th v-if="props.form.tipo_alvo === 'produto'" class="px-3 py-2 text-left">Fornecedor</th>
               <th class="px-3 py-2 text-left">Preço</th>
               <th class="px-3 py-2 text-left">Desconto %</th>
               <th class="px-3 py-2 text-left">Qtd. Mínima</th>
@@ -92,10 +140,33 @@ function removeItem(index) {
               <td class="px-3 py-2">
                 <select v-model="row.item_id" class="border rounded px-2 py-1 w-full">
                   <option value="">Selecione</option>
-                  <option v-for="i in itensOptions" :key="i.id" :value="i.id">
-                    {{ i.sku }} - {{ i.nome }}
+                  <option v-for="opt in filteredOptions()" :key="opt.id" :value="opt.id">{{ opt.label }}</option>
+                </select>
+                <div v-if="props.form.errors[`itens.${index}.${props.form.tipo_alvo === 'produto' ? 'produto_id' : 'item_id'}`]" class="text-red-600 text-xs mt-1">
+                  {{ props.form.errors[`itens.${index}.${props.form.tipo_alvo === 'produto' ? 'produto_id' : 'item_id'}`] }}
+                </div>
+              </td>
+              <td v-if="props.form.tipo_alvo === 'produto'" class="px-3 py-2">
+                <select v-model="row.marca_id" class="border rounded px-2 py-1 w-full">
+                  <option value="">—</option>
+                  <option v-for="m in props.marcas" :key="m.id_marca" :value="m.id_marca">
+                    {{ m.nome_marca }}
                   </option>
                 </select>
+                <div v-if="props.form.errors[`itens.${index}.marca_id`]" class="text-red-600 text-xs mt-1">
+                  {{ props.form.errors[`itens.${index}.marca_id`] }}
+                </div>
+              </td>
+              <td v-if="props.form.tipo_alvo === 'produto'" class="px-3 py-2">
+                <select v-model="row.fornecedor_id" class="border rounded px-2 py-1 w-full">
+                  <option value="">—</option>
+                  <option v-for="f in props.fornecedores" :key="f.id_fornecedor" :value="f.id_fornecedor">
+                    {{ f.nome_fornecedor }}
+                  </option>
+                </select>
+                <div v-if="props.form.errors[`itens.${index}.fornecedor_id`]" class="text-red-600 text-xs mt-1">
+                  {{ props.form.errors[`itens.${index}.fornecedor_id`] }}
+                </div>
               </td>
               <td class="px-3 py-2">
                 <input v-model="row.preco" type="number" step="0.01" min="0" class="border rounded px-2 py-1 w-full">

@@ -16,9 +16,14 @@ const form = reactive({
 const dtColumns = [
   { data: 'c1', title: 'Código' },
   { data: 'c2', title: 'Nome' },
-  { data: 'c3', title: 'Moeda' },
-  { data: 'c4', title: 'Início' },
-  { data: 'c5', title: 'Fim' },
+  {
+    data: 'c3',
+    title: 'Tipo',
+    render: (data) => (data === 'produto' ? 'Produtos' : 'Itens'),
+  },
+  { data: 'c4', title: 'Moeda' },
+  { data: 'c5', title: 'Início' },
+  { data: 'c6', title: 'Fim' },
   {
     data: 'st',
     title: 'Ativo',
@@ -66,6 +71,6 @@ onBeforeUnmount(() => stopSyncFilters())
     :columns="dtColumns"
     :order="[[0, 'asc']]"
     :page-length="10"
-    :actions-col-index="6"
+    :actions-col-index="7"
   />
 </template>
