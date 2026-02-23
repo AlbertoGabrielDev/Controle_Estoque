@@ -47,6 +47,7 @@ class VendaController extends Controller
     public function buscarProduto(Request $request)
     {
         $request->validate([
+            'client' => 'nullable|string|max:20',
             'codigo_qr' => 'nullable|string',
             'codigo_produto' => 'nullable|string',
         ]);
@@ -61,7 +62,8 @@ class VendaController extends Controller
         try {
             $dados = $this->service->buscarProduto(
                 $request->input('codigo_qr'),
-                $request->input('codigo_produto')
+                $request->input('codigo_produto'),
+                $request->input('client')
             );
 
             return response()->json([

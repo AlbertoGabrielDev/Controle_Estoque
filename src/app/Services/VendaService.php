@@ -21,10 +21,11 @@ class VendaService
     /* ===========================
        CONSULTAS DE PRODUTO/ESTOQUE
        =========================== */
-    public function buscarProduto(?string $codigoQr = null, ?string $codigoProd = null): array
+    public function buscarProduto(?string $codigoQr = null, ?string $codigoProd = null, ?string $client = null): array
     {
         $codigoQr = trim((string) ($codigoQr ?? ''));
         $codigoProd = trim((string) ($codigoProd ?? ''));
+        $tabelaPreco = $this->resolveTabelaPrecoPorCliente($client);
 
         if ($codigoQr !== '') {
             $estoque = Estoque::query()
@@ -40,6 +41,7 @@ class VendaService
             }
 
             $unidadeCodigo = $produto->unidadeMedida?->codigo ?? $produto->unidade_medida;
+            $precoVenda = $this->resolvePrecoUnitario($produto, 1, $tabelaPreco, $estoque);
 
             return [
                 'produto' => [
@@ -49,7 +51,7 @@ class VendaService
                     'cod_produto' => $produto->cod_produto,
                     'unidade_medida' => $unidadeCodigo,
                     'qrcode' => $estoque->qrcode,
-                    'preco_venda' => (float) ($estoque->preco_venda ?? 0),
+                    'preco_venda' => (float) $precoVenda,
                     'estoque_atual' => (int) ($estoque->quantidade ?? 0),
                     'fornecedor' => (string) optional($estoque->fornecedores)->nome_fornecedor,
                     'marca' => (string) optional($estoque->marcas)->nome_marca,
@@ -86,7 +88,8 @@ class VendaService
 
         $unidadeCodigo = $produto->unidadeMedida?->codigo ?? $produto->unidade_medida;
 
-        $opcoes = $estoques->map(function (Estoque $estoque) use ($produto, $unidadeCodigo) {
+        $opcoes = $estoques->map(function (Estoque $estoque) use ($produto, $unidadeCodigo, $tabelaPreco) {
+            $precoVenda = $this->resolvePrecoUnitario($produto, 1, $tabelaPreco, $estoque);
             return [
                 'id_produto' => $produto->id_produto,
                 'id_estoque' => $estoque->id_estoque,
@@ -94,7 +97,7 @@ class VendaService
                 'cod_produto' => $produto->cod_produto,
                 'unidade_medida' => $unidadeCodigo,
                 'qrcode' => $estoque->qrcode,
-                'preco_venda' => (float) ($estoque->preco_venda ?? 0),
+                'preco_venda' => (float) $precoVenda,
                 'estoque_atual' => (int) ($estoque->quantidade ?? 0),
                 'fornecedor' => (string) optional($estoque->fornecedores)->nome_fornecedor,
                 'marca' => (string) optional($estoque->marcas)->nome_marca,

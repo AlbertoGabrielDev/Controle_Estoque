@@ -8,6 +8,8 @@ const props = defineProps({
   produtos: { type: Array, default: () => [] },
   marcas: { type: Array, default: () => [] },
   fornecedores: { type: Array, default: () => [] },
+  marcasPorProduto: { type: Object, default: () => ({}) },
+  fornecedoresPorProduto: { type: Object, default: () => ({}) },
 })
 
 const form = useForm({
@@ -85,7 +87,11 @@ function submit() {
     :produtos="props.produtos"
     :marcas="props.marcas"
     :fornecedores="props.fornecedores"
+    :marcas-por-produto="props.marcasPorProduto"
+    :fornecedores-por-produto="props.fornecedoresPorProduto"
     submit-label="Salvar Alterações"
     @submit="submit"
   />
 </template>
+
+

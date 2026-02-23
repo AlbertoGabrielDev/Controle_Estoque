@@ -7,6 +7,8 @@ const props = defineProps({
   produtos: { type: Array, default: () => [] },
   marcas: { type: Array, default: () => [] },
   fornecedores: { type: Array, default: () => [] },
+  marcasPorProduto: { type: Object, default: () => ({}) },
+  fornecedoresPorProduto: { type: Object, default: () => ({}) },
   submitLabel: { type: String, default: 'Salvar' },
 })
 
@@ -27,6 +29,53 @@ const options = computed(() => {
 })
 
 const filteredOptions = () => options.value
+
+function resolveProductKey(value) {
+  if (value === null || value === undefined || value === '') {
+    return ''
+  }
+  return String(value)
+}
+
+function marcasForRow(row) {
+  if (!row?.item_id) {
+    return []
+  }
+  const key = resolveProductKey(row.item_id)
+  const list = props.marcasPorProduto?.[key] ?? []
+  if (!row.marca_id) {
+    return list
+  }
+  const selectedId = Number(row.marca_id)
+  if (list.some((item) => Number(item.id_marca) === selectedId)) {
+    return list
+  }
+  const fallback = (props.marcas ?? []).find((item) => Number(item.id_marca) === selectedId)
+  return fallback ? [...list, fallback] : list
+}
+
+function fornecedoresForRow(row) {
+  if (!row?.item_id) {
+    return []
+  }
+  const key = resolveProductKey(row.item_id)
+  const list = props.fornecedoresPorProduto?.[key] ?? []
+  if (!row.fornecedor_id) {
+    return list
+  }
+  const selectedId = Number(row.fornecedor_id)
+  if (list.some((item) => Number(item.id_fornecedor) === selectedId)) {
+    return list
+  }
+  const fallback = (props.fornecedores ?? []).find((item) => Number(item.id_fornecedor) === selectedId)
+  return fallback ? [...list, fallback] : list
+}
+
+function onProdutoChange(row) {
+  if (!row) return
+  row.marca_id = ''
+  row.fornecedor_id = ''
+}
 
 function addItem() {
   props.form.itens.push({
@@ -138,7 +187,7 @@ watch(
           <tbody>
             <tr v-for="(row, index) in props.form.itens" :key="index" class="border-t">
               <td class="px-3 py-2">
-                <select v-model="row.item_id" class="border rounded px-2 py-1 w-full">
+                <select v-model="row.item_id" class="border rounded px-2 py-1 w-full" @change="onProdutoChange(row)">
                   <option value="">Selecione</option>
                   <option v-for="opt in filteredOptions()" :key="opt.id" :value="opt.id">{{ opt.label }}</option>
                 </select>
@@ -149,7 +198,7 @@ watch(
               <td v-if="props.form.tipo_alvo === 'produto'" class="px-3 py-2">
                 <select v-model="row.marca_id" class="border rounded px-2 py-1 w-full">
                   <option value="">—</option>
-                  <option v-for="m in props.marcas" :key="m.id_marca" :value="m.id_marca">
+                  <option v-for="m in marcasForRow(row)" :key="m.id_marca" :value="m.id_marca">
                     {{ m.nome_marca }}
                   </option>
                 </select>
@@ -160,7 +209,7 @@ watch(
               <td v-if="props.form.tipo_alvo === 'produto'" class="px-3 py-2">
                 <select v-model="row.fornecedor_id" class="border rounded px-2 py-1 w-full">
                   <option value="">—</option>
-                  <option v-for="f in props.fornecedores" :key="f.id_fornecedor" :value="f.id_fornecedor">
+                  <option v-for="f in fornecedoresForRow(row)" :key="f.id_fornecedor" :value="f.id_fornecedor">
                     {{ f.nome_fornecedor }}
                   </option>
                 </select>
@@ -194,3 +243,4 @@ watch(
     </div>
   </form>
 </template>
+

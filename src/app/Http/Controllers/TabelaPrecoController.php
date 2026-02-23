@@ -7,6 +7,7 @@ use App\Http\Requests\TabelaPrecoUpdateRequest;
 use App\Models\Fornecedor;
 use App\Models\Item;
 use App\Models\Marca;
+use App\Models\Estoque;
 use App\Models\Produto;
 use App\Models\TabelaPreco;
 use App\Services\DataTableService;
@@ -55,6 +56,8 @@ class TabelaPrecoController extends Controller
 
     public function create()
     {
+        [$marcasPorProduto, $fornecedoresPorProduto] = $this->resolveProdutoAssociacoes();
+
         return Inertia::render('PriceTables/Create', [
             'itens' => Item::query()
                 ->select('id', 'sku', 'nome', 'preco_base')
@@ -72,6 +75,8 @@ class TabelaPrecoController extends Controller
                 ->select('id_fornecedor', 'nome_fornecedor')
                 ->orderBy('nome_fornecedor')
                 ->get(),
+            'marcasPorProduto' => $marcasPorProduto,
+            'fornecedoresPorProduto' => $fornecedoresPorProduto,
         ]);
     }
 
@@ -89,6 +94,7 @@ class TabelaPrecoController extends Controller
     public function edit(TabelaPreco $tabela_preco)
     {
         $tabela_preco->load(['itens', 'produtos']);
+        [$marcasPorProduto, $fornecedoresPorProduto] = $this->resolveProdutoAssociacoes();
 
         return Inertia::render('PriceTables/Edit', [
             'tabela' => $tabela_preco,
@@ -108,6 +114,8 @@ class TabelaPrecoController extends Controller
                 ->select('id_fornecedor', 'nome_fornecedor')
                 ->orderBy('nome_fornecedor')
                 ->get(),
+            'marcasPorProduto' => $marcasPorProduto,
+            'fornecedoresPorProduto' => $fornecedoresPorProduto,
         ]);
     }
 
@@ -128,4 +136,47 @@ class TabelaPrecoController extends Controller
 
         return redirect()->route('tabelas_preco.index')->with('success', 'Tabela de preço removida.');
     }
+
+    private function resolveProdutoAssociacoes(): array
+    {
+        $marcasPorProduto = [];
+        $fornecedoresPorProduto = [];
+
+        $estoques = Estoque::query()
+            ->with([
+                'marcas:id_marca,nome_marca',
+                'fornecedores:id_fornecedor,nome_fornecedor',
+            ])
+            ->where('status', 1)
+            ->get(['id_produto_fk', 'id_marca_fk', 'id_fornecedor_fk']);
+
+        foreach ($estoques as $estoque) {
+            $produtoId = (string) ($estoque->id_produto_fk ?? '');
+            if ($produtoId === '') {
+                continue;
+            }
+
+            if ($estoque->id_marca_fk && $estoque->marcas) {
+                $marcaId = (int) $estoque->id_marca_fk;
+                $marcasPorProduto[$produtoId][$marcaId] = [
+                    'id_marca' => $marcaId,
+                    'nome_marca' => (string) $estoque->marcas->nome_marca,
+                ];
+            }
+
+            if ($estoque->id_fornecedor_fk && $estoque->fornecedores) {
+                $fornecedorId = (int) $estoque->id_fornecedor_fk;
+                $fornecedoresPorProduto[$produtoId][$fornecedorId] = [
+                    'id_fornecedor' => $fornecedorId,
+                    'nome_fornecedor' => (string) $estoque->fornecedores->nome_fornecedor,
+                ];
+            }
+        }
+
+        $marcasPorProduto = array_map(static fn ($items) => array_values($items), $marcasPorProduto);
+        $fornecedoresPorProduto = array_map(static fn ($items) => array_values($items), $fornecedoresPorProduto);
+
+        return [$marcasPorProduto, $fornecedoresPorProduto];
+    }
 }
+

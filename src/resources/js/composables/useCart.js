@@ -75,7 +75,12 @@ export function useCart(options = {}) {
   }
 
   async function fetchProduct(payload) {
-    const { data } = await axios.post(route('buscar.produto'), payload)
+    const clientValue = String(client.value ?? '').trim()
+    const nextPayload = { ...payload }
+    if (clientValue) {
+      nextPayload.client = clientValue
+    }
+    const { data } = await axios.post(route('buscar.produto'), nextPayload)
     if (!data?.success) {
       throw new Error(data?.message || 'Produto nao encontrado.')
     }
