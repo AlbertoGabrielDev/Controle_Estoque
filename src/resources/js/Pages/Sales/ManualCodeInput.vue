@@ -6,19 +6,27 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  options: {
+    type: Array,
+    default: () => [],
+  },
 })
 
-const emit = defineEmits(['submit'])
+const emit = defineEmits(['submit', 'select', 'clear-options'])
 
 const open = ref(false)
 const code = ref('')
 
 function toggle() {
   open.value = !open.value
+  if (!open.value) {
+    emit('clear-options')
+  }
 }
 
 function close() {
   open.value = false
+  emit('clear-options')
 }
 
 async function submit() {
@@ -27,8 +35,17 @@ async function submit() {
     return
   }
 
+  emit('clear-options')
   emit('submit', normalizedCode)
   code.value = ''
+}
+
+function selectOption(option) {
+  emit('select', option)
+}
+
+function money(value) {
+  return Number(value || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
 }
 
 function onKeydown(event) {
@@ -85,6 +102,45 @@ function onKeydown(event) {
           >
             Fechar
           </button>
+        </div>
+      </div>
+
+      <div v-if="options.length" class="mt-4">
+        <div class="text-sm text-gray-600 mb-2">
+          Encontramos mais de um cadastro para este codigo. Selecione o estoque desejado.
+        </div>
+        <div class="overflow-auto border rounded-lg bg-white">
+          <table class="min-w-full divide-y divide-gray-200 text-sm">
+            <thead class="bg-gray-50">
+              <tr>
+                <th class="px-3 py-2 text-left font-medium text-gray-500 uppercase tracking-wider">ID Estoque</th>
+                <th class="px-3 py-2 text-left font-medium text-gray-500 uppercase tracking-wider">Produto</th>
+                <th class="px-3 py-2 text-left font-medium text-gray-500 uppercase tracking-wider">Fornecedor</th>
+                <th class="px-3 py-2 text-left font-medium text-gray-500 uppercase tracking-wider">Marca</th>
+                <th class="px-3 py-2 text-left font-medium text-gray-500 uppercase tracking-wider">Preco</th>
+                <th class="px-3 py-2 text-left font-medium text-gray-500 uppercase tracking-wider">Acoes</th>
+              </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+              <tr v-for="option in options" :key="option.id_estoque">
+                <td class="px-3 py-2 text-gray-700">{{ option.id_estoque }}</td>
+                <td class="px-3 py-2 text-gray-700">{{ option.nome_produto }}</td>
+                <td class="px-3 py-2 text-gray-700">{{ option.fornecedor || '-' }}</td>
+                <td class="px-3 py-2 text-gray-700">{{ option.marca || '-' }}</td>
+                <td class="px-3 py-2 text-gray-700">{{ money(option.preco_venda) }}</td>
+                <td class="px-3 py-2 text-gray-700">
+                  <button
+                    type="button"
+                    class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1 rounded-md disabled:opacity-60"
+                    :disabled="disabled"
+                    @click="selectOption(option)"
+                  >
+                    Selecionar
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </div>
     </div>

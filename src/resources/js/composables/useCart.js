@@ -1,7 +1,9 @@
 import axios from 'axios'
 import { computed, ref } from 'vue'
 
-export function useCart() {
+export function useCart(options = {}) {
+  const requireClient = options.requireClient !== false
+  const userId = options.userId ?? null
   const client = ref('')
   const serverCart = ref(null)
   const stagedItems = ref([])
@@ -58,13 +60,34 @@ export function useCart() {
     }
   }
 
+  function resolveClientKey() {
+    const trimmed = String(client.value ?? '').trim()
+    if (trimmed) {
+      return trimmed
+    }
+
+    if (!requireClient && userId) {
+      const key = `ANON-${userId}`
+      return key.length > 20 ? key.slice(0, 20) : key
+    }
+
+    return ''
+  }
+
   async function fetchProduct(payload) {
     const { data } = await axios.post(route('buscar.produto'), payload)
-    if (!data?.success || !data?.produto) {
+    if (!data?.success) {
       throw new Error(data?.message || 'Produto nao encontrado.')
     }
 
-    return data.produto
+    const opcoes = Array.isArray(data?.opcoes) ? data.opcoes : []
+    const produto = data?.produto ?? null
+
+    if (!produto && opcoes.length === 0) {
+      throw new Error(data?.message || 'Produto nao encontrado.')
+    }
+
+    return { produto, opcoes }
   }
 
   function addProductToStaged(product, quantity = 1) {
@@ -92,16 +115,20 @@ export function useCart() {
   }
 
   async function addProduct(product, quantity = 1) {
-    if (!client.value) {
+    const clientKey = resolveClientKey()
+    if (!clientKey) {
       addProductToStaged(product, quantity)
-      notify('Produto adicionado no carrinho local. Defina o cliente para sincronizar.', 'info')
+      const message = requireClient
+        ? 'Produto adicionado no carrinho local. Defina o cliente para sincronizar.'
+        : 'Produto adicionado no carrinho local.'
+      notify(message, 'info')
       return true
     }
 
     busy.value = true
     try {
       const { data } = await axios.post(route('adicionar.venda'), {
-        client: client.value,
+        client: clientKey,
         id_produto: Number(product.id_produto),
         id_estoque: product.id_estoque ? Number(product.id_estoque) : null,
         quantidade: quantity,
@@ -127,15 +154,26 @@ export function useCart() {
     const normalizedCode = String(code ?? '').trim()
     if (!normalizedCode) {
       notify('Informe um codigo de produto.', 'warning')
-      return false
+      return { added: false, opcoes: [] }
     }
 
     try {
-      const product = await fetchProduct({ codigo_produto: normalizedCode })
-      return await addProduct(product, 1)
+      const { produto, opcoes } = await fetchProduct({ codigo_produto: normalizedCode })
+      if (opcoes.length > 1) {
+        return { added: false, opcoes }
+      }
+
+      const selecionado = produto ?? opcoes[0]
+      if (!selecionado) {
+        notify('Produto nao encontrado.', 'error')
+        return { added: false, opcoes: [] }
+      }
+
+      const added = await addProduct(selecionado, 1)
+      return { added, opcoes: [] }
     } catch (error) {
       notify(messageFromError(error, 'Produto nao encontrado.'), 'error')
-      return false
+      return { added: false, opcoes: [] }
     }
   }
 
@@ -147,23 +185,39 @@ export function useCart() {
     }
 
     try {
-      const product = await fetchProduct({ codigo_qr: normalizedCode })
-      return await addProduct(product, 1)
+      const { produto } = await fetchProduct({ codigo_qr: normalizedCode })
+      if (!produto) {
+        notify('Produto nao encontrado pelo QR code.', 'error')
+        return false
+      }
+
+      return await addProduct(produto, 1)
     } catch (error) {
       notify(messageFromError(error, 'Produto nao encontrado pelo QR code.'), 'error')
       return false
     }
   }
 
+  async function addSelectedProduct(product, quantity = 1) {
+    if (!product) {
+      return false
+    }
+
+    return await addProduct(product, quantity)
+  }
+
   async function loadCart() {
-    if (!client.value) {
-      notify('Informe o cliente para carregar o carrinho.', 'warning')
+    const clientKey = resolveClientKey()
+    if (!clientKey) {
+      if (requireClient) {
+        notify('Informe o cliente para carregar o carrinho.', 'warning')
+      }
       return null
     }
 
     busy.value = true
     try {
-      const { data } = await axios.post(route('carrinho.venda'), { client: client.value })
+      const { data } = await axios.post(route('carrinho.venda'), { client: clientKey })
       if (!data?.success) {
         notify(data?.message || 'Falha ao carregar carrinho.', 'error')
         return null
@@ -180,8 +234,11 @@ export function useCart() {
   }
 
   async function loadCartMerge() {
-    if (!client.value) {
-      notify('Informe o cliente para sincronizar o carrinho.', 'warning')
+    const clientKey = resolveClientKey()
+    if (!clientKey) {
+      if (requireClient) {
+        notify('Informe o cliente para sincronizar o carrinho.', 'warning')
+      }
       return null
     }
 
@@ -199,7 +256,7 @@ export function useCart() {
     try {
       for (const item of stagedItems.value) {
         await axios.post(route('adicionar.venda'), {
-          client: client.value,
+          client: clientKey,
           id_produto: Number(item.id_produto),
           id_estoque: item.id_estoque ? Number(item.id_estoque) : null,
           quantidade: Number(item.quantidade || 1),
@@ -238,8 +295,11 @@ export function useCart() {
       return
     }
 
-    if (!client.value) {
-      notify('Cliente nao informado.', 'warning')
+    const clientKey = resolveClientKey()
+    if (!clientKey) {
+      if (requireClient) {
+        notify('Cliente nao informado.', 'warning')
+      }
       return
     }
 
@@ -248,7 +308,7 @@ export function useCart() {
     busy.value = true
     try {
       const { data } = await axios.post(route('atualizar_quantidade.venda'), {
-        client: client.value,
+        client: clientKey,
         cart_item_id: Number(item.id),
         quantidade: nextQuantity,
       })
@@ -276,15 +336,18 @@ export function useCart() {
       return
     }
 
-    if (!client.value) {
-      notify('Cliente nao informado.', 'warning')
+    const clientKey = resolveClientKey()
+    if (!clientKey) {
+      if (requireClient) {
+        notify('Cliente nao informado.', 'warning')
+      }
       return
     }
 
     busy.value = true
     try {
       const { data } = await axios.post(route('remover.venda'), {
-        client: client.value,
+        client: clientKey,
         cart_item_id: Number(item.id),
       })
 
@@ -303,8 +366,11 @@ export function useCart() {
   }
 
   async function finalizeSale() {
-    if (!client.value) {
-      notify('Informe o cliente antes de finalizar a venda.', 'warning')
+    const clientKey = resolveClientKey()
+    if (!clientKey) {
+      if (requireClient) {
+        notify('Informe o cliente antes de finalizar a venda.', 'warning')
+      }
       return false
     }
 
@@ -323,7 +389,7 @@ export function useCart() {
         return false
       }
 
-      const { data } = await axios.post(route('registrar.venda'), { client: client.value })
+      const { data } = await axios.post(route('registrar.venda'), { client: clientKey })
       if (!data?.success) {
         const detailText = stockDetails(data?.detalhes ?? [])
         notify(detailText ? `${data?.message || 'Falha ao finalizar venda.'} ${detailText}` : (data?.message || 'Falha ao finalizar venda.'), 'error')
@@ -355,6 +421,7 @@ export function useCart() {
     finalizing,
     addByManualCode,
     addByQrCode,
+    addSelectedProduct,
     loadCartMerge,
     changeQuantity,
     removeItem,

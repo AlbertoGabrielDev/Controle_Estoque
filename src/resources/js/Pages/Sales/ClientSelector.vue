@@ -6,6 +6,10 @@ const props = defineProps({
     type: String,
     default: '',
   },
+  required: {
+    type: Boolean,
+    default: true,
+  },
   loading: {
     type: Boolean,
     default: false,
@@ -39,6 +43,7 @@ function sanitizeClient() {
     <div class="md:col-span-2">
       <label for="sales-client" class="block text-sm font-medium text-gray-700">
         Cliente (WhatsApp)
+        <span v-if="!required" class="ml-1 text-xs text-gray-500">(Opcional)</span>
       </label>
       <input
         id="sales-client"

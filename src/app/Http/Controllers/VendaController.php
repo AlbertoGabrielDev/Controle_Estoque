@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Venda;
+use App\Services\AppSettingService;
 use App\Services\VendaService;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -10,7 +11,10 @@ use Inertia\Response as InertiaResponse;
 
 class VendaController extends Controller
 {
-    public function __construct(private VendaService $service)
+    public function __construct(
+        private VendaService $service,
+        private AppSettingService $settings
+    )
     {
         //
     }
@@ -18,6 +22,7 @@ class VendaController extends Controller
     public function vendas(): InertiaResponse
     {
         return Inertia::render('Sales/Index', [
+            'requireClient' => $this->settings->getBool(AppSettingService::KEY_SALES_REQUIRE_CLIENT, true),
             'vendas' => fn () => Venda::query()
                 ->with([
                     'usuario:id,name',
@@ -61,7 +66,8 @@ class VendaController extends Controller
 
             return response()->json([
                 'success' => true,
-                'produto' => $dados
+                'produto' => $dados['produto'] ?? null,
+                'opcoes' => $dados['opcoes'] ?? [],
             ]);
         } catch (\Throwable $e) {
             return response()->json([
@@ -105,8 +111,22 @@ class VendaController extends Controller
 
     public function carrinho(Request $request)
     {
-        $request->validate(['client' => 'required|string|max:20']);
-        $cart = $this->service->obterCarrinho($request->client);
+        $requireClient = $this->requireClient();
+        $request->validate([
+            'client' => $requireClient
+                ? 'required|string|max:20'
+                : 'nullable|string|max:20',
+        ]);
+
+        $client = $this->resolveClient($request, $requireClient);
+        if (!$client) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Informe o cliente para carregar o carrinho.',
+            ], 422);
+        }
+
+        $cart = $this->service->obterCarrinho($client);
 
         return response()->json([
             'success' => true,
@@ -116,16 +136,27 @@ class VendaController extends Controller
 
     public function adicionarItem(Request $request)
     {
+        $requireClient = $this->requireClient();
         $request->validate([
-            'client' => 'required|string|max:20',
+            'client' => $requireClient
+                ? 'required|string|max:20'
+                : 'nullable|string|max:20',
             'id_produto' => 'required|integer',
             'id_estoque' => 'nullable|integer|exists:estoques,id_estoque',
             'quantidade' => 'required|integer|min:1',
         ]);
 
         try {
+            $client = $this->resolveClient($request, $requireClient);
+            if (!$client) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Informe o cliente para adicionar itens.',
+                ], 422);
+            }
+
             $cart = $this->service->adicionarItem(
-                $request->client,
+                $client,
                 (int) $request->id_produto,
                 (int) $request->quantidade,
                 $request->filled('id_estoque') ? (int) $request->id_estoque : null
@@ -145,15 +176,26 @@ class VendaController extends Controller
 
     public function atualizarQuantidade(Request $request)
     {
+        $requireClient = $this->requireClient();
         $request->validate([
-            'client' => 'required|string|max:20',
+            'client' => $requireClient
+                ? 'required|string|max:20'
+                : 'nullable|string|max:20',
             'cart_item_id' => 'required|integer',
             'quantidade' => 'required|integer|min:0',
         ]);
 
         try {
+            $client = $this->resolveClient($request, $requireClient);
+            if (!$client) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Informe o cliente para atualizar itens.',
+                ], 422);
+            }
+
             $cart = $this->service->atualizarQuantidadeItem(
-                $request->client,
+                $client,
                 (int) $request->cart_item_id,
                 (int) $request->quantidade
             );
@@ -172,14 +214,25 @@ class VendaController extends Controller
 
     public function removerItem(Request $request)
     {
+        $requireClient = $this->requireClient();
         $request->validate([
-            'client' => 'required|string|max:20',
+            'client' => $requireClient
+                ? 'required|string|max:20'
+                : 'nullable|string|max:20',
             'cart_item_id' => 'required|integer',
         ]);
 
         try {
+            $client = $this->resolveClient($request, $requireClient);
+            if (!$client) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Informe o cliente para remover itens.',
+                ], 422);
+            }
+
             $cart = $this->service->removerItem(
-                $request->client,
+                $client,
                 (int) $request->cart_item_id
             );
 
@@ -197,12 +250,23 @@ class VendaController extends Controller
 
     public function registrarVenda(Request $request)
     {
+        $requireClient = $this->requireClient();
         $request->validate([
-            'client' => 'required|string|max:20',
+            'client' => $requireClient
+                ? 'required|string|max:20'
+                : 'nullable|string|max:20',
         ]);
 
         try {
-            $resultado = $this->service->finalizarVendaDoCarrinho($request->client);
+            $client = $this->resolveClient($request, $requireClient);
+            if (!$client) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Informe o cliente antes de finalizar a venda.',
+                ], 422);
+            }
+
+            $resultado = $this->service->finalizarVendaDoCarrinho($client);
 
             if (!$resultado['ok']) {
                 return response()->json([
@@ -228,5 +292,30 @@ class VendaController extends Controller
     public function historicoVendas()
     {
         return redirect()->route('vendas.venda');
+    }
+
+    private function requireClient(): bool
+    {
+        return $this->settings->getBool(AppSettingService::KEY_SALES_REQUIRE_CLIENT, true);
+    }
+
+    private function resolveClient(Request $request, bool $requireClient): ?string
+    {
+        $client = trim((string) $request->input('client', ''));
+        if ($client !== '') {
+            return $client;
+        }
+
+        if ($requireClient) {
+            return null;
+        }
+
+        $userId = auth()->id();
+        if (!$userId) {
+            return null;
+        }
+
+        $key = AppSettingService::ANON_CLIENT_PREFIX . $userId;
+        return strlen($key) > 20 ? substr($key, 0, 20) : $key;
     }
 }

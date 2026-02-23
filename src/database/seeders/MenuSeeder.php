@@ -243,6 +243,18 @@ class MenuSeeder extends Seeder
             ]
         );
 
+        Menu::updateOrCreate(
+            ['slug' => 'config_vendas'],
+            [
+                'name' => 'Config. Vendas',
+                'slug' => 'config_vendas',
+                'icon' => 'fas fa-sliders-h mr-2',
+                'route' => 'configuracoes.vendas',
+                'parent_id' => $configuracoes->id,
+                'order' => 2,
+            ]
+        );
+
         /**
          * =========================
          * NOVO: Cadastros (MDM)

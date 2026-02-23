@@ -26,6 +26,7 @@ use App\Http\Controllers\CentroCustoController;
 use App\Http\Controllers\ContaContabilController;
 use App\Http\Controllers\VendaController;
 use App\Http\Controllers\SpreadsheetController;
+use App\Http\Controllers\SalesSettingsController;
 use Illuminate\Foundation\Application;
 use Inertia\Inertia;
 
@@ -277,6 +278,11 @@ Route::middleware([
         Route::post('/labels/assign', [WhatsAppContactsController::class, 'assignLabel'])->name('whatsapp.labels.assign');
         Route::delete('/labels/{id}', [WhatsAppContactsController::class, 'deleteLabel'])->name('whatsapp.labels.destroy');
         Route::get('/verdurao/whatsapp/labels/{id}/members', [WhatsAppContactsController::class, 'labelMembers'])->name('whatsapp.labels.members');
+    });
+
+    Route::prefix('configuracoes')->name('configuracoes.')->group(function () {
+        Route::get('/vendas', [SalesSettingsController::class, 'index'])->name('vendas')->middleware('check.permission:view_post,config_vendas');
+        Route::put('/vendas', [SalesSettingsController::class, 'update'])->name('vendas.update')->middleware('check.permission:edit_post,config_vendas');
     });
 
     Route::prefix('taxes')->name('taxes.')->group(function () {

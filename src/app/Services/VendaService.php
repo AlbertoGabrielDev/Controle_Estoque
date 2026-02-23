@@ -11,6 +11,7 @@ use App\Models\OrderItem;
 use App\Models\Produto;
 use App\Models\TabelaPreco;
 use App\Models\Venda;                 // <--- inclui Venda
+use App\Services\AppSettingService;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
@@ -20,7 +21,6 @@ class VendaService
     /* ===========================
        CONSULTAS DE PRODUTO/ESTOQUE
        =========================== */
-
     public function buscarProduto(?string $codigoQr = null, ?string $codigoProd = null): array
     {
         $codigoQr = trim((string) ($codigoQr ?? ''));
@@ -28,7 +28,7 @@ class VendaService
 
         if ($codigoQr !== '') {
             $estoque = Estoque::query()
-                ->with('produtos.unidadeMedida:id,codigo')
+                ->with(['produtos.unidadeMedida:id,codigo', 'fornecedores:id_fornecedor,nome_fornecedor', 'marcas:id_marca,nome_marca'])
                 ->where('status', 1)
                 ->where('quantidade', '>', 0)
                 ->where('qrcode', $codigoQr)
@@ -42,14 +42,19 @@ class VendaService
             $unidadeCodigo = $produto->unidadeMedida?->codigo ?? $produto->unidade_medida;
 
             return [
-                'id_produto' => $produto->id_produto,
-                'id_estoque' => $estoque->id_estoque,
-                'nome_produto' => $produto->nome_produto,
-                'cod_produto' => $produto->cod_produto,
-                'unidade_medida' => $unidadeCodigo,
-                'qrcode' => $estoque->qrcode,
-                'preco_venda' => (float) ($estoque->preco_venda ?? 0),
-                'estoque_atual' => (int) ($estoque->quantidade ?? 0),
+                'produto' => [
+                    'id_produto' => $produto->id_produto,
+                    'id_estoque' => $estoque->id_estoque,
+                    'nome_produto' => $produto->nome_produto,
+                    'cod_produto' => $produto->cod_produto,
+                    'unidade_medida' => $unidadeCodigo,
+                    'qrcode' => $estoque->qrcode,
+                    'preco_venda' => (float) ($estoque->preco_venda ?? 0),
+                    'estoque_atual' => (int) ($estoque->quantidade ?? 0),
+                    'fornecedor' => (string) optional($estoque->fornecedores)->nome_fornecedor,
+                    'marca' => (string) optional($estoque->marcas)->nome_marca,
+                ],
+                'opcoes' => [],
             ];
         }
 
@@ -67,32 +72,45 @@ class VendaService
             })
             ->firstOrFail();
 
-        $preco = Estoque::where('id_produto_fk', $produto->id_produto)
+        $estoques = Estoque::query()
+            ->with(['fornecedores:id_fornecedor,nome_fornecedor', 'marcas:id_marca,nome_marca'])
+            ->where('id_produto_fk', $produto->id_produto)
             ->where('status', 1)
             ->where('quantidade', '>', 0)
-            ->orderByDesc('preco_venda')
-            ->value('preco_venda');
+            ->orderByDesc('id_estoque')
+            ->get();
 
-        $qtdDisponivel = (int) Estoque::where('id_produto_fk', $produto->id_produto)
-            ->where('status', 1)
-            ->where('quantidade', '>', 0)
-            ->sum('quantidade');
-
-        if ($qtdDisponivel <= 0) {
+        if ($estoques->isEmpty()) {
             abort(404, 'Produto não encontrado');
         }
 
         $unidadeCodigo = $produto->unidadeMedida?->codigo ?? $produto->unidade_medida;
 
+        $opcoes = $estoques->map(function (Estoque $estoque) use ($produto, $unidadeCodigo) {
+            return [
+                'id_produto' => $produto->id_produto,
+                'id_estoque' => $estoque->id_estoque,
+                'nome_produto' => $produto->nome_produto,
+                'cod_produto' => $produto->cod_produto,
+                'unidade_medida' => $unidadeCodigo,
+                'qrcode' => $estoque->qrcode,
+                'preco_venda' => (float) ($estoque->preco_venda ?? 0),
+                'estoque_atual' => (int) ($estoque->quantidade ?? 0),
+                'fornecedor' => (string) optional($estoque->fornecedores)->nome_fornecedor,
+                'marca' => (string) optional($estoque->marcas)->nome_marca,
+            ];
+        })->values()->all();
+
+        if (count($opcoes) === 1) {
+            return [
+                'produto' => $opcoes[0],
+                'opcoes' => [],
+            ];
+        }
+
         return [
-            'id_produto' => $produto->id_produto,
-            'id_estoque' => null,
-            'nome_produto' => $produto->nome_produto,
-            'cod_produto' => $produto->cod_produto,
-            'unidade_medida' => $unidadeCodigo,
-            'qrcode' => null,
-            'preco_venda' => (float) ($preco ?? 0),
-            'estoque_atual' => $qtdDisponivel,
+            'produto' => null,
+            'opcoes' => $opcoes,
         ];
     }
 
@@ -403,6 +421,10 @@ class VendaService
             return null;
         }
 
+        if (str_starts_with($client, AppSettingService::ANON_CLIENT_PREFIX)) {
+            return null;
+        }
+
         $cliente = Cliente::query()
             ->where('whatsapp', $client)
             ->first();
@@ -537,3 +559,4 @@ class VendaService
         ];
     }
 }
+

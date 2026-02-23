@@ -1,6 +1,6 @@
 <script setup>
-import { computed } from 'vue'
-import { Head, router } from '@inertiajs/vue3'
+import { computed, ref } from 'vue'
+import { Head, router, usePage } from '@inertiajs/vue3'
 import CartTable from './CartTable.vue'
 import ClientSelector from './ClientSelector.vue'
 import ManualCodeInput from './ManualCodeInput.vue'
@@ -13,7 +13,14 @@ const props = defineProps({
     type: Object,
     default: () => ({}),
   },
+  requireClient: {
+    type: Boolean,
+    default: true,
+  },
 })
+
+const page = usePage()
+const userId = page.props.auth?.user?.id ?? null
 
 const {
   client,
@@ -24,16 +31,32 @@ const {
   finalizing,
   addByManualCode,
   addByQrCode,
+  addSelectedProduct,
   loadCartMerge,
   changeQuantity,
   removeItem,
   finalizeSale,
-} = useCart()
+} = useCart({ requireClient: props.requireClient, userId })
+
+const manualOptions = ref([])
 
 const clientModel = computed({
   get: () => client.value,
   set: (value) => setClient(value),
 })
+
+async function onManualSubmit(code) {
+  manualOptions.value = []
+  const result = await addByManualCode(code)
+  if (result?.opcoes?.length) {
+    manualOptions.value = result.opcoes
+  }
+}
+
+async function onManualSelect(option) {
+  manualOptions.value = []
+  await addSelectedProduct(option, 1)
+}
 
 async function onFinalizeSale() {
   const success = await finalizeSale()
@@ -78,13 +101,17 @@ function goToSalesPage(page) {
 
     <ClientSelector
       v-model="clientModel"
+      :required="props.requireClient"
       :loading="busy"
       @load-cart="loadCartMerge"
     />
 
     <ManualCodeInput
       :disabled="busy || finalizing"
-      @submit="addByManualCode"
+      :options="manualOptions"
+      @submit="onManualSubmit"
+      @select="onManualSelect"
+      @clear-options="manualOptions = []"
     />
 
     <QrScanner
