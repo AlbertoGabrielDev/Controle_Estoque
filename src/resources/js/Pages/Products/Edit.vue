@@ -26,7 +26,6 @@ const form = useForm({
   descricao: props.produto?.descricao ?? '',
   unidade_medida_id: props.produto?.unidade_medida_id ?? '',
   item_id: props.produto?.item_id ?? '',
-  qrcode: props.produto?.qrcode ?? '',
   inf_nutriente: stringifyNutrition(props.produto?.inf_nutriente),
   id_categoria_fk: props.categoriaSelecionada ?? '',
 })
@@ -49,7 +48,6 @@ function submit() {
     :categorias="props.categorias"
     :unidades="props.unidades"
     :itens="props.itens"
-    :show-qrcode="true"
     submit-label="Salvar Alterações"
     @submit="submit"
   />

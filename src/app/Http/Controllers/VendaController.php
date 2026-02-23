@@ -76,6 +76,7 @@ class VendaController extends Controller
         $request->validate([
             'itens' => 'required|array|min:1',
             'itens.*.id_produto' => 'required|integer',
+            'itens.*.id_estoque' => 'nullable|integer|exists:estoques,id_estoque',
             'itens.*.quantidade' => 'required|integer|min:1',
         ]);
 
@@ -118,6 +119,7 @@ class VendaController extends Controller
         $request->validate([
             'client' => 'required|string|max:20',
             'id_produto' => 'required|integer',
+            'id_estoque' => 'nullable|integer|exists:estoques,id_estoque',
             'quantidade' => 'required|integer|min:1',
         ]);
 
@@ -125,7 +127,8 @@ class VendaController extends Controller
             $cart = $this->service->adicionarItem(
                 $request->client,
                 (int) $request->id_produto,
-                (int) $request->quantidade
+                (int) $request->quantidade,
+                $request->filled('id_estoque') ? (int) $request->id_estoque : null
             );
 
             return response()->json([

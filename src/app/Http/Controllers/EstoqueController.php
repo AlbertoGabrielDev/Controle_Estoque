@@ -15,6 +15,7 @@ use App\Support\DataTableActions;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Inertia\Response as InertiaResponse;
 
@@ -141,6 +142,9 @@ class EstoqueController extends Controller
     public function inserirEstoque(ValidacaoEstoque $request)
     {
         $validated = $request->validated();
+        if (empty($validated['qrcode'])) {
+            $validated['qrcode'] = (string) Str::uuid();
+        }
         $produtoId = (int) $validated['id_produto_fk'];
         $produto = Produto::findOrFail($produtoId);
         $categoriaId = DB::table('categoria_produtos')
@@ -201,6 +205,9 @@ class EstoqueController extends Controller
     {
         $estoque = Estoque::findOrFail($estoqueId);
         $validated = $request->validated();
+        if (array_key_exists('qrcode', $validated) && ($validated['qrcode'] === null || $validated['qrcode'] === '')) {
+            unset($validated['qrcode']);
+        }
         $produtoId = (int) ($validated['id_produto_fk'] ?? $estoque->id_produto_fk);
         $produto = Produto::findOrFail($produtoId);
 

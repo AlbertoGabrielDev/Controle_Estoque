@@ -98,6 +98,7 @@ class EstoqueSeeder extends Seeder
                     'preco_custo'       => $precoCusto,
                     'preco_venda'       => $precoVenda,
                     'lote'              => $lote,
+                    'qrcode'            => (string) Str::uuid(),
                     'validade'          => Carbon::now()->addDays(rand(30, 720))->format('Y-m-d'),
                     'data_chegada'      => Carbon::now()->subDays(rand(0, 30))->format('Y-m-d'),
                     'localizacao'       => 'R' . rand(1, 5) . '-C' . rand(1, 20),

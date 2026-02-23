@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class ValidacaoEstoque extends FormRequest
 {
@@ -13,6 +14,7 @@ class ValidacaoEstoque extends FormRequest
 
     public function rules(): array
     {
+        $estoqueId = $this->route('estoqueId');
         return [
             'id_produto_fk' => 'required|integer|exists:produtos,id_produto',
             'id_fornecedor_fk' => 'required|integer|exists:fornecedores,id_fornecedor',
@@ -23,6 +25,12 @@ class ValidacaoEstoque extends FormRequest
             'data_chegada' => 'nullable|date',
             'validade' => 'nullable|date',
             'lote' => 'nullable|string|max:20',
+            'qrcode' => [
+                'nullable',
+                'string',
+                'max:80',
+                Rule::unique('estoques', 'qrcode')->ignore($estoqueId, 'id_estoque'),
+            ],
             'quantidade' => 'required|numeric|min:0|lte:10000',
             'quantidade_aviso' => 'nullable|numeric|min:0|lte:10000',
         ];
@@ -40,6 +48,7 @@ class ValidacaoEstoque extends FormRequest
             'quantidade.lte' => 'Quantidade máxima permitida é 10000.',
             'quantidade_aviso.lte' => 'Quantidade de aviso máxima permitida é 10000.',
             'lote.max' => 'Máximo de caracteres para lote é 20.',
+            'qrcode.unique' => 'QRCode já está em uso.',
         ];
     }
 }

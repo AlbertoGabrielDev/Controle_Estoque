@@ -20,6 +20,7 @@ const form = useForm({
   preco_venda: props.estoque?.preco_venda ?? '',
   quantidade_aviso: props.estoque?.quantidade_aviso ?? '',
   lote: props.estoque?.lote ?? '',
+  qrcode: props.estoque?.qrcode ?? '',
   localizacao: props.estoque?.localizacao ?? '',
   validade: props.estoque?.validade?.slice?.(0, 10) ?? '',
   data_chegada: props.estoque?.data_chegada?.slice?.(0, 10) ?? '',

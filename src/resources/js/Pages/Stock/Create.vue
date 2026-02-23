@@ -17,6 +17,7 @@ const form = useForm({
   preco_venda: '',
   quantidade_aviso: '',
   lote: '',
+  qrcode: '',
   localizacao: '',
   validade: '',
   data_chegada: '',

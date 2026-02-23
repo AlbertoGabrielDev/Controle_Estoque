@@ -13,6 +13,7 @@ class Venda extends Model
 
     protected $fillable = [
         'id_produto_fk',
+        'id_estoque_fk',
         'id_usuario_fk',
         'cod_produto',
         'unidade_medida',

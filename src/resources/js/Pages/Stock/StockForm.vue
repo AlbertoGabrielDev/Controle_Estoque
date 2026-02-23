@@ -102,6 +102,19 @@ onBeforeUnmount(() => clearTimeout(timer))
       </div>
     </div>
 
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div>
+        <label class="block text-sm font-medium">QRCode do Lote</label>
+        <input
+          v-model="props.form.qrcode"
+          class="mt-1 border rounded px-3 py-2 w-full bg-gray-100"
+          placeholder="Será gerado ao salvar"
+          readonly
+        >
+        <div v-if="props.form.errors.qrcode" class="text-red-600 text-sm mt-1">{{ props.form.errors.qrcode }}</div>
+      </div>
+    </div>
+
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
       <div>
         <label class="block text-sm font-medium">Quantidade de Aviso</label>

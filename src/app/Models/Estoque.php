@@ -30,6 +30,7 @@ class Estoque extends Model
         'preco_custo',
         'preco_venda',
         'lote',
+        'qrcode',
         'id_tax_fk',
         'validade',
         'data_chegada',

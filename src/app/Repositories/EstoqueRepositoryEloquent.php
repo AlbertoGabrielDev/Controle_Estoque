@@ -14,6 +14,7 @@ use App\Models\Produto;
 use Prettus\Repository\Eloquent\BaseRepository;
 use App\Repositories\EstoqueRepository;
 use Carbon\Carbon;
+use Illuminate\Support\Str;
 
 use Illuminate\Http\Request;
 
@@ -51,6 +52,9 @@ class EstoqueRepositoryEloquent extends BaseRepository implements EstoqueReposit
     public function inserirEstoque(array $data)
     {
         // $data = current_unidade()->id_unidade_fk ?? 1;
+        if (empty($data['qrcode'])) {
+            $data['qrcode'] = (string) Str::uuid();
+        }
         $estoque = $this->create($data);
 
         MarcaProduto::create([

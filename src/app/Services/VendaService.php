@@ -23,54 +23,74 @@ class VendaService
 
     public function buscarProduto(?string $codigoQr = null, ?string $codigoProd = null): array
     {
-        // 1) Encontrar o produto ATIVO que corresponda ao QR ou código
-        //    e que TENHA pelo menos um lote ativo (status=1) com quantidade > 0.
+        $codigoQr = trim((string) ($codigoQr ?? ''));
+        $codigoProd = trim((string) ($codigoProd ?? ''));
+
+        if ($codigoQr !== '') {
+            $estoque = Estoque::query()
+                ->with('produtos.unidadeMedida:id,codigo')
+                ->where('status', 1)
+                ->where('quantidade', '>', 0)
+                ->where('qrcode', $codigoQr)
+                ->firstOrFail();
+
+            $produto = $estoque->produtos;
+            if (!$produto || (int) $produto->status !== 1) {
+                abort(404, 'Produto não encontrado');
+            }
+
+            $unidadeCodigo = $produto->unidadeMedida?->codigo ?? $produto->unidade_medida;
+
+            return [
+                'id_produto' => $produto->id_produto,
+                'id_estoque' => $estoque->id_estoque,
+                'nome_produto' => $produto->nome_produto,
+                'cod_produto' => $produto->cod_produto,
+                'unidade_medida' => $unidadeCodigo,
+                'qrcode' => $estoque->qrcode,
+                'preco_venda' => (float) ($estoque->preco_venda ?? 0),
+                'estoque_atual' => (int) ($estoque->quantidade ?? 0),
+            ];
+        }
+
+        // Busca por código do produto (sem QR)
         $produto = Produto::query()
             ->with('unidadeMedida:id,codigo')
-            ->where('status', 1) // produto ativo
-            ->where(function ($q) use ($codigoQr, $codigoProd) {
-                if ($codigoQr) {
-                    $q->orWhere('qrcode', trim($codigoQr));
-                }
-                if ($codigoProd) {
-                    $q->orWhere('cod_produto', trim($codigoProd));
-                }
-            })
+            ->where('status', 1)
+            ->where('cod_produto', $codigoProd)
             ->whereExists(function ($q) {
                 $q->selectRaw(1)
                     ->from('estoques')
                     ->whereColumn('estoques.id_produto_fk', 'produtos.id_produto')
-                    ->where('estoques.status', 1)         // lote ativo
-                    ->where('estoques.quantidade', '>', 0); // com quantidade
+                    ->where('estoques.status', 1)
+                    ->where('estoques.quantidade', '>', 0);
             })
-            ->firstOrFail(); // se não achar, dispara 404 e o controller devolve "Produto não encontrado!"
+            ->firstOrFail();
 
-        // 2) Preço = MAIOR preço de um lote ativo com quantidade > 0 (opcional: pode usar o último, etc.)
         $preco = Estoque::where('id_produto_fk', $produto->id_produto)
             ->where('status', 1)
             ->where('quantidade', '>', 0)
             ->orderByDesc('preco_venda')
             ->value('preco_venda');
 
-        // 3) Quantidade disponível SOMENTE de lotes ativos (>0)
         $qtdDisponivel = (int) Estoque::where('id_produto_fk', $produto->id_produto)
             ->where('status', 1)
             ->where('quantidade', '>', 0)
             ->sum('quantidade');
 
-        // (Segurança extra) Se por algum motivo a soma for 0, consideramos "não encontrado"
         if ($qtdDisponivel <= 0) {
-            abort(404, 'Produto não encontrado'); // mantém o comportamento esperado no front
+            abort(404, 'Produto não encontrado');
         }
 
         $unidadeCodigo = $produto->unidadeMedida?->codigo ?? $produto->unidade_medida;
 
         return [
             'id_produto' => $produto->id_produto,
+            'id_estoque' => null,
             'nome_produto' => $produto->nome_produto,
             'cod_produto' => $produto->cod_produto,
             'unidade_medida' => $unidadeCodigo,
-            'qrcode' => $produto->qrcode,
+            'qrcode' => null,
             'preco_venda' => (float) ($preco ?? 0),
             'estoque_atual' => $qtdDisponivel,
         ];
@@ -82,15 +102,24 @@ class VendaService
 
         foreach ($itens as $item) {
             $produtoId = (int) $item['id_produto'];
+            $estoqueId = isset($item['id_estoque']) ? (int) $item['id_estoque'] : null;
             $qtdPedida = (int) $item['quantidade'];
 
-            $disponivel = (int) Estoque::where('id_produto_fk', $produtoId)
-                ->where('status', 1)
-                ->sum('quantidade');
+            if ($estoqueId) {
+                $disponivel = (int) Estoque::whereKey($estoqueId)
+                    ->where('id_produto_fk', $produtoId)
+                    ->where('status', 1)
+                    ->value('quantidade');
+            } else {
+                $disponivel = (int) Estoque::where('id_produto_fk', $produtoId)
+                    ->where('status', 1)
+                    ->sum('quantidade');
+            }
 
             if ($disponivel < $qtdPedida) {
                 $faltantes[] = [
                     'id_produto' => $produtoId,
+                    'id_estoque' => $estoqueId,
                     'estoque_atual' => $disponivel,
                     'quantidade_solicitada' => $qtdPedida,
                 ];
@@ -117,28 +146,46 @@ class VendaService
         return $this->obterOuCriarCarrinho($client)->load('items');
     }
 
-    public function adicionarItem(string $client, int $idProduto, int $quantidade): Cart
+    public function adicionarItem(string $client, int $idProduto, int $quantidade, ?int $idEstoque = null): Cart
     {
         if ($quantidade < 1) {
             throw ValidationException::withMessages(['quantidade' => 'Quantidade deve ser pelo menos 1.']);
         }
 
-        $produto = Produto::findOrFail($idProduto);
+        $estoque = null;
+        if ($idEstoque) {
+            $estoque = Estoque::query()
+                ->whereKey($idEstoque)
+                ->where('status', 1)
+                ->where('quantidade', '>', 0)
+                ->firstOrFail();
+            $produto = Produto::findOrFail($estoque->id_produto_fk);
+        } else {
+            $produto = Produto::findOrFail($idProduto);
+        }
 
         $tabelaPreco = $this->resolveTabelaPrecoPorCliente($client);
 
         $cart = $this->obterOuCriarCarrinho($client);
 
-        $item = $cart->items()->where('cod_produto', $produto->cod_produto)->first();
+        $itemQuery = $cart->items()->where('cod_produto', $produto->cod_produto);
+        if ($idEstoque) {
+            $itemQuery->where('id_estoque_fk', $idEstoque);
+        } else {
+            $itemQuery->whereNull('id_estoque_fk');
+        }
+
+        $item = $itemQuery->first();
 
         if ($item) {
             $item->quantidade += $quantidade;
-            $item->preco_unit = $this->resolvePrecoUnitario($produto, $item->quantidade, $tabelaPreco);
+            $item->preco_unit = $this->resolvePrecoUnitario($produto, $item->quantidade, $tabelaPreco, $estoque);
             $item->subtotal_valor = $item->quantidade * $item->preco_unit;
             $item->save();
         } else {
-            $precoUnit = $this->resolvePrecoUnitario($produto, $quantidade, $tabelaPreco);
+            $precoUnit = $this->resolvePrecoUnitario($produto, $quantidade, $tabelaPreco, $estoque);
             $cart->items()->create([
+                'id_estoque_fk' => $idEstoque,
                 'cod_produto' => $produto->cod_produto,
                 'nome_produto' => $produto->nome_produto,
                 'preco_unit' => $precoUnit,
@@ -162,13 +209,14 @@ class VendaService
         if ($quantidade < 1) {
             $item->delete();
         } else {
-            $produto = Produto::query()
-                ->where('cod_produto', $item->cod_produto)
-                ->first();
+            $estoque = $item->id_estoque_fk ? Estoque::find($item->id_estoque_fk) : null;
+            $produto = $estoque
+                ? Produto::find($estoque->id_produto_fk)
+                : Produto::query()->where('cod_produto', $item->cod_produto)->first();
             $tabelaPreco = $this->resolveTabelaPrecoPorCliente($client);
             $item->quantidade = $quantidade;
             if ($produto) {
-                $item->preco_unit = $this->resolvePrecoUnitario($produto, $quantidade, $tabelaPreco);
+                $item->preco_unit = $this->resolvePrecoUnitario($produto, $quantidade, $tabelaPreco, $estoque);
             }
             $item->subtotal_valor = $item->quantidade * $item->preco_unit;
             $item->save();
@@ -206,6 +254,7 @@ class VendaService
         $faltantes = $this->verificarEstoqueItens(
             $cart->items->map(fn($i) => [
                 'id_produto' => $this->produtoIdPorCodigo($i->cod_produto),
+                'id_estoque' => $i->id_estoque_fk ?? null,
                 'quantidade' => $i->quantidade,
             ])->all()
         );
@@ -229,9 +278,10 @@ class VendaService
 
             foreach ($cart->items as $ci) {
                 $produtoId = $this->produtoIdPorCodigo($ci->cod_produto);
+                $estoqueId = $ci->id_estoque_fk ? (int) $ci->id_estoque_fk : null;
 
-                // Baixa estoque FIFO
-                $this->baixarEstoqueFIFO($produtoId, $ci->quantidade);
+                // Baixa estoque (se veio via QR, usa o lote; senao FIFO)
+                $this->baixarEstoque($produtoId, $ci->quantidade, $estoqueId);
 
                 // Grava item do pedido (coluna é sub_valor)
                 $oi = new OrderItem();
@@ -254,6 +304,9 @@ class VendaService
 
                 $venda = new Venda();
                 $venda->id_produto_fk = $produtoId;
+                if ($estoqueId) {
+                    $venda->id_estoque_fk = $estoqueId;
+                }
                 $venda->id_usuario_fk = auth()->id(); // se null e a coluna não aceitar, ajuste o default no schema
                 $venda->quantidade = $ci->quantidade;
                 $venda->preco_venda = $ci->preco_unit;
@@ -280,9 +333,32 @@ class VendaService
         });
     }
 
-    protected function baixarEstoqueFIFO(int $produtoId, int $qtdNecessaria): void
+    protected function baixarEstoque(int $produtoId, int $qtdNecessaria, ?int $estoqueId = null): void
     {
         if ($qtdNecessaria <= 0) {
+            return;
+        }
+
+        if ($estoqueId) {
+            $lote = Estoque::query()
+                ->whereKey($estoqueId)
+                ->lockForUpdate()
+                ->firstOrFail();
+
+            if ((int) $lote->id_produto_fk !== $produtoId) {
+                throw ValidationException::withMessages([
+                    'estoque' => "Lote {$estoqueId} nao pertence ao produto {$produtoId}."
+                ]);
+            }
+
+            if ((int) $lote->status !== 1 || (int) $lote->quantidade < $qtdNecessaria) {
+                throw ValidationException::withMessages([
+                    'estoque' => "Estoque insuficiente no lote {$estoqueId}."
+                ]);
+            }
+
+            $lote->quantidade -= $qtdNecessaria;
+            $lote->save();
             return;
         }
 
@@ -374,19 +450,21 @@ class VendaService
             ->first();
     }
 
-    private function resolvePrecoUnitario(Produto $produto, int $quantidade, ?TabelaPreco $tabelaPreco): float
+    private function resolvePrecoUnitario(Produto $produto, int $quantidade, ?TabelaPreco $tabelaPreco, ?Estoque $estoque = null): float
     {
-        $precoEstoque = (float) (Estoque::where('id_produto_fk', $produto->id_produto)
-            ->where('status', 1)
-            ->orderByDesc('preco_venda')
-            ->value('preco_venda') ?? 0);
+        $precoEstoque = $estoque
+            ? (float) ($estoque->preco_venda ?? 0)
+            : (float) (Estoque::where('id_produto_fk', $produto->id_produto)
+                ->where('status', 1)
+                ->orderByDesc('preco_venda')
+                ->value('preco_venda') ?? 0);
 
         if (!$tabelaPreco) {
             return $precoEstoque;
         }
 
         if ($tabelaPreco->tipo_alvo === 'produto') {
-            $context = $this->resolveContextoProduto($produto);
+            $context = $this->resolveContextoProduto($produto, $estoque);
             $marcaId = $context['marca_id'] ?? null;
             $fornecedorId = $context['fornecedor_id'] ?? null;
 
@@ -436,8 +514,15 @@ class VendaService
         return round($preco, 2);
     }
 
-    private function resolveContextoProduto(Produto $produto): array
+    private function resolveContextoProduto(Produto $produto, ?Estoque $estoque = null): array
     {
+        if ($estoque) {
+            return [
+                'marca_id' => $estoque->id_marca_fk,
+                'fornecedor_id' => $estoque->id_fornecedor_fk,
+            ];
+        }
+
         $lote = Estoque::query()
             ->where('id_produto_fk', $produto->id_produto)
             ->where('status', 1)

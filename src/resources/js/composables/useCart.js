@@ -17,6 +17,7 @@ export function useCart() {
         rowKey: `server-${item.id}`,
         id: Number(item.id),
         id_produto: Number(item.id_produto ?? 0),
+        id_estoque: item.id_estoque_fk ? Number(item.id_estoque_fk) : null,
         name: item.nome_produto,
         code: item.cod_produto,
         unitPrice: normalizeMoney(item.preco_unit),
@@ -25,16 +26,17 @@ export function useCart() {
       }))
     }
 
-    return stagedItems.value.map((item) => ({
-      kind: 'local',
-      rowKey: `local-${item.localId}`,
-      id: item.localId,
-      id_produto: Number(item.id_produto),
-      name: item.nome_produto,
-      code: item.cod_produto,
-      unitPrice: normalizeMoney(item.preco_venda),
-      quantity: Number(item.quantidade || 0),
-      subtotal: normalizeMoney(item.preco_venda) * Number(item.quantidade || 0),
+      return stagedItems.value.map((item) => ({
+        kind: 'local',
+        rowKey: `local-${item.localId}`,
+        id: item.localId,
+        id_produto: Number(item.id_produto),
+        id_estoque: item.id_estoque ?? null,
+        name: item.nome_produto,
+        code: item.cod_produto,
+        unitPrice: normalizeMoney(item.preco_venda),
+        quantity: Number(item.quantidade || 0),
+        subtotal: normalizeMoney(item.preco_venda) * Number(item.quantidade || 0),
     }))
   })
 
@@ -66,7 +68,13 @@ export function useCart() {
   }
 
   function addProductToStaged(product, quantity = 1) {
-    const existing = stagedItems.value.find((item) => Number(item.id_produto) === Number(product.id_produto))
+    const estoqueId = product.id_estoque ? Number(product.id_estoque) : null
+    const existing = stagedItems.value.find((item) => {
+      if (estoqueId) {
+        return Number(item.id_estoque) === estoqueId
+      }
+      return Number(item.id_produto) === Number(product.id_produto) && !item.id_estoque
+    })
     if (existing) {
       existing.quantidade += quantity
       return
@@ -75,6 +83,7 @@ export function useCart() {
     stagedItems.value.push({
       localId: Date.now() + Math.round(Math.random() * 1000),
       id_produto: Number(product.id_produto),
+      id_estoque: estoqueId,
       cod_produto: product.cod_produto,
       nome_produto: product.nome_produto,
       preco_venda: normalizeMoney(product.preco_venda),
@@ -94,6 +103,7 @@ export function useCart() {
       const { data } = await axios.post(route('adicionar.venda'), {
         client: client.value,
         id_produto: Number(product.id_produto),
+        id_estoque: product.id_estoque ? Number(product.id_estoque) : null,
         quantidade: quantity,
       })
 
@@ -191,6 +201,7 @@ export function useCart() {
         await axios.post(route('adicionar.venda'), {
           client: client.value,
           id_produto: Number(item.id_produto),
+          id_estoque: item.id_estoque ? Number(item.id_estoque) : null,
           quantidade: Number(item.quantidade || 1),
         })
       }
