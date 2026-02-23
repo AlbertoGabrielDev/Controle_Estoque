@@ -33,7 +33,6 @@ class ValidacaoProdutoEditar extends FormRequest
             'unidade_medida_id' => 'required|integer|exists:unidades_medida,id',
             'item_id' => 'nullable|integer|exists:itens,id',
             'inf_nutriente' => 'nullable|string',
-            'qrcode' => 'nullable|string|max:255',
             'id_categoria_fk' => 'required|integer|exists:categorias,id_categoria',
         ];
     }

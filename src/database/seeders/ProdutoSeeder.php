@@ -8,7 +8,6 @@ use App\Models\UnidadeMedida;
 use App\Models\Item;
 use Database\Factories\ProdutoFactory;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Str;
 
 class ProdutoSeeder extends Seeder
 {
@@ -48,7 +47,6 @@ class ProdutoSeeder extends Seeder
                     'unidade_medida_id' => $unidade?->id,
                     'item_id'        => $item?->id,
                     'status'         => 1,
-                    'qrcode'         => (string) Str::uuid(),
                     'id_users_fk'    => 1,
                 ]
             );

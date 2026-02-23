@@ -11,7 +11,6 @@ use Illuminate\Support\Facades\Auth;
 use Prettus\Repository\Contracts\RepositoryInterface;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Http\Request;
-use Illuminate\Support\Str;
 use Yajra\DataTables\Facades\DataTables;
 use App\Support\DataTableActions;
 use Illuminate\Support\Facades\DB;
@@ -108,7 +107,6 @@ class ProdutoRepository
             'unidade_medida_id' => $request->unidade_medida_id,
             'item_id' => $request->item_id,
             'inf_nutriente' => $request->inf_nutriente ? json_encode($request->inf_nutriente) : null,
-            'qrcode' => Str::uuid(),
             'id_users_fk' => Auth::id()
         ]);
         $produtoId = Produto::latest('id_produto')->first();
@@ -156,7 +154,6 @@ class ProdutoRepository
         $produto->update([
             'cod_produto' => $request->cod_produto,
             'nome_produto' => $request->nome_produto,
-            'qrcode' => $request->qrcode,
             'descricao' => $request->descricao,
             'unidade_medida' => $unidadeCodigo,
             'unidade_medida_id' => $request->unidade_medida_id,

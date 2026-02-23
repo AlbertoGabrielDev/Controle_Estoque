@@ -33,7 +33,6 @@ class Produto extends Model implements Transformable
         'item_id',
         'inf_nutriente',
         'id_users_fk',
-        'qrcode',
         'status'
     ];
 

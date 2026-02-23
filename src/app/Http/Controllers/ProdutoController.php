@@ -13,7 +13,6 @@ use App\Support\DataTableActions;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
 use Inertia\Inertia;
 
 class ProdutoController extends Controller
@@ -85,7 +84,6 @@ class ProdutoController extends Controller
             'unidade_medida_id' => $validated['unidade_medida_id'],
             'item_id' => $validated['item_id'] ?? null,
             'inf_nutriente' => $nutrition,
-            'qrcode' => (string) Str::uuid(),
             'id_users_fk' => Auth::id(),
         ]);
 
@@ -140,7 +138,6 @@ class ProdutoController extends Controller
             'unidade_medida' => $unidadeCodigo,
             'unidade_medida_id' => $validated['unidade_medida_id'],
             'item_id' => $validated['item_id'] ?? null,
-            'qrcode' => $validated['qrcode'] ?? $produto->qrcode,
             'inf_nutriente' => $nutrition,
         ]);
 

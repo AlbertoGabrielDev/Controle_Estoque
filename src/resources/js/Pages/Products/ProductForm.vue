@@ -4,7 +4,6 @@ const props = defineProps({
   categorias: { type: Array, default: () => [] },
   unidades: { type: Array, default: () => [] },
   itens: { type: Array, default: () => [] },
-  showQrcode: { type: Boolean, default: false },
   submitLabel: { type: String, default: 'Salvar' },
 })
 
@@ -43,13 +42,6 @@ defineEmits(['submit'])
           </option>
         </select>
         <div v-if="props.form.errors.unidade_medida_id" class="text-red-600 text-sm mt-1">{{ props.form.errors.unidade_medida_id }}</div>
-      </div>
-    </div>
-
-    <div v-if="props.showQrcode" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-      <div>
-        <label class="block text-sm font-medium">QR Code</label>
-        <input v-model="props.form.qrcode" class="mt-1 border rounded px-3 py-2 w-full">
       </div>
     </div>
 

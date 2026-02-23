@@ -879,7 +879,6 @@ class ProdutoFactory extends Factory
             'inf_nutriente' => json_encode($produto['inf_nutriente']),
             'unidade_medida' => $this->faker->randomElement(['kg', 'g', 'ml', 'L']),
             'status' => $this->faker->boolean(),
-            'qrcode' => $this->faker->uuid(),
             'id_users_fk' => 1,
         ];
     }
