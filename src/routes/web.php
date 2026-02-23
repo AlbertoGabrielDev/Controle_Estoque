@@ -22,7 +22,6 @@ use App\Http\Controllers\UnidadeController;
 use App\Http\Controllers\UnidadeMedidaController;
 use App\Http\Controllers\ItemController;
 use App\Http\Controllers\TabelaPrecoController;
-use App\Http\Controllers\ImpostoController;
 use App\Http\Controllers\CentroCustoController;
 use App\Http\Controllers\ContaContabilController;
 use App\Http\Controllers\VendaController;
@@ -213,17 +212,6 @@ Route::middleware([
             Route::put('/{tabela_preco}', [TabelaPrecoController::class, 'update'])->name('update');
             Route::delete('/{tabela_preco}', [TabelaPrecoController::class, 'destroy'])->name('destroy');
             Route::post('/status/{modelName}/{id}', [TabelaPrecoController::class, 'updateStatus'])->name('status');
-        });
-
-        Route::prefix('/impostos')->name('impostos.')->group(function () {
-            Route::get('/', [ImpostoController::class, 'index'])->name('index');
-            Route::get('/data', [ImpostoController::class, 'data'])->name('data');
-            Route::get('/create', [ImpostoController::class, 'create'])->name('create');
-            Route::post('/', [ImpostoController::class, 'store'])->name('store');
-            Route::get('/{imposto}/edit', [ImpostoController::class, 'edit'])->name('edit');
-            Route::put('/{imposto}', [ImpostoController::class, 'update'])->name('update');
-            Route::delete('/{imposto}', [ImpostoController::class, 'destroy'])->name('destroy');
-            Route::post('/status/{modelName}/{id}', [ImpostoController::class, 'updateStatus'])->name('status');
         });
 
         Route::prefix('/centros-custo')->name('centros_custo.')->group(function () {

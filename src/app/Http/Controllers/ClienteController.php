@@ -7,7 +7,7 @@ use App\Http\Requests\ClienteUpdateRequest;
 use App\Models\Cliente;
 use App\Repositories\ClienteRepository;
 use App\Models\CustomerSegment;
-use App\Models\Imposto;
+use App\Models\Tax;
 use App\Models\TabelaPreco;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -68,7 +68,8 @@ class ClienteController extends Controller
                 ->select('id', 'codigo', 'nome')
                 ->orderBy('nome')
                 ->get(),
-            'impostos' => Imposto::query()
+            'impostos' => Tax::query()
+                ->where('ativo', true)
                 ->select('id', 'codigo', 'nome')
                 ->orderBy('nome')
                 ->get(),
@@ -108,7 +109,8 @@ class ClienteController extends Controller
                 ->select('id', 'codigo', 'nome')
                 ->orderBy('nome')
                 ->get(),
-            'impostos' => Imposto::query()
+            'impostos' => Tax::query()
+                ->where('ativo', true)
                 ->select('id', 'codigo', 'nome')
                 ->orderBy('nome')
                 ->get(),

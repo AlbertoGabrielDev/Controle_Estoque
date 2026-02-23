@@ -8,8 +8,8 @@ use App\Traits\HasStatus;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use App\Models\Imposto;
 use App\Models\TabelaPreco;
+use App\Models\Tax;
 
 class Cliente extends Model
 {
@@ -76,7 +76,7 @@ class Cliente extends Model
 
     public function impostoPadrao(): BelongsTo
     {
-        return $this->belongsTo(Imposto::class, 'imposto_padrao_id');
+        return $this->belongsTo(Tax::class, 'imposto_padrao_id');
     }
 
     protected static function booted(): void

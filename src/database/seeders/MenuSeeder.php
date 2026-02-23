@@ -311,17 +311,8 @@ class MenuSeeder extends Seeder
             ]
         );
 
-        Menu::updateOrCreate(
-            ['slug' => 'impostos'],
-            [
-                'name' => 'Impostos',
-                'slug' => 'impostos',
-                'icon' => 'fas fa-percent mr-2',
-                'route' => 'impostos.index',
-                'parent_id' => $cadastros->id,
-                'order' => 7,
-            ]
-        );
+        // Remove menu antigo de Impostos (MDM), mantemos apenas Taxas (Imposto)
+        Menu::where('slug', 'impostos')->delete();
 
         Menu::updateOrCreate(
             ['slug' => 'centros_custo'],

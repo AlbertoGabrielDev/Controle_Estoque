@@ -45,7 +45,7 @@ return new class extends Migration
             if (Schema::hasColumn('clientes', 'imposto_padrao_id')) {
                 $table->foreign('imposto_padrao_id')
                     ->references('id')
-                    ->on('impostos')
+                    ->on('taxes')
                     ->nullOnDelete();
             }
         });

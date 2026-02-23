@@ -118,6 +118,8 @@ const USE_PRINCIPAL = [
   /^Brands\//, /^Units\//, /^Categories\//, /^Suppliers\//, /^Users\//,
   /^Products\//, /^Stock\//,
   /^Clients\//, /^Segments\//, /^Taxes\//,
+  // Cadastro Mestre (MDM)
+  /^MeasureUnits\//, /^Items\//, /^PriceTables\//, /^CostCenters\//, /^AccountingAccounts\//,
 ]
 
 createInertiaApp({

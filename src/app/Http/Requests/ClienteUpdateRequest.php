@@ -49,7 +49,7 @@ class ClienteUpdateRequest extends FormRequest
             'tabela_preco'=> ['nullable', 'string', 'max:60'],
             'condicao_pagamento' => ['nullable', 'string', 'max:60'],
             'tabela_preco_id' => ['nullable', 'integer', 'exists:tabelas_preco,id'],
-            'imposto_padrao_id' => ['nullable', 'integer', 'exists:impostos,id'],
+            'imposto_padrao_id' => ['nullable', 'integer', 'exists:taxes,id'],
             'ativo'       => ['required', 'boolean'],
             'status'      => ['nullable', 'in:0,1'],
             'observacoes' => ['nullable', 'string'],
