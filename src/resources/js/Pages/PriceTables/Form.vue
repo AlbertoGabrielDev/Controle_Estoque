@@ -5,8 +5,6 @@ const props = defineProps({
   form: { type: Object, required: true },
   itens: { type: Array, default: () => [] },
   produtos: { type: Array, default: () => [] },
-  marcas: { type: Array, default: () => [] },
-  fornecedores: { type: Array, default: () => [] },
   marcasPorProduto: { type: Object, default: () => ({}) },
   fornecedoresPorProduto: { type: Object, default: () => ({}) },
   submitLabel: { type: String, default: 'Salvar' },
@@ -50,8 +48,7 @@ function marcasForRow(row) {
   if (list.some((item) => Number(item.id_marca) === selectedId)) {
     return list
   }
-  const fallback = (props.marcas ?? []).find((item) => Number(item.id_marca) === selectedId)
-  return fallback ? [...list, fallback] : list
+  return [...list, { id_marca: selectedId, nome_marca: `Marca #${selectedId}` }]
 }
 
 function fornecedoresForRow(row) {
@@ -67,8 +64,7 @@ function fornecedoresForRow(row) {
   if (list.some((item) => Number(item.id_fornecedor) === selectedId)) {
     return list
   }
-  const fallback = (props.fornecedores ?? []).find((item) => Number(item.id_fornecedor) === selectedId)
-  return fallback ? [...list, fallback] : list
+  return [...list, { id_fornecedor: selectedId, nome_fornecedor: `Fornecedor #${selectedId}` }]
 }
 
 function onProdutoChange(row) {
@@ -243,4 +239,3 @@ watch(
     </div>
   </form>
 </template>
-

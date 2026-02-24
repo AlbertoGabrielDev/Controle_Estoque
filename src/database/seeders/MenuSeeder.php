@@ -349,5 +349,17 @@ class MenuSeeder extends Seeder
                 'order' => 9,
             ]
         );
+
+        Menu::updateOrCreate(
+            ['slug' => 'despesas'],
+            [
+                'name' => 'Despesas',
+                'slug' => 'despesas',
+                'icon' => 'fas fa-receipt mr-2',
+                'route' => 'despesas.index',
+                'parent_id' => $cadastros->id,
+                'order' => 10,
+            ]
+        );
     }
 }

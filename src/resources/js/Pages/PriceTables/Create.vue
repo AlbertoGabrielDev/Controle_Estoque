@@ -5,8 +5,6 @@ import PriceTableForm from './Form.vue'
 const props = defineProps({
   itens: { type: Array, default: () => [] },
   produtos: { type: Array, default: () => [] },
-  marcas: { type: Array, default: () => [] },
-  fornecedores: { type: Array, default: () => [] },
   marcasPorProduto: { type: Object, default: () => ({}) },
   fornecedoresPorProduto: { type: Object, default: () => ({}) },
 })
@@ -67,8 +65,6 @@ function submit() {
     :form="form"
     :itens="props.itens"
     :produtos="props.produtos"
-    :marcas="props.marcas"
-    :fornecedores="props.fornecedores"
     :marcas-por-produto="props.marcasPorProduto"
     :fornecedores-por-produto="props.fornecedoresPorProduto"
     submit-label="Criar Tabela"

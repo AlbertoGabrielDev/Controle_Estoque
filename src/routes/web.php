@@ -24,6 +24,7 @@ use App\Http\Controllers\ItemController;
 use App\Http\Controllers\TabelaPrecoController;
 use App\Http\Controllers\CentroCustoController;
 use App\Http\Controllers\ContaContabilController;
+use App\Http\Controllers\DespesaController;
 use App\Http\Controllers\VendaController;
 use App\Http\Controllers\SpreadsheetController;
 use App\Http\Controllers\SalesSettingsController;
@@ -235,6 +236,17 @@ Route::middleware([
             Route::put('/{conta_contabil}', [ContaContabilController::class, 'update'])->name('update');
             Route::delete('/{conta_contabil}', [ContaContabilController::class, 'destroy'])->name('destroy');
             Route::post('/status/{modelName}/{id}', [ContaContabilController::class, 'updateStatus'])->name('status');
+        });
+
+        Route::prefix('/despesas')->name('despesas.')->group(function () {
+            Route::get('/', [DespesaController::class, 'index'])->name('index');
+            Route::get('/data', [DespesaController::class, 'data'])->name('data');
+            Route::get('/create', [DespesaController::class, 'create'])->name('create');
+            Route::post('/', [DespesaController::class, 'store'])->name('store');
+            Route::get('/{despesa}/edit', [DespesaController::class, 'edit'])->name('edit');
+            Route::put('/{despesa}', [DespesaController::class, 'update'])->name('update');
+            Route::delete('/{despesa}', [DespesaController::class, 'destroy'])->name('destroy');
+            Route::post('/status/{modelName}/{id}', [DespesaController::class, 'updateStatus'])->name('status');
         });
     });
 
