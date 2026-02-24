@@ -29,6 +29,7 @@ class DatabaseSeeder extends Seeder
             TabelaPrecoSeeder::class,
             CentroCustoSeeder::class,
             ContaContabilSeeder::class,
+            DespesaSeeder::class,
             TaxSeeder::class,
             SupermercadoBasicoTaxesSeeder::class,
             EstoqueSeeder::class,

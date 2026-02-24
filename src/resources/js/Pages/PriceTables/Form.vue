@@ -1,5 +1,5 @@
-<script setup>
-import { computed, watch } from 'vue'
+﻿<script setup>
+import { computed, ref, watch } from 'vue'
 
 const props = defineProps({
   form: { type: Object, required: true },
@@ -8,6 +8,8 @@ const props = defineProps({
   marcasPorProduto: { type: Object, default: () => ({}) },
   fornecedoresPorProduto: { type: Object, default: () => ({}) },
   submitLabel: { type: String, default: 'Salvar' },
+  enablePagination: { type: Boolean, default: false },
+  pageSize: { type: Number, default: 10 },
 })
 
 defineEmits(['submit'])
@@ -27,6 +29,45 @@ const options = computed(() => {
 })
 
 const filteredOptions = () => options.value
+
+const pageSizeOptions = [10, 25, 50, 100]
+const currentPage = ref(1)
+const perPage = ref(props.pageSize)
+
+const totalItems = computed(() => props.form.itens.length)
+const totalPages = computed(() => {
+  if (!props.enablePagination) return 1
+  return Math.max(1, Math.ceil(totalItems.value / perPage.value))
+})
+const pageStart = computed(() => {
+  if (!props.enablePagination) return 0
+  return (currentPage.value - 1) * perPage.value
+})
+const pagedItens = computed(() => {
+  if (!props.enablePagination) return props.form.itens
+  return props.form.itens.slice(pageStart.value, pageStart.value + perPage.value)
+})
+const pageEnd = computed(() => Math.min(pageStart.value + pagedItens.value.length, totalItems.value))
+const showPagination = computed(() => props.enablePagination && totalItems.value > perPage.value)
+
+function clampPage() {
+  if (!props.enablePagination) return
+  if (currentPage.value > totalPages.value) currentPage.value = totalPages.value
+  if (currentPage.value < 1) currentPage.value = 1
+}
+
+function goToPage(page) {
+  if (!props.enablePagination) return
+  currentPage.value = Math.min(Math.max(page, 1), totalPages.value)
+}
+
+function previousPage() {
+  goToPage(currentPage.value - 1)
+}
+
+function nextPage() {
+  goToPage(currentPage.value + 1)
+}
 
 function resolveProductKey(value) {
   if (value === null || value === undefined || value === '') {
@@ -82,10 +123,14 @@ function addItem() {
     desconto_percent: 0,
     quantidade_minima: 1,
   })
+  if (props.enablePagination) {
+    currentPage.value = Math.max(1, Math.ceil(props.form.itens.length / perPage.value))
+  }
 }
 
 function removeItem(index) {
   props.form.itens.splice(index, 1)
+  clampPage()
 }
 
 watch(
@@ -93,9 +138,14 @@ watch(
   (novo, antigo) => {
     if (antigo && novo !== antigo) {
       props.form.itens = []
+      currentPage.value = 1
     }
   }
 )
+
+watch([totalItems, perPage], () => {
+  clampPage()
+})
 </script>
 
 <template>
@@ -161,10 +211,18 @@ watch(
     </div>
 
     <div class="border-t pt-4">
-      <div class="flex items-center justify-between mb-3">
+      <div class="flex flex-wrap items-center justify-between gap-3 mb-3">
         <h3 class="font-semibold">
           {{ props.form.tipo_alvo === 'produto' ? 'Produtos e Preços' : 'Itens e Preços' }}
         </h3>
+        <div v-if="props.enablePagination" class="flex items-center gap-2 text-sm text-slate-600">
+          <span>Itens por página</span>
+          <select v-model.number="perPage" class="border rounded px-2 py-1">
+            <option v-for="size in pageSizeOptions" :key="size" :value="size">
+              {{ size }}
+            </option>
+          </select>
+        </div>
       </div>
 
       <div class="overflow-x-auto">
@@ -181,14 +239,14 @@ watch(
             </tr>
           </thead>
           <tbody>
-            <tr v-for="(row, index) in props.form.itens" :key="index" class="border-t">
+            <tr v-for="(row, index) in pagedItens" :key="pageStart + index" class="border-t">
               <td class="px-3 py-2">
                 <select v-model="row.item_id" class="border rounded px-2 py-1 w-full" @change="onProdutoChange(row)">
                   <option value="">Selecione</option>
                   <option v-for="opt in filteredOptions()" :key="opt.id" :value="opt.id">{{ opt.label }}</option>
                 </select>
-                <div v-if="props.form.errors[`itens.${index}.${props.form.tipo_alvo === 'produto' ? 'produto_id' : 'item_id'}`]" class="text-red-600 text-xs mt-1">
-                  {{ props.form.errors[`itens.${index}.${props.form.tipo_alvo === 'produto' ? 'produto_id' : 'item_id'}`] }}
+                <div v-if="props.form.errors[`itens.${pageStart + index}.${props.form.tipo_alvo === 'produto' ? 'produto_id' : 'item_id'}`]" class="text-red-600 text-xs mt-1">
+                  {{ props.form.errors[`itens.${pageStart + index}.${props.form.tipo_alvo === 'produto' ? 'produto_id' : 'item_id'}`] }}
                 </div>
               </td>
               <td v-if="props.form.tipo_alvo === 'produto'" class="px-3 py-2">
@@ -198,8 +256,8 @@ watch(
                     {{ m.nome_marca }}
                   </option>
                 </select>
-                <div v-if="props.form.errors[`itens.${index}.marca_id`]" class="text-red-600 text-xs mt-1">
-                  {{ props.form.errors[`itens.${index}.marca_id`] }}
+                <div v-if="props.form.errors[`itens.${pageStart + index}.marca_id`]" class="text-red-600 text-xs mt-1">
+                  {{ props.form.errors[`itens.${pageStart + index}.marca_id`] }}
                 </div>
               </td>
               <td v-if="props.form.tipo_alvo === 'produto'" class="px-3 py-2">
@@ -209,8 +267,8 @@ watch(
                     {{ f.nome_fornecedor }}
                   </option>
                 </select>
-                <div v-if="props.form.errors[`itens.${index}.fornecedor_id`]" class="text-red-600 text-xs mt-1">
-                  {{ props.form.errors[`itens.${index}.fornecedor_id`] }}
+                <div v-if="props.form.errors[`itens.${pageStart + index}.fornecedor_id`]" class="text-red-600 text-xs mt-1">
+                  {{ props.form.errors[`itens.${pageStart + index}.fornecedor_id`] }}
                 </div>
               </td>
               <td class="px-3 py-2">
@@ -223,14 +281,40 @@ watch(
                 <input v-model="row.quantidade_minima" type="number" step="1" min="1" class="border rounded px-2 py-1 w-full">
               </td>
               <td class="px-3 py-2">
-                <button type="button" class="px-2 py-1 rounded bg-red-50 text-red-600" @click="removeItem(index)">Remover</button>
+                <button type="button" class="px-2 py-1 rounded bg-red-50 text-red-600" @click="removeItem(pageStart + index)">Remover</button>
               </td>
             </tr>
             <tr v-if="!props.form.itens.length">
-              <td colspan="5" class="px-3 py-3 text-center text-slate-500">Nenhum item adicionado.</td>
+              <td :colspan="props.form.tipo_alvo === 'produto' ? 7 : 5" class="px-3 py-3 text-center text-slate-500">
+                Nenhum item adicionado.
+              </td>
             </tr>
           </tbody>
         </table>
+      </div>
+      <div v-if="showPagination" class="flex flex-wrap items-center justify-between gap-3 mt-3 text-sm">
+        <div class="text-slate-600">
+          Mostrando {{ pageStart + 1 }} - {{ pageEnd }} de {{ totalItems }}
+        </div>
+        <div class="flex items-center gap-2">
+          <button
+            type="button"
+            class="px-2 py-1 rounded border disabled:opacity-50"
+            :disabled="currentPage === 1"
+            @click="previousPage"
+          >
+            Anterior
+          </button>
+          <span class="text-slate-600">Página {{ currentPage }} de {{ totalPages }}</span>
+          <button
+            type="button"
+            class="px-2 py-1 rounded border disabled:opacity-50"
+            :disabled="currentPage === totalPages"
+            @click="nextPage"
+          >
+            Próxima
+          </button>
+        </div>
       </div>
     </div>
 

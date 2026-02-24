@@ -85,8 +85,8 @@ function submit() {
     :produtos="props.produtos"
     :marcas-por-produto="props.marcasPorProduto"
     :fornecedores-por-produto="props.fornecedoresPorProduto"
+    enable-pagination
     submit-label="Salvar Alterações"
     @submit="submit"
   />
 </template>
-
