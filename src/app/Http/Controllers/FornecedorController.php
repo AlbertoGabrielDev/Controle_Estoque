@@ -24,7 +24,7 @@ class FornecedorController extends Controller
         return Inertia::render('Suppliers/Index', [
             'filters' => [
                 'q' => (string) $request->query('q', ''),
-                'ativo' => (string) $request->query('ativo', ''),
+                'status' => (string) $request->query('status', $request->query('ativo', '')),
             ],
         ]);
     }

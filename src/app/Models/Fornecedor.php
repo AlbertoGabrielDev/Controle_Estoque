@@ -104,6 +104,13 @@ class Fornecedor extends Model
                     "{$t}.email",
                 ],
             ],
+            'status' => [
+                'type' => 'select',
+                'column' => "{$t}.status",
+                'cast' => 'int',
+                'operator' => '=',
+                'nullable' => true,
+            ],
             'ativo' => [
                 'type' => 'select',
                 'column' => "{$t}.ativo",

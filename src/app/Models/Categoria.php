@@ -105,6 +105,13 @@ class Categoria extends Model
                     "{$t}.nome_categoria",
                 ],
             ],
+            'status' => [
+                'type' => 'select',
+                'column' => "{$t}.status",
+                'cast' => 'int',
+                'operator' => '=',
+                'nullable' => true,
+            ],
             'ativo' => [
                 'type' => 'select',
                 'column' => "{$t}.ativo",

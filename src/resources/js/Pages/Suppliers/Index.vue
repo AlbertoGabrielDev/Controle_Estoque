@@ -10,7 +10,7 @@ const props = defineProps({
 
 const form = reactive({
   q: props.filters?.q ?? '',
-  ativo: props.filters?.ativo ?? '',
+  status: props.filters?.status ?? '',
 })
 
 const dtColumns = [
@@ -55,7 +55,7 @@ onBeforeUnmount(() => stopSyncFilters())
       class="px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500"
       placeholder="Buscar por código, nome ou NIF/CIF"
     >
-    <select v-model="form.ativo" class="px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500">
+    <select v-model="form.status" class="px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500">
       <option value="">Ativo</option>
       <option :value="1">Ativo</option>
       <option :value="0">Inativo</option>

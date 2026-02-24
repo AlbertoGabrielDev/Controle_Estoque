@@ -44,7 +44,7 @@ class CategoriaController extends Controller
         return Inertia::render('Categories/Index', [
             'filters' => [
                 'q' => (string) $request->query('q', ''),
-                'ativo' => (string) $request->query('ativo', ''),
+                'status' => (string) $request->query('status', $request->query('ativo', '')),
             ],
         ]);
     }
@@ -71,6 +71,12 @@ class CategoriaController extends Controller
 
     public function cadastro()
     {
+        if (!\Schema::hasTable('categorias')) {
+            return Inertia::render('Categories/Create', [
+                'categoriasPai' => [],
+            ]);
+        }
+
         return Inertia::render('Categories/Create', [
             'categoriasPai' => Categoria::query()
                 ->select('id_categoria', 'nome_categoria')

@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\AppSetting;
+use Illuminate\Support\Facades\Schema;
 
 class AppSettingService
 {
@@ -11,6 +12,10 @@ class AppSettingService
 
     public function getBool(string $key, bool $default = false): bool
     {
+        if (!Schema::hasTable('app_settings')) {
+            return $default;
+        }
+
         $value = AppSetting::query()->where('key', $key)->value('value');
         if ($value === null) {
             return $default;
@@ -26,6 +31,10 @@ class AppSettingService
 
     public function setBool(string $key, bool $value): void
     {
+        if (!Schema::hasTable('app_settings')) {
+            return;
+        }
+
         AppSetting::updateOrCreate(
             ['key' => $key],
             ['value' => $value ? '1' : '0']
