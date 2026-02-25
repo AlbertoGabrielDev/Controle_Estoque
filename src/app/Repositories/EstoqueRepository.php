@@ -2,20 +2,6 @@
 
 namespace App\Repositories;
 
-use Prettus\Repository\Contracts\RepositoryInterface;
-
-/**
- * Interface EstoqueRepository.
- *
- * @package namespace App\Repositories;
- */
-interface EstoqueRepository extends RepositoryInterface
+interface EstoqueRepository extends \Modules\Stock\Repositories\EstoqueRepository
 {
-    public function cadastro();
-
-    public function inserirEstoque(array $data);
-
-    public function editar($estoqueId);
-
-    public function salvarEditar(array $data, $estoqueId);
 }

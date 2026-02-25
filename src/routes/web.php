@@ -1,19 +1,15 @@
 <?php
 
-use App\Http\Controllers\Api\GraficosApiController;
 use App\Http\Controllers\BotWhatsappController;
 use App\Http\Controllers\BusinessController;
-use App\Http\Controllers\CalendarController;
 use App\Http\Controllers\ClienteController;
 use App\Http\Controllers\CustomerSegmentController;
-use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\MessageTemplateController;
 use App\Http\Controllers\TaxRuleController;
 use App\Http\Controllers\WhatsAppContactsController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\CategoriaController;
 use App\Http\Controllers\ProdutoController;
-use App\Http\Controllers\EstoqueController;
 use App\Http\Controllers\FornecedorController;
 use App\Http\Controllers\UsuarioController;
 use App\Http\Controllers\MarcaController;
@@ -21,11 +17,9 @@ use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UnidadeController;
 use App\Http\Controllers\UnidadeMedidaController;
 use App\Http\Controllers\ItemController;
-use App\Http\Controllers\TabelaPrecoController;
 use App\Http\Controllers\CentroCustoController;
 use App\Http\Controllers\ContaContabilController;
 use App\Http\Controllers\DespesaController;
-use App\Http\Controllers\VendaController;
 use App\Http\Controllers\SpreadsheetController;
 use App\Http\Controllers\SalesSettingsController;
 use Illuminate\Foundation\Application;
@@ -109,23 +103,6 @@ Route::middleware([
     });
 
 
-    Route::prefix('/estoque')->group(function () {
-        Route::get('/', [EstoqueController::class, 'index'])->name('estoque.index')->middleware('check.permission:view_post,estoque');
-        Route::get('/data', [EstoqueController::class, 'data'])->name('estoque.data')->middleware('check.permission:view_post,estoque');
-        Route::get('/cadastro', [EstoqueController::class, 'cadastro'])->name('estoque.cadastro')->middleware('check.permission:create_post,estoque');
-        Route::post('/cadastro', [EstoqueController::class, 'inserirEstoque'])->name('estoque.inserirEstoque');
-        Route::get('/buscar-estoque', [EstoqueController::class, 'buscar'])->name('estoque.buscar');
-        Route::post('/calc-impostos', [EstoqueController::class, 'calcImpostos'])->name('estoque.calcImpostos');
-        Route::get('/editar/{estoqueId}', [EstoqueController::class, 'editar'])->name('estoque.editar')->middleware('check.permission:edit_post,estoque');
-        Route::put('/editar/{estoqueId}', [EstoqueController::class, 'salvarEditar'])->name('estoque.salvarEditar');
-        Route::post('/status/{modelName}/{id}', [EstoqueController::class, 'updateStatus'])->middleware('check.permission:status,estoque')->name('estoque.status');
-        Route::get('/quantidade/{estoqueId}/{operacao}', [EstoqueController::class, 'atualizarEstoque'])->name('estoque.quantidade');
-        Route::get('grafico-filtro', [EstoqueController::class, 'graficoFiltro'])->name('estoque.graficoFiltro');
-        Route::get('/grafico', [GraficosApiController::class, 'months'])->name('months');
-
-        Route::get('/historico', [EstoqueController::class, 'historico'])->name('estoque.historico')->middleware('check.permission:view_post,historico');
-    });
-
     Route::prefix('/fornecedor')->group(function () {
         Route::get('/', [FornecedorController::class, 'index'])->name('fornecedor.index')->middleware('check.permission:view_post,fornecedores');
         Route::get('/data', [FornecedorController::class, 'data'])->name('fornecedor.data')->middleware('check.permission:view_post,fornecedores');
@@ -194,17 +171,6 @@ Route::middleware([
             Route::post('/status/{modelName}/{id}', [ItemController::class, 'updateStatus'])->name('status');
         });
 
-        Route::prefix('/tabelas-preco')->name('tabelas_preco.')->group(function () {
-            Route::get('/', [TabelaPrecoController::class, 'index'])->name('index');
-            Route::get('/data', [TabelaPrecoController::class, 'data'])->name('data');
-            Route::get('/create', [TabelaPrecoController::class, 'create'])->name('create');
-            Route::post('/', [TabelaPrecoController::class, 'store'])->name('store');
-            Route::get('/{tabela_preco}/edit', [TabelaPrecoController::class, 'edit'])->name('edit');
-            Route::put('/{tabela_preco}', [TabelaPrecoController::class, 'update'])->name('update');
-            Route::delete('/{tabela_preco}', [TabelaPrecoController::class, 'destroy'])->name('destroy');
-            Route::post('/status/{modelName}/{id}', [TabelaPrecoController::class, 'updateStatus'])->name('status');
-        });
-
         Route::prefix('/centros-custo')->name('centros_custo.')->group(function () {
             Route::get('/', [CentroCustoController::class, 'index'])->name('index');
             Route::get('/data', [CentroCustoController::class, 'data'])->name('data');
@@ -248,20 +214,6 @@ Route::middleware([
         Route::get('/editar/{roleId}', [RoleController::class, 'editar'])->name('roles.editar')->middleware('check.permission:edit_post,permissao');
         Route::put('/editar/{roleId}', [RoleController::class, 'salvarEditar'])->name('roles.salvarEditar')->middleware('check.permission:edit_post,permissao');
         Route::post('/status/{modelName}/{id}', [RoleController::class, 'updateStatus'])->name('roles.status');
-    });
-
-    Route::prefix('/vendas')->group(function () {
-        Route::get('/', [VendaController::class, 'vendas'])->name('vendas.venda')->middleware('check.permission:view_post,vendas');
-        Route::post('/buscar-produto', [VendaController::class, 'buscarProduto'])->name('buscar.produto');
-        Route::post('/verificar-estoque', [VendaController::class, 'verificarEstoque'])->name('verificar.estoque');
-        Route::post('/registrar-venda', [VendaController::class, 'registrarVenda'])->name('registrar.venda');
-        Route::post('/carrinho', [VendaController::class, 'carrinho'])->name('carrinho.venda'); // <-- era /carrinho/carrinho
-        Route::post('/carrinho/adicionar', [VendaController::class, 'adicionarItem'])->name('adicionar.venda');
-        Route::post('/carrinho/quantidade', [VendaController::class, 'atualizarQuantidade'])->name('atualizar_quantidade.venda');
-        Route::post('/carrinho/remover', [VendaController::class, 'removerItem'])->name('remover.venda');
-        Route::get('/vendas', [VendaController::class, 'historicoVendas'])->name('vendas.historico_vendas')->middleware('check.permission:view_post,vendas');
-        Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard.index')->middleware('check.permission:view_post,vendas');
-        Route::get('/calendar', [CalendarController::class, 'index'])->name('vendas.calendar');
     });
 
     Route::prefix('/spreadsheet')->name('spreadsheet.')->group(function () {

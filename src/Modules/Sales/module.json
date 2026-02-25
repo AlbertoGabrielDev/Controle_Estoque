@@ -1,0 +1,6 @@
+{
+  "name": "Sales",
+  "slug": "sales",
+  "enabled": true,
+  "description": "Modulo core de vendas, carrinho e pedidos (Fase 3)."
+}

@@ -1,0 +1,6 @@
+{
+  "name": "Stock",
+  "slug": "stock",
+  "enabled": true,
+  "description": "Modulo core de estoque (Fase 3)."
+}

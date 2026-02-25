@@ -2,16 +2,6 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
-
-class Cart extends Model
+class Cart extends \Modules\Sales\Models\Cart
 {
-    protected $fillable = ['client', 'status', 'total_valor','id_usuario_fk'];
-
-    public function items()
-    {
-        return $this->hasMany(CartItem::class);
-    }
-    use HasFactory;
 }

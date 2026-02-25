@@ -1,0 +1,6 @@
+{
+  "name": "PriceTables",
+  "slug": "price-tables",
+  "enabled": true,
+  "description": "Modulo core de tabelas de preco (Fase 3)."
+}

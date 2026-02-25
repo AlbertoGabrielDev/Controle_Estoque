@@ -7,8 +7,10 @@ organizado dentro de cada modulo.
 Status atual:
 - Fase 0: concluida e revisada (inventario, convencoes e matriz arquitetural por modulo).
 - Fase 1: concluida e revisada (infraestrutura base validada com o padrao arquitetural atualizado).
-- Fase 2: em andamento (cutover de `Products` com wrappers de compatibilidade + DB artifacts do modulo).
+- Fase 2: concluida (modulo `Products` modularizado com wrappers temporarios de compatibilidade).
 - Observacao Fase 2: wrappers de `resources/js/Pages/Products/*` permanecem temporariamente por compatibilidade com testes/contratos legados.
+- Fase 3: concluida (modulos `Stock`/`Estoque`, `PriceTables` e `Sales` com backend/rotas/pages/DB artifacts co-localizados, wrappers de compatibilidade, smoke tests e testes de fluxo minimos).
+- Observacao Fase 3: `Dashboard`/`Calendar` permanecem como componentes compartilhados (`Shared/Core`) nesta etapa, consumidos pelas rotas do modulo `Sales`.
 
 Regras gerais:
 - Cada fase deve terminar com testes PHPunit (rodar com SQLite via Docker).
