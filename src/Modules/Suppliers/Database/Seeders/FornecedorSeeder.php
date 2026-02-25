@@ -17,6 +17,7 @@ class FornecedorSeeder extends Seeder
             Fornecedor::query()->firstOrCreate(
                 ['nome_fornecedor' => $nome],
                 [
+                    'codigo' => sprintf('FOR-%03d', $i),
                     'logradouro' => $faker->streetName(),
                     'numero_casa' => (string) $faker->numberBetween(1, 9999),
                     'bairro' => $faker->word(),

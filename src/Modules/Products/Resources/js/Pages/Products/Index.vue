@@ -152,13 +152,13 @@ function nutritionTitle(data) {
 }
 
 const dtColumns = [
-  { data: 'c1', title: 'CÃ³digo' },
+  { data: 'c1', title: 'Código' },
   linkify({ data: 'c2', title: 'Nome' }, { routeName: 'produtos.editar', idField: 'id' }),
-  { data: 'c3', title: 'DescriÃ§Ã£o', className: 'hidden lg:table-cell' },
+  { data: 'c3', title: 'Descrição', className: 'hidden lg:table-cell' },
   { data: 'c4', title: 'Unidade' },
   {
     data: 'c5',
-    title: 'NutriÃ§Ã£o',
+    title: 'Nutrição',
     orderable: false,
     searchable: false,
     render: (data, type) => {
@@ -173,7 +173,7 @@ const dtColumns = [
       ? '<span class="text-green-700">Ativo</span>'
       : '<span class="text-gray-500">Inativo</span>',
   },
-  { data: 'acoes', title: 'AÃ§Ãµes', orderable: false, searchable: false },
+  { data: 'acoes', title: 'Ações', orderable: false, searchable: false },
 ]
 
 const stopSyncFilters = useQueryFilters(form, 'produtos.index')
@@ -200,7 +200,7 @@ onBeforeUnmount(() => stopSyncFilters())
       v-model="form.q"
       type="text"
       class="px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500"
-      placeholder="Buscar por cÃ³digo, nome, descriÃ§Ã£o ou unidade"
+      placeholder="Buscar por código, nome, descrição ou unidade"
     >
     <select v-model="form.status" class="px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500">
       <option value="">Status</option>
@@ -219,5 +219,4 @@ onBeforeUnmount(() => stopSyncFilters())
     :actions-col-index="6"
   />
 </template>
-
 
