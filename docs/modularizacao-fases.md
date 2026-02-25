@@ -11,7 +11,8 @@ Status atual:
 - Observacao Fase 2: wrappers de `resources/js/Pages/Products/*` permanecem temporariamente por compatibilidade com testes/contratos legados.
 - Fase 3: concluida (modulos `Stock`/`Estoque`, `PriceTables` e `Sales` com backend/rotas/pages/DB artifacts co-localizados, wrappers de compatibilidade, smoke tests e testes de fluxo minimos).
 - Observacao Fase 3: `Dashboard`/`Calendar` permanecem como componentes compartilhados (`Shared/Core`) nesta etapa, consumidos pelas rotas do modulo `Sales`.
-- Fase 4: em andamento (modulos `Brands`/`Marcas`, `Categories`/`Categorias`, `Items`/`Itens`, `MeasureUnits`/`UnidadesMedida`, `Units`/`Unidades`, `Suppliers`/`Fornecedores` e `Customers`/`Clientes + Segmentos` iniciados com cutover incremental e wrappers temporarios).
+- Fase 4: concluida (modulos `Brands`/`Marcas`, `Categories`/`Categorias`, `Items`/`Itens`, `MeasureUnits`/`UnidadesMedida`, `Units`/`Unidades`, `Suppliers`/`Fornecedores` e `Customers`/`Clientes + Segmentos` finalizados com cutover incremental e wrappers temporarios).
+- Fase 5: concluida (modulos `Finance` e `Taxes` com backend/rotas/pages/DB artifacts co-localizados e wrappers temporarios).
 
 Regras gerais:
 - Cada fase deve terminar com testes PHPunit (rodar com SQLite via Docker).
@@ -322,9 +323,11 @@ PHPUnit:
 Entregas:
 - Migrar Centros de Custo, Contas Contabeis e Despesas.
 - Migrar Taxas/Rules e calculos relacionados.
+- Co-localizar rotas, pages e DB artifacts em `Modules/Finance` e `Modules/Taxes`, mantendo wrappers em `App/*`, `database/*` e `resources/js/Pages/*`.
 
 PHPUnit:
-- Testes cobrindo pelo menos 1 regra fiscal e 1 fluxo financeiro.
+- Teste cobrindo 1 regra fiscal (`tests/Feature/Modules/TaxesModulePhaseFiveFlowTest.php`).
+- Teste cobrindo 1 fluxo financeiro (`tests/Feature/Modules/FinanceModulePhaseFiveFlowTest.php`).
 
 ## Fase 6 - Admin, Auth e Configuracoes
 Entregas:

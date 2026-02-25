@@ -33,6 +33,8 @@ use Modules\Products\Repositories\ProdutoRepository as ModuleProdutoRepository;
 use Modules\Products\Repositories\ProdutoRepositoryEloquent as ModuleProdutoRepositoryEloquent;
 use Modules\Stock\Repositories\EstoqueRepository as ModuleEstoqueRepository;
 use Modules\Stock\Repositories\EstoqueRepositoryEloquent as ModuleEstoqueRepositoryEloquent;
+use Modules\Taxes\Repositories\TaxRuleRepository as ModuleTaxRuleRepository;
+use Modules\Taxes\Repositories\TaxRuleRepositoryEloquent as ModuleTaxRuleRepositoryEloquent;
 
 use Illuminate\Pagination\Paginator;
 class AppServiceProvider extends ServiceProvider
@@ -57,6 +59,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(ClienteRepository::class, ClienteRepositoryEloquent::class);
         $this->app->bind(ModuleClienteRepository::class, ModuleClienteRepositoryEloquent::class);
         $this->app->bind(TaxRuleRepository::class, TaxRuleRepositoryEloquent::class);
+        $this->app->bind(ModuleTaxRuleRepository::class, ModuleTaxRuleRepositoryEloquent::class);
     }
 
     /**

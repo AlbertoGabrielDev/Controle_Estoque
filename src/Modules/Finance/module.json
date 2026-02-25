@@ -1,0 +1,6 @@
+{
+  "name": "Finance",
+  "slug": "finance",
+  "enabled": true,
+  "description": "Modulo financeiro (centros de custo, contas contabeis, despesas) - Fase 5."
+}

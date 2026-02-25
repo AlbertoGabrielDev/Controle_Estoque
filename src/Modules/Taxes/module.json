@@ -1,0 +1,6 @@
+{
+  "name": "Taxes",
+  "slug": "taxes",
+  "enabled": true,
+  "description": "Modulo de taxas e regras fiscais (Fase 5)."
+}
