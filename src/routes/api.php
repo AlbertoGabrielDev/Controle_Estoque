@@ -1,15 +1,11 @@
 <?php
 
 use App\Http\Controllers\CalendarController;
-use App\Http\Controllers\ProdutoController;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\CartController;
-use App\Http\Controllers\OrderController;
+use App\Http\Controllers\Api\CartController;
+use App\Http\Controllers\Api\OrderController;
 
 
-
-Route::get('/products/search', [ProdutoController::class, 'search']);
-Route::get('/products/{sku}', [ProdutoController::class, 'show']);
 
 Route::post('/carts/upsert', [CartController::class, 'upsert']);
 Route::get('/carts/by-client/{client}', [CartController::class, 'getByclient']);

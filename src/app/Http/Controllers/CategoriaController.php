@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\Categoria;
-use App\Models\Produto;
 use App\Services\DataTableService;
 use App\Support\DataTableActions;
 use App\Http\Requests\CategoriaStoreRequest;
@@ -14,6 +13,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 use Inertia\Response as InertiaResponse;
+use Modules\Products\Models\Produto;
 
 class CategoriaController extends Controller
 {

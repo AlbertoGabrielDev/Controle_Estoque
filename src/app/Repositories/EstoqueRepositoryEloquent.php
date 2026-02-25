@@ -3,18 +3,17 @@
 namespace App\Repositories;
 
 use App\Criteria\StatusCriteria;
-use App\Http\Requests\ValidacaoEstoque;
 use App\Models\Categoria;
 use App\Models\Estoque;
 use App\Models\Fornecedor;
 use App\Models\Historico;
 use App\Models\Marca;
 use App\Models\MarcaProduto;
-use App\Models\Produto;
 use Prettus\Repository\Eloquent\BaseRepository;
 use App\Repositories\EstoqueRepository;
 use Carbon\Carbon;
 use Illuminate\Support\Str;
+use Modules\Products\Models\Produto;
 
 use Illuminate\Http\Request;
 
@@ -104,27 +103,18 @@ class EstoqueRepositoryEloquent extends BaseRepository implements EstoqueReposit
 
     }
 
-    public function salvarEditar(ValidacaoEstoque $request, $estoqueId)
+    public function salvarEditar(array $data, $estoqueId)
     {
-        try {
+        $estoque = $this->update($data, $estoqueId);
 
-            $this->update($request->validated(), $estoqueId);
-            return redirect()->route('estoque.index')
-                ->with('toast', [
-                    'type' => 'success',
-                    'message' => 'Estoque atualizado com sucesso!'
-                ]);
-
-            MarcaProduto::update(
-                ['id_produto_fk' => $request->id_produto_fk],
-                ['id_marca_fk' => $request->id_marca_fk]
+        if (!empty($data['id_produto_fk']) && !empty($data['id_marca_fk'])) {
+            MarcaProduto::query()->updateOrCreate(
+                ['id_produto_fk' => $data['id_produto_fk']],
+                ['id_marca_fk' => $data['id_marca_fk']]
             );
-        } catch (\Exception $e) {
-            return back()->with('toast', [
-                'type' => 'error',
-                'message' => 'Erro ao atualizar estoque: ' . $e->getMessage()
-            ]);
         }
+
+        return $estoque;
     }
     public function findWithRelations($id, array $relations)
     {

@@ -11,5 +11,11 @@ use Prettus\Repository\Contracts\RepositoryInterface;
  */
 interface EstoqueRepository extends RepositoryInterface
 {
-    //
+    public function cadastro();
+
+    public function inserirEstoque(array $data);
+
+    public function editar($estoqueId);
+
+    public function salvarEditar(array $data, $estoqueId);
 }

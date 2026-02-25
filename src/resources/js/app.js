@@ -25,6 +25,8 @@ const appName = import.meta.env.VITE_APP_NAME || 'Laravel'
 initializeTheme()
 
 const ERP_TOAST_CONTAINER_ID = 'erp-toast-container'
+const corePages = import.meta.glob('./Pages/**/*.vue')
+const modulePages = import.meta.glob('../../Modules/*/Resources/js/Pages/**/*.vue')
 
 function ensureFallbackToastContainer() {
   if (typeof document === 'undefined') return null
@@ -127,8 +129,7 @@ createInertiaApp({
   title: (title) => `${title} - ${appName}`,
 
   resolve: (name) => {
-    const pages = import.meta.glob('./Pages/**/*.vue')
-    return resolvePageComponent(`./Pages/${name}.vue`, pages).then((mod) => {
+    const applyPageLayout = (mod) => {
       const page = mod.default || mod
       const isWpp = USE_VUE_SIDEBAR.some((rx) => rx.test(name))
       const isDash = USE_PRINCIPAL.some((rx) => rx.test(name))
@@ -137,7 +138,21 @@ createInertiaApp({
       else if (isDash) page.layout = page.layout || PrincipalLayout
 
       return mod
-    })
+    }
+
+    const coreKey = `./Pages/${name}.vue`
+    if (corePages[coreKey]) {
+      return resolvePageComponent(coreKey, corePages).then(applyPageLayout)
+    }
+
+    const moduleSuffix = `/Resources/js/Pages/${name}.vue`
+    const moduleKey = Object.keys(modulePages).find((key) => key.endsWith(moduleSuffix))
+
+    if (!moduleKey) {
+      throw new Error(`Inertia page not found: ${name}`)
+    }
+
+    return modulePages[moduleKey]().then(applyPageLayout)
   },
 
   setup({ el, App, props, plugin }) {

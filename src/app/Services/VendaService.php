@@ -8,13 +8,13 @@ use App\Models\Cliente;
 use App\Models\Estoque;
 use App\Models\Order;
 use App\Models\OrderItem;
-use App\Models\Produto;
 use App\Models\TabelaPreco;
 use App\Models\Venda;                 // <--- inclui Venda
 use App\Services\AppSettingService;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
+use Modules\Products\Models\Produto;
 
 class VendaService
 {
@@ -562,4 +562,3 @@ class VendaService
         ];
     }
 }
-

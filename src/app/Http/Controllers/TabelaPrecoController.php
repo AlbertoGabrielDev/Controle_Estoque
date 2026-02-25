@@ -8,13 +8,13 @@ use App\Models\Fornecedor;
 use App\Models\Item;
 use App\Models\Marca;
 use App\Models\Estoque;
-use App\Models\Produto;
 use App\Models\TabelaPreco;
 use App\Services\DataTableService;
 use App\Services\TabelaPrecoService;
 use App\Support\DataTableActions;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use Modules\Products\Models\Produto;
 
 class TabelaPrecoController extends Controller
 {

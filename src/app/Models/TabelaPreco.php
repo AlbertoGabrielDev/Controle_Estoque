@@ -6,7 +6,7 @@ use App\Traits\HasDatatableConfig;
 use App\Traits\HasStatus;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use App\Models\Produto;
+use Modules\Products\Models\Produto;
 
 class TabelaPreco extends Model
 {

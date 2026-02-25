@@ -1,0 +1,160 @@
+<?php
+
+namespace Modules\Products\Models;
+
+use App\Models\Categoria;
+use App\Models\Fornecedor;
+use App\Models\Item;
+use App\Models\Marca;
+use App\Models\TaxRule;
+use App\Models\TaxRuleAlvo;
+use App\Models\UnidadeMedida;
+use App\Models\Venda;
+use App\Traits\HasDatatableConfig;
+use App\Traits\HasStatus;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Prettus\Repository\Contracts\Transformable;
+use Prettus\Repository\Traits\TransformableTrait;
+
+class Produto extends Model implements Transformable
+{
+    use TransformableTrait;
+    use HasFactory;
+    use HasStatus;
+    use HasDatatableConfig;
+
+    protected $table = 'produtos';
+
+    protected $primaryKey = 'id_produto';
+
+    protected $fillable = [
+        'cod_produto',
+        'nome_produto',
+        'descricao',
+        'unidade_medida',
+        'unidade_medida_id',
+        'item_id',
+        'inf_nutriente',
+        'id_users_fk',
+        'status',
+    ];
+
+    protected $casts = [
+        'inf_nutriente' => 'array',
+    ];
+
+    public function fornecedores(): BelongsToMany
+    {
+        return $this->belongsToMany(Fornecedor::class, 'estoques', 'id_produto_fk', 'id_fornecedor_fk')
+            ->as('estoques')
+            ->withPivot([
+                'id_estoque',
+                'quantidade',
+                'localizacao',
+                'preco_custo',
+                'preco_venda',
+                'lote',
+                'data_chegada',
+                'validade',
+                'localizacao',
+                'quantidade_aviso',
+                'created_at',
+                'status',
+            ]);
+    }
+
+    public function categorias(): BelongsToMany
+    {
+        return $this->belongsToMany(Categoria::class, 'categoria_produtos', 'id_produto_fk', 'id_categoria_fk');
+    }
+
+    public function marcas(): BelongsToMany
+    {
+        return $this->belongsToMany(Marca::class, 'marca_produtos', 'id_produto_fk', 'id_marca_fk')->as('marca_produto');
+    }
+
+    public function vendas(): HasMany
+    {
+        return $this->hasMany(Venda::class, 'id_produto_fk', 'id_produto');
+    }
+
+    public function taxRuleAlvos(): HasMany
+    {
+        return $this->hasMany(TaxRuleAlvo::class, 'id_produto_fk', 'id_produto');
+    }
+
+    public function taxRules(): BelongsToMany
+    {
+        return $this->belongsToMany(
+            TaxRule::class,
+            'tax_rule_alvos',
+            'id_produto_fk',
+            'tax_rule_id',
+            'id_produto',
+            'id'
+        )->withTimestamps();
+    }
+
+    public function unidadeMedida(): BelongsTo
+    {
+        return $this->belongsTo(UnidadeMedida::class, 'unidade_medida_id');
+    }
+
+    public function item(): BelongsTo
+    {
+        return $this->belongsTo(Item::class, 'item_id');
+    }
+
+    public static function dtColumns(): array
+    {
+        $t = (new static())->getTable();
+        $joinUnidade = ['unidades_medida', 'unidades_medida.id', '=', "{$t}.unidade_medida_id", 'left'];
+
+        return [
+            'id' => ['db' => "{$t}.id_produto", 'label' => '#', 'order' => true, 'search' => false],
+            'c1' => ['db' => "{$t}.cod_produto", 'label' => 'Codigo', 'order' => true, 'search' => true],
+            'c2' => ['db' => "{$t}.nome_produto", 'label' => 'Nome', 'order' => true, 'search' => true],
+            'c3' => ['db' => "{$t}.descricao", 'label' => 'Descricao', 'order' => true, 'search' => true],
+            'c4' => [
+                'db' => "COALESCE(unidades_medida.codigo, {$t}.unidade_medida)",
+                'label' => 'Unidade',
+                'order' => true,
+                'search' => true,
+                'join' => $joinUnidade,
+            ],
+            'c5' => ['db' => "{$t}.inf_nutriente", 'label' => 'Nutricao', 'order' => false, 'search' => false],
+            'st' => ['db' => "{$t}.status", 'label' => 'Status', 'order' => true, 'search' => false],
+            'acoes' => ['computed' => true],
+        ];
+    }
+
+    public static function dtFilters(): array
+    {
+        $t = (new static())->getTable();
+
+        return [
+            'q' => [
+                'type' => 'text',
+                'columns' => [
+                    "{$t}.cod_produto",
+                    "{$t}.nome_produto",
+                    "{$t}.descricao",
+                    "{$t}.unidade_medida",
+                    'unidades_medida.codigo',
+                    'unidades_medida.descricao',
+                ],
+            ],
+            'status' => [
+                'type' => 'select',
+                'column' => "{$t}.status",
+                'cast' => 'int',
+                'operator' => '=',
+                'nullable' => true,
+            ],
+        ];
+    }
+}
