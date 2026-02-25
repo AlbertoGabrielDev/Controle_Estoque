@@ -1,4 +1,4 @@
-<script setup>
+﻿<script setup>
 import { computed } from 'vue'
 import { Head, Link, router } from '@inertiajs/vue3'
 import ButtonStatus from '@/components/ButtonStatus.vue'
@@ -39,20 +39,141 @@ function goToPage(page) {
   )
 }
 
-function formatNutrition(value) {
+function decodeHtmlEntities(value) {
+  if (typeof value !== 'string' || !value.includes('&')) return value
+  if (typeof document === 'undefined') return value
+  const textarea = document.createElement('textarea')
+  textarea.innerHTML = value
+  return textarea.value
+}
+
+function tryJsonParse(value) {
+  try {
+    return JSON.parse(value)
+  } catch {
+    return value
+  }
+}
+
+function unwrapQuoted(value) {
+  if (typeof value !== 'string' || value.length < 2) return value
+  const first = value[0]
+  const last = value[value.length - 1]
+  if ((first === '"' && last === '"') || (first === "'" && last === "'")) {
+    return value.slice(1, -1)
+  }
+  return value
+}
+
+function normalizeNutrition(value) {
   if (value === null || value === undefined || value === '') {
-    return '-'
+    return null
   }
 
   if (typeof value === 'string') {
-    return value
+    let cleaned = decodeHtmlEntities(value).trim()
+    let parsed = tryJsonParse(cleaned)
+    if (typeof parsed === 'string') {
+      const unwrapped = unwrapQuoted(parsed)
+      if (unwrapped !== parsed) {
+        parsed = tryJsonParse(unwrapped)
+      }
+    }
+    return parsed
+  }
+
+  return value
+}
+
+function formatNutritionEntry(entry) {
+  if (entry === null || entry === undefined || entry === '') return ''
+
+  if (typeof entry === 'string' || typeof entry === 'number') {
+    return String(entry)
+  }
+
+  if (typeof entry !== 'object') {
+    return String(entry)
+  }
+
+  const rawLabel = entry.label ?? entry.nome ?? entry.chave ?? entry.key ?? entry.nutriente ?? ''
+  const labelText = String(rawLabel ?? '').trim()
+  const displayLabel = labelText
+
+  const value = entry.valor ?? entry.value ?? entry.quantidade ?? entry.qtd ?? entry.amount
+  const unit = entry.unidade ?? entry.unit ?? entry.un
+
+  if (displayLabel && value !== undefined && value !== null && value !== '') {
+    return `${displayLabel}: ${value}${unit ? ` ${unit}` : ''}`
+  }
+
+  if (displayLabel) {
+    return displayLabel
+  }
+
+  if (value !== undefined && value !== null) {
+    return String(value)
   }
 
   try {
-    return JSON.stringify(value)
-  } catch (_) {
-    return String(value)
+    return JSON.stringify(entry)
+  } catch {
+    return String(entry)
   }
+}
+
+function formatNutrition(value, { limit, maxLength } = {}) {
+  const parsed = normalizeNutrition(value)
+  if (parsed === null || parsed === undefined || parsed === '') return '-'
+
+  if (typeof parsed === 'string') {
+    if (maxLength && parsed.length > maxLength) {
+      return `${parsed.slice(0, maxLength)}...`
+    }
+    return parsed
+  }
+
+  if (Array.isArray(parsed)) {
+    if (parsed.length === 0) return '-'
+    const items = parsed.map((entry) => formatNutritionEntry(entry)).filter(Boolean)
+    if (items.length === 0) return '-'
+    const shown = limit ? items.slice(0, limit) : items
+    const text = shown.join(', ')
+    if (limit && items.length > limit) {
+      return `${text}...`
+    }
+    return text
+  }
+
+  if (typeof parsed === 'object') {
+    const keys = Object.keys(parsed)
+    if (keys.length === 0) return '-'
+    if (keys.length === 1 && Object.prototype.hasOwnProperty.call(parsed, 'texto')) {
+      return String(parsed.texto ?? '')
+    }
+
+    const entries = Object.entries(parsed)
+    const shown = limit ? entries.slice(0, limit) : entries
+    const text = shown
+      .map(([key, val]) => `${key}: ${val}`)
+      .join(', ')
+
+    if (limit && entries.length > limit) {
+      return `${text}...`
+    }
+
+    return text || '-'
+  }
+
+  return String(parsed)
+}
+
+function nutritionSummary(value) {
+  return formatNutrition(value, { limit: 4, maxLength: 120 })
+}
+
+function nutritionTitle(value) {
+  return formatNutrition(value)
 }
 </script>
 
@@ -105,8 +226,8 @@ function formatNutrition(value) {
             <td class="px-4 py-3">{{ produto.nome_produto }}</td>
             <td class="px-4 py-3">{{ produto.descricao }}</td>
             <td class="px-4 py-3">{{ produto.unidade_medida }}</td>
-            <td class="px-4 py-3 max-w-xs truncate" :title="formatNutrition(produto.inf_nutriente)">
-              {{ formatNutrition(produto.inf_nutriente) }}
+            <td class="px-4 py-3 max-w-xs truncate" :title="nutritionTitle(produto.inf_nutriente)">
+              {{ nutritionSummary(produto.inf_nutriente) }}
             </td>
             <td class="px-4 py-3">
               <Link
@@ -159,3 +280,4 @@ function formatNutrition(value) {
     </div>
   </div>
 </template>
+

@@ -864,6 +864,76 @@ class ProdutoFactory extends Factory
             ],
         ];
     }
+
+    public static function normalizeNutritionList(array $data): array
+    {
+        if (array_is_list($data)) {
+            $items = [];
+            foreach ($data as $item) {
+                if (is_array($item)) {
+                    $label = $item['label'] ?? $item['nome'] ?? $item['chave'] ?? $item['key'] ?? $item['nutriente'] ?? null;
+                    $value = $item['valor'] ?? $item['value'] ?? $item['quantidade'] ?? $item['qtd'] ?? null;
+                    $unit = $item['unidade'] ?? $item['unit'] ?? null;
+
+                    if ($label === null && $value === null) {
+                        continue;
+                    }
+
+                    $items[] = [
+                        'label' => is_string($label) && $label !== '' ? $label : 'Item',
+                        'valor' => $value,
+                        'unidade' => $unit,
+                    ];
+                    continue;
+                }
+
+                if ($item === null || $item === '') {
+                    continue;
+                }
+
+                $items[] = [
+                    'label' => 'Item',
+                    'valor' => $item,
+                    'unidade' => null,
+                ];
+            }
+
+            return $items;
+        }
+
+        $normalized = [];
+        foreach ($data as $key => $value) {
+            $normalized[] = [
+                'label' => self::labelFromKey((string) $key),
+                'valor' => $value,
+                'unidade' => self::unitFromKey((string) $key),
+            ];
+        }
+
+        return $normalized;
+    }
+
+    private static function labelFromKey(string $key): string
+    {
+        $clean = trim(str_replace('_', ' ', $key));
+        return $clean === '' ? 'Item' : ucwords($clean);
+    }
+
+    private static function unitFromKey(string $key): ?string
+    {
+        $map = [
+            'calorias' => 'kcal',
+            'proteina' => 'g',
+            'carboidrato' => 'g',
+            'gordura' => 'g',
+            'fibra' => 'g',
+            'sodio' => 'mg',
+            'acucar' => 'g',
+        ];
+
+        $k = strtolower(trim($key));
+        return $map[$k] ?? null;
+    }
     public function definition(): array
     {
         static $indice = 0;
@@ -876,7 +946,7 @@ class ProdutoFactory extends Factory
             'cod_produto' => $this->faker->unique()->bothify('PROD-####'),
             'nome_produto' => $produto['nome'],
             'descricao' => mb_substr($produto['descricao'], 0, 50),
-            'inf_nutriente' => json_encode($produto['inf_nutriente']),
+            'inf_nutriente' => self::normalizeNutritionList($produto['inf_nutriente']),
             'unidade_medida' => $this->faker->randomElement(['kg', 'g', 'ml', 'L']),
             'status' => $this->faker->boolean(),
             'id_users_fk' => 1,

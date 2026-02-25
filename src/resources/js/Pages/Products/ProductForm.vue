@@ -70,12 +70,12 @@ defineEmits(['submit'])
     </div>
 
     <div>
-      <label class="block text-sm font-medium">Informações Nutricionais (JSON ou texto)</label>
+      <label class="block text-sm font-medium">Informações Nutricionais (JSON - lista de itens)</label>
       <textarea
         v-model="props.form.inf_nutriente"
         rows="5"
         class="mt-1 border rounded px-3 py-2 w-full"
-        placeholder='Exemplo JSON: {"calorias":"120","porcao":"100g"}'
+        placeholder='Exemplo JSON: [{"label":"Calorias","valor":120,"unidade":"kcal"},{"label":"Proteina","valor":5,"unidade":"g"}]'
       />
       <div v-if="props.form.errors.inf_nutriente" class="text-red-600 text-sm mt-1">{{ props.form.errors.inf_nutriente }}</div>
     </div>

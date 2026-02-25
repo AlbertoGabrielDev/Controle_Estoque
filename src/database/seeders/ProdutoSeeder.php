@@ -42,7 +42,7 @@ class ProdutoSeeder extends Seeder
                 [
                     'nome_produto'   => $p['nome'],
                     'descricao'      => mb_substr($p['descricao'], 0, 50),
-                    'inf_nutriente'  => json_encode($p['inf_nutriente']),
+                    'inf_nutriente'  => ProdutoFactory::normalizeNutritionList($p['inf_nutriente']),
                     'unidade_medida' => $unidadeCodigo,
                     'unidade_medida_id' => $unidade?->id,
                     'item_id'        => $item?->id,

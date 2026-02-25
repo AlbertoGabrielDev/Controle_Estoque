@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('cod_produto',60)->unique();
             $table->string('nome_produto',50);
             $table->string('descricao',50);
-            $table->json('inf_nutriente');
+            $table->json('inf_nutriente')->nullable();
             $table->string('unidade_medida',2);
             $table->boolean('status')->default(1);
             $table->timestamps();
@@ -27,6 +27,6 @@ return new class extends Migration
     }
     public function down(): void
     {
-        Schema::dropIfExists('produto');
+        Schema::dropIfExists('produtos');
     }
 };
