@@ -14,6 +14,7 @@ Status atual:
 - Fase 4: concluida (modulos `Brands`/`Marcas`, `Categories`/`Categorias`, `Items`/`Itens`, `MeasureUnits`/`UnidadesMedida`, `Units`/`Unidades`, `Suppliers`/`Fornecedores` e `Customers`/`Clientes + Segmentos` finalizados com cutover incremental e wrappers temporarios).
 - Fase 5: concluida (modulos `Finance` e `Taxes` com backend/rotas/pages/DB artifacts co-localizados e wrappers temporarios).
 - Fase 6: concluida (modulos `Admin` e `Settings` migrados, dominio WhatsApp removido e testes da fase adicionados).
+- Fase 7: em andamento (limpeza final: remover artefatos/rotas/dependencias legadas e alinhar documentacao).
 
 Regras gerais:
 - Cada fase deve terminar com testes PHPunit (rodar com SQLite via Docker).
@@ -345,6 +346,12 @@ Entregas:
 - Remover pastas antigas ou duplicadas.
 - Atualizar documentacao e caminhos.
 - Revisao geral de imports/rotas.
+Progresso:
+- Removido pacote `@wppconnect-team/wppconnect` de `package.json` (dependencia legada do dominio WhatsApp).
+- Removido `resources/js/ziggy.js` gerado com rotas antigas; regenerar via `php artisan ziggy:generate` apos limpar rotas (fase concluida).
+Pendencias:
+- Atualizar `package-lock.json` com `npm install` (limpeza do pacote removido).
+- Regenerar `ziggy.js` apos revisao final das rotas/menus.
 
 PHPUnit:
 - Rodar suite completa e corrigir regressao.
