@@ -1,0 +1,6 @@
+{
+  "name": "Products",
+  "slug": "products",
+  "enabled": true,
+  "description": "Modulo piloto para migracao de Produtos."
+}
