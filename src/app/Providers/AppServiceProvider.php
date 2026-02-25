@@ -33,6 +33,8 @@ use Modules\Products\Repositories\ProdutoRepository as ModuleProdutoRepository;
 use Modules\Products\Repositories\ProdutoRepositoryEloquent as ModuleProdutoRepositoryEloquent;
 use Modules\Stock\Repositories\EstoqueRepository as ModuleEstoqueRepository;
 use Modules\Stock\Repositories\EstoqueRepositoryEloquent as ModuleEstoqueRepositoryEloquent;
+use Modules\Admin\Repositories\RoleRepository as ModuleRoleRepository;
+use Modules\Admin\Repositories\RoleRepositoryEloquent as ModuleRoleRepositoryEloquent;
 use Modules\Taxes\Repositories\TaxRuleRepository as ModuleTaxRuleRepository;
 use Modules\Taxes\Repositories\TaxRuleRepositoryEloquent as ModuleTaxRuleRepositoryEloquent;
 
@@ -56,6 +58,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(ModuleVendaRepository::class, ModuleVendaRepositoryEloquent::class);
         $this->app->bind(UnidadesRepository::class, UnidadesRepositoryEloquent::class);
         $this->app->bind(RoleRepository::class, RoleRepositoryEloquent::class);
+        $this->app->bind(ModuleRoleRepository::class, ModuleRoleRepositoryEloquent::class);
         $this->app->bind(ClienteRepository::class, ClienteRepositoryEloquent::class);
         $this->app->bind(ModuleClienteRepository::class, ModuleClienteRepositoryEloquent::class);
         $this->app->bind(TaxRuleRepository::class, TaxRuleRepositoryEloquent::class);

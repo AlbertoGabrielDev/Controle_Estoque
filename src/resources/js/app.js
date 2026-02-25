@@ -12,7 +12,6 @@ import { ZiggyVue } from 'ziggy-js'
 import Toast from 'vue-toastification'
 import 'vue-toastification/dist/index.css'
 
-import SidebarLayout from './Layouts/Sidebar.vue'
 import PrincipalLayout from './Layouts/PrincipalLayout.vue'
 
 import { initializeTheme } from './composables/useTheme'
@@ -113,7 +112,6 @@ if (typeof window !== 'undefined' && typeof window.showToast !== 'function') {
 }
 
 // Regras de layout
-const USE_VUE_SIDEBAR = [/^Wpp\//, /^Bot\//]
 const USE_PRINCIPAL = [
   /^Dashboard\//, /^Calendar\//, /^Vendas\//, /^Sales\//, /^Spreadsheets\//, /^Estoque\//, /^Categoria\//,
   /^Fornecedor\//, /^Marca\//, /^Usuario\//, /^Unidade\//, /^Roles\//,
@@ -131,11 +129,9 @@ createInertiaApp({
   resolve: (name) => {
     const applyPageLayout = (mod) => {
       const page = mod.default || mod
-      const isWpp = USE_VUE_SIDEBAR.some((rx) => rx.test(name))
       const isDash = USE_PRINCIPAL.some((rx) => rx.test(name))
 
-      if (isWpp) page.layout = page.layout || SidebarLayout
-      else if (isDash) page.layout = page.layout || PrincipalLayout
+      if (isDash) page.layout = page.layout || PrincipalLayout
 
       return mod
     }

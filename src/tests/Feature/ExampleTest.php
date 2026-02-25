@@ -3,7 +3,6 @@
 namespace Tests\Feature;
 
 use App\Http\Controllers\CustomerSegmentController;
-use App\Http\Controllers\WhatsAppContactsController;
 use App\Models\CustomerSegment;
 use Illuminate\Http\Request;
 use PHPUnit\Framework\Attributes\Group;
@@ -44,36 +43,6 @@ class ExampleTest extends TestCase
 
         $this->assertSame('Segments/Edit', $payload['component']);
         $this->assertSame('Segmento Teste', $payload['props']['segmento']['nome'] ?? null);
-    }
-
-    public function test_whatsapp_contacts_component_contract(): void
-    {
-        $controller = new class extends WhatsAppContactsController {
-            public function __construct()
-            {
-                $this->base = 'http://fake.local';
-            }
-
-            protected function getJson(string $url, $fallback = [])
-            {
-                if (str_contains($url, 'contacts-with-dialog')) {
-                    return [['id' => '5511999999999@c.us', 'name' => 'Contato Teste']];
-                }
-
-                if (str_contains($url, '/labels')) {
-                    return [['id' => 'vip', 'name' => 'VIP']];
-                }
-
-                return $fallback;
-            }
-        };
-
-        $request = $this->makeInertiaRequest('/verdurao/whatsapp/contacts');
-        $payload = $this->toInertiaPayload($controller->index($request), $request);
-
-        $this->assertSame('Wpp/Contacts/Contacts', $payload['component']);
-        $this->assertSame('Contato Teste', $payload['props']['contacts'][0]['name'] ?? null);
-        $this->assertSame('VIP', $payload['props']['labels'][0]['name'] ?? null);
     }
 
     private function makeInertiaRequest(string $uri, array $query = []): Request

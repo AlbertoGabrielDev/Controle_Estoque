@@ -7,7 +7,7 @@ use Illuminate\Validation\ValidationException;
 class StockService extends VendaService
 {
     /**
-     * Compatibilidade para APIs de carrinho antigas (n8n / WhatsApp).
+     * Compatibilidade para APIs de carrinho antigas (n8n).
      *
      * @param array<int, array<string, mixed>> $items
      * @return array{linhas: array<int, array<string, mixed>>, total_valor: float}

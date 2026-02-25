@@ -13,6 +13,7 @@ Status atual:
 - Observacao Fase 3: `Dashboard`/`Calendar` permanecem como componentes compartilhados (`Shared/Core`) nesta etapa, consumidos pelas rotas do modulo `Sales`.
 - Fase 4: concluida (modulos `Brands`/`Marcas`, `Categories`/`Categorias`, `Items`/`Itens`, `MeasureUnits`/`UnidadesMedida`, `Units`/`Unidades`, `Suppliers`/`Fornecedores` e `Customers`/`Clientes + Segmentos` finalizados com cutover incremental e wrappers temporarios).
 - Fase 5: concluida (modulos `Finance` e `Taxes` com backend/rotas/pages/DB artifacts co-localizados e wrappers temporarios).
+- Fase 6: concluida (modulos `Admin` e `Settings` migrados, dominio WhatsApp removido e testes da fase adicionados).
 
 Regras gerais:
 - Cada fase deve terminar com testes PHPunit (rodar com SQLite via Docker).
@@ -336,8 +337,8 @@ Entregas:
 - Remover o dominio `WhatsApp / Marketing / MessageTemplates` (descontinuado) e limpar dependencias cruzadas em outros modulos.
 
 PHPUnit:
-- Testes de autenticacao basica e permissao.
-- Teste(s) de regressao para garantir ausencia de referencias/rotas/componentes do dominio removido.
+- Testes de autenticacao basica e permissao (`tests/Feature/Modules/AdminModulePhaseSixAuthTest.php`).
+- Teste(s) de regressao para garantir ausencia de referencias/rotas/componentes do dominio removido (`tests/Feature/Modules/AdminModulePhaseSixRegressionTest.php`).
 
 ## Fase 7 - Limpeza e padronizacao
 Entregas:

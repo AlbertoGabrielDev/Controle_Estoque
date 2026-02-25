@@ -2,14 +2,6 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
-
-class AppSetting extends Model
+class AppSetting extends \Modules\Settings\Models\AppSetting
 {
-    protected $table = 'app_settings';
-
-    protected $fillable = [
-        'key',
-        'value',
-    ];
 }

@@ -1,0 +1,6 @@
+{
+  "name": "Settings",
+  "slug": "settings",
+  "enabled": true,
+  "description": "Modulo de configuracoes (Fase 6)."
+}

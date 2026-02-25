@@ -55,9 +55,7 @@ const props = defineProps({
     <Link :href="route('clientes.show', { cliente: cliente.id_cliente, tab: 'fiscal' })" class="px-3 py-2 rounded border"
       :class="{ 'bg-blue-600 text-white border-blue-600': tab==='fiscal' }"
     >Fiscal/Comercial</Link>
-    <Link :href="route('clientes.show', { cliente: cliente.id_cliente, tab: 'whatsapp' })" class="px-3 py-2 rounded border"
-      :class="{ 'bg-blue-600 text-white border-blue-600': tab==='whatsapp' }"
-    >WhatsApp</Link>
+
   </div>
 
   <div class="bg-white rounded shadow p-4">
@@ -88,8 +86,7 @@ const props = defineProps({
       <div class="text-gray-500">Em breve: dados fiscais/comerciais adicionais…</div>
     </div>
 
-    <div v-else-if="tab==='whatsapp'">
-      <div class="text-gray-500">Em breve: mensagens WhatsApp e campanhas…</div>
-    </div>
+
   </div>
 </template>
+

@@ -2,19 +2,6 @@
 
 namespace App\Http\Requests;
 
-use Illuminate\Foundation\Http\FormRequest;
-
-class SalesSettingsRequest extends FormRequest
+class SalesSettingsRequest extends \Modules\Settings\Http\Requests\SalesSettingsRequest
 {
-    public function authorize(): bool
-    {
-        return true;
-    }
-
-    public function rules(): array
-    {
-        return [
-            'require_client' => ['required', 'boolean'],
-        ];
-    }
 }

@@ -1,0 +1,6 @@
+{
+  "name": "Admin",
+  "slug": "admin",
+  "enabled": true,
+  "description": "Modulo administrativo (usuarios, roles, permissoes e menus) - Fase 6."
+}

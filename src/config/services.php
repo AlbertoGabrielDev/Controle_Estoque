@@ -31,9 +31,6 @@ return [
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
 
-    'whatsapp_node' => [
-        'url' => env('WHATSAPP_NODE_URL', 'http://localhost:3001/verdurao/bot/whatsapp'),
-    ],
 
     'n8n' => [
         'api_key' => env('N8N_API_KEY'),
