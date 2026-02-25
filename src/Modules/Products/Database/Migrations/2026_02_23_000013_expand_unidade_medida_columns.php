@@ -6,8 +6,17 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
+    private function isSqlite(): bool
+    {
+        return DB::getDriverName() === 'sqlite';
+    }
+
     public function up(): void
     {
+        if ($this->isSqlite()) {
+            return;
+        }
+
         if (Schema::hasTable('produtos') && Schema::hasColumn('produtos', 'unidade_medida')) {
             DB::statement('ALTER TABLE `produtos` MODIFY `unidade_medida` VARCHAR(10) NOT NULL');
         }
@@ -19,6 +28,10 @@ return new class extends Migration
 
     public function down(): void
     {
+        if ($this->isSqlite()) {
+            return;
+        }
+
         if (Schema::hasTable('produtos') && Schema::hasColumn('produtos', 'unidade_medida')) {
             DB::statement('UPDATE `produtos` SET `unidade_medida` = LEFT(`unidade_medida`, 2)');
             DB::statement('ALTER TABLE `produtos` MODIFY `unidade_medida` VARCHAR(2) NOT NULL');

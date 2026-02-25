@@ -19,6 +19,8 @@ use App\Repositories\TaxRuleRepositoryEloquent;
 use App\Repositories\UnidadesRepository;
 use App\Repositories\UnidadesRepositoryEloquent;
 use Illuminate\Support\ServiceProvider;
+use Modules\Customers\Repositories\ClienteRepository as ModuleClienteRepository;
+use Modules\Customers\Repositories\ClienteRepositoryEloquent as ModuleClienteRepositoryEloquent;
 use Modules\Sales\Repositories\CartRepository as ModuleCartRepository;
 use Modules\Sales\Repositories\CartRepositoryEloquent as ModuleCartRepositoryEloquent;
 use Modules\Sales\Repositories\OrderRepository as ModuleOrderRepository;
@@ -53,6 +55,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(UnidadesRepository::class, UnidadesRepositoryEloquent::class);
         $this->app->bind(RoleRepository::class, RoleRepositoryEloquent::class);
         $this->app->bind(ClienteRepository::class, ClienteRepositoryEloquent::class);
+        $this->app->bind(ModuleClienteRepository::class, ModuleClienteRepositoryEloquent::class);
         $this->app->bind(TaxRuleRepository::class, TaxRuleRepositoryEloquent::class);
     }
 

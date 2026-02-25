@@ -7,8 +7,18 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
+    private function isSqlite(): bool
+    {
+        return DB::getDriverName() === 'sqlite';
+    }
+
     public function up(): void
     {
+        if ($this->isSqlite()) {
+            Schema::dropIfExists('impostos');
+            return;
+        }
+
         if (Schema::hasTable('clientes') && Schema::hasColumn('clientes', 'imposto_padrao_id')) {
             if (Schema::hasTable('impostos') && Schema::hasTable('taxes')) {
                 // Tenta mapear pelo codigo antes de remover a tabela de impostos
@@ -40,6 +50,10 @@ return new class extends Migration
 
     public function down(): void
     {
+        if ($this->isSqlite()) {
+            return;
+        }
+
         if (Schema::hasTable('clientes') && Schema::hasColumn('clientes', 'imposto_padrao_id')) {
             $fkName = $this->foreignKeyName('clientes', 'imposto_padrao_id');
             if ($fkName) {
@@ -59,6 +73,10 @@ return new class extends Migration
 
     private function foreignKeyName(string $table, string $column): ?string
     {
+        if ($this->isSqlite()) {
+            return null;
+        }
+
         $schema = DB::getDatabaseName();
 
         $row = DB::table('information_schema.KEY_COLUMN_USAGE')

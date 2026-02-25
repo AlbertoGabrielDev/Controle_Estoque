@@ -2,21 +2,12 @@
 
 use App\Http\Controllers\BotWhatsappController;
 use App\Http\Controllers\BusinessController;
-use App\Http\Controllers\ClienteController;
-use App\Http\Controllers\CustomerSegmentController;
 use App\Http\Controllers\MessageTemplateController;
 use App\Http\Controllers\TaxRuleController;
 use App\Http\Controllers\WhatsAppContactsController;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\CategoriaController;
-use App\Http\Controllers\ProdutoController;
-use App\Http\Controllers\FornecedorController;
 use App\Http\Controllers\UsuarioController;
-use App\Http\Controllers\MarcaController;
 use App\Http\Controllers\RoleController;
-use App\Http\Controllers\UnidadeController;
-use App\Http\Controllers\UnidadeMedidaController;
-use App\Http\Controllers\ItemController;
 use App\Http\Controllers\CentroCustoController;
 use App\Http\Controllers\ContaContabilController;
 use App\Http\Controllers\DespesaController;
@@ -63,70 +54,6 @@ Route::middleware([
     'verified',
 ])->prefix('/verdurao')->group(function () {
 
-    Route::prefix('/categoria')->group(function () {
-        Route::get('/', [CategoriaController::class, 'inicio'])->name('categoria.inicio')->middleware('check.permission:view_post,categoria');
-        Route::get('/index', [CategoriaController::class, 'index'])->name('categoria.index')->middleware('check.permission:view_post,categoria');
-        Route::get('/data', [CategoriaController::class, 'data'])->name('categoria.data')->middleware('check.permission:view_post,categoria');
-        Route::get('/cadastro', [CategoriaController::class, 'cadastro'])->name('categoria.cadastro')->middleware('check.permission:create_post,categoria');
-        Route::post('/cadastro', [CategoriaController::class, 'inserirCategoria'])->name('categoria.inserirCategoria');
-        Route::get('/produto/{categoria}', [CategoriaController::class, 'produto'])->name('categorias.produto');
-        Route::get('/editar/{categoriaId}', [CategoriaController::class, 'editar'])->name('categorias.editar')->middleware('check.permission:edit_post,categoria');
-        Route::post('/editar/{categoriaId}', [CategoriaController::class, 'salvarEditar'])->name('categorias.salvarEditar');
-        Route::delete('/{categoriaId}', [CategoriaController::class, 'destroy'])->name('categorias.destroy')->middleware('check.permission:edit_post,categoria');
-        Route::post('/status/{modelName}/{id}', [CategoriaController::class, 'updateStatus'])->name('categoria.status');
-        Route::post('/produto/status/{produtoId}', [ProdutoController::class, 'status'])->name('produtos.status');
-    });
-
-    Route::prefix('/clientes')->group(function () {
-        // Route::get('/clientes', [ClienteController::class, 'index'])->name('clientes.index');
-
-        Route::get('/clientes', [ClienteController::class, 'index'])->name('clientes.index');
-        Route::get('/clientes/data', [ClienteController::class, 'data'])->name('clientes.data');
-
-        Route::get('/clientes/create', [ClienteController::class, 'create'])->name('clientes.create');
-        Route::post('/clientes', [ClienteController::class, 'store'])->name('clientes.store');
-        Route::get('/clientes/{cliente}', [ClienteController::class, 'show'])->name('clientes.show');
-        Route::get('/clientes/{cliente}/edit', [ClienteController::class, 'edit'])->name('clientes.edit');
-        Route::put('/clientes/{cliente}', [ClienteController::class, 'update'])->name('clientes.update');
-        Route::delete('/clientes/{cliente}', [ClienteController::class, 'destroy'])->name('clientes.destroy');
-        Route::post('/status/{modelName}/{id}', [ClienteController::class, 'updateStatus'])->middleware('check.permission:status,clientes')->name('cliente.status');
-        Route::get('/clientes-autocomplete', [ClienteController::class, 'autocomplete'])->name('clientes.autocomplete');
-
-        // Segmentos
-        Route::get('/segmentos', [CustomerSegmentController::class, 'index'])->name('segmentos.index');
-        Route::get('/segmentos/data', [CustomerSegmentController::class, 'data'])->name('segmentos.data');
-        Route::get('/segmentos/create', [CustomerSegmentController::class, 'create'])->name('segmentos.create');
-        Route::post('/segmentos', [CustomerSegmentController::class, 'store'])->name('segmentos.store');
-        Route::get('/segmentos/{segment}', [CustomerSegmentController::class, 'edit'])->name('segmentos.edit');
-        Route::put('/segmentos/{segment}', [CustomerSegmentController::class, 'update'])->name('segmentos.update');
-        Route::delete('/segmentos/{segment}', [CustomerSegmentController::class, 'destroy'])->name('segmentos.destroy');
-    });
-
-
-    Route::prefix('/fornecedor')->group(function () {
-        Route::get('/', [FornecedorController::class, 'index'])->name('fornecedor.index')->middleware('check.permission:view_post,fornecedores');
-        Route::get('/data', [FornecedorController::class, 'data'])->name('fornecedor.data')->middleware('check.permission:view_post,fornecedores');
-        Route::get('/cadastro', [FornecedorController::class, 'cadastro'])->name('fornecedor.cadastro')->middleware('check.permission:create_post,fornecedores');
-        Route::post('/cadastro', [FornecedorController::class, 'inserirCadastro'])->name('fornecedor.inserirCadastro')->middleware('check.permission:create_post,fornecedores');
-        Route::get('/cidade/{estado}', [FornecedorController::class, 'getCidade'])->name('fornecedor.cidade');
-        Route::get('/buscar-fornecedor', [FornecedorController::class, 'buscar'])->name('fornecedor.buscar');
-        Route::get('/editar/{fornecedorId}', [FornecedorController::class, 'editar'])->name('fornecedor.editar')->middleware('check.permission:edit_post,fornecedores');
-        Route::post('/editar/{fornecedorId}', [FornecedorController::class, 'salvarEditar'])->name('fornecedor.salvarEditar')->middleware('check.permission:edit_post,fornecedores');
-        Route::delete('/{fornecedorId}', [FornecedorController::class, 'destroy'])->name('fornecedor.destroy')->middleware('check.permission:edit_post,fornecedores');
-        Route::post('/status/{modelName}/{id}', [FornecedorController::class, 'updateStatus'])->middleware('check.permission:status,fornecedores')->name('fornecedor.status');
-    });
-
-    Route::prefix('/marca')->group(function () {
-        Route::get('/index', [MarcaController::class, 'index'])->name('marca.index')->middleware('check.permission:view_post,marca');
-        Route::get('/data', [MarcaController::class, 'data'])->name('marca.data')->middleware('check.permission:view_post,marca');
-        Route::get('/cadastro', [MarcaController::class, 'cadastro'])->name('marca.cadastro')->middleware('check.permission:create_post,marca');
-        Route::post('/cadastro', [MarcaController::class, 'inserirMarca'])->name('marca.inserirMarca');
-        Route::get('/buscar-marca', [MarcaController::class, 'buscar'])->name('marca.buscar');
-        Route::get('/editar/{marcaId}', [MarcaController::class, 'editar'])->name('marca.editar')->middleware('check.permission:edit_post,marca');
-        Route::post('/editar/{marcaId}', [MarcaController::class, 'salvarEditar'])->name('marca.salvarEditar');
-        Route::post('/status/{modelName}/{id}', [MarcaController::class, 'updateStatus'])->name('marca.status')->middleware('check.permission:status,marca');
-    });
-
     Route::prefix('/usuario')->group(function () {
         Route::get('/index', [UsuarioController::class, 'index'])->name('usuario.index')->middleware('check.permission:view_post,perfil');
         Route::get('/data', [UsuarioController::class, 'data'])->name('usuario.data')->middleware('check.permission:view_post,perfil');
@@ -137,40 +64,7 @@ Route::middleware([
         Route::put('/editar/{userId}', [UsuarioController::class, 'salvarEditar'])->name('usuario.salvarEditar');
         Route::get('/buscar-usuario', [UsuarioController::class, 'buscar'])->name('usuario.buscar');
     });
-    Route::prefix('/unidades')->group(function () {
-        Route::get('/index', [UnidadeController::class, 'index'])->name('unidade.index')->middleware('check.permission:view_post,unidades');
-        Route::get('/data', [UnidadeController::class, 'data'])->name('unidade.data')->middleware('check.permission:view_post,unidades');
-        Route::get('/cadastro', [UnidadeController::class, 'cadastro'])->name('unidades.cadastro')->middleware('check.permission:create_post,unidades');
-        Route::post('/cadastro', [UnidadeController::class, 'inserirUnidade'])->name('unidades.inserirUnidade');
-        Route::get('/buscar-unidade', [UnidadeController::class, 'buscar'])->name('unidade.buscar');
-        Route::get('/editar/{unidadeId}', [UnidadeController::class, 'editar'])->name('unidades.editar')->middleware('check.permission:edit_post,unidades');
-        Route::post('/editar/{unidadeId}', [UnidadeController::class, 'salvarEditar'])->name('unidades.salvarEditar');
-        Route::post('/status/{modelName}/{id}', [UnidadeController::class, 'updateStatus'])->name('unidades.status');
-    });
-
     Route::prefix('/cadastros')->group(function () {
-        Route::prefix('/unidades-medida')->name('unidades_medida.')->group(function () {
-            Route::get('/', [UnidadeMedidaController::class, 'index'])->name('index');
-            Route::get('/data', [UnidadeMedidaController::class, 'data'])->name('data');
-            Route::get('/create', [UnidadeMedidaController::class, 'create'])->name('create');
-            Route::post('/', [UnidadeMedidaController::class, 'store'])->name('store');
-            Route::get('/{unidade_medida}/edit', [UnidadeMedidaController::class, 'edit'])->name('edit');
-            Route::put('/{unidade_medida}', [UnidadeMedidaController::class, 'update'])->name('update');
-            Route::delete('/{unidade_medida}', [UnidadeMedidaController::class, 'destroy'])->name('destroy');
-            Route::post('/status/{modelName}/{id}', [UnidadeMedidaController::class, 'updateStatus'])->name('status');
-        });
-
-        Route::prefix('/itens')->name('itens.')->group(function () {
-            Route::get('/', [ItemController::class, 'index'])->name('index');
-            Route::get('/data', [ItemController::class, 'data'])->name('data');
-            Route::get('/create', [ItemController::class, 'create'])->name('create');
-            Route::post('/', [ItemController::class, 'store'])->name('store');
-            Route::get('/{item}/edit', [ItemController::class, 'edit'])->name('edit');
-            Route::put('/{item}', [ItemController::class, 'update'])->name('update');
-            Route::delete('/{item}', [ItemController::class, 'destroy'])->name('destroy');
-            Route::post('/status/{modelName}/{id}', [ItemController::class, 'updateStatus'])->name('status');
-        });
-
         Route::prefix('/centros-custo')->name('centros_custo.')->group(function () {
             Route::get('/', [CentroCustoController::class, 'index'])->name('index');
             Route::get('/data', [CentroCustoController::class, 'data'])->name('data');

@@ -11,6 +11,7 @@ Status atual:
 - Observacao Fase 2: wrappers de `resources/js/Pages/Products/*` permanecem temporariamente por compatibilidade com testes/contratos legados.
 - Fase 3: concluida (modulos `Stock`/`Estoque`, `PriceTables` e `Sales` com backend/rotas/pages/DB artifacts co-localizados, wrappers de compatibilidade, smoke tests e testes de fluxo minimos).
 - Observacao Fase 3: `Dashboard`/`Calendar` permanecem como componentes compartilhados (`Shared/Core`) nesta etapa, consumidos pelas rotas do modulo `Sales`.
+- Fase 4: em andamento (modulos `Brands`/`Marcas`, `Categories`/`Categorias`, `Items`/`Itens`, `MeasureUnits`/`UnidadesMedida`, `Units`/`Unidades`, `Suppliers`/`Fornecedores` e `Customers`/`Clientes + Segmentos` iniciados com cutover incremental e wrappers temporarios).
 
 Regras gerais:
 - Cada fase deve terminar com testes PHPunit (rodar com SQLite via Docker).
@@ -138,6 +139,20 @@ Legenda:
   - Repository + RepositoryEloquent: OPCIONAL (se centralizar filtros/permissoes por unidade)
   - Model: SIM
   - Jobs/Events/Listeners/Commands: OPCIONAL
+- `Fornecedores`:
+  - Controller: SIM
+  - FormRequest: SIM
+  - Service: SIM
+  - Repository + RepositoryEloquent: NAO (inicialmente)
+  - Model: SIM
+  - Jobs/Events/Listeners/Commands: OPCIONAL
+- `Clientes`:
+  - Controller: SIM
+  - FormRequest: SIM
+  - Service: SIM
+  - Repository + RepositoryEloquent: SIM
+  - Model: SIM
+  - Jobs/Events/Listeners/Commands: OPCIONAL
 
 ### Clientes, segmentos e relacao comercial
 - `Clientes`:
@@ -155,6 +170,7 @@ Legenda:
   - Repository + RepositoryEloquent: NAO (inicialmente)
   - Model: SIM
   - Jobs/Events/Listeners/Commands: OPCIONAL
+  - Status da Fase 4: cutover modular concluido dentro do modulo `Customers` (wrappers temporarios mantidos).
 
 ### Financeiro
 - `CentroCusto`:
@@ -286,13 +302,21 @@ PHPUnit:
 - Testes de fluxo de estoque e venda (minimo 1 teste por modulo).
 
 ## Fase 4 - Modulos de cadastros e suporte
+Status parcial:
+- `Brands`/`Marcas` iniciado (controller/requests/service/model/rotas/pages/DB artifacts no modulo + wrappers de compatibilidade).
+- `Categories`/`Categorias` iniciado (controller/requests/service/model/rotas/pages/DB artifacts no modulo + wrappers de compatibilidade).
+- `Items`/`Itens` iniciado (controller/requests/service/model/rotas/pages/DB artifacts no modulo + wrappers de compatibilidade).
+- `MeasureUnits`/`UnidadesMedida` iniciado (controller/request/service/model/rotas/pages/DB artifacts no modulo + wrappers de compatibilidade).
+- `Units`/`Unidades` iniciado (controller/requests/service/model/rotas/pages/DB artifacts no modulo + wrappers de compatibilidade).
+- `Suppliers`/`Fornecedores` iniciado (controller/requests/service/model/rotas/pages/DB artifacts no modulo + wrappers de compatibilidade).
+
 Entregas:
 - Migrar Categorias, Marcas, Fornecedores, Itens, Unidades/UnidadesMedida.
 - Migrar Clientes e Segmentos.
 - Ajustar seeds/factories dos modulos e padronizar carregamento por modulo.
 
 PHPUnit:
-- Testes de CRUD basicos para cada modulo migrado.
+- Testes de CRUD basicos para cada modulo migrado (implementados em `tests/Feature/Modules/PhaseFourCrudTest.php`).
 
 ## Fase 5 - Financeiro e Taxas
 Entregas:

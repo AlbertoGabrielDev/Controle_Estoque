@@ -6,6 +6,11 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration {
+    private function isSqlite(): bool
+    {
+        return DB::getDriverName() === 'sqlite';
+    }
+
     /** Helper: cria índice apenas se não existir (MySQL) */
     private function ensureIndex(string $table, string $indexName, array $cols): void
     {
@@ -76,6 +81,25 @@ return new class extends Migration {
 
     public function up(): void
     {
+        if ($this->isSqlite()) {
+            if (!Schema::hasTable('tax_rule_alvos')) {
+                Schema::create('tax_rule_alvos', function (Blueprint $table) {
+                    $table->id();
+                    $table->unsignedBigInteger('tax_rule_id');
+                    $table->unsignedSmallInteger('id_categoria_fk')->nullable();
+                    $table->unsignedSmallInteger('id_produto_fk')->nullable();
+                    $table->timestamps();
+
+                    $table->unique(['tax_rule_id', 'id_categoria_fk'], 'tra_rule_cat_unique');
+                    $table->unique(['tax_rule_id', 'id_produto_fk'], 'tra_rule_prod_unique');
+                    $table->index(['id_categoria_fk'], 'tra_cat_idx');
+                    $table->index(['id_produto_fk'], 'tra_prod_idx');
+                });
+            }
+
+            return;
+        }
+
         // 0) Garante índices simples que outras FKs possam usar (sem duplicar)
         if (Schema::hasTable('tax_rules')) {
             if (Schema::hasColumn('tax_rules', 'segment_id')) {
@@ -198,6 +222,11 @@ return new class extends Migration {
 
     public function down(): void
     {
+        if ($this->isSqlite()) {
+            Schema::dropIfExists('tax_rule_alvos');
+            return;
+        }
+
         // 1) Recria coluna antiga (fallback) — não assume FK aqui
         if (!Schema::hasColumn('tax_rules', 'id_categoria_fk')) {
             Schema::table('tax_rules', function (Blueprint $table) {
