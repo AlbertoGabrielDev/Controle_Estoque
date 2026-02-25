@@ -2,11 +2,11 @@
 
 namespace App\Http\Middleware;
 
-use App\Models\Menu;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Inertia\Middleware;
+use Modules\Admin\Models\Menu;
 
 class HandleInertiaRequests extends Middleware
 {

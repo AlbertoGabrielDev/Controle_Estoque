@@ -86,8 +86,8 @@
             const warningMessage = "{{ session('warning') }}";
             const infoMessage = "{{ session('info') }}";
 
-            // Captura erros de validação
-            const validationErrors = @json($errors->all());
+            // Captura erros de validação (protege se $errors não estiver disponível)
+            const validationErrors = @json(($errors ?? new \Illuminate\Support\ViewErrorBag())->all());
             let message = '';
             let isError = false;
 

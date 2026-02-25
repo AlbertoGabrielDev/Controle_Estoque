@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Support\Modules\ModuleRegistry;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 
 class ModuleServiceProvider extends ServiceProvider
@@ -54,7 +55,11 @@ class ModuleServiceProvider extends ServiceProvider
                 foreach (['web.php', 'api.php'] as $file) {
                     $fullPath = $routesPath . DIRECTORY_SEPARATOR . $file;
                     if (is_file($fullPath)) {
-                        $this->loadRoutesFrom($fullPath);
+                        if ($file === 'web.php') {
+                            Route::middleware('web')->group($fullPath);
+                        } else {
+                            Route::middleware('api')->group($fullPath);
+                        }
                     }
                 }
             }

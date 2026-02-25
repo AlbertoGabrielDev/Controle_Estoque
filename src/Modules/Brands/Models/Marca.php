@@ -7,6 +7,7 @@ use App\Traits\HasStatus;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Modules\Brands\Database\Factories\MarcaFactory;
 use Modules\Products\Models\Produto;
 use Modules\Stock\Models\Estoque;
 
@@ -67,5 +68,10 @@ class Marca extends Model
                 'nullable' => true,
             ],
         ];
+    }
+
+    protected static function newFactory()
+    {
+        return MarcaFactory::new();
     }
 }

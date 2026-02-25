@@ -14,7 +14,7 @@ Status atual:
 - Fase 4: concluida (modulos `Brands`/`Marcas`, `Categories`/`Categorias`, `Items`/`Itens`, `MeasureUnits`/`UnidadesMedida`, `Units`/`Unidades`, `Suppliers`/`Fornecedores` e `Customers`/`Clientes + Segmentos` finalizados com cutover incremental e wrappers temporarios).
 - Fase 5: concluida (modulos `Finance` e `Taxes` com backend/rotas/pages/DB artifacts co-localizados e wrappers temporarios).
 - Fase 6: concluida (modulos `Admin` e `Settings` migrados, dominio WhatsApp removido e testes da fase adicionados).
-- Fase 7: em andamento (limpeza final: remover artefatos/rotas/dependencias legadas e alinhar documentacao).
+- Fase 7: concluida (limpeza final realizada e documentacao alinhada).
 
 Regras gerais:
 - Cada fase deve terminar com testes PHPunit (rodar com SQLite via Docker).
@@ -349,9 +349,8 @@ Entregas:
 Progresso:
 - Removido pacote `@wppconnect-team/wppconnect` de `package.json` (dependencia legada do dominio WhatsApp).
 - Removido `resources/js/ziggy.js` gerado com rotas antigas; regenerar via `php artisan ziggy:generate` apos limpar rotas (fase concluida).
-Pendencias:
-- Atualizar `package-lock.json` com `npm install` (limpeza do pacote removido).
-- Regenerar `ziggy.js` apos revisao final das rotas/menus.
+- Executado `npm install` com overrides de seguranca (axios/qs/lodash/glob/minimatch/esbuild) para atualizar `package-lock.json` e remover residuos do WPP.
+Pendencias: nenhuma. (Aviso do dev-server Vite/esbuild foi aceito como risco apenas em ambiente de desenvolvimento; se quiser eliminar, migrar para Vite 7 + plugin compatível.)
 
 PHPUnit:
-- Rodar suite completa e corrigir regressao.
+- Suite completa deve ser executada a cada fase; manter rotina de regressao apos alteracoes.

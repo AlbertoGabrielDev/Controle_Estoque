@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Modules\Categories\Database\Factories\CategoriaFactory;
 use Modules\Products\Models\Produto;
 
 class Categoria extends Model
@@ -68,6 +69,11 @@ class Categoria extends Model
             'id_categoria',
             'id'
         )->withTimestamps();
+    }
+
+    protected static function newFactory()
+    {
+        return CategoriaFactory::new();
     }
 
     protected static function booted(): void
