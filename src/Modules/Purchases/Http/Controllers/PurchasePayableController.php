@@ -3,6 +3,9 @@
 namespace Modules\Purchases\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Services\DataTableService;
+use App\Support\DataTableActions;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response as InertiaResponse;
@@ -10,6 +13,15 @@ use Modules\Purchases\Models\PurchasePayable;
 
 class PurchasePayableController extends Controller
 {
+    /**
+     * Create a new controller instance.
+     *
+     * @param \App\Services\DataTableService $dt
+     */
+    public function __construct(private DataTableService $dt)
+    {
+    }
+
     /**
      * Display a listing of purchase payables.
      *
@@ -26,34 +38,37 @@ class PurchasePayableController extends Controller
             'data_fim' => (string) $request->query('data_fim', ''),
         ];
 
-        $query = PurchasePayable::query();
-
-        if ($filters['q'] !== '') {
-            $query->where('numero_documento', 'like', '%' . $filters['q'] . '%');
-        }
-
-        if ($filters['status'] !== '') {
-            $query->where('status', $filters['status']);
-        }
-
-        if ($filters['supplier_id'] !== '') {
-            $query->where('supplier_id', $filters['supplier_id']);
-        }
-
-        if ($filters['data_inicio'] !== '') {
-            $query->whereDate('data_vencimento', '>=', $filters['data_inicio']);
-        }
-
-        if ($filters['data_fim'] !== '') {
-            $query->whereDate('data_vencimento', '<=', $filters['data_fim']);
-        }
-
-        $payables = $query->orderByDesc('id')->paginate(10)->withQueryString();
-
         return Inertia::render('Purchases/Payables/Index', [
             'filters' => $filters,
-            'payables' => $payables,
         ]);
+    }
+
+    /**
+     * Return DataTables JSON for purchase payables.
+     *
+     * @param \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function data(Request $request): JsonResponse
+    {
+        [$query, $columnsMap] = PurchasePayable::makeDatatableQuery($request);
+
+        return $this->dt->make(
+            $query,
+            $columnsMap,
+            rawColumns: ['acoes'],
+            decorate: function ($dt) {
+                $dt->addColumn('acoes', function ($row) {
+                    $showUrl = route('purchases.payables.show', $row->id);
+                    $show = sprintf(
+                        '<a href="%s" class="p-2 text-blue-600 hover:bg-blue-50 rounded-md inline-flex items-center" title="Ver"><i class="fas fa-eye"></i></a>',
+                        e($showUrl)
+                    );
+
+                    return DataTableActions::wrap([$show]);
+                });
+            }
+        );
     }
 
     /**

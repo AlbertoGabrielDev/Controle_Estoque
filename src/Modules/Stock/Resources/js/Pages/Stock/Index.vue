@@ -41,7 +41,6 @@ function formatDate(data) {
 const dtColumns = [
   { data: 'c1', title: 'Código' },
   linkify({ data: 'c2', title: 'Produto' }, { routeName: 'estoque.editar', idField: 'id' }),
-  { data: 'c3', title: 'Fornecedor' },
   { data: 'c10', title: 'Marca', className: 'hidden lg:table-cell' },
   { data: 'c4', title: 'Custo', render: (data) => money(data), className: 'hidden md:table-cell' },
   { data: 'c5', title: 'Venda', render: (data) => money(data), className: 'hidden md:table-cell' },
@@ -124,6 +123,6 @@ onBeforeUnmount(() => stopSyncFilters())
     :columns="dtColumns"
     :order="[[0, 'desc']]"
     :page-length="10"
-    :actions-col-index="11"
+    :actions-col-index="10"
   />
 </template>

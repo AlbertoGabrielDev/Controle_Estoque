@@ -51,22 +51,31 @@ class EstoqueSeeder extends Seeder
         $fornecedorIds = Fornecedor::query()->pluck('id_fornecedor')->all();
         $marcaIds      = Marca::query()->pluck('id_marca')->all();
 
-        if (empty($produtoIds) || empty($fornecedorIds) || empty($marcaIds)) {
-            $this->command->warn('Produtos/Fornecedores/Marcas não encontrados. Rode as seeds deles antes da EstoqueSeeder.');
+        if (empty($produtoIds)) {
+            $this->command->warn('Produtos não encontrados. Rode a seed de produtos antes da EstoqueSeeder.');
             return;
+        }
+        if (empty($fornecedorIds)) {
+            $this->command->warn('Fornecedores não encontrados. Estoques serão criados sem fornecedor.');
+        }
+        if (empty($marcaIds)) {
+            $this->command->warn('Marcas não encontradas. Estoques serão criados sem marca.');
         }
 
         $now  = Carbon::now();
         $rows = [];
 
+        $fornecedoresPool = !empty($fornecedorIds) ? $fornecedorIds : [null];
+        $marcasPool = !empty($marcaIds) ? $marcaIds : [null];
+
         // Para cada produto, criar no maximo 3 fornecedores e 3 marcas diferentes (sem repetir)
         foreach ($produtoIds as $idProduto) {
-            $maxFornecedores = min(3, count($fornecedorIds));
-            $maxMarcas = min(3, count($marcaIds));
+            $maxFornecedores = min(3, count($fornecedoresPool));
+            $maxMarcas = min(3, count($marcasPool));
 
-            $fornecedoresProduto = $this->pickRandom($fornecedorIds, $maxFornecedores);
-            $marcasProduto = $this->pickRandom($marcaIds, $maxMarcas);
-            $maxComb = min(count($fornecedoresProduto), count($marcasProduto));
+            $fornecedoresProduto = $this->pickRandom($fornecedoresPool, $maxFornecedores);
+            $marcasProduto = $this->pickRandom($marcasPool, $maxMarcas);
+            $maxComb = max(1, min(count($fornecedoresProduto), count($marcasProduto)));
 
             for ($i = 0; $i < $maxComb; $i++) {
                 $idFornecedor = $fornecedoresProduto[$i];

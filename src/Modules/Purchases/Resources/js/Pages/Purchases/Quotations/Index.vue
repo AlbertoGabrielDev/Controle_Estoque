@@ -1,12 +1,11 @@
 ﻿<script setup>
 import { Head, Link } from '@inertiajs/vue3'
 import { onBeforeUnmount, reactive } from 'vue'
+import DataTable from '@/components/DataTable.vue'
 import { useQueryFilters } from '@/composables/useQueryFilters'
-import Pagination from '../Shared/Pagination.vue'
 
 const props = defineProps({
   filters: { type: Object, default: () => ({}) },
-  quotations: { type: Object, default: () => ({ data: [], links: [] }) },
 })
 
 const form = reactive({
@@ -16,6 +15,14 @@ const form = reactive({
   data_inicio: props.filters.data_inicio ?? '',
   data_fim: props.filters.data_fim ?? '',
 })
+
+const dtColumns = [
+  { data: 'c1', title: 'Numero' },
+  { data: 'c2', title: 'Status' },
+  { data: 'c3', title: 'Requisicao' },
+  { data: 'c4', title: 'Data Limite' },
+  { data: 'acoes', title: 'Acoes', orderable: false, searchable: false },
+]
 
 const stopSyncFilters = useQueryFilters(form, 'purchases.quotations.index')
 onBeforeUnmount(() => stopSyncFilters())
@@ -46,38 +53,13 @@ onBeforeUnmount(() => stopSyncFilters())
     <input v-model="form.data_fim" type="date" class="px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500">
   </div>
 
-  <div class="overflow-x-auto bg-white rounded shadow">
-    <table class="w-full text-sm">
-      <thead class="bg-slate-50">
-        <tr>
-          <th class="px-4 py-2 text-left">Numero</th>
-          <th class="px-4 py-2 text-left">Status</th>
-          <th class="px-4 py-2 text-left">Requisicao</th>
-          <th class="px-4 py-2 text-left">Data Limite</th>
-          <th class="px-4 py-2 text-left">Acoes</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="quotation in props.quotations.data" :key="quotation.id" class="border-t">
-          <td class="px-4 py-2">{{ quotation.numero }}</td>
-          <td class="px-4 py-2">{{ quotation.status }}</td>
-          <td class="px-4 py-2">{{ quotation.requisition_id }}</td>
-          <td class="px-4 py-2">{{ quotation.data_limite ?? '-' }}</td>
-          <td class="px-4 py-2">
-            <div class="flex flex-wrap gap-2">
-              <Link :href="route('purchases.quotations.show', quotation.id)" class="text-blue-600">Ver</Link>
-              <Link v-if="quotation.status === 'aberta'" :href="route('purchases.quotations.edit', quotation.id)" class="text-blue-600">Editar</Link>
-            </div>
-          </td>
-        </tr>
-        <tr v-if="!props.quotations.data.length">
-          <td colspan="5" class="px-4 py-3 text-center text-slate-500">Nenhuma cotacao encontrada.</td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-
-  <div class="mt-4">
-    <Pagination :links="props.quotations.links" />
-  </div>
+  <DataTable
+    table-id="dt-purchases-quotations"
+    :ajax-url="route('purchases.quotations.data')"
+    :ajax-params="form"
+    :columns="dtColumns"
+    :order="[[0, 'desc']]"
+    :page-length="10"
+    :actions-col-index="4"
+  />
 </template>

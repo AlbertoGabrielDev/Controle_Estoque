@@ -27,11 +27,11 @@ return new class extends Migration
             $table->unsignedBigInteger('id_users_fk');
             $table->foreign('id_users_fk')->references('id')->on('users');
 
-            $table->unsignedSmallInteger('id_marca_fk');
+            $table->unsignedSmallInteger('id_marca_fk')->nullable();
             $table->foreign('id_marca_fk')->references('id_marca')->on('marcas');
 
             
-            $table->unsignedSmallInteger('id_fornecedor_fk');
+            $table->unsignedSmallInteger('id_fornecedor_fk')->nullable();
             $table->foreign('id_fornecedor_fk')->references('id_fornecedor')->on('fornecedores');
 
             
@@ -48,4 +48,3 @@ return new class extends Migration
         Schema::dropIfExists('estoque');
     }
 };
-

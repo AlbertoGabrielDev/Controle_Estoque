@@ -3,8 +3,12 @@
 namespace Modules\Purchases\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Services\DataTableService;
+use App\Support\DataTableActions;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 use Inertia\Response as InertiaResponse;
 use Modules\Purchases\Http\Requests\PurchaseQuotationAddSupplierRequest;
@@ -18,9 +22,10 @@ use RuntimeException;
 
 class PurchaseQuotationController extends Controller
 {
-    public function __construct(private PurchaseQuotationService $service)
-    {
-    }
+    public function __construct(
+        private PurchaseQuotationService $service,
+        private DataTableService $dt
+    ) {}
 
     /**
      * Display a listing of purchase quotations.
@@ -38,36 +43,51 @@ class PurchaseQuotationController extends Controller
             'data_fim' => (string) $request->query('data_fim', ''),
         ];
 
-        $query = PurchaseQuotation::query()->with('requisition');
+        return Inertia::render('Purchases/Quotations/Index', [
+            'filters' => $filters,
+        ]);
+    }
 
-        if ($filters['q'] !== '') {
-            $query->where('numero', 'like', '%' . $filters['q'] . '%');
-        }
+    /**
+     * Return DataTables JSON for purchase quotations.
+     *
+     * @param \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function data(Request $request): JsonResponse
+    {
+        [$query, $columnsMap] = PurchaseQuotation::makeDatatableQuery($request);
 
-        if ($filters['status'] !== '') {
-            $query->where('status', $filters['status']);
-        }
-
-        if ($filters['supplier_id'] !== '') {
-            $query->whereHas('suppliers', function ($supplierQuery) use ($filters) {
-                $supplierQuery->where('supplier_id', $filters['supplier_id']);
+        $supplierId = (string) $request->query('supplier_id', '');
+        if ($supplierId !== '') {
+            $query->whereExists(function ($sub) use ($supplierId) {
+                $sub->select(DB::raw(1))
+                    ->from('purchase_quotation_suppliers as pqs')
+                    ->whereColumn('pqs.quotation_id', 'purchase_quotations.id')
+                    ->where('pqs.supplier_id', $supplierId);
             });
         }
 
-        if ($filters['data_inicio'] !== '') {
-            $query->whereDate('data_limite', '>=', $filters['data_inicio']);
-        }
+        return $this->dt->make(
+            $query,
+            $columnsMap,
+            rawColumns: ['acoes'],
+            decorate: function ($dt) {
+                $dt->addColumn('acoes', function ($row) {
+                    $showUrl = route('purchases.quotations.show', $row->id);
+                    $show = sprintf(
+                        '<a href="%s" class="p-2 text-blue-600 hover:bg-blue-50 rounded-md inline-flex items-center" title="Ver"><i class="fas fa-eye"></i></a>',
+                        e($showUrl)
+                    );
+                    $canEdit = (string) $row->c2 === 'aberta';
 
-        if ($filters['data_fim'] !== '') {
-            $query->whereDate('data_limite', '<=', $filters['data_fim']);
-        }
-
-        $quotations = $query->orderByDesc('id')->paginate(10)->withQueryString();
-
-        return Inertia::render('Purchases/Quotations/Index', [
-            'filters' => $filters,
-            'quotations' => $quotations,
-        ]);
+                    return DataTableActions::wrap([
+                        $show,
+                        DataTableActions::edit('purchases.quotations.edit', $row->id, $canEdit),
+                    ]);
+                });
+            }
+        );
     }
 
     /**

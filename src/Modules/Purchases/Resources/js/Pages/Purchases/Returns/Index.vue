@@ -1,12 +1,11 @@
 ﻿<script setup>
 import { Head, Link } from '@inertiajs/vue3'
 import { onBeforeUnmount, reactive } from 'vue'
+import DataTable from '@/components/DataTable.vue'
 import { useQueryFilters } from '@/composables/useQueryFilters'
-import Pagination from '../Shared/Pagination.vue'
 
 const props = defineProps({
   filters: { type: Object, default: () => ({}) },
-  returns: { type: Object, default: () => ({ data: [], links: [] }) },
 })
 
 const form = reactive({
@@ -15,6 +14,15 @@ const form = reactive({
   data_inicio: props.filters.data_inicio ?? '',
   data_fim: props.filters.data_fim ?? '',
 })
+
+const dtColumns = [
+  { data: 'c1', title: 'Numero' },
+  { data: 'c2', title: 'Status' },
+  { data: 'c3', title: 'Pedido' },
+  { data: 'c4', title: 'Recebimento' },
+  { data: 'c5', title: 'Data' },
+  { data: 'acoes', title: 'Acoes', orderable: false, searchable: false },
+]
 
 const stopSyncFilters = useQueryFilters(form, 'purchases.returns.index')
 onBeforeUnmount(() => stopSyncFilters())
@@ -42,37 +50,13 @@ onBeforeUnmount(() => stopSyncFilters())
     <input v-model="form.data_fim" type="date" class="px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500">
   </div>
 
-  <div class="overflow-x-auto bg-white rounded shadow">
-    <table class="w-full text-sm">
-      <thead class="bg-slate-50">
-        <tr>
-          <th class="px-4 py-2 text-left">Numero</th>
-          <th class="px-4 py-2 text-left">Status</th>
-          <th class="px-4 py-2 text-left">Pedido</th>
-          <th class="px-4 py-2 text-left">Recebimento</th>
-          <th class="px-4 py-2 text-left">Data</th>
-          <th class="px-4 py-2 text-left">Acoes</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="purchaseReturn in props.returns.data" :key="purchaseReturn.id" class="border-t">
-          <td class="px-4 py-2">{{ purchaseReturn.numero }}</td>
-          <td class="px-4 py-2">{{ purchaseReturn.status }}</td>
-          <td class="px-4 py-2">{{ purchaseReturn.order_id ?? '-' }}</td>
-          <td class="px-4 py-2">{{ purchaseReturn.receipt_id ?? '-' }}</td>
-          <td class="px-4 py-2">{{ purchaseReturn.data_devolucao }}</td>
-          <td class="px-4 py-2">
-            <Link :href="route('purchases.returns.show', purchaseReturn.id)" class="text-blue-600">Ver</Link>
-          </td>
-        </tr>
-        <tr v-if="!props.returns.data.length">
-          <td colspan="6" class="px-4 py-3 text-center text-slate-500">Nenhuma devolucao encontrada.</td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-
-  <div class="mt-4">
-    <Pagination :links="props.returns.links" />
-  </div>
+  <DataTable
+    table-id="dt-purchases-returns"
+    :ajax-url="route('purchases.returns.data')"
+    :ajax-params="form"
+    :columns="dtColumns"
+    :order="[[0, 'desc']]"
+    :page-length="10"
+    :actions-col-index="5"
+  />
 </template>

@@ -55,10 +55,12 @@ class EstoqueRepositoryEloquent extends BaseRepository implements EstoqueReposit
         }
         $estoque = $this->create($data);
 
-        MarcaProduto::create([
-            'id_produto_fk' => $data['id_produto_fk'],
-            'id_marca_fk' => $data['id_marca_fk'],
-        ]);
+        if (!empty($data['id_produto_fk']) && !empty($data['id_marca_fk'])) {
+            MarcaProduto::create([
+                'id_produto_fk' => $data['id_produto_fk'],
+                'id_marca_fk' => $data['id_marca_fk'],
+            ]);
+        }
 
         return $estoque;
     }

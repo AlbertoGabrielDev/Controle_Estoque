@@ -1,12 +1,11 @@
 ﻿<script setup>
-import { Head, Link } from '@inertiajs/vue3'
+import { Head } from '@inertiajs/vue3'
 import { onBeforeUnmount, reactive } from 'vue'
+import DataTable from '@/components/DataTable.vue'
 import { useQueryFilters } from '@/composables/useQueryFilters'
-import Pagination from '../Shared/Pagination.vue'
 
 const props = defineProps({
   filters: { type: Object, default: () => ({}) },
-  payables: { type: Object, default: () => ({ data: [], links: [] }) },
 })
 
 const form = reactive({
@@ -16,6 +15,15 @@ const form = reactive({
   data_inicio: props.filters.data_inicio ?? '',
   data_fim: props.filters.data_fim ?? '',
 })
+
+const dtColumns = [
+  { data: 'c1', title: 'Documento' },
+  { data: 'c2', title: 'Status' },
+  { data: 'c3', title: 'Fornecedor' },
+  { data: 'c4', title: 'Vencimento' },
+  { data: 'c5', title: 'Valor' },
+  { data: 'acoes', title: 'Acoes', orderable: false, searchable: false },
+]
 
 const stopSyncFilters = useQueryFilters(form, 'purchases.payables.index')
 onBeforeUnmount(() => stopSyncFilters())
@@ -41,37 +49,13 @@ onBeforeUnmount(() => stopSyncFilters())
     <input v-model="form.data_fim" type="date" class="px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500">
   </div>
 
-  <div class="overflow-x-auto bg-white rounded shadow">
-    <table class="w-full text-sm">
-      <thead class="bg-slate-50">
-        <tr>
-          <th class="px-4 py-2 text-left">Documento</th>
-          <th class="px-4 py-2 text-left">Status</th>
-          <th class="px-4 py-2 text-left">Fornecedor</th>
-          <th class="px-4 py-2 text-left">Vencimento</th>
-          <th class="px-4 py-2 text-left">Valor</th>
-          <th class="px-4 py-2 text-left">Acoes</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="payable in props.payables.data" :key="payable.id" class="border-t">
-          <td class="px-4 py-2">{{ payable.numero_documento }}</td>
-          <td class="px-4 py-2">{{ payable.status }}</td>
-          <td class="px-4 py-2">{{ payable.supplier_id }}</td>
-          <td class="px-4 py-2">{{ payable.data_vencimento }}</td>
-          <td class="px-4 py-2">{{ payable.valor_total }}</td>
-          <td class="px-4 py-2">
-            <Link :href="route('purchases.payables.show', payable.id)" class="text-blue-600">Ver</Link>
-          </td>
-        </tr>
-        <tr v-if="!props.payables.data.length">
-          <td colspan="6" class="px-4 py-3 text-center text-slate-500">Nenhuma conta encontrada.</td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-
-  <div class="mt-4">
-    <Pagination :links="props.payables.links" />
-  </div>
+  <DataTable
+    table-id="dt-purchases-payables"
+    :ajax-url="route('purchases.payables.data')"
+    :ajax-params="form"
+    :columns="dtColumns"
+    :order="[[0, 'desc']]"
+    :page-length="10"
+    :actions-col-index="5"
+  />
 </template>

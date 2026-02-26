@@ -17,8 +17,8 @@ class ValidacaoEstoque extends FormRequest
         $estoqueId = $this->route('estoqueId');
         return [
             'id_produto_fk' => 'required|integer|exists:produtos,id_produto',
-            'id_fornecedor_fk' => 'required|integer|exists:fornecedores,id_fornecedor',
-            'id_marca_fk' => 'required|integer|exists:marcas,id_marca',
+            'id_fornecedor_fk' => 'nullable|integer|exists:fornecedores,id_fornecedor',
+            'id_marca_fk' => 'nullable|integer|exists:marcas,id_marca',
             'localizacao' => 'nullable|string|max:10',
             'preco_custo' => 'nullable|numeric',
             'preco_venda' => 'nullable|numeric',
@@ -40,8 +40,6 @@ class ValidacaoEstoque extends FormRequest
     {
         return [
             'id_produto_fk.required' => 'Selecione um produto.',
-            'id_fornecedor_fk.required' => 'Selecione um fornecedor.',
-            'id_marca_fk.required' => 'Selecione uma marca.',
             'localizacao.max' => 'Máximo de número permitido no campo Localização é 10.',
             'data_chegada.date' => 'Formato de data inválido.',
             'validade.date' => 'Formato de data inválido.',

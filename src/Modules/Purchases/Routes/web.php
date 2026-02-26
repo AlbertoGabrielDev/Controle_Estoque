@@ -16,6 +16,7 @@ Route::middleware([
     Route::prefix('/purchases')->group(function () {
         Route::prefix('/requisitions')->group(function () {
             Route::get('/', [PurchaseRequisitionController::class, 'index'])->name('purchases.requisitions.index');
+            Route::get('/data', [PurchaseRequisitionController::class, 'data'])->name('purchases.requisitions.data');
             Route::get('/create', [PurchaseRequisitionController::class, 'create'])->name('purchases.requisitions.create');
             Route::post('/', [PurchaseRequisitionController::class, 'store'])->name('purchases.requisitions.store');
             Route::get('/{requisitionId}', [PurchaseRequisitionController::class, 'show'])->name('purchases.requisitions.show');
@@ -28,6 +29,7 @@ Route::middleware([
 
         Route::prefix('/quotations')->group(function () {
             Route::get('/', [PurchaseQuotationController::class, 'index'])->name('purchases.quotations.index');
+            Route::get('/data', [PurchaseQuotationController::class, 'data'])->name('purchases.quotations.data');
             Route::get('/create', [PurchaseQuotationController::class, 'create'])->name('purchases.quotations.create');
             Route::post('/', [PurchaseQuotationController::class, 'store'])->name('purchases.quotations.store');
             Route::get('/{quotationId}', [PurchaseQuotationController::class, 'show'])->name('purchases.quotations.show');
@@ -42,6 +44,7 @@ Route::middleware([
 
         Route::prefix('/orders')->group(function () {
             Route::get('/', [PurchaseOrderController::class, 'index'])->name('purchases.orders.index');
+            Route::get('/data', [PurchaseOrderController::class, 'data'])->name('purchases.orders.data');
             Route::post('/from-quotation', [PurchaseOrderController::class, 'storeFromQuotation'])->name('purchases.orders.fromQuotation');
             Route::get('/{orderId}', [PurchaseOrderController::class, 'show'])->name('purchases.orders.show');
             Route::patch('/{orderId}/cancel', [PurchaseOrderController::class, 'cancel'])->name('purchases.orders.cancel');
@@ -50,6 +53,7 @@ Route::middleware([
 
         Route::prefix('/receipts')->group(function () {
             Route::get('/', [PurchaseReceiptController::class, 'index'])->name('purchases.receipts.index');
+            Route::get('/data', [PurchaseReceiptController::class, 'data'])->name('purchases.receipts.data');
             Route::get('/create', [PurchaseReceiptController::class, 'create'])->name('purchases.receipts.create');
             Route::post('/', [PurchaseReceiptController::class, 'store'])->name('purchases.receipts.store');
             Route::get('/{receiptId}', [PurchaseReceiptController::class, 'show'])->name('purchases.receipts.show');
@@ -60,6 +64,7 @@ Route::middleware([
 
         Route::prefix('/returns')->group(function () {
             Route::get('/', [PurchaseReturnController::class, 'index'])->name('purchases.returns.index');
+            Route::get('/data', [PurchaseReturnController::class, 'data'])->name('purchases.returns.data');
             Route::get('/create', [PurchaseReturnController::class, 'create'])->name('purchases.returns.create');
             Route::post('/', [PurchaseReturnController::class, 'store'])->name('purchases.returns.store');
             Route::get('/{returnId}', [PurchaseReturnController::class, 'show'])->name('purchases.returns.show');
@@ -69,6 +74,7 @@ Route::middleware([
 
         Route::prefix('/payables')->group(function () {
             Route::get('/', [PurchasePayableController::class, 'index'])->name('purchases.payables.index');
+            Route::get('/data', [PurchasePayableController::class, 'data'])->name('purchases.payables.data');
             Route::get('/{payableId}', [PurchasePayableController::class, 'show'])->name('purchases.payables.show');
         });
     });

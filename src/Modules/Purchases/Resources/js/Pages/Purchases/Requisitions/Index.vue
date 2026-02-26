@@ -1,12 +1,11 @@
 ﻿<script setup>
 import { Head, Link } from '@inertiajs/vue3'
 import { onBeforeUnmount, reactive } from 'vue'
+import DataTable from '@/components/DataTable.vue'
 import { useQueryFilters } from '@/composables/useQueryFilters'
-import Pagination from '../Shared/Pagination.vue'
 
 const props = defineProps({
   filters: { type: Object, default: () => ({}) },
-  requisitions: { type: Object, default: () => ({ data: [], links: [] }) },
 })
 
 const form = reactive({
@@ -15,6 +14,14 @@ const form = reactive({
   data_inicio: props.filters.data_inicio ?? '',
   data_fim: props.filters.data_fim ?? '',
 })
+
+const dtColumns = [
+  { data: 'c1', title: 'Numero' },
+  { data: 'c2', title: 'Status' },
+  { data: 'c3', title: 'Data' },
+  { data: 'c4', title: 'Itens' },
+  { data: 'acoes', title: 'Acoes', orderable: false, searchable: false },
+]
 
 const stopSyncFilters = useQueryFilters(form, 'purchases.requisitions.index')
 onBeforeUnmount(() => stopSyncFilters())
@@ -50,38 +57,13 @@ onBeforeUnmount(() => stopSyncFilters())
     <input v-model="form.data_fim" type="date" class="px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500">
   </div>
 
-  <div class="overflow-x-auto bg-white rounded shadow">
-    <table class="w-full text-sm">
-      <thead class="bg-slate-50">
-        <tr>
-          <th class="px-4 py-2 text-left">Numero</th>
-          <th class="px-4 py-2 text-left">Status</th>
-          <th class="px-4 py-2 text-left">Data</th>
-          <th class="px-4 py-2 text-left">Itens</th>
-          <th class="px-4 py-2 text-left">Acoes</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="requisition in props.requisitions.data" :key="requisition.id" class="border-t">
-          <td class="px-4 py-2">{{ requisition.numero }}</td>
-          <td class="px-4 py-2">{{ requisition.status }}</td>
-          <td class="px-4 py-2">{{ requisition.data_requisicao ?? '-' }}</td>
-          <td class="px-4 py-2">{{ requisition.items?.length ?? 0 }}</td>
-          <td class="px-4 py-2">
-            <div class="flex flex-wrap gap-2">
-              <Link :href="route('purchases.requisitions.show', requisition.id)" class="text-blue-600">Ver</Link>
-              <Link v-if="requisition.status === 'draft'" :href="route('purchases.requisitions.edit', requisition.id)" class="text-blue-600">Editar</Link>
-            </div>
-          </td>
-        </tr>
-        <tr v-if="!props.requisitions.data.length">
-          <td colspan="5" class="px-4 py-3 text-center text-slate-500">Nenhuma requisicao encontrada.</td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-
-  <div class="mt-4">
-    <Pagination :links="props.requisitions.links" />
-  </div>
+  <DataTable
+    table-id="dt-purchases-requisitions"
+    :ajax-url="route('purchases.requisitions.data')"
+    :ajax-params="form"
+    :columns="dtColumns"
+    :order="[[0, 'desc']]"
+    :page-length="10"
+    :actions-col-index="4"
+  />
 </template>

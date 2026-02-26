@@ -3,7 +3,10 @@
 namespace Modules\Purchases\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Services\DataTableService;
+use App\Support\DataTableActions;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response as InertiaResponse;
@@ -15,9 +18,10 @@ use RuntimeException;
 
 class PurchaseRequisitionController extends Controller
 {
-    public function __construct(private PurchaseRequisitionService $service)
-    {
-    }
+    public function __construct(
+        private PurchaseRequisitionService $service,
+        private DataTableService $dt
+    ) {}
 
     /**
      * Display a listing of purchase requisitions.
@@ -34,30 +38,41 @@ class PurchaseRequisitionController extends Controller
             'data_fim' => (string) $request->query('data_fim', ''),
         ];
 
-        $query = PurchaseRequisition::query()->with('items');
-
-        if ($filters['q'] !== '') {
-            $query->where('numero', 'like', '%' . $filters['q'] . '%');
-        }
-
-        if ($filters['status'] !== '') {
-            $query->where('status', $filters['status']);
-        }
-
-        if ($filters['data_inicio'] !== '') {
-            $query->whereDate('data_requisicao', '>=', $filters['data_inicio']);
-        }
-
-        if ($filters['data_fim'] !== '') {
-            $query->whereDate('data_requisicao', '<=', $filters['data_fim']);
-        }
-
-        $requisitions = $query->orderByDesc('id')->paginate(10)->withQueryString();
-
         return Inertia::render('Purchases/Requisitions/Index', [
             'filters' => $filters,
-            'requisitions' => $requisitions,
         ]);
+    }
+
+    /**
+     * Return DataTables JSON for purchase requisitions.
+     *
+     * @param \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function data(Request $request): JsonResponse
+    {
+        [$query, $columnsMap] = PurchaseRequisition::makeDatatableQuery($request);
+
+        return $this->dt->make(
+            $query,
+            $columnsMap,
+            rawColumns: ['acoes'],
+            decorate: function ($dt) {
+                $dt->addColumn('acoes', function ($row) {
+                    $showUrl = route('purchases.requisitions.show', $row->id);
+                    $show = sprintf(
+                        '<a href="%s" class="p-2 text-blue-600 hover:bg-blue-50 rounded-md inline-flex items-center" title="Ver"><i class="fas fa-eye"></i></a>',
+                        e($showUrl)
+                    );
+                    $canEdit = (string) $row->c2 === 'draft';
+
+                    return DataTableActions::wrap([
+                        $show,
+                        DataTableActions::edit('purchases.requisitions.edit', $row->id, $canEdit),
+                    ]);
+                });
+            }
+        );
     }
 
     /**
