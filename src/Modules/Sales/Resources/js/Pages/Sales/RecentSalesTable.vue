@@ -46,7 +46,8 @@ function goNext() {
         <thead class="bg-slate-50 dark:bg-slate-800/70">
           <tr class="text-sm md:text-base text-slate-600 dark:text-slate-300">
             <th class="py-3 px-4 md:px-6 text-left font-medium">Nome</th>
-            <th class="py-3 px-4 md:px-6 text-left font-medium">Preco Venda</th>
+            <th class="py-3 px-4 md:px-6 text-left font-medium">Preço Venda</th>
+            <th class="py-3 px-4 md:px-6 text-left font-medium">Preço Total</th>
             <th class="py-3 px-4 md:px-6 text-left font-medium">Cod. Produto</th>
             <th class="py-3 px-4 md:px-6 text-left font-medium">Quantidade</th>
             <th class="py-3 px-4 md:px-6 text-left font-medium">Vendedor</th>
@@ -60,7 +61,14 @@ function goNext() {
             class="border-b border-slate-200 dark:border-slate-700 text-sm md:text-base"
           >
             <td class="py-3 px-4 md:px-6 text-slate-700 dark:text-slate-200">{{ sale.nome_produto }}</td>
-            <td class="py-3 px-4 md:px-6 text-slate-700 dark:text-slate-200">{{ money(sale.preco_venda) }}</td>
+            <td class="py-3 px-4 md:px-6 text-slate-700 dark:text-slate-200">
+              <span v-if="sale.preco_unit != null">{{ money(sale.preco_unit) }}</span>
+              <span v-else>-</span>
+            </td>
+            <td class="py-3 px-4 md:px-6 text-slate-700 dark:text-slate-200">
+              <span v-if="sale.preco_total != null">{{ money(sale.preco_total) }}</span>
+              <span v-else>-</span>
+            </td>
             <td class="py-3 px-4 md:px-6 text-slate-700 dark:text-slate-200">{{ sale.cod_produto }}</td>
             <td class="py-3 px-4 md:px-6 text-slate-700 dark:text-slate-200">{{ sale.quantidade }}</td>
             <td class="py-3 px-4 md:px-6 text-slate-700 dark:text-slate-200">{{ sale.vendedor || '-' }}</td>
@@ -68,7 +76,7 @@ function goNext() {
           </tr>
 
           <tr v-if="rows.length === 0">
-            <td colspan="6" class="py-8 px-4 text-center text-slate-500 dark:text-slate-400">
+            <td colspan="7" class="py-8 px-4 text-center text-slate-500 dark:text-slate-400">
               Nenhuma venda registrada ate o momento.
             </td>
           </tr>
@@ -117,3 +125,6 @@ function goNext() {
   background-color: transparent;
 }
 </style>
+
+
+

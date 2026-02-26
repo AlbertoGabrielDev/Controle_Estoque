@@ -254,11 +254,13 @@ const monthlyOptions = { responsive: true, maintainAspectRatio: false, plugins: 
     <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
       <div class="bg-white rounded-xl shadow p-4">
         <div class="text-sm text-gray-500">Vendas (intervalo)</div>
+        <div class="text-xs text-gray-400">Contagem de vendas no intervalo</div>
         <div class="mt-1 text-2xl font-bold">{{ props.kpis?.salesCount ?? 0 }}</div>
       </div>
 
       <div class="bg-white rounded-xl shadow p-4">
         <div class="text-sm text-gray-500">Faturamento <strong>bruto</strong></div>
+        <div class="text-xs text-gray-400">Soma(preco_venda * quantidade)</div>
         <div class="mt-1 text-2xl font-bold">
           {{ brl.format(props.kpis?.grossRevenue ?? 0) }}
         </div>
@@ -266,6 +268,7 @@ const monthlyOptions = { responsive: true, maintainAspectRatio: false, plugins: 
 
       <div class="bg-white rounded-xl shadow p-4">
         <div class="text-sm text-gray-500">Faturamento <strong>líquido</strong></div>
+        <div class="text-xs text-gray-400">Bruto - devolucoes - descontos - impostos</div>
         <div class="mt-1 text-2xl font-bold">
           {{ brl.format(props.kpis?.netRevenue ?? 0) }}
         </div>
@@ -276,6 +279,7 @@ const monthlyOptions = { responsive: true, maintainAspectRatio: false, plugins: 
 
       <div class="bg-white rounded-xl shadow p-4">
         <div class="text-sm text-gray-500">Lucro (intervalo)</div>
+        <div class="text-xs text-gray-400">(preco_venda - custo_unit) * qtd</div>
         <div class="mt-1 text-2xl font-bold">
           {{ brl.format(props.kpis?.profit ?? 0) }}
         </div>

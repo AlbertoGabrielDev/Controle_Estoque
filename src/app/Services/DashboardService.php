@@ -49,6 +49,21 @@ class DashboardService
         return $q;
     }
 
+    private function vendasBaseWithEstoque(?int $userId)
+    {
+        $q = DB::table('vendas as v')
+            ->leftJoin('estoques as e', 'e.id_estoque', '=', 'v.id_estoque_fk');
+        if ($userId) {
+            $q->where('v.id_usuario_fk', $userId);
+        }
+        return $q;
+    }
+
+    private function precoVendaExpr(): string
+    {
+        return "COALESCE(e.preco_venda, v.preco_venda, 0)";
+    }
+
     /**
      * Helper: expressão SQL da alíquota do JSON de impostos do estoque.
      * Retorna DECIMAL (coalesce para 0).
@@ -65,11 +80,12 @@ class DashboardService
     {
         [$from, $to] = $this->normalizeRange($from, $to, $days);
 
-        $rows = $this->vendasBase($userId)
-            ->selectRaw('DATE(created_at) dia,
-                         SUM(preco_venda)       AS total_bruto,
-                         SUM(quantidade)        AS qtd')
-            ->whereBetween('created_at', [$from, $to])
+        $precoExpr = $this->precoVendaExpr();
+        $rows = $this->vendasBaseWithEstoque($userId)
+            ->selectRaw("DATE(v.created_at) dia,
+                         SUM(($precoExpr) * v.quantidade) AS total_bruto,
+                         SUM(v.quantidade)        AS qtd")
+            ->whereBetween('v.created_at', [$from, $to])
             ->groupBy('dia')
             ->orderBy('dia')
             ->get()
@@ -93,13 +109,14 @@ class DashboardService
     {
         [$from, $to] = $this->normalizeRange($from, $to);
 
-        $rows = $this->vendasBase($userId)
-            ->whereBetween('created_at', [$from, $to])
-            ->selectRaw('cod_produto, nome_produto,
-                         SUM(preco_venda) AS total_bruto,
-                         SUM(quantidade)  AS qtd')
-            ->groupBy('cod_produto','nome_produto')
-            ->orderByDesc(DB::raw('SUM(preco_venda)'))
+        $precoExpr = $this->precoVendaExpr();
+        $rows = $this->vendasBaseWithEstoque($userId)
+            ->whereBetween('v.created_at', [$from, $to])
+            ->selectRaw("v.cod_produto, v.nome_produto,
+                         SUM(($precoExpr) * v.quantidade) AS total_bruto,
+                         SUM(v.quantidade)  AS qtd")
+            ->groupBy('v.cod_produto','v.nome_produto')
+            ->orderByDesc(DB::raw("SUM(($precoExpr) * v.quantidade)"))
             ->limit($limit)
             ->get();
 
@@ -129,10 +146,11 @@ class DashboardService
     {
         [$from, $to] = $this->normalizeRange($from, $to);
 
-        $rows = $this->vendasBase($userId)
-            ->whereBetween('created_at', [$from, $to])
-            ->selectRaw('YEAR(created_at) as ano, MONTH(created_at) as mes,
-                         SUM(preco_venda)  as total_bruto')
+        $precoExpr = $this->precoVendaExpr();
+        $rows = $this->vendasBaseWithEstoque($userId)
+            ->whereBetween('v.created_at', [$from, $to])
+            ->selectRaw("YEAR(v.created_at) as ano, MONTH(v.created_at) as mes,
+                         SUM(($precoExpr) * v.quantidade)  as total_bruto")
             ->groupBy('ano','mes')
             ->orderBy('ano')->orderBy('mes')
             ->get();
@@ -157,15 +175,14 @@ class DashboardService
     {
         [$from, $to] = $this->normalizeRange($from, $to);
 
-        $q = DB::table('vendas as v')
+        $precoExpr = $this->precoVendaExpr();
+        $q = $this->vendasBaseWithEstoque($userId)
             ->join('unidades as u', 'u.id_unidade', '=', 'v.id_unidade_fk')
             ->whereBetween('v.created_at', [$from, $to]);
 
-        if ($userId) $q->where('v.id_usuario_fk', $userId);
-
-        $rows = $q->selectRaw('u.nome as unidade, SUM(v.preco_venda) as total_bruto')
+        $rows = $q->selectRaw("u.nome as unidade, SUM(($precoExpr) * v.quantidade) as total_bruto")
             ->groupBy('u.nome')
-            ->orderByDesc(DB::raw('SUM(v.preco_venda)'))
+            ->orderByDesc(DB::raw("SUM(($precoExpr) * v.quantidade)"))
             ->get();
 
         return [
@@ -185,10 +202,11 @@ class DashboardService
             ->whereBetween('created_at', [$from, $to])
             ->count();
 
-        // 2) FATURAMENTO BRUTO: soma dos totais de linha
-        $grossRevenue = (float) $this->vendasBase($userId)
-            ->whereBetween('created_at', [$from, $to])
-            ->selectRaw('COALESCE(SUM(preco_venda),0) AS total')
+        // 2) FATURAMENTO BRUTO: soma de (preco_venda_unit * quantidade)
+        $precoExpr = $this->precoVendaExpr();
+        $grossRevenue = (float) $this->vendasBaseWithEstoque($userId)
+            ->whereBetween('v.created_at', [$from, $to])
+            ->selectRaw("COALESCE(SUM(($precoExpr) * v.quantidade),0) AS total")
             ->value('total');
 
         // 3) IMPOSTOS sobre vendas (por linha, via id_estoque_fk → aliquota no JSON)
@@ -196,24 +214,22 @@ class DashboardService
         //    impostos_da_linha = total_da_linha * aliquota
         $aliq = $this->aliqExpr();
 
-        $taxes = (float) DB::table('vendas as v')
-            ->leftJoin('estoques as e', 'e.id_estoque', '=', 'v.id_estoque_fk')
-            ->when($userId, fn($qq) => $qq->where('v.id_usuario_fk', $userId))
+        $taxes = (float) $this->vendasBaseWithEstoque($userId)
             ->whereBetween('v.created_at', [$from, $to])
-            ->selectRaw("COALESCE(SUM(v.preco_venda * ($aliq)), 0) as impostos")
+            ->selectRaw("COALESCE(SUM((($precoExpr) * v.quantidade) * ($aliq)), 0) as impostos")
             ->value('impostos');
 
         // 4) FATURAMENTO LÍQUIDO
-        $netRevenue = max(0.0, $grossRevenue - $taxes);
+        $returns = 0.0;   // ainda nao modelado
+        $discounts = 0.0; // ainda nao modelado
+        $netRevenue = max(0.0, $grossRevenue - $returns - $discounts - $taxes);
 
         // 5) LUCRO (usando custo unitário do estoque)
         //    preco_unit = total_linha / quantidade
-        $profit = (float) DB::table('vendas AS v')
-            ->leftJoin('estoques AS e', 'e.id_estoque', '=', 'v.id_estoque_fk')
-            ->when($userId, fn($qq) => $qq->where('v.id_usuario_fk', $userId))
+        $profit = (float) $this->vendasBaseWithEstoque($userId)
             ->whereBetween('v.created_at', [$from, $to])
             ->selectRaw("
-                COALESCE(SUM( ((v.preco_venda / NULLIF(v.quantidade,0)) - e.preco_custo) * v.quantidade ), 0
+                COALESCE(SUM( ((($precoExpr) - COALESCE(e.preco_custo,0)) * v.quantidade) ), 0
             ) AS lucro")
             ->value('lucro');
 
@@ -223,6 +239,8 @@ class DashboardService
             'netRevenue'   => $netRevenue,
             'taxes'        => $taxes,
             'profit'       => $profit,
+            'returns'      => $returns,
+            'discounts'    => $discounts,
         ];
     }
 }

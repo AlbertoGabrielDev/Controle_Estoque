@@ -28,6 +28,7 @@ class VendaController extends Controller
                 ->with([
                     'usuario:id,name',
                     'produto:id_produto,nome_produto,cod_produto',
+                    'estoque:id_estoque,preco_venda',
                 ])
                 ->latest()
                 ->paginate(10)
@@ -36,6 +37,12 @@ class VendaController extends Controller
                         'id' => $venda->id,
                         'nome_produto' => (string) ($venda->nome_produto ?: optional($venda->produto)->nome_produto),
                         'preco_venda' => (float) $venda->preco_venda,
+                        'preco_unit' => $venda->estoque?->preco_venda !== null
+                            ? (float) $venda->estoque->preco_venda
+                            : null,
+                        'preco_total' => $venda->estoque?->preco_venda !== null
+                            ? (float) $venda->estoque->preco_venda * (int) $venda->quantidade
+                            : null,
                         'cod_produto' => (string) ($venda->cod_produto ?: optional($venda->produto)->cod_produto),
                         'quantidade' => (int) $venda->quantidade,
                         'vendedor' => (string) optional($venda->usuario)->name,
