@@ -1,0 +1,6 @@
+﻿{
+  "name": "Purchases",
+  "slug": "purchases",
+  "enabled": true,
+  "description": "Modulo de compras (requisicao, cotacao, pedido, recebimento, devolucao e contas a pagar)."
+}

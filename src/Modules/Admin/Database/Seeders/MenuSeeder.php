@@ -361,5 +361,94 @@ class MenuSeeder extends Seeder
                 'order' => 10,
             ]
         );
+
+        /**
+         * =========================
+         * NOVO: Compras
+         * =========================
+         */
+        $compras = Menu::updateOrCreate(
+            ['slug' => 'compras'],
+            [
+                'name' => 'Compras',
+                'slug' => 'compras',
+                'icon' => 'fas fa-shopping-cart mr-2',
+                'route' => null,
+                'parent_id' => null,
+                'order' => 13,
+            ]
+        );
+
+        Menu::updateOrCreate(
+            ['slug' => 'compras_requisicoes'],
+            [
+                'name' => 'Requisicoes',
+                'slug' => 'compras_requisicoes',
+                'icon' => 'fas fa-clipboard-list mr-2',
+                'route' => 'purchases.requisitions.index',
+                'parent_id' => $compras->id,
+                'order' => 1,
+            ]
+        );
+
+        Menu::updateOrCreate(
+            ['slug' => 'compras_cotacoes'],
+            [
+                'name' => 'Cotacoes',
+                'slug' => 'compras_cotacoes',
+                'icon' => 'fas fa-file-signature mr-2',
+                'route' => 'purchases.quotations.index',
+                'parent_id' => $compras->id,
+                'order' => 2,
+            ]
+        );
+
+        Menu::updateOrCreate(
+            ['slug' => 'compras_pedidos'],
+            [
+                'name' => 'Pedidos',
+                'slug' => 'compras_pedidos',
+                'icon' => 'fas fa-file-invoice mr-2',
+                'route' => 'purchases.orders.index',
+                'parent_id' => $compras->id,
+                'order' => 3,
+            ]
+        );
+
+        Menu::updateOrCreate(
+            ['slug' => 'compras_recebimentos'],
+            [
+                'name' => 'Recebimentos',
+                'slug' => 'compras_recebimentos',
+                'icon' => 'fas fa-box-open mr-2',
+                'route' => 'purchases.receipts.index',
+                'parent_id' => $compras->id,
+                'order' => 4,
+            ]
+        );
+
+        Menu::updateOrCreate(
+            ['slug' => 'compras_devolucoes'],
+            [
+                'name' => 'Devolucoes',
+                'slug' => 'compras_devolucoes',
+                'icon' => 'fas fa-undo mr-2',
+                'route' => 'purchases.returns.index',
+                'parent_id' => $compras->id,
+                'order' => 5,
+            ]
+        );
+
+        Menu::updateOrCreate(
+            ['slug' => 'compras_payables'],
+            [
+                'name' => 'Contas a Pagar',
+                'slug' => 'compras_payables',
+                'icon' => 'fas fa-money-check-alt mr-2',
+                'route' => 'purchases.payables.index',
+                'parent_id' => $compras->id,
+                'order' => 6,
+            ]
+        );
     }
 }

@@ -121,6 +121,7 @@ const USE_PRINCIPAL = [
   /^Settings\//,
   // Cadastro Mestre (MDM)
   /^MeasureUnits\//, /^Items\//, /^PriceTables\//, /^CostCenters\//, /^AccountingAccounts\//,/^Expenses\//,
+  /^Purchases\//,
 ]
 
 createInertiaApp({

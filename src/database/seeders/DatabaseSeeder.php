@@ -33,6 +33,7 @@ class DatabaseSeeder extends Seeder
             TaxSeeder::class,
             SupermercadoBasicoTaxesSeeder::class,
             EstoqueSeeder::class,
+            PurchasesSeeder::class,
             VendaSeeder::class,
         ]);
 
