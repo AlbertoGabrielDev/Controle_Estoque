@@ -9,6 +9,7 @@ Route::middleware([
     'auth',
     config('jetstream.auth_session'),
     'verified',
+    'check.permission.auto',
 ])->prefix('/verdurao')->group(function () {
     Route::prefix('/cadastros')->group(function () {
         Route::prefix('/centros-custo')->name('centros_custo.')->group(function () {

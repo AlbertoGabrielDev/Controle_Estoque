@@ -201,7 +201,7 @@ const monthlyOptions = { responsive: true, maintainAspectRatio: false, plugins: 
     <!-- Filtros -->
     <div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
       <div class="flex items-center gap-2">
-        <label for="att" class="text-sm text-gray-600">Atendente:</label>
+        <label for="att" class="text-sm text-gray-600">Usuario:</label>
         <select id="att" v-model="selectedAtt" class="border rounded-lg px-3 py-2 text-sm">
           <option :value="''">Todos</option>
           <option v-for="a in attendants" :key="a.id" :value="a.id">

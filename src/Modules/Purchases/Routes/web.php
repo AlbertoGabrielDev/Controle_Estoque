@@ -12,6 +12,7 @@ Route::middleware([
     'auth',
     config('jetstream.auth_session'),
     'verified',
+    'check.permission.auto',
 ])->prefix('/verdurao')->group(function () {
     Route::prefix('/purchases')->group(function () {
         Route::prefix('/requisitions')->group(function () {

@@ -7,9 +7,10 @@ Route::middleware([
     'auth',
     config('jetstream.auth_session'),
     'verified',
+    'check.permission.auto',
 ])->prefix('/verdurao')->group(function () {
     Route::prefix('configuracoes')->name('configuracoes.')->group(function () {
-        Route::get('/vendas', [SalesSettingsController::class, 'index'])->name('vendas')->middleware('check.permission:view_post,config_vendas');
-        Route::put('/vendas', [SalesSettingsController::class, 'update'])->name('vendas.update')->middleware('check.permission:edit_post,config_vendas');
+        Route::get('/vendas', [SalesSettingsController::class, 'index'])->name('vendas');
+        Route::put('/vendas', [SalesSettingsController::class, 'update'])->name('vendas.update');
     });
 });

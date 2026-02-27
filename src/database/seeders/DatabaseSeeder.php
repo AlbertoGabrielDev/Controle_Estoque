@@ -18,6 +18,7 @@ class DatabaseSeeder extends Seeder
             UnidadeSeeder::class,
             MenuSeeder::class,
             PermissionSeeder::class,
+            RoleMenuPermissionSeeder::class,
             CategoriaSeeder::class,
             UnidadeMedidaSeeder::class,
             ItemSeeder::class,

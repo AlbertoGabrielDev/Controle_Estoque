@@ -21,8 +21,8 @@ class DashboardController extends Controller
         $to   = $toStr   ? Carbon::createFromFormat('Y-m-d', $toStr)->endOfDay()   : null;
 
         $attendants = User::query()
-            ->select('id','name')
-            ->whereHas('roles', fn($q) => $q->where('name', 'atendente'))
+            ->select('id', 'name')
+            ->whereHas('vendas')
             ->orderBy('name')
             ->get();
 

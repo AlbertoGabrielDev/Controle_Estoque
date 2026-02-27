@@ -7,6 +7,7 @@ Route::middleware([
     'auth',
     config('jetstream.auth_session'),
     'verified',
+    'check.permission.auto',
 ])->prefix('/verdurao')->group(function () {
     Route::prefix('/cadastros')->group(function () {
         Route::prefix('/unidades-medida')->name('unidades_medida.')->group(function () {

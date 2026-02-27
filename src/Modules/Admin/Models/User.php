@@ -89,6 +89,8 @@ class User extends Authenticatable
             return true;
         }
 
+        $menuSlug = mb_strtolower($menuSlug);
+
         $roleIds = $this->roles()->pluck('roles.id');
         if ($roleIds->isEmpty()) {
             return false;
@@ -98,7 +100,7 @@ class User extends Authenticatable
             ->join('menus as m', 'm.id', '=', 'rmp.menu_id')
             ->join('permissions as p', 'p.id', '=', 'rmp.permission_id')
             ->whereIn('rmp.role_id', $roleIds->all())
-            ->where('m.slug', $menuSlug)
+            ->whereRaw('LOWER(m.slug) = ?', [$menuSlug])
             ->where('p.name', $permissionName)
             ->exists();
 

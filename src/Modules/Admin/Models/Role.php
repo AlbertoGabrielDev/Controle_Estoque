@@ -34,8 +34,10 @@ class Role extends Model
 
     public function hasPermissionByNames(string $menuSlug, string $permissionName): bool
     {
+        $menuSlug = mb_strtolower($menuSlug);
+
         return $this->menus()
-            ->where('menus.slug', $menuSlug)
+            ->whereRaw('LOWER(menus.slug) = ?', [$menuSlug])
             ->whereHas('permissions', function ($q) use ($permissionName) {
                 $q->where('permissions.name', $permissionName);
             })
