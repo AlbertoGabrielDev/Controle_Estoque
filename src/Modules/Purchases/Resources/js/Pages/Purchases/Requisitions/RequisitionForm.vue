@@ -1,4 +1,4 @@
-﻿<script setup>
+<script setup>
 import { computed } from 'vue'
 
 const props = defineProps({
@@ -48,7 +48,7 @@ const totalEstimado = computed(() => props.form.items.reduce((total, item) => {
 </script>
 
 <template>
-  <form @submit.prevent="$emit('submit')" class="bg-white p-4 rounded shadow space-y-4">
+  <form @submit.prevent="$emit('submit')" class="bg-white p-4 rounded shadow dark:bg-slate-900 dark:border dark:border-slate-700 space-y-4">
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
       <div>
         <label class="block text-sm font-medium">Data da Requisicao</label>
@@ -68,12 +68,12 @@ const totalEstimado = computed(() => props.form.items.reduce((total, item) => {
 
     <div class="flex items-center justify-between">
       <h3 class="font-semibold">Itens da Requisicao</h3>
-      <button type="button" class="px-3 py-2 rounded bg-gray-100 hover:bg-gray-200" @click="addItem">Adicionar Item</button>
+      <button type="button" class="px-3 py-2 rounded bg-gray-100 hover:bg-gray-200 dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-slate-100" @click="addItem">Adicionar Item</button>
     </div>
 
     <div class="overflow-x-auto">
-      <table class="w-full text-sm border">
-        <thead class="bg-slate-50">
+      <table class="w-full text-sm border purchases-table dark:border-slate-700">
+        <thead class="bg-slate-50 dark:bg-slate-800/70">
           <tr>
             <th class="px-3 py-2 text-left">Item ID</th>
             <th class="px-3 py-2 text-left">Descricao</th>
@@ -86,7 +86,7 @@ const totalEstimado = computed(() => props.form.items.reduce((total, item) => {
           </tr>
         </thead>
         <tbody>
-          <tr v-for="(item, index) in props.form.items" :key="index" class="border-t">
+          <tr v-for="(item, index) in props.form.items" :key="index" class="border-t dark:border-slate-700">
             <td class="px-3 py-2">
               <input v-model="item.item_id" type="number" min="1" class="border rounded px-2 py-1 w-full">
               <div v-if="props.form.errors[`items.${index}.item_id`]" class="text-red-600 text-xs mt-1">
@@ -118,24 +118,24 @@ const totalEstimado = computed(() => props.form.items.reduce((total, item) => {
               <input v-model="item.observacoes" class="border rounded px-2 py-1 w-full">
             </td>
             <td class="px-3 py-2">
-              <button type="button" class="px-2 py-1 rounded bg-red-50 text-red-600" @click="removeItem(index)">Remover</button>
+              <button type="button" class="px-2 py-1 rounded bg-red-50 text-red-600 hover:bg-red-100 dark:bg-red-900/40 dark:text-red-300 dark:hover:bg-red-900/60 transition-colors" @click="removeItem(index)">Remover</button>
             </td>
           </tr>
           <tr v-if="!props.form.items.length">
-            <td colspan="8" class="px-3 py-3 text-center text-slate-500">Nenhum item adicionado.</td>
+            <td colspan="8" class="px-3 py-3 text-center text-slate-500 dark:text-slate-400">Nenhum item adicionado.</td>
           </tr>
         </tbody>
       </table>
     </div>
 
-    <div class="flex flex-wrap items-center justify-between gap-3 text-sm text-slate-600">
+    <div class="flex flex-wrap items-center justify-between gap-3 text-sm text-slate-600 dark:text-slate-300">
       <div>Total de itens: {{ props.form.items.length }}</div>
       <div>Quantidade total: {{ totalQuantidade.toFixed(3) }}</div>
       <div>Valor estimado: {{ totalEstimado.toFixed(2) }}</div>
     </div>
 
     <div class="flex justify-end">
-      <button :disabled="props.form.processing" class="px-3 py-2 rounded bg-blue-600 text-white">
+      <button :disabled="props.form.processing" class="px-3 py-2 rounded bg-blue-600 text-white hover:bg-blue-700 transition-colors">
         {{ submitLabel }}
       </button>
     </div>

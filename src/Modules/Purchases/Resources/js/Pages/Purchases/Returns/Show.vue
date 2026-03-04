@@ -1,4 +1,4 @@
-﻿<script setup>
+<script setup>
 import { Head, Link } from '@inertiajs/vue3'
 
 const props = defineProps({
@@ -12,10 +12,10 @@ const props = defineProps({
   <div class="flex flex-wrap items-center justify-between gap-3 mb-6">
     <div>
       <h2 class="text-2xl font-semibold">Devolucao {{ props.purchaseReturn.numero }}</h2>
-      <div class="text-sm text-slate-600">Status: {{ props.purchaseReturn.status }}</div>
+      <div class="text-sm text-slate-600 dark:text-slate-300">Status: {{ props.purchaseReturn.status }}</div>
     </div>
     <div class="flex flex-wrap gap-2">
-      <Link :href="route('purchases.returns.index')" class="text-blue-600">Voltar</Link>
+      <Link :href="route('purchases.returns.index')" class="text-blue-600 dark:text-cyan-400">Voltar</Link>
       <Link
         v-if="props.purchaseReturn.status === 'aberta'"
         method="patch"
@@ -37,15 +37,15 @@ const props = defineProps({
     </div>
   </div>
 
-  <div class="bg-white rounded shadow p-4 space-y-4">
+  <div class="bg-white rounded shadow p-4 space-y-4 dark:bg-slate-900 dark:border dark:border-slate-700">
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
       <div>
-        <div class="text-xs text-slate-500">Pedido</div>
+        <div class="text-xs text-slate-500 dark:text-slate-400">Pedido</div>
         <div class="font-medium">
           <Link
             v-if="props.purchaseReturn.order_id"
             :href="route('purchases.orders.show', props.purchaseReturn.order_id)"
-            class="text-blue-600"
+            class="text-blue-600 dark:text-cyan-400"
           >
             {{ props.purchaseReturn.order_id }}
           </Link>
@@ -53,12 +53,12 @@ const props = defineProps({
         </div>
       </div>
       <div>
-        <div class="text-xs text-slate-500">Recebimento</div>
+        <div class="text-xs text-slate-500 dark:text-slate-400">Recebimento</div>
         <div class="font-medium">
           <Link
             v-if="props.purchaseReturn.receipt_id"
             :href="route('purchases.receipts.show', props.purchaseReturn.receipt_id)"
-            class="text-blue-600"
+            class="text-blue-600 dark:text-cyan-400"
           >
             {{ props.purchaseReturn.receipt_id }}
           </Link>
@@ -66,21 +66,21 @@ const props = defineProps({
         </div>
       </div>
       <div>
-        <div class="text-xs text-slate-500">Data</div>
+        <div class="text-xs text-slate-500 dark:text-slate-400">Data</div>
         <div class="font-medium">{{ props.purchaseReturn.data_devolucao }}</div>
       </div>
     </div>
 
     <div>
-      <div class="text-xs text-slate-500">Motivo</div>
+      <div class="text-xs text-slate-500 dark:text-slate-400">Motivo</div>
       <div class="font-medium">{{ props.purchaseReturn.motivo }}</div>
     </div>
 
     <div>
       <h3 class="font-semibold mb-2">Itens</h3>
       <div class="overflow-x-auto">
-        <table class="w-full text-sm border">
-          <thead class="bg-slate-50">
+        <table class="w-full text-sm border purchases-table dark:border-slate-700">
+          <thead class="bg-slate-50 dark:bg-slate-800/70">
             <tr>
               <th class="px-3 py-2 text-left">Item ID</th>
               <th class="px-3 py-2 text-left">Receipt Item</th>
@@ -90,7 +90,7 @@ const props = defineProps({
             </tr>
           </thead>
           <tbody>
-            <tr v-for="item in props.purchaseReturn.items" :key="item.id" class="border-t">
+            <tr v-for="item in props.purchaseReturn.items" :key="item.id" class="border-t dark:border-slate-700">
               <td class="px-3 py-2">{{ item.item_id }}</td>
               <td class="px-3 py-2">{{ item.receipt_item_id ?? '-' }}</td>
               <td class="px-3 py-2">{{ item.order_item_id ?? '-' }}</td>
@@ -98,7 +98,7 @@ const props = defineProps({
               <td class="px-3 py-2">{{ item.observacoes ?? '-' }}</td>
             </tr>
             <tr v-if="!props.purchaseReturn.items?.length">
-              <td colspan="5" class="px-3 py-3 text-center text-slate-500">Nenhum item.</td>
+              <td colspan="5" class="px-3 py-3 text-center text-slate-500 dark:text-slate-400">Nenhum item.</td>
             </tr>
           </tbody>
         </table>

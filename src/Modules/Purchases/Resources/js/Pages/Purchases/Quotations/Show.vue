@@ -1,4 +1,4 @@
-﻿<script setup>
+<script setup>
 import { Head, Link, useForm } from '@inertiajs/vue3'
 import { reactive } from 'vue'
 
@@ -55,11 +55,11 @@ function submitPrices(supplierId) {
   <div class="flex flex-wrap items-center justify-between gap-3 mb-6">
     <div>
       <h2 class="text-2xl font-semibold">Cotacao {{ props.quotation.numero }}</h2>
-      <div class="text-sm text-slate-600">Status: {{ props.quotation.status }}</div>
+      <div class="text-sm text-slate-600 dark:text-slate-300">Status: {{ props.quotation.status }}</div>
     </div>
     <div class="flex flex-wrap gap-2">
-      <Link :href="route('purchases.quotations.index')" class="text-blue-600">Voltar</Link>
-      <Link v-if="props.quotation.status === 'aberta'" :href="route('purchases.quotations.edit', props.quotation.id)" class="text-blue-600">Editar</Link>
+      <Link :href="route('purchases.quotations.index')" class="text-blue-600 dark:text-cyan-400">Voltar</Link>
+      <Link v-if="props.quotation.status === 'aberta'" :href="route('purchases.quotations.edit', props.quotation.id)" class="text-blue-600 dark:text-cyan-400">Editar</Link>
       <Link
         v-if="props.quotation.status === 'aberta'"
         method="patch"
@@ -84,63 +84,63 @@ function submitPrices(supplierId) {
         as="button"
         :href="route('purchases.orders.fromQuotation')"
         :data="{ quotation_id: props.quotation.id }"
-        class="px-3 py-1 rounded bg-slate-700 text-white"
+        class="px-3 py-1 rounded bg-slate-700 text-white dark:bg-slate-600 dark:hover:bg-slate-500 transition-colors"
       >
         Gerar Pedidos
       </Link>
     </div>
   </div>
 
-  <div class="bg-white rounded shadow p-4 space-y-6">
+  <div class="bg-white rounded shadow p-4 space-y-6 dark:bg-slate-900 dark:border dark:border-slate-700">
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
       <div>
-        <div class="text-xs text-slate-500">Requisicao</div>
-        <Link :href="route('purchases.requisitions.show', props.quotation.requisition_id)" class="text-blue-600">
+        <div class="text-xs text-slate-500 dark:text-slate-400">Requisicao</div>
+        <Link :href="route('purchases.requisitions.show', props.quotation.requisition_id)" class="text-blue-600 dark:text-cyan-400">
           {{ props.quotation.requisition_id }}
         </Link>
       </div>
       <div>
-        <div class="text-xs text-slate-500">Data limite</div>
+        <div class="text-xs text-slate-500 dark:text-slate-400">Data limite</div>
         <div class="font-medium">{{ props.quotation.data_limite ?? '-' }}</div>
       </div>
       <div>
-        <div class="text-xs text-slate-500">Observacoes</div>
+        <div class="text-xs text-slate-500 dark:text-slate-400">Observacoes</div>
         <div class="font-medium">{{ props.quotation.observacoes ?? '-' }}</div>
       </div>
     </div>
 
-    <div class="border-t pt-4">
+    <div class="border-t pt-4 dark:border-slate-700">
       <h3 class="font-semibold mb-3">Adicionar fornecedor</h3>
       <form @submit.prevent="submitAddSupplier" class="flex flex-wrap gap-2 items-center">
         <input v-model="addSupplierForm.supplier_id" type="number" min="1" placeholder="Fornecedor ID" class="border rounded px-3 py-2">
-        <button :disabled="addSupplierForm.processing" class="px-3 py-2 rounded bg-gray-100 hover:bg-gray-200">
+        <button :disabled="addSupplierForm.processing" class="px-3 py-2 rounded bg-gray-100 hover:bg-gray-200 dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-slate-100">
           Adicionar
         </button>
       </form>
     </div>
 
-    <div class="border-t pt-4 space-y-4">
+    <div class="border-t pt-4 space-y-4 dark:border-slate-700">
       <h3 class="font-semibold">Fornecedores</h3>
 
-      <div v-if="!props.quotation.suppliers?.length" class="text-sm text-slate-500">
+      <div v-if="!props.quotation.suppliers?.length" class="text-sm text-slate-500 dark:text-slate-400">
         Nenhum fornecedor cadastrado.
       </div>
 
-      <div v-for="supplier in props.quotation.suppliers" :key="supplier.id" class="border rounded p-4 space-y-3">
+      <div v-for="supplier in props.quotation.suppliers" :key="supplier.id" class="border rounded p-4 dark:border-slate-700 space-y-3">
         <div class="flex flex-wrap items-center justify-between gap-2">
           <div>
-            <div class="text-sm text-slate-500">Fornecedor</div>
+            <div class="text-sm text-slate-500 dark:text-slate-400">Fornecedor</div>
             <div class="font-medium">
               {{ supplier.supplier?.nome_fornecedor ?? supplier.supplier?.razao_social ?? supplier.supplier_id }}
             </div>
           </div>
-          <div class="text-sm text-slate-600">Status: {{ supplier.status }}</div>
+          <div class="text-sm text-slate-600 dark:text-slate-300">Status: {{ supplier.status }}</div>
         </div>
 
         <form v-if="supplierForms[supplier.id]" @submit.prevent="submitPrices(supplier.id)">
           <div class="overflow-x-auto">
-            <table class="w-full text-sm border">
-              <thead class="bg-slate-50">
+            <table class="w-full text-sm border purchases-table dark:border-slate-700">
+              <thead class="bg-slate-50 dark:bg-slate-800/70">
                 <tr>
                   <th class="px-3 py-2 text-left">Req Item</th>
                   <th class="px-3 py-2 text-left">Quantidade</th>
@@ -155,7 +155,7 @@ function submitPrices(supplierId) {
                 <tr
                   v-for="(item, index) in supplier.items"
                   :key="item.id"
-                  class="border-t"
+                  class="border-t dark:border-slate-700"
                 >
                   <td class="px-3 py-2">{{ item.requisition_item_id }}</td>
                   <td class="px-3 py-2">
@@ -178,21 +178,21 @@ function submitPrices(supplierId) {
                       as="button"
                       :href="route('purchases.quotations.selectItem', props.quotation.id)"
                       :data="{ quotation_supplier_item_id: item.id }"
-                      class="px-2 py-1 rounded bg-blue-600 text-white"
+                      class="px-2 py-1 rounded bg-blue-600 text-white hover:bg-blue-700 transition-colors"
                     >
                       Selecionar
                     </Link>
                   </td>
                 </tr>
                 <tr v-if="!supplier.items?.length">
-                  <td colspan="7" class="px-3 py-3 text-center text-slate-500">Nenhum item.</td>
+                  <td colspan="7" class="px-3 py-3 text-center text-slate-500 dark:text-slate-400">Nenhum item.</td>
                 </tr>
               </tbody>
             </table>
           </div>
 
           <div class="mt-3 flex justify-end">
-            <button :disabled="supplierForms[supplier.id].processing" class="px-3 py-2 rounded bg-slate-700 text-white">
+            <button :disabled="supplierForms[supplier.id].processing" class="px-3 py-2 rounded bg-slate-700 text-white dark:bg-slate-600 dark:hover:bg-slate-500 transition-colors">
               Salvar precos
             </button>
           </div>
@@ -200,19 +200,19 @@ function submitPrices(supplierId) {
       </div>
     </div>
 
-    <div class="border-t pt-4">
+    <div class="border-t pt-4 dark:border-slate-700">
       <h3 class="font-semibold mb-2">Pedidos Gerados</h3>
       <div v-if="props.quotation.orders?.length" class="flex flex-wrap gap-2">
         <Link
           v-for="order in props.quotation.orders"
           :key="order.id"
           :href="route('purchases.orders.show', order.id)"
-          class="px-2 py-1 rounded bg-slate-100 text-slate-700"
+          class="px-2 py-1 rounded bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-200"
         >
           {{ order.numero }} ({{ order.status }})
         </Link>
       </div>
-      <div v-else class="text-sm text-slate-500">Nenhum pedido gerado.</div>
+      <div v-else class="text-sm text-slate-500 dark:text-slate-400">Nenhum pedido gerado.</div>
     </div>
   </div>
 </template>

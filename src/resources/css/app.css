@@ -313,3 +313,24 @@ table.dataTable thead th {
   box-shadow: 0 0 0px 1000px #0b1220 inset !important;
   caret-color: #e5e7eb !important;
 }
+
+/* Purchases module tables: force dark header/cells in dark mode */
+.dark .purchases-table thead,
+.dark .purchases-table thead th,
+.dark .purchases-table thead td {
+  background-color: #0f172a !important;
+  color: #94a3b8 !important;
+  border-color: #334155 !important;
+}
+
+.dark .purchases-table tbody th,
+.dark .purchases-table tbody td {
+  background-color: transparent !important;
+  color: #cbd5e1 !important;
+  border-color: #1e293b !important;
+}
+
+.dark .purchases-table tbody tr:hover th,
+.dark .purchases-table tbody tr:hover td {
+  background-color: #111827 !important;
+}

@@ -1,4 +1,4 @@
-﻿<script setup>
+<script setup>
 import { Head, Link } from '@inertiajs/vue3'
 
 const props = defineProps({
@@ -12,10 +12,10 @@ const props = defineProps({
   <div class="flex flex-wrap items-center justify-between gap-3 mb-6">
     <div>
       <h2 class="text-2xl font-semibold">Pedido {{ props.order.numero }}</h2>
-      <div class="text-sm text-slate-600">Status: {{ props.order.status }}</div>
+      <div class="text-sm text-slate-600 dark:text-slate-300">Status: {{ props.order.status }}</div>
     </div>
     <div class="flex flex-wrap gap-2">
-      <Link :href="route('purchases.orders.index')" class="text-blue-600">Voltar</Link>
+      <Link :href="route('purchases.orders.index')" class="text-blue-600 dark:text-cyan-400">Voltar</Link>
       <Link
         v-if="props.order.status !== 'cancelado' && props.order.status !== 'fechado'"
         method="patch"
@@ -30,25 +30,25 @@ const props = defineProps({
         method="patch"
         as="button"
         :href="route('purchases.orders.close', props.order.id)"
-        class="px-3 py-1 rounded bg-slate-700 text-white"
+        class="px-3 py-1 rounded bg-slate-700 text-white dark:bg-slate-600 dark:hover:bg-slate-500 transition-colors"
       >
         Fechar
       </Link>
     </div>
   </div>
 
-  <div class="bg-white rounded shadow p-4 space-y-4">
+  <div class="bg-white rounded shadow p-4 space-y-4 dark:bg-slate-900 dark:border dark:border-slate-700">
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
       <div>
-        <div class="text-xs text-slate-500">Fornecedor</div>
+        <div class="text-xs text-slate-500 dark:text-slate-400">Fornecedor</div>
         <div class="font-medium">{{ props.order.supplier?.nome_fornecedor ?? props.order.supplier_id }}</div>
       </div>
       <div>
-        <div class="text-xs text-slate-500">Data Emissao</div>
+        <div class="text-xs text-slate-500 dark:text-slate-400">Data Emissao</div>
         <div class="font-medium">{{ props.order.data_emissao }}</div>
       </div>
       <div>
-        <div class="text-xs text-slate-500">Total</div>
+        <div class="text-xs text-slate-500 dark:text-slate-400">Total</div>
         <div class="font-medium">{{ props.order.total }}</div>
       </div>
     </div>
@@ -56,8 +56,8 @@ const props = defineProps({
     <div>
       <h3 class="font-semibold mb-2">Itens</h3>
       <div class="overflow-x-auto">
-        <table class="w-full text-sm border">
-          <thead class="bg-slate-50">
+        <table class="w-full text-sm border purchases-table dark:border-slate-700">
+          <thead class="bg-slate-50 dark:bg-slate-800/70">
             <tr>
               <th class="px-3 py-2 text-left">Item ID</th>
               <th class="px-3 py-2 text-left">Descricao</th>
@@ -67,7 +67,7 @@ const props = defineProps({
             </tr>
           </thead>
           <tbody>
-            <tr v-for="item in props.order.items" :key="item.id" class="border-t">
+            <tr v-for="item in props.order.items" :key="item.id" class="border-t dark:border-slate-700">
               <td class="px-3 py-2">{{ item.item_id }}</td>
               <td class="px-3 py-2">{{ item.descricao_snapshot }}</td>
               <td class="px-3 py-2">{{ item.quantidade_pedida }}</td>
@@ -75,7 +75,7 @@ const props = defineProps({
               <td class="px-3 py-2">{{ item.preco_unit }}</td>
             </tr>
             <tr v-if="!props.order.items?.length">
-              <td colspan="5" class="px-3 py-3 text-center text-slate-500">Nenhum item.</td>
+              <td colspan="5" class="px-3 py-3 text-center text-slate-500 dark:text-slate-400">Nenhum item.</td>
             </tr>
           </tbody>
         </table>
@@ -89,12 +89,12 @@ const props = defineProps({
           v-for="receipt in props.order.receipts"
           :key="receipt.id"
           :href="route('purchases.receipts.show', receipt.id)"
-          class="px-2 py-1 rounded bg-slate-100 text-slate-700"
+          class="px-2 py-1 rounded bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-200"
         >
           {{ receipt.numero }} ({{ receipt.status }})
         </Link>
       </div>
-      <div v-else class="text-sm text-slate-500">Nenhum recebimento vinculado.</div>
+      <div v-else class="text-sm text-slate-500 dark:text-slate-400">Nenhum recebimento vinculado.</div>
     </div>
 
     <div>
@@ -104,12 +104,12 @@ const props = defineProps({
           v-for="purchaseReturn in props.order.returns"
           :key="purchaseReturn.id"
           :href="route('purchases.returns.show', purchaseReturn.id)"
-          class="px-2 py-1 rounded bg-slate-100 text-slate-700"
+          class="px-2 py-1 rounded bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-200"
         >
           {{ purchaseReturn.numero }} ({{ purchaseReturn.status }})
         </Link>
       </div>
-      <div v-else class="text-sm text-slate-500">Nenhuma devolucao vinculada.</div>
+      <div v-else class="text-sm text-slate-500 dark:text-slate-400">Nenhuma devolucao vinculada.</div>
     </div>
 
     <div>
@@ -119,12 +119,12 @@ const props = defineProps({
           v-for="payable in props.order.payables"
           :key="payable.id"
           :href="route('purchases.payables.show', payable.id)"
-          class="px-2 py-1 rounded bg-slate-100 text-slate-700"
+          class="px-2 py-1 rounded bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-200"
         >
           {{ payable.numero_documento }} ({{ payable.status }})
         </Link>
       </div>
-      <div v-else class="text-sm text-slate-500">Nenhuma conta vinculada.</div>
+      <div v-else class="text-sm text-slate-500 dark:text-slate-400">Nenhuma conta vinculada.</div>
     </div>
   </div>
 </template>

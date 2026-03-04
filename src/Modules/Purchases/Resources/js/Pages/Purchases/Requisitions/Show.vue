@@ -1,4 +1,4 @@
-﻿<script setup>
+<script setup>
 import { Head, Link } from '@inertiajs/vue3'
 
 const props = defineProps({
@@ -12,11 +12,11 @@ const props = defineProps({
   <div class="flex flex-wrap items-center justify-between gap-3 mb-6">
     <div>
       <h2 class="text-2xl font-semibold">Requisicao {{ props.requisition.numero }}</h2>
-      <div class="text-sm text-slate-600">Status: {{ props.requisition.status }}</div>
+      <div class="text-sm text-slate-600 dark:text-slate-300">Status: {{ props.requisition.status }}</div>
     </div>
     <div class="flex flex-wrap gap-2">
-      <Link :href="route('purchases.requisitions.index')" class="text-blue-600">Voltar</Link>
-      <Link v-if="props.requisition.status === 'draft'" :href="route('purchases.requisitions.edit', props.requisition.id)" class="text-blue-600">Editar</Link>
+      <Link :href="route('purchases.requisitions.index')" class="text-blue-600 dark:text-cyan-400">Voltar</Link>
+      <Link v-if="props.requisition.status === 'draft'" :href="route('purchases.requisitions.edit', props.requisition.id)" class="text-blue-600 dark:text-cyan-400">Editar</Link>
       <Link
         v-if="props.requisition.status === 'draft'"
         method="patch"
@@ -40,25 +40,25 @@ const props = defineProps({
         method="patch"
         as="button"
         :href="route('purchases.requisitions.close', props.requisition.id)"
-        class="px-3 py-1 rounded bg-slate-700 text-white"
+        class="px-3 py-1 rounded bg-slate-700 text-white dark:bg-slate-600 dark:hover:bg-slate-500 transition-colors"
       >
         Fechar
       </Link>
     </div>
   </div>
 
-  <div class="bg-white rounded shadow p-4 space-y-4">
+  <div class="bg-white rounded shadow p-4 space-y-4 dark:bg-slate-900 dark:border dark:border-slate-700">
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
       <div>
-        <div class="text-xs text-slate-500">Data</div>
+        <div class="text-xs text-slate-500 dark:text-slate-400">Data</div>
         <div class="font-medium">{{ props.requisition.data_requisicao ?? '-' }}</div>
       </div>
       <div>
-        <div class="text-xs text-slate-500">Solicitado por</div>
+        <div class="text-xs text-slate-500 dark:text-slate-400">Solicitado por</div>
         <div class="font-medium">{{ props.requisition.solicitado_por ?? '-' }}</div>
       </div>
       <div>
-        <div class="text-xs text-slate-500">Observacoes</div>
+        <div class="text-xs text-slate-500 dark:text-slate-400">Observacoes</div>
         <div class="font-medium">{{ props.requisition.observacoes ?? '-' }}</div>
       </div>
     </div>
@@ -66,8 +66,8 @@ const props = defineProps({
     <div>
       <h3 class="font-semibold mb-2">Itens</h3>
       <div class="overflow-x-auto">
-        <table class="w-full text-sm border">
-          <thead class="bg-slate-50">
+        <table class="w-full text-sm border purchases-table dark:border-slate-700">
+          <thead class="bg-slate-50 dark:bg-slate-800/70">
             <tr>
               <th class="px-3 py-2 text-left">Item ID</th>
               <th class="px-3 py-2 text-left">Descricao</th>
@@ -77,7 +77,7 @@ const props = defineProps({
             </tr>
           </thead>
           <tbody>
-            <tr v-for="item in props.requisition.items" :key="item.id" class="border-t">
+            <tr v-for="item in props.requisition.items" :key="item.id" class="border-t dark:border-slate-700">
               <td class="px-3 py-2">{{ item.item_id }}</td>
               <td class="px-3 py-2">{{ item.descricao_snapshot }}</td>
               <td class="px-3 py-2">{{ item.quantidade }}</td>
@@ -85,7 +85,7 @@ const props = defineProps({
               <td class="px-3 py-2">{{ item.imposto_id ?? '-' }}</td>
             </tr>
             <tr v-if="!props.requisition.items?.length">
-              <td colspan="5" class="px-3 py-3 text-center text-slate-500">Nenhum item cadastrado.</td>
+              <td colspan="5" class="px-3 py-3 text-center text-slate-500 dark:text-slate-400">Nenhum item cadastrado.</td>
             </tr>
           </tbody>
         </table>
@@ -94,27 +94,27 @@ const props = defineProps({
 
     <div>
       <h3 class="font-semibold mb-2">Vinculos do Fluxo</h3>
-      <div class="text-sm text-slate-600">Requisicao -> Cotacao -> Pedido -> Recebimento -> Devolucao -> AP</div>
+      <div class="text-sm text-slate-600 dark:text-slate-300">Requisicao -> Cotacao -> Pedido -> Recebimento -> Devolucao -> AP</div>
       <div class="mt-3 space-y-3">
         <div v-if="props.requisition.quotations?.length">
-          <div class="text-xs text-slate-500">Cotacoes e Pedidos</div>
+          <div class="text-xs text-slate-500 dark:text-slate-400">Cotacoes e Pedidos</div>
           <div class="space-y-3">
-            <div v-for="quotation in props.requisition.quotations" :key="quotation.id" class="border rounded p-3">
+            <div v-for="quotation in props.requisition.quotations" :key="quotation.id" class="border rounded p-3 dark:border-slate-700">
               <div class="flex flex-wrap items-center gap-2">
                 <Link
                   :href="route('purchases.quotations.show', quotation.id)"
-                  class="px-2 py-1 rounded bg-slate-100 text-slate-700"
+                  class="px-2 py-1 rounded bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-200"
                 >
                   {{ quotation.numero }} ({{ quotation.status }})
                 </Link>
-                <span v-if="!quotation.orders?.length" class="text-xs text-slate-500">Sem pedidos</span>
+                <span v-if="!quotation.orders?.length" class="text-xs text-slate-500 dark:text-slate-400">Sem pedidos</span>
               </div>
               <div v-if="quotation.orders?.length" class="flex flex-wrap gap-2 mt-2">
                 <Link
                   v-for="order in quotation.orders"
                   :key="order.id"
                   :href="route('purchases.orders.show', order.id)"
-                  class="px-2 py-1 rounded bg-blue-50 text-blue-700"
+                  class="px-2 py-1 rounded bg-blue-50 text-blue-700 dark:bg-cyan-900/40 dark:text-cyan-300"
                 >
                   {{ order.numero }} ({{ order.status }})
                 </Link>
@@ -122,7 +122,7 @@ const props = defineProps({
             </div>
           </div>
         </div>
-        <div v-else class="text-sm text-slate-500">Nenhuma cotacao vinculada.</div>
+        <div v-else class="text-sm text-slate-500 dark:text-slate-400">Nenhuma cotacao vinculada.</div>
       </div>
     </div>
   </div>
