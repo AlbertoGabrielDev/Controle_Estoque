@@ -10,18 +10,21 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response as InertiaResponse;
+use Modules\Purchases\Models\PurchaseRequisition;
+use Modules\Purchases\Repositories\PurchaseRequisitionRepository;
+use Modules\Purchases\Services\PurchaseRequisitionService;
 use Modules\Purchases\Http\Requests\PurchaseRequisitionStoreRequest;
 use Modules\Purchases\Http\Requests\PurchaseRequisitionUpdateRequest;
-use Modules\Purchases\Models\PurchaseRequisition;
-use Modules\Purchases\Services\PurchaseRequisitionService;
 use RuntimeException;
 
 class PurchaseRequisitionController extends Controller
 {
     public function __construct(
         private PurchaseRequisitionService $service,
+        private PurchaseRequisitionRepository $repository,
         private DataTableService $dt
-    ) {}
+    ) {
+    }
 
     /**
      * Display a listing of purchase requisitions.
@@ -82,7 +85,7 @@ class PurchaseRequisitionController extends Controller
      */
     public function create(): InertiaResponse
     {
-        return Inertia::render('Purchases/Requisitions/Create');
+        return Inertia::render('Purchases/Requisitions/Create', $this->repository->formPayload());
     }
 
     /**
@@ -111,9 +114,7 @@ class PurchaseRequisitionController extends Controller
      */
     public function show(int $requisitionId): InertiaResponse
     {
-        $requisition = PurchaseRequisition::query()
-            ->with(['items', 'quotations.orders'])
-            ->findOrFail($requisitionId);
+        $requisition = $this->repository->findWithRelations($requisitionId);
 
         return Inertia::render('Purchases/Requisitions/Show', [
             'requisition' => $requisition,
@@ -128,13 +129,12 @@ class PurchaseRequisitionController extends Controller
      */
     public function edit(int $requisitionId): InertiaResponse
     {
-        $requisition = PurchaseRequisition::query()
-            ->with('items')
-            ->findOrFail($requisitionId);
+        $requisition = $this->repository->findForEdit($requisitionId);
 
-        return Inertia::render('Purchases/Requisitions/Edit', [
-            'requisition' => $requisition,
-        ]);
+        return Inertia::render('Purchases/Requisitions/Edit', array_merge(
+            ['requisition' => $requisition],
+            $this->repository->formPayload()
+        ));
     }
 
     /**

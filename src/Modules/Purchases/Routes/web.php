@@ -46,6 +46,8 @@ Route::middleware([
         Route::prefix('/orders')->group(function () {
             Route::get('/', [PurchaseOrderController::class, 'index'])->name('purchases.orders.index');
             Route::get('/data', [PurchaseOrderController::class, 'data'])->name('purchases.orders.data');
+            Route::get('/create', [PurchaseOrderController::class, 'create'])->name('purchases.orders.create');
+            Route::post('/from-requisition', [PurchaseOrderController::class, 'storeFromRequisition'])->name('purchases.orders.fromRequisition');
             Route::post('/from-quotation', [PurchaseOrderController::class, 'storeFromQuotation'])->name('purchases.orders.fromQuotation');
             Route::get('/{orderId}', [PurchaseOrderController::class, 'show'])->name('purchases.orders.show');
             Route::patch('/{orderId}/cancel', [PurchaseOrderController::class, 'cancel'])->name('purchases.orders.cancel');

@@ -2,6 +2,11 @@
 import { Head, Link, useForm } from '@inertiajs/vue3'
 import QuotationForm from './QuotationForm.vue'
 
+const props = defineProps({
+  requisitions_options: { type: Array, default: () => [] },
+  suppliers_options: { type: Array, default: () => [] },
+})
+
 const form = useForm({
   requisition_id: '',
   data_limite: '',
@@ -27,5 +32,12 @@ function submit() {
     <Link :href="route('purchases.quotations.index')" class="text-blue-600">Voltar</Link>
   </div>
 
-  <QuotationForm :form="form" submit-label="Criar Cotacao" :show-suppliers="true" @submit="submit" />
+  <QuotationForm 
+    :form="form" 
+    :requisitions-options="props.requisitions_options"
+    :suppliers-options="props.suppliers_options"
+    submit-label="Criar Cotacao" 
+    :show-suppliers="true" 
+    @submit="submit" 
+  />
 </template>

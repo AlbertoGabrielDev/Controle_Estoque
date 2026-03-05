@@ -19,6 +19,8 @@ use Modules\Purchases\Models\PurchaseReturn;
 use PHPUnit\Framework\Attributes\Group;
 use Tests\TestCase;
 
+use App\Http\Middleware\CheckPermissionAuto;
+
 #[Group('modularizacao')]
 class PurchasesModuleFlowTest extends TestCase
 {
@@ -35,7 +37,7 @@ class PurchasesModuleFlowTest extends TestCase
 
         config(['app.url' => 'http://localhost']);
         URL::forceRootUrl('http://localhost');
-        $this->withoutMiddleware(VerifyCsrfToken::class);
+        $this->withoutMiddleware([VerifyCsrfToken::class, CheckPermissionAuto::class]);
     }
 
     /**

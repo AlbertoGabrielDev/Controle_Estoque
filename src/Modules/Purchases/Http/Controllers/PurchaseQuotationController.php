@@ -18,6 +18,7 @@ use Modules\Purchases\Http\Requests\PurchaseQuotationStoreRequest;
 use Modules\Purchases\Http\Requests\PurchaseQuotationUpdateRequest;
 use Modules\Purchases\Models\PurchaseQuotation;
 use Modules\Purchases\Services\PurchaseQuotationService;
+use Modules\Suppliers\Models\Fornecedor;
 use RuntimeException;
 
 class PurchaseQuotationController extends Controller
@@ -25,7 +26,8 @@ class PurchaseQuotationController extends Controller
     public function __construct(
         private PurchaseQuotationService $service,
         private DataTableService $dt
-    ) {}
+    ) {
+    }
 
     /**
      * Display a listing of purchase quotations.
@@ -97,7 +99,16 @@ class PurchaseQuotationController extends Controller
      */
     public function create(): InertiaResponse
     {
-        return Inertia::render('Purchases/Quotations/Create');
+        return Inertia::render('Purchases/Quotations/Create', [
+            'requisitions_options' => \Modules\Purchases\Models\PurchaseRequisition::query()
+                ->select('id', 'numero', 'data_requisicao', 'observacoes', 'status')
+                ->where('status', 'LIKE', '%aprovado%')
+                ->get(),
+            'suppliers_options' => Fornecedor::query()
+                ->select('id_fornecedor as id', 'razao_social', 'nome_fornecedor', 'cnpj')
+                ->where('ativo', true)
+                ->get(),
+        ]);
     }
 
     /**
@@ -151,6 +162,15 @@ class PurchaseQuotationController extends Controller
 
         return Inertia::render('Purchases/Quotations/Edit', [
             'quotation' => $quotation,
+            'requisitions_options' => \Modules\Purchases\Models\PurchaseRequisition::query()
+                ->select('id', 'numero', 'data_requisicao', 'observacoes', 'status')
+                ->where('status', 'LIKE', '%aprovado%')
+                ->orWhere('id', $quotation->requisition_id)
+                ->get(),
+            'suppliers_options' => Fornecedor::query()
+                ->select('id_fornecedor as id', 'razao_social', 'nome_fornecedor', 'cnpj')
+                ->where('ativo', true)
+                ->get(),
         ]);
     }
 

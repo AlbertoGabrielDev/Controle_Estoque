@@ -2,19 +2,15 @@
 import { Head, Link, useForm } from '@inertiajs/vue3'
 import ReceiptForm from './ReceiptForm.vue'
 
+const props = defineProps({
+  orders_options: { type: Array, default: () => [] },
+})
+
 const form = useForm({
   order_id: '',
-  data_recebimento: '',
+  data_recebimento: new Date().toISOString().split('T')[0],
   observacoes: '',
-  items: [
-    {
-      order_item_id: '',
-      quantidade_recebida: 1,
-      preco_unit_recebido: 0,
-      imposto_id: '',
-      aliquota_snapshot: '',
-    },
-  ],
+  items: [],
 })
 
 /**
@@ -23,7 +19,10 @@ const form = useForm({
  * @returns {void}
  */
 function submit() {
-  form.post(route('purchases.receipts.store'))
+  form.transform((data) => ({
+    ...data,
+    items: data.items.filter(item => Number(item.quantidade_recebida) > 0)
+  })).post(route('purchases.receipts.store'))
 }
 </script>
 
@@ -35,5 +34,11 @@ function submit() {
     <Link :href="route('purchases.receipts.index')" class="text-blue-600">Voltar</Link>
   </div>
 
-  <ReceiptForm :form="form" submit-label="Registrar Recebimento" @submit="submit" />
+  <ReceiptForm 
+    :form="form" 
+    :orders-options="props.orders_options"
+    submit-label="Registrar Recebimento" 
+    @submit="submit" 
+  />
 </template>
+

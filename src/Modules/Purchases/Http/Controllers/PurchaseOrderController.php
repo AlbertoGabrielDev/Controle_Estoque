@@ -12,6 +12,8 @@ use Inertia\Inertia;
 use Inertia\Response as InertiaResponse;
 use Modules\Purchases\Http\Requests\PurchaseOrderFromQuotationRequest;
 use Modules\Purchases\Models\PurchaseOrder;
+use Modules\Purchases\Models\PurchaseRequisition;
+use Modules\Purchases\Repositories\PurchaseOrderRepository;
 use Modules\Purchases\Services\PurchaseOrderService;
 use RuntimeException;
 
@@ -19,8 +21,10 @@ class PurchaseOrderController extends Controller
 {
     public function __construct(
         private PurchaseOrderService $service,
+        private PurchaseOrderRepository $repository,
         private DataTableService $dt
-    ) {}
+    ) {
+    }
 
     /**
      * Display a listing of purchase orders.
@@ -72,6 +76,60 @@ class PurchaseOrderController extends Controller
     }
 
     /**
+     * Show the form for creating a new order.
+     *
+     * @param \Illuminate\Http\Request $request
+     * @return \Inertia\Response
+     */
+    public function create(Request $request): InertiaResponse
+    {
+        $requisitionId = $request->query('requisition_id');
+        $requisition = null;
+
+        if ($requisitionId) {
+            $requisition = PurchaseRequisition::query()
+                ->with('items')
+                ->where('status', 'LIKE', '%aprovado%')
+                ->find($requisitionId);
+        }
+
+        return Inertia::render('Purchases/Orders/Create', [
+            'requisition' => $requisition,
+            'requisitions_options' => $this->repository->requisitionsOptions(),
+            'suppliers_options' => $this->repository->suppliersOptions(),
+        ]);
+    }
+
+    /**
+     * Store a newly created order from a requisition.
+     *
+     * @param \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function storeFromRequisition(Request $request): RedirectResponse
+    {
+        $request->validate([
+            'requisition_id' => 'required|integer|exists:purchase_requisitions,id',
+            'supplier_id' => 'required|integer',
+            'data_prevista' => 'nullable|date',
+            'observacoes' => 'nullable|string',
+        ]);
+
+        try {
+            $order = $this->service->createFromRequisition(
+                (int) $request->input('requisition_id'),
+                (int) $request->input('supplier_id'),
+                $request->only(['data_prevista', 'observacoes'])
+            );
+        } catch (RuntimeException $exception) {
+            return redirect()->back()->with('error', $exception->getMessage());
+        }
+
+        return redirect()->route('purchases.orders.show', $order->id)
+            ->with('success', 'Pedido criado com sucesso a partir da requisição.');
+    }
+
+    /**
      * Display the specified order.
      *
      * @param int $orderId
@@ -79,9 +137,7 @@ class PurchaseOrderController extends Controller
      */
     public function show(int $orderId): InertiaResponse
     {
-        $order = PurchaseOrder::query()
-            ->with(['items', 'receipts', 'supplier', 'quotation', 'returns', 'payables'])
-            ->findOrFail($orderId);
+        $order = $this->repository->findWithRelations($orderId);
 
         return Inertia::render('Purchases/Orders/Show', [
             'order' => $order,

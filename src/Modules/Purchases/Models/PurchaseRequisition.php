@@ -59,6 +59,16 @@ class PurchaseRequisition extends Model
     }
 
     /**
+     * Get the orders created directly from this requisition.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function orders(): HasMany
+    {
+        return $this->hasMany(PurchaseOrder::class, 'requisition_id');
+    }
+
+    /**
      * Get DataTables columns configuration for purchase requisitions.
      *
      * @return array<string, array{

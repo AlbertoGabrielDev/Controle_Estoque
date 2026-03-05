@@ -4,6 +4,8 @@ import QuotationForm from './QuotationForm.vue'
 
 const props = defineProps({
   quotation: { type: Object, required: true },
+  requisitions_options: { type: Array, default: () => [] },
+  suppliers_options: { type: Array, default: () => [] },
 })
 
 const form = useForm({
@@ -36,6 +38,8 @@ function submit() {
     submit-label="Salvar Alteracoes"
     :show-suppliers="false"
     :readonly-requisition="true"
+    :requisitions-options="props.requisitions_options"
+    :suppliers-options="props.suppliers_options"
     @submit="submit"
   />
 </template>

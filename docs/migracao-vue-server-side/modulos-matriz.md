@@ -15,6 +15,7 @@
 | Estoque | Vue/Inertia + server-side padrao | Consolidado | 03 |
 | Vendas | Vue/Inertia componentizado | Consolidado | 04 |
 | Spreadsheets | Vue/Inertia componentizado | Consolidado | 04 |
+| Purchases (Compras) | Vue/Inertia + server-side padrao | Consolidado | 08 |
 
 ## Observacoes
 - Auth/Profile/Wpp ja estao em Inertia e nao entram como foco principal da migracao de modulos de negocio.

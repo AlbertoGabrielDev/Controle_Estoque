@@ -2,6 +2,10 @@
 import { Head, Link, useForm } from '@inertiajs/vue3'
 import ReturnForm from './ReturnForm.vue'
 
+const props = defineProps({
+  items_options: { type: Array, default: () => [] },
+})
+
 const form = useForm({
   receipt_id: '',
   order_id: '',
@@ -36,5 +40,10 @@ function submit() {
     <Link :href="route('purchases.returns.index')" class="text-blue-600">Voltar</Link>
   </div>
 
-  <ReturnForm :form="form" submit-label="Criar Devolucao" @submit="submit" />
+  <ReturnForm 
+    :form="form" 
+    :items-options="props.items_options"
+    submit-label="Criar Devolucao" 
+    @submit="submit" 
+  />
 </template>

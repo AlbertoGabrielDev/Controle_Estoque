@@ -44,6 +44,13 @@ const props = defineProps({
       >
         Fechar
       </Link>
+      <Link
+        v-if="props.requisition.status === 'aprovado'"
+        :href="route('purchases.orders.create', { requisition_id: props.requisition.id })"
+        class="px-3 py-1 rounded bg-emerald-600 text-white hover:bg-emerald-700 transition-colors"
+      >
+        Gerar Pedido
+      </Link>
     </div>
   </div>
 
@@ -94,10 +101,23 @@ const props = defineProps({
 
     <div>
       <h3 class="font-semibold mb-2">Vinculos do Fluxo</h3>
-      <div class="text-sm text-slate-600 dark:text-slate-300">Requisicao -> Cotacao -> Pedido -> Recebimento -> Devolucao -> AP</div>
+      <div class="text-sm text-slate-600 dark:text-slate-300">Requisicao -> Pedido -> Recebimento -> Devolucao -> AP</div>
       <div class="mt-3 space-y-3">
+        <div v-if="props.requisition.orders?.length">
+          <div class="text-xs text-slate-500 dark:text-slate-400">Pedidos</div>
+          <div class="flex flex-wrap gap-2 mt-2">
+            <Link
+              v-for="order in props.requisition.orders"
+              :key="order.id"
+              :href="route('purchases.orders.show', order.id)"
+              class="px-2 py-1 rounded bg-blue-50 text-blue-700 dark:bg-cyan-900/40 dark:text-cyan-300"
+            >
+              {{ order.numero }} ({{ order.status }})
+            </Link>
+          </div>
+        </div>
         <div v-if="props.requisition.quotations?.length">
-          <div class="text-xs text-slate-500 dark:text-slate-400">Cotacoes e Pedidos</div>
+          <div class="text-xs text-slate-500 dark:text-slate-400">Cotacoes (Legacy)</div>
           <div class="space-y-3">
             <div v-for="quotation in props.requisition.quotations" :key="quotation.id" class="border rounded p-3 dark:border-slate-700">
               <div class="flex flex-wrap items-center gap-2">
@@ -107,22 +127,11 @@ const props = defineProps({
                 >
                   {{ quotation.numero }} ({{ quotation.status }})
                 </Link>
-                <span v-if="!quotation.orders?.length" class="text-xs text-slate-500 dark:text-slate-400">Sem pedidos</span>
-              </div>
-              <div v-if="quotation.orders?.length" class="flex flex-wrap gap-2 mt-2">
-                <Link
-                  v-for="order in quotation.orders"
-                  :key="order.id"
-                  :href="route('purchases.orders.show', order.id)"
-                  class="px-2 py-1 rounded bg-blue-50 text-blue-700 dark:bg-cyan-900/40 dark:text-cyan-300"
-                >
-                  {{ order.numero }} ({{ order.status }})
-                </Link>
               </div>
             </div>
           </div>
         </div>
-        <div v-else class="text-sm text-slate-500 dark:text-slate-400">Nenhuma cotacao vinculada.</div>
+        <div v-if="!props.requisition.orders?.length && !props.requisition.quotations?.length" class="text-sm text-slate-500 dark:text-slate-400">Nenhum pedido vinculado.</div>
       </div>
     </div>
   </div>

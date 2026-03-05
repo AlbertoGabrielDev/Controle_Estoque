@@ -3,8 +3,13 @@ import { computed } from 'vue'
 
 const props = defineProps({
   form: { type: Object, required: true },
+  itemsOptions: { type: Array, default: () => [] },
+  unidadesOptions: { type: Array, default: () => [] },
   submitLabel: { type: String, default: 'Salvar' },
 })
+
+import Multiselect from 'vue-multiselect'
+import 'vue-multiselect/dist/vue-multiselect.css'
 
 /**
  * Add a new item row to the requisition form.
@@ -14,8 +19,10 @@ const props = defineProps({
 function addItem() {
   props.form.items.push({
     item_id: '',
+    _item_obj: null,
     descricao_snapshot: '',
     unidade_medida_id: '',
+    _unidade_obj: null,
     quantidade: 1,
     preco_estimado: 0,
     imposto_id: '',
@@ -45,6 +52,35 @@ const totalEstimado = computed(() => props.form.items.reduce((total, item) => {
   const unit = Number.isNaN(preco) ? 0 : preco
   return total + (qty * unit)
 }, 0))
+
+function onItemSelected(selectedItem, index) {
+  const row = props.form.items[index]
+  if (selectedItem) {
+    row.item_id = selectedItem.id
+    row.descricao_snapshot = selectedItem.nome
+    
+    // Auto fill unit if available
+    if (selectedItem.unidade_medida_id) {
+       row.unidade_medida_id = selectedItem.unidade_medida_id
+       row._unidade_obj = props.unidadesOptions.find(u => u.id === selectedItem.unidade_medida_id) || null
+    }
+  } else {
+    row.item_id = ''
+  }
+}
+
+function customItemLabel(option) {
+  return `${option.sku ? option.sku + ' - ' : ''}${option.nome}`
+}
+
+function onUnidadeSelected(selectedObj, index) {
+  const row = props.form.items[index]
+  if (selectedObj) {
+    row.unidade_medida_id = selectedObj.id
+  } else {
+    row.unidade_medida_id = ''
+  }
+}
 </script>
 
 <template>
@@ -87,20 +123,42 @@ const totalEstimado = computed(() => props.form.items.reduce((total, item) => {
         </thead>
         <tbody>
           <tr v-for="(item, index) in props.form.items" :key="index" class="border-t dark:border-slate-700">
-            <td class="px-3 py-2">
-              <input v-model="item.item_id" type="number" min="1" class="border rounded px-2 py-1 w-full">
+            <td class="px-3 py-2 min-w-[250px]">
+              <Multiselect
+                v-model="item._item_obj"
+                :options="props.itemsOptions"
+                :custom-label="customItemLabel"
+                track-by="id"
+                placeholder="Buscar Item"
+                select-label="Enter para esc."
+                deselect-label="Enter p/ remover"
+                :use-teleport="true"
+                class="w-full text-sm"
+                @update:modelValue="(val) => onItemSelected(val, index)"
+              />
               <div v-if="props.form.errors[`items.${index}.item_id`]" class="text-red-600 text-xs mt-1">
                 {{ props.form.errors[`items.${index}.item_id`] }}
               </div>
             </td>
             <td class="px-3 py-2">
-              <input v-model="item.descricao_snapshot" class="border rounded px-2 py-1 w-full">
+              <input v-model="item.descricao_snapshot" class="border rounded px-2 py-1 w-full" placeholder="Descricao na cotacao">
               <div v-if="props.form.errors[`items.${index}.descricao_snapshot`]" class="text-red-600 text-xs mt-1">
                 {{ props.form.errors[`items.${index}.descricao_snapshot`] }}
               </div>
             </td>
-            <td class="px-3 py-2">
-              <input v-model="item.unidade_medida_id" type="number" min="1" class="border rounded px-2 py-1 w-full">
+            <td class="px-3 py-2 min-w-[150px]">
+               <Multiselect
+                v-model="item._unidade_obj"
+                :options="props.unidadesOptions"
+                label="codigo"
+                track-by="id"
+                placeholder="Unid."
+                select-label="Enter para esc."
+                deselect-label=""
+                :use-teleport="true"
+                class="w-full text-sm"
+                @update:modelValue="(val) => onUnidadeSelected(val, index)"
+              />
             </td>
             <td class="px-3 py-2">
               <input v-model="item.quantidade" type="number" step="0.001" min="0" class="border rounded px-2 py-1 w-full">

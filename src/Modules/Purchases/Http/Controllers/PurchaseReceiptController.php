@@ -8,6 +8,7 @@ use App\Support\DataTableActions;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use App\Models\Item;
 use Inertia\Inertia;
 use Inertia\Response as InertiaResponse;
 use Modules\Purchases\Http\Requests\PurchaseReceiptStoreRequest;
@@ -20,7 +21,8 @@ class PurchaseReceiptController extends Controller
     public function __construct(
         private PurchaseReceiptService $service,
         private DataTableService $dt
-    ) {}
+    ) {
+    }
 
     /**
      * Display a listing of purchase receipts.
@@ -78,7 +80,17 @@ class PurchaseReceiptController extends Controller
      */
     public function create(): InertiaResponse
     {
-        return Inertia::render('Purchases/Receipts/Create');
+        return Inertia::render('Purchases/Receipts/Create', [
+            'orders_options' => \Modules\Purchases\Models\PurchaseOrder::query()
+                ->select('id', 'numero', 'status', 'data_emissao')
+                ->with([
+                    'items' => function ($q) {
+                        $q->select('id', 'order_id', 'item_id', 'descricao_snapshot', 'quantidade_pedida', 'preco_unit', 'quantidade_recebida');
+                    }
+                ])
+                ->whereIn('status', ['emitido', 'parcialmente_recebido'])
+                ->get(),
+        ]);
     }
 
     /**

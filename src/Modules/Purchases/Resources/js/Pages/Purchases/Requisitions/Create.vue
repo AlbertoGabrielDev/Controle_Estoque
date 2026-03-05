@@ -2,6 +2,11 @@
 import { Head, Link, useForm } from '@inertiajs/vue3'
 import RequisitionForm from './RequisitionForm.vue'
 
+const props = defineProps({
+  items_options: { type: Array, default: () => [] },
+  unidades_options: { type: Array, default: () => [] },
+})
+
 const form = useForm({
   observacoes: '',
   data_requisicao: '',
@@ -36,5 +41,11 @@ function submit() {
     <Link :href="route('purchases.requisitions.index')" class="text-blue-600">Voltar</Link>
   </div>
 
-  <RequisitionForm :form="form" submit-label="Criar Requisicao" @submit="submit" />
+  <RequisitionForm 
+    :form="form" 
+    :items-options="props.items_options"
+    :unidades-options="props.unidades_options"
+    submit-label="Criar Requisicao" 
+    @submit="submit" 
+  />
 </template>

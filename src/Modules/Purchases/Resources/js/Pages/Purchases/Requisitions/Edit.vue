@@ -4,6 +4,8 @@ import RequisitionForm from './RequisitionForm.vue'
 
 const props = defineProps({
   requisition: { type: Object, required: true },
+  items_options: { type: Array, default: () => [] },
+  unidades_options: { type: Array, default: () => [] },
 })
 
 const form = useForm({
@@ -38,5 +40,11 @@ function submit() {
     <Link :href="route('purchases.requisitions.show', props.requisition.id)" class="text-blue-600">Voltar</Link>
   </div>
 
-  <RequisitionForm :form="form" submit-label="Salvar Alteracoes" @submit="submit" />
+  <RequisitionForm 
+    :form="form" 
+    :items-options="props.items_options"
+    :unidades-options="props.unidades_options"
+    submit-label="Salvar Alteracoes" 
+    @submit="submit" 
+  />
 </template>

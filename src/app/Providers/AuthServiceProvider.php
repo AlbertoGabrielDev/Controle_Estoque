@@ -23,8 +23,9 @@ class AuthServiceProvider extends ServiceProvider
     {
         $this->registerPolicies();
 
-        Gate::define('has-permission', function (User $user, string $menuSlug, string $permissionName): bool {
-            return $user->hasPermission($menuSlug, $permissionName);
+        Gate::define('has-permission', function ($user, string $menuSlug, string $permissionName): bool {
+            /** @var \App\Models\User|\Modules\Admin\Models\User $user */
+            return method_exists($user, 'hasPermission') && $user->hasPermission($menuSlug, $permissionName);
         });
     }
 }

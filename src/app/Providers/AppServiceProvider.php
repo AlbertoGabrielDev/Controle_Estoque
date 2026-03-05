@@ -37,6 +37,10 @@ use Modules\Admin\Repositories\RoleRepository as ModuleRoleRepository;
 use Modules\Admin\Repositories\RoleRepositoryEloquent as ModuleRoleRepositoryEloquent;
 use Modules\Taxes\Repositories\TaxRuleRepository as ModuleTaxRuleRepository;
 use Modules\Taxes\Repositories\TaxRuleRepositoryEloquent as ModuleTaxRuleRepositoryEloquent;
+use Modules\Purchases\Repositories\PurchaseRequisitionRepository as ModulePurchaseRequisitionRepository;
+use Modules\Purchases\Repositories\PurchaseRequisitionRepositoryEloquent as ModulePurchaseRequisitionRepositoryEloquent;
+use Modules\Purchases\Repositories\PurchaseOrderRepository as ModulePurchaseOrderRepository;
+use Modules\Purchases\Repositories\PurchaseOrderRepositoryEloquent as ModulePurchaseOrderRepositoryEloquent;
 
 use Illuminate\Pagination\Paginator;
 class AppServiceProvider extends ServiceProvider
@@ -63,6 +67,8 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(ModuleClienteRepository::class, ModuleClienteRepositoryEloquent::class);
         $this->app->bind(TaxRuleRepository::class, TaxRuleRepositoryEloquent::class);
         $this->app->bind(ModuleTaxRuleRepository::class, ModuleTaxRuleRepositoryEloquent::class);
+        $this->app->bind(ModulePurchaseRequisitionRepository::class, ModulePurchaseRequisitionRepositoryEloquent::class);
+        $this->app->bind(ModulePurchaseOrderRepository::class, ModulePurchaseOrderRepositoryEloquent::class);
     }
 
     /**

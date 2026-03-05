@@ -92,6 +92,76 @@ class PurchaseOrderService
     }
 
     /**
+     * Create a purchase order directly from an approved requisition.
+     *
+     * @param int $requisitionId
+     * @param int $supplierId
+     * @param array $data
+     * @return \Modules\Purchases\Models\PurchaseOrder
+     * @throws \RuntimeException
+     * @throws \Throwable
+     */
+    public function createFromRequisition(int $requisitionId, int $supplierId, array $data = []): PurchaseOrder
+    {
+        return DB::transaction(function () use ($requisitionId, $supplierId, $data): PurchaseOrder {
+            $requisition = \Modules\Purchases\Models\PurchaseRequisition::query()
+                ->with('items')
+                ->findOrFail($requisitionId);
+
+            if ($requisition->status !== 'aprovado') {
+                throw new RuntimeException('A requisição precisa estar aprovada para gerar um pedido.');
+            }
+
+            if ($requisition->items->isEmpty()) {
+                throw new RuntimeException('A requisição não possui itens.');
+            }
+
+            $order = PurchaseOrder::query()->create([
+                'numero' => $this->numberService->generate('PO'),
+                'status' => 'emitido',
+                'supplier_id' => $supplierId,
+                'requisition_id' => $requisitionId,
+                'quotation_id' => null,
+                'data_emissao' => Carbon::today(),
+                'data_prevista' => $data['data_prevista'] ?? null,
+                'observacoes' => $data['observacoes'] ?? null,
+                'total' => 0,
+            ]);
+
+            $total = 0;
+
+            foreach ($requisition->items as $reqItem) {
+                $precoUnit = (float) ($reqItem->preco_estimado ?? 0);
+                $quantidade = (float) $reqItem->quantidade;
+                $lineTotal = $precoUnit * $quantidade;
+
+                PurchaseOrderItem::query()->create([
+                    'order_id' => $order->id,
+                    'item_id' => $reqItem->item_id,
+                    'descricao_snapshot' => $reqItem->descricao_snapshot,
+                    'unidade_medida_id' => $reqItem->unidade_medida_id,
+                    'quantidade_pedida' => $quantidade,
+                    'quantidade_recebida' => 0,
+                    'preco_unit' => $precoUnit,
+                    'imposto_id' => $reqItem->imposto_id,
+                    'aliquota_snapshot' => 0,
+                    'total_linha' => $lineTotal,
+                ]);
+
+                $total += $lineTotal;
+            }
+
+            $order->update(['total' => $total]);
+
+            // Fechar a requisição após gerar o pedido
+            $requisition->status = 'fechado';
+            $requisition->save();
+
+            return $order->refresh();
+        });
+    }
+
+    /**
      * Cancel a purchase order.
      *
      * @param int $orderId

@@ -4,7 +4,11 @@ import { computed } from 'vue'
 const props = defineProps({
   form: { type: Object, required: true },
   submitLabel: { type: String, default: 'Salvar' },
+  itemsOptions: { type: Array, default: () => [] },
 })
+
+import Multiselect from 'vue-multiselect'
+import 'vue-multiselect/dist/vue-multiselect.css'
 
 /**
  * Add a new item row to the return form.
@@ -16,6 +20,7 @@ function addItem() {
     receipt_item_id: '',
     order_item_id: '',
     item_id: '',
+    _item_obj: null,
     quantidade_devolvida: 1,
     observacoes: '',
   })
@@ -35,6 +40,19 @@ const totalQuantidade = computed(() => props.form.items.reduce((total, item) => 
   const value = Number(item.quantidade_devolvida)
   return total + (Number.isNaN(value) ? 0 : value)
 }, 0))
+
+function onItemSelected(selectedItem, index) {
+  const row = props.form.items[index]
+  if (selectedItem) {
+    row.item_id = selectedItem.id
+  } else {
+    row.item_id = ''
+  }
+}
+
+function customItemLabel(option) {
+  return `${option.sku ? option.sku + ' - ' : ''}${option.nome}`
+}
 </script>
 
 <template>
@@ -88,8 +106,19 @@ const totalQuantidade = computed(() => props.form.items.reduce((total, item) => 
             <td class="px-3 py-2">
               <input v-model="item.order_item_id" type="number" min="1" class="border rounded px-2 py-1 w-full">
             </td>
-            <td class="px-3 py-2">
-              <input v-model="item.item_id" type="number" min="1" class="border rounded px-2 py-1 w-full">
+            <td class="px-3 py-2 min-w-[250px]">
+              <Multiselect
+                v-model="item._item_obj"
+                :options="props.itemsOptions"
+                :custom-label="customItemLabel"
+                track-by="id"
+                placeholder="Buscar Item"
+                select-label="Enter para esc."
+                deselect-label=""
+                :use-teleport="true"
+                class="w-full text-sm"
+                @update:modelValue="(val) => onItemSelected(val, index)"
+              />
               <div v-if="props.form.errors[`items.${index}.item_id`]" class="text-red-600 text-xs mt-1">
                 {{ props.form.errors[`items.${index}.item_id`] }}
               </div>

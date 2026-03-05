@@ -8,6 +8,7 @@ use App\Support\DataTableActions;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use App\Models\Item;
 use Inertia\Inertia;
 use Inertia\Response as InertiaResponse;
 use Modules\Purchases\Http\Requests\PurchaseReturnStoreRequest;
@@ -20,7 +21,8 @@ class PurchaseReturnController extends Controller
     public function __construct(
         private PurchaseReturnService $service,
         private DataTableService $dt
-    ) {}
+    ) {
+    }
 
     /**
      * Display a listing of purchase returns.
@@ -77,7 +79,9 @@ class PurchaseReturnController extends Controller
      */
     public function create(): InertiaResponse
     {
-        return Inertia::render('Purchases/Returns/Create');
+        return Inertia::render('Purchases/Returns/Create', [
+            'items_options' => Item::query()->select('id', 'sku', 'nome', 'descricao')->where('ativo', true)->get(),
+        ]);
     }
 
     /**

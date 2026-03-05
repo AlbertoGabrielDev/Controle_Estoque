@@ -219,8 +219,8 @@ class MenuSeeder extends Seeder
             ['slug' => 'configuracoes'],
             [
                 'name' => 'Configurações',
-                'slug'  => 'configuracoes',
-                'icon'  => 'fas fa-cog mr-2',
+                'slug' => 'configuracoes',
+                'icon' => 'fas fa-cog mr-2',
                 'route' => null,           // pai sem rota
                 'parent_id' => null,
                 'order' => 11,
@@ -391,17 +391,8 @@ class MenuSeeder extends Seeder
             ]
         );
 
-        Menu::updateOrCreate(
-            ['slug' => 'compras_cotacoes'],
-            [
-                'name' => 'Cotacoes',
-                'slug' => 'compras_cotacoes',
-                'icon' => 'fas fa-file-signature mr-2',
-                'route' => 'purchases.quotations.index',
-                'parent_id' => $compras->id,
-                'order' => 2,
-            ]
-        );
+        // Cotações desativadas — ocultar do menu
+        Menu::where('slug', 'compras_cotacoes')->delete();
 
         Menu::updateOrCreate(
             ['slug' => 'compras_pedidos'],

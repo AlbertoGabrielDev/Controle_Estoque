@@ -21,6 +21,7 @@ class PurchaseOrder extends Model
         'status',
         'supplier_id',
         'quotation_id',
+        'requisition_id',
         'data_emissao',
         'data_prevista',
         'observacoes',
@@ -51,6 +52,16 @@ class PurchaseOrder extends Model
     public function quotation(): BelongsTo
     {
         return $this->belongsTo(PurchaseQuotation::class, 'quotation_id');
+    }
+
+    /**
+     * Get the requisition that originated this order.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function requisition(): BelongsTo
+    {
+        return $this->belongsTo(PurchaseRequisition::class, 'requisition_id');
     }
 
     /**

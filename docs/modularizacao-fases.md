@@ -98,6 +98,14 @@ Legenda:
   - Model: SIM
   - Jobs/Events/Listeners/Commands: OPCIONAL
   - Motivo do Repository: regras/filtros/escopos e consultas de configuracao fiscal.
+- `Purchases` / `Compras` (requisicoes, pedidos, recebimentos, devolucoes, contas a pagar):
+  - Controller: SIM (um por subdominio: Requisitions, Orders, Receipts, Returns, Payables)
+  - FormRequest: SIM (store/update por subdominio)
+  - Service: SIM (obrigatorio, modulo transacional com fluxo de status)
+  - Repository + RepositoryEloquent: SIM (PurchaseRequisitionRepository, PurchaseOrderRepository)
+  - Model: SIM (um por entidade: PurchaseRequisition, PurchaseOrder, PurchaseReceipt, PurchaseReturn, etc.)
+  - Jobs/Events/Listeners/Commands: OPCIONAL
+  - Motivo do Repository: consultas com eager-loading complexo (items + receipts + supplier + returns + payables), filtros de status reutilizados, options de dropdown (requisicoes aprovadas, fornecedores ativos), datatable com joins.
 
 ### Cadastros mestre (CRUDs + datatable)
 - `Categorias`:

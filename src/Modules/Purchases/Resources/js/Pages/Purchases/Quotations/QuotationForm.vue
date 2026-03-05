@@ -1,42 +1,46 @@
 ﻿<script setup>
-import { ref } from 'vue'
+import { ref, watch, onMounted } from 'vue'
+import Multiselect from 'vue-multiselect'
+import 'vue-multiselect/dist/vue-multiselect.css'
 
 const props = defineProps({
   form: { type: Object, required: true },
   submitLabel: { type: String, default: 'Salvar' },
   showSuppliers: { type: Boolean, default: true },
   readonlyRequisition: { type: Boolean, default: false },
+  readonlyRequisition: { type: Boolean, default: false },
+  requisitionsOptions: { type: Array, default: () => [] },
+  suppliersOptions: { type: Array, default: () => [] },
 })
 
-const supplierInput = ref('')
+const selectedRequisition = ref(null)
+const selectedSuppliers = ref([])
 
-/**
- * Add a supplier id to the quotation form list.
- *
- * @returns {void}
- */
-function addSupplierId() {
-  const value = Number(supplierInput.value)
-  if (!value || Number.isNaN(value)) {
-    supplierInput.value = ''
-    return
+onMounted(() => {
+  if (props.form.requisition_id && props.requisitionsOptions) {
+    selectedRequisition.value = props.requisitionsOptions.find(r => r.id === props.form.requisition_id) || null
   }
-
-  if (!props.form.supplier_ids.includes(value)) {
-    props.form.supplier_ids.push(value)
+  
+  if (props.form.supplier_ids && props.form.supplier_ids.length > 0 && props.suppliersOptions) {
+    selectedSuppliers.value = props.suppliersOptions.filter(s => props.form.supplier_ids.includes(s.id))
   }
+})
 
-  supplierInput.value = ''
+watch(selectedRequisition, (newVal) => {
+  props.form.requisition_id = newVal ? newVal.id : ''
+})
+
+watch(selectedSuppliers, (newValues) => {
+  props.form.supplier_ids = newValues ? newValues.map(s => s.id) : []
+}, { deep: true })
+
+function customRequisitionLabel(option) {
+  return option ? option.numero : ''
 }
 
-/**
- * Remove a supplier id from the quotation form list.
- *
- * @param {number} index
- * @returns {void}
- */
-function removeSupplierId(index) {
-  props.form.supplier_ids.splice(index, 1)
+function customSupplierLabel(option) {
+  const name = option ? (option.razao_social || option.nome_fornecedor) : ''
+  return option ? `${name} (CNPJ: ${option.cnpj})` : ''
 }
 </script>
 
@@ -45,13 +49,18 @@ function removeSupplierId(index) {
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
       <div>
         <label class="block text-sm font-medium">Requisicao ID</label>
-        <input
-          v-model="props.form.requisition_id"
-          type="number"
-          min="1"
-          class="mt-1 border rounded px-3 py-2 w-full"
-          :readonly="readonlyRequisition"
-        >
+        <Multiselect
+          v-model="selectedRequisition"
+          :options="props.requisitionsOptions"
+          :custom-label="customRequisitionLabel"
+          track-by="id"
+          placeholder="Buscar Requisição"
+          select-label="Enter para esc."
+          deselect-label=""
+          :use-teleport="true"
+          :disabled="readonlyRequisition"
+          class="w-full text-sm mt-1"
+        />
         <div v-if="props.form.errors.requisition_id" class="text-red-600 text-sm mt-1">
           {{ props.form.errors.requisition_id }}
         </div>
@@ -76,21 +85,25 @@ function removeSupplierId(index) {
       <div class="flex items-center justify-between">
         <h3 class="font-semibold">Fornecedores Convidados</h3>
       </div>
-      <div class="flex flex-wrap gap-2">
-        <input v-model="supplierInput" type="number" min="1" placeholder="Fornecedor ID" class="border rounded px-3 py-2">
-        <button type="button" class="px-3 py-2 rounded bg-gray-100 hover:bg-gray-200" @click="addSupplierId">Adicionar</button>
+      <div>
+        <Multiselect
+          v-model="selectedSuppliers"
+          :options="props.suppliersOptions"
+          :custom-label="customSupplierLabel"
+          :multiple="true"
+          :close-on-select="false"
+          :clear-on-select="false"
+          track-by="id"
+          placeholder="Pesquisar e adicionar Fornecedores"
+          select-label="Enter p/ adic."
+          deselect-label="Enter p/ remv."
+          :use-teleport="true"
+          class="w-full text-sm"
+        />
+        <div v-if="props.form.errors.supplier_ids" class="text-red-600 text-sm mt-1">
+          {{ props.form.errors.supplier_ids }}
+        </div>
       </div>
-      <div v-if="props.form.supplier_ids.length" class="flex flex-wrap gap-2">
-        <span
-          v-for="(supplierId, index) in props.form.supplier_ids"
-          :key="`${supplierId}-${index}`"
-          class="px-2 py-1 rounded bg-slate-100 text-slate-700"
-        >
-          {{ supplierId }}
-          <button type="button" class="ml-2 text-red-600" @click="removeSupplierId(index)">x</button>
-        </span>
-      </div>
-      <div v-else class="text-sm text-slate-500">Nenhum fornecedor adicionado.</div>
     </div>
 
     <div class="flex justify-end">
