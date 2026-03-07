@@ -9,17 +9,20 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response as InertiaResponse;
-use Modules\Purchases\Models\PurchasePayable;
+use Modules\Purchases\Repositories\PurchasePayableRepository;
 
 class PurchasePayableController extends Controller
 {
     /**
      * Create a new controller instance.
      *
+     * @param \Modules\Purchases\Repositories\PurchasePayableRepository $repository
      * @param \App\Services\DataTableService $dt
      */
-    public function __construct(private DataTableService $dt)
-    {
+    public function __construct(
+        private PurchasePayableRepository $repository,
+        private DataTableService $dt
+    ) {
     }
 
     /**
@@ -51,7 +54,7 @@ class PurchasePayableController extends Controller
      */
     public function data(Request $request): JsonResponse
     {
-        [$query, $columnsMap] = PurchasePayable::makeDatatableQuery($request);
+        [$query, $columnsMap] = $this->repository->getDatatableQuery($request->all());
 
         return $this->dt->make(
             $query,
@@ -79,12 +82,15 @@ class PurchasePayableController extends Controller
      */
     public function show(int $payableId): InertiaResponse
     {
-        $payable = PurchasePayable::query()
-            ->with(['supplier', 'order', 'receipt'])
-            ->findOrFail($payableId);
+        $payable = $this->repository->findByIdWithRelations($payableId, [
+            'supplier',
+            'order',
+            'receipt',
+        ]);
 
         return Inertia::render('Purchases/Payables/Show', [
             'payable' => $payable,
         ]);
     }
 }
+

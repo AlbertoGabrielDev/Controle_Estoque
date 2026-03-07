@@ -10,6 +10,7 @@ use Inertia\Inertia;
 use Modules\Suppliers\Http\Requests\FornecedorStoreRequest;
 use Modules\Suppliers\Http\Requests\FornecedorUpdateRequest;
 use Modules\Suppliers\Models\Fornecedor;
+use Modules\Suppliers\Repositories\FornecedorRepository;
 use Modules\Suppliers\Services\FornecedorService;
 use RuntimeException;
 
@@ -17,7 +18,8 @@ class FornecedorController extends Controller
 {
     public function __construct(
         private DataTableService $dt,
-        private FornecedorService $service
+        private FornecedorService $service,
+        private FornecedorRepository $repository
     ) {
     }
 
@@ -33,7 +35,7 @@ class FornecedorController extends Controller
 
     public function data(Request $request)
     {
-        [$query, $columnsMap] = Fornecedor::makeDatatableQuery($request);
+        [$query, $columnsMap] = $this->repository->makeDatatableQuery($request->all());
 
         return $this->dt->make(
             $query,

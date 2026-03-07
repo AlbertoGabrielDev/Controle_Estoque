@@ -9,14 +9,15 @@ use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Modules\Brands\Http\Requests\ValidacaoMarca;
 use Modules\Brands\Http\Requests\ValidacaoMarcaEditar;
-use Modules\Brands\Models\Marca;
+use Modules\Brands\Repositories\MarcaRepository;
 use Modules\Brands\Services\MarcaService;
 
 class MarcaController extends Controller
 {
     public function __construct(
         private DataTableService $dt,
-        private MarcaService $service
+        private MarcaService $service,
+        private MarcaRepository $repository
     ) {
     }
 
@@ -32,7 +33,7 @@ class MarcaController extends Controller
 
     public function data(Request $request)
     {
-        [$query, $columnsMap] = Marca::makeDatatableQuery($request);
+        [$query, $columnsMap] = $this->repository->makeDatatableQuery($request->all());
 
         return $this->dt->make(
             $query,

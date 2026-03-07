@@ -10,6 +10,14 @@ use Prettus\Repository\Contracts\RepositoryInterface;
 
 interface ClienteRepository extends RepositoryInterface
 {
+    /**
+     * Get the Datatable query and columns map.
+     *
+     * @param array $filters
+     * @return array{0: \Illuminate\Database\Eloquent\Builder, 1: array}
+     */
+    public function makeDatatableQuery(array $filters): array;
+
     public function paginateWithFilters(array $filters): LengthAwarePaginator;
 
     public function getSegments(): EloquentCollection;

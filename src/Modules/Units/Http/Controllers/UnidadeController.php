@@ -10,13 +10,15 @@ use Inertia\Inertia;
 use Modules\Units\Http\Requests\UnidadeStoreRequest;
 use Modules\Units\Http\Requests\UnidadeUpdateRequest;
 use Modules\Units\Models\Unidades;
+use Modules\Units\Repositories\UnidadesRepository;
 use Modules\Units\Services\UnidadeService;
 
 class UnidadeController extends Controller
 {
     public function __construct(
         private DataTableService $dt,
-        private UnidadeService $service
+        private UnidadeService $service,
+        private UnidadesRepository $repository
     ) {
     }
 
@@ -32,7 +34,7 @@ class UnidadeController extends Controller
 
     public function data(Request $request)
     {
-        [$query, $columnsMap] = Unidades::makeDatatableQuery($request);
+        [$query, $columnsMap] = $this->repository->makeDatatableQuery($request->all());
 
         return $this->dt->make(
             $query,

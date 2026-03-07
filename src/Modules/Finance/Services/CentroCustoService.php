@@ -18,11 +18,11 @@ class CentroCustoService
 
     public function update(CentroCusto $centroCusto, array $data): CentroCusto
     {
-        return $this->repo->update($centroCusto, $data);
+        return $this->repo->update($data, $centroCusto->id);
     }
 
     public function delete(CentroCusto $centroCusto): void
     {
-        $this->repo->delete($centroCusto);
+        $this->repo->delete($centroCusto->id);
     }
 }

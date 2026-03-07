@@ -9,13 +9,15 @@ use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Modules\Finance\Http\Requests\ContaContabilRequest;
 use Modules\Finance\Models\ContaContabil;
+use Modules\Finance\Repositories\ContaContabilRepository;
 use Modules\Finance\Services\ContaContabilService;
 
 class ContaContabilController extends Controller
 {
     public function __construct(
         private DataTableService $dt,
-        private ContaContabilService $service
+        private ContaContabilService $service,
+        private ContaContabilRepository $repository
     ) {
     }
 
@@ -31,7 +33,7 @@ class ContaContabilController extends Controller
 
     public function data(Request $request)
     {
-        [$query, $columnsMap] = ContaContabil::makeDatatableQuery($request);
+        [$query, $columnsMap] = $this->repository->makeDatatableQuery($request->all());
 
         return $this->dt->make(
             $query,
@@ -52,10 +54,7 @@ class ContaContabilController extends Controller
     public function create()
     {
         return Inertia::render('AccountingAccounts/Create', [
-            'contasPai' => ContaContabil::query()
-                ->select('id', 'codigo', 'nome')
-                ->orderBy('nome')
-                ->get(),
+            'contasPai' => $this->repository->getParentOptions(),
         ]);
     }
 
@@ -70,11 +69,7 @@ class ContaContabilController extends Controller
     {
         return Inertia::render('AccountingAccounts/Edit', [
             'conta' => $conta_contabil,
-            'contasPai' => ContaContabil::query()
-                ->where('id', '<>', $conta_contabil->id)
-                ->select('id', 'codigo', 'nome')
-                ->orderBy('nome')
-                ->get(),
+            'contasPai' => $this->repository->getParentOptions($conta_contabil->id),
         ]);
     }
 

@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Modules\Customers\Http\Requests\CustomerSegmentRequest;
 use Modules\Customers\Models\CustomerSegment;
+use Modules\Customers\Repositories\CustomerSegmentRepository;
 use Modules\Customers\Services\CustomerSegmentService;
 
 class CustomerSegmentController extends Controller
@@ -16,6 +17,7 @@ class CustomerSegmentController extends Controller
     public function __construct(
         private DataTableService $dt,
         private CustomerSegmentService $service,
+        private CustomerSegmentRepository $repository
     ) {
     }
 
@@ -30,7 +32,7 @@ class CustomerSegmentController extends Controller
 
     public function data(Request $request)
     {
-        [$query, $columnsMap] = CustomerSegment::makeDatatableQuery($request);
+        [$query, $columnsMap] = $this->repository->makeDatatableQuery($request->all());
 
         return $this->dt->make(
             $query,

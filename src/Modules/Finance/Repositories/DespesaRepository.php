@@ -2,27 +2,15 @@
 
 namespace Modules\Finance\Repositories;
 
-use Modules\Finance\Models\Despesa;
+use Prettus\Repository\Contracts\RepositoryInterface;
 
-class DespesaRepository
+interface DespesaRepository extends RepositoryInterface
 {
-    public function __construct(private Despesa $model)
-    {
-    }
-
-    public function create(array $data): Despesa
-    {
-        return $this->model->create($data);
-    }
-
-    public function update(Despesa $despesa, array $data): Despesa
-    {
-        $despesa->update($data);
-        return $despesa;
-    }
-
-    public function delete(Despesa $despesa): void
-    {
-        $despesa->delete();
-    }
+    /**
+     * Get the Datatable query and columns map.
+     *
+     * @param array $filters
+     * @return array{0: \Illuminate\Database\Eloquent\Builder, 1: array}
+     */
+    public function makeDatatableQuery(array $filters): array;
 }

@@ -9,13 +9,15 @@ use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Modules\MeasureUnits\Http\Requests\UnidadeMedidaRequest;
 use Modules\MeasureUnits\Models\UnidadeMedida;
+use Modules\MeasureUnits\Repositories\UnidadeMedidaRepository;
 use Modules\MeasureUnits\Services\UnidadeMedidaService;
 
 class UnidadeMedidaController extends Controller
 {
     public function __construct(
         private DataTableService $dt,
-        private UnidadeMedidaService $service
+        private UnidadeMedidaService $service,
+        private UnidadeMedidaRepository $repository
     ) {
     }
 
@@ -31,7 +33,7 @@ class UnidadeMedidaController extends Controller
 
     public function data(Request $request)
     {
-        [$query, $columnsMap] = UnidadeMedida::makeDatatableQuery($request);
+        [$query, $columnsMap] = $this->repository->makeDatatableQuery($request->all());
 
         return $this->dt->make(
             $query,
@@ -52,10 +54,7 @@ class UnidadeMedidaController extends Controller
     public function create()
     {
         return Inertia::render('MeasureUnits/Create', [
-            'unidadesBase' => UnidadeMedida::query()
-                ->select('id', 'codigo', 'descricao')
-                ->orderBy('codigo')
-                ->get(),
+            'unidadesBase' => $this->repository->getBaseOptions(),
         ]);
     }
 
@@ -70,11 +69,7 @@ class UnidadeMedidaController extends Controller
     {
         return Inertia::render('MeasureUnits/Edit', [
             'unidade' => $unidade_medida,
-            'unidadesBase' => UnidadeMedida::query()
-                ->where('id', '<>', $unidade_medida->id)
-                ->select('id', 'codigo', 'descricao')
-                ->orderBy('codigo')
-                ->get(),
+            'unidadesBase' => $this->repository->getBaseOptions($unidade_medida->id),
         ]);
     }
 

@@ -41,6 +41,34 @@ use Modules\Purchases\Repositories\PurchaseRequisitionRepository as ModulePurcha
 use Modules\Purchases\Repositories\PurchaseRequisitionRepositoryEloquent as ModulePurchaseRequisitionRepositoryEloquent;
 use Modules\Purchases\Repositories\PurchaseOrderRepository as ModulePurchaseOrderRepository;
 use Modules\Purchases\Repositories\PurchaseOrderRepositoryEloquent as ModulePurchaseOrderRepositoryEloquent;
+use Modules\Purchases\Repositories\PurchaseReceiptRepository as ModulePurchaseReceiptRepository;
+use Modules\Purchases\Repositories\PurchaseReceiptRepositoryEloquent as ModulePurchaseReceiptRepositoryEloquent;
+use Modules\Purchases\Repositories\PurchasePayableRepository as ModulePurchasePayableRepository;
+use Modules\Purchases\Repositories\PurchasePayableRepositoryEloquent as ModulePurchasePayableRepositoryEloquent;
+use Modules\Purchases\Repositories\PurchaseQuotationRepository as ModulePurchaseQuotationRepository;
+use Modules\Purchases\Repositories\PurchaseQuotationRepositoryEloquent as ModulePurchaseQuotationRepositoryEloquent;
+use Modules\Purchases\Repositories\PurchaseReturnRepository as ModulePurchaseReturnRepository;
+use Modules\Purchases\Repositories\PurchaseReturnRepositoryEloquent as ModulePurchaseReturnRepositoryEloquent;
+use Modules\Brands\Repositories\MarcaRepository;
+use Modules\Brands\Repositories\MarcaRepositoryEloquent;
+use Modules\Categories\Repositories\CategoriaRepository as ModuleCategoriaRepository;
+use Modules\Categories\Repositories\CategoriaRepositoryEloquent as ModuleCategoriaRepositoryEloquent;
+use Modules\Customers\Repositories\CustomerSegmentRepository;
+use Modules\Customers\Repositories\CustomerSegmentRepositoryEloquent;
+use Modules\Finance\Repositories\CentroCustoRepository;
+use Modules\Finance\Repositories\CentroCustoRepositoryEloquent;
+use Modules\Finance\Repositories\ContaContabilRepository;
+use Modules\Finance\Repositories\ContaContabilRepositoryEloquent;
+use Modules\Finance\Repositories\DespesaRepository;
+use Modules\Finance\Repositories\DespesaRepositoryEloquent;
+use Modules\Items\Repositories\ItemRepository;
+use Modules\Items\Repositories\ItemRepositoryEloquent;
+use Modules\MeasureUnits\Repositories\UnidadeMedidaRepository;
+use Modules\MeasureUnits\Repositories\UnidadeMedidaRepositoryEloquent;
+use Modules\Suppliers\Repositories\FornecedorRepository;
+use Modules\Suppliers\Repositories\FornecedorRepositoryEloquent;
+use Modules\Units\Repositories\UnidadesRepository as ModuleUnidadesRepository;
+use Modules\Units\Repositories\UnidadesRepositoryEloquent as ModuleUnidadesRepositoryEloquent;
 
 use Illuminate\Pagination\Paginator;
 class AppServiceProvider extends ServiceProvider
@@ -69,6 +97,21 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(ModuleTaxRuleRepository::class, ModuleTaxRuleRepositoryEloquent::class);
         $this->app->bind(ModulePurchaseRequisitionRepository::class, ModulePurchaseRequisitionRepositoryEloquent::class);
         $this->app->bind(ModulePurchaseOrderRepository::class, ModulePurchaseOrderRepositoryEloquent::class);
+        $this->app->bind(ModulePurchaseReceiptRepository::class, ModulePurchaseReceiptRepositoryEloquent::class);
+        $this->app->bind(ModulePurchasePayableRepository::class, ModulePurchasePayableRepositoryEloquent::class);
+        $this->app->bind(ModulePurchaseQuotationRepository::class, ModulePurchaseQuotationRepositoryEloquent::class);
+        $this->app->bind(ModulePurchaseReturnRepository::class, ModulePurchaseReturnRepositoryEloquent::class);
+
+        $this->app->bind(MarcaRepository::class, MarcaRepositoryEloquent::class);
+        $this->app->bind(ModuleCategoriaRepository::class, ModuleCategoriaRepositoryEloquent::class);
+        $this->app->bind(CustomerSegmentRepository::class, CustomerSegmentRepositoryEloquent::class);
+        $this->app->bind(CentroCustoRepository::class, CentroCustoRepositoryEloquent::class);
+        $this->app->bind(ContaContabilRepository::class, ContaContabilRepositoryEloquent::class);
+        $this->app->bind(DespesaRepository::class, DespesaRepositoryEloquent::class);
+        $this->app->bind(ItemRepository::class, ItemRepositoryEloquent::class);
+        $this->app->bind(UnidadeMedidaRepository::class, UnidadeMedidaRepositoryEloquent::class);
+        $this->app->bind(FornecedorRepository::class, FornecedorRepositoryEloquent::class);
+        $this->app->bind(ModuleUnidadesRepository::class, ModuleUnidadesRepositoryEloquent::class);
     }
 
     /**

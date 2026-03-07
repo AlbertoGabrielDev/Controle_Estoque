@@ -12,13 +12,15 @@ use Modules\Categories\Models\Categoria;
 use Modules\Items\Http\Requests\ItemStoreRequest;
 use Modules\Items\Http\Requests\ItemUpdateRequest;
 use Modules\Items\Models\Item;
+use Modules\Items\Repositories\ItemRepository;
 use Modules\Items\Services\ItemService;
 
 class ItemController extends Controller
 {
     public function __construct(
         private DataTableService $dt,
-        private ItemService $service
+        private ItemService $service,
+        private ItemRepository $repository
     ) {
     }
 
@@ -35,7 +37,7 @@ class ItemController extends Controller
 
     public function data(Request $request)
     {
-        [$query, $columnsMap] = Item::makeDatatableQuery($request);
+        [$query, $columnsMap] = $this->repository->makeDatatableQuery($request->all());
 
         return $this->dt->make(
             $query,

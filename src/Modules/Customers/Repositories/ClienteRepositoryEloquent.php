@@ -23,17 +23,29 @@ class ClienteRepositoryEloquent extends BaseRepository implements ClienteReposit
         parent::boot();
     }
 
+    /**
+     * Get the Datatable query and columns map.
+     *
+     * @param array $filters
+     * @return array{0: \Illuminate\Database\Eloquent\Builder, 1: array}
+     */
+    public function makeDatatableQuery(array $filters): array
+    {
+        $request = new \Illuminate\Http\Request($filters);
+        return $this->model::makeDatatableQuery($request);
+    }
+
     public function paginateWithFilters(array $filters): LengthAwarePaginator
     {
         $q = trim((string) ($filters['q'] ?? ''));
-        $uf        = strtoupper(trim((string) ($filters['uf'] ?? '')));
+        $uf = strtoupper(trim((string) ($filters['uf'] ?? '')));
         $segmentId = $filters['segment_id'] ?? null;
-        $raw       = $filters['status'] ?? 1;
-        $status    = ((string) $raw === '1' || $raw === 1) ? 1 : 0;
+        $raw = $filters['status'] ?? 1;
+        $status = ((string) $raw === '1' || $raw === 1) ? 1 : 0;
 
         $query = $this->model
             ->newQuery()
-            ->when($q !== '', fn ($qry) => $qry->where(function ($s) use ($q) {
+            ->when($q !== '', fn($qry) => $qry->where(function ($s) use ($q) {
                 $s->where('nome', 'like', "%{$q}%")
                     ->orWhere('nome_fantasia', 'like', "%{$q}%")
                     ->orWhere('razao_social', 'like', "%{$q}%")
@@ -87,7 +99,7 @@ class ClienteRepositoryEloquent extends BaseRepository implements ClienteReposit
     {
         return $this->model
             ->newQuery()
-            ->when($term !== '', fn ($q) => $q->where(function ($s) use ($term) {
+            ->when($term !== '', fn($q) => $q->where(function ($s) use ($term) {
                 $s->where('nome', 'like', "%{$term}%")
                     ->orWhere('nome_fantasia', 'like', "%{$term}%")
                     ->orWhere('razao_social', 'like', "%{$term}%")

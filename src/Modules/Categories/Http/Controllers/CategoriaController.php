@@ -14,6 +14,7 @@ use Inertia\Response as InertiaResponse;
 use Modules\Categories\Http\Requests\CategoriaStoreRequest;
 use Modules\Categories\Http\Requests\CategoriaUpdateRequest;
 use Modules\Categories\Models\Categoria;
+use Modules\Categories\Repositories\CategoriaRepository;
 use Modules\Categories\Services\CategoriaService;
 use Modules\Products\Models\Produto;
 use RuntimeException;
@@ -22,7 +23,8 @@ class CategoriaController extends Controller
 {
     public function __construct(
         private DataTableService $dt,
-        private CategoriaService $service
+        private CategoriaService $service,
+        private CategoriaRepository $repository
     ) {
     }
 
@@ -45,7 +47,7 @@ class CategoriaController extends Controller
 
     public function data(Request $request)
     {
-        [$query, $columnsMap] = Categoria::makeDatatableQuery($request);
+        [$query, $columnsMap] = $this->repository->makeDatatableQuery($request->all());
 
         return $this->dt->make(
             $query,
@@ -87,11 +89,9 @@ class CategoriaController extends Controller
     {
         return Inertia::render('Categories/Products', [
             'categoriaId' => (int) $categoriaId,
-            'categoria' => fn () => (string) Categoria::query()
-                ->whereKey($categoriaId)
-                ->value('nome_categoria'),
+            'categoria' => fn() => (string) $this->service->findOrFail((int) $categoriaId)->nome_categoria,
             'produtos' => function () use ($categoriaId) {
-                $categoria = Categoria::query()->findOrFail($categoriaId);
+                $categoria = $this->service->findOrFail((int) $categoriaId);
                 $query = $categoria->produtos()
                     ->select([
                         'produtos.id_produto',

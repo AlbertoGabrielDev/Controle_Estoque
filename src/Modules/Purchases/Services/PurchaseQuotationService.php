@@ -6,14 +6,18 @@ use Illuminate\Support\Facades\DB;
 use Modules\Purchases\Models\PurchaseQuotation;
 use Modules\Purchases\Models\PurchaseQuotationSupplier;
 use Modules\Purchases\Models\PurchaseQuotationSupplierItem;
-use Modules\Purchases\Models\PurchaseRequisition;
 use Modules\Purchases\Models\PurchaseRequisitionItem;
+use Modules\Purchases\Repositories\PurchaseQuotationRepository;
+use Modules\Purchases\Repositories\PurchaseRequisitionRepository;
 use RuntimeException;
 
 class PurchaseQuotationService
 {
-    public function __construct(private DocumentNumberService $numberService)
-    {
+    public function __construct(
+        private DocumentNumberService $numberService,
+        private PurchaseQuotationRepository $quotationRepository,
+        private PurchaseRequisitionRepository $requisitionRepository
+    ) {
     }
 
     /**
@@ -28,9 +32,9 @@ class PurchaseQuotationService
     public function createFromRequisition(int $requisitionId, array $payload): PurchaseQuotation
     {
         return DB::transaction(function () use ($requisitionId, $payload): PurchaseQuotation {
-            $requisition = PurchaseRequisition::query()->with('items')->findOrFail($requisitionId);
+            $requisition = $this->requisitionRepository->findForEdit($requisitionId);
 
-            $quotation = PurchaseQuotation::query()->create([
+            $quotation = $this->quotationRepository->createQuotation([
                 'numero' => $this->numberService->generate('COT'),
                 'status' => 'aberta',
                 'requisition_id' => $requisition->id,
@@ -58,7 +62,7 @@ class PurchaseQuotationService
     public function addSupplier(int $quotationId, int $supplierId): PurchaseQuotationSupplier
     {
         return DB::transaction(function () use ($quotationId, $supplierId): PurchaseQuotationSupplier {
-            $quotation = PurchaseQuotation::query()->with('requisition.items')->findOrFail($quotationId);
+            $quotation = $this->quotationRepository->findByIdWithRelations($quotationId, ['requisition.items']);
 
             if ($quotation->status !== 'aberta') {
                 throw new RuntimeException('Somente cotacoes abertas podem receber fornecedores.');
@@ -157,12 +161,12 @@ class PurchaseQuotationService
      *
      * @param int $quotationId
      * @param array $payload
-     * @return \\Modules\\Purchases\\Models\\PurchaseQuotation
+     * @return \Modules\Purchases\Models\PurchaseQuotation
      * @throws \RuntimeException
      */
     public function updateQuotation(int $quotationId, array $payload): PurchaseQuotation
     {
-        $quotation = PurchaseQuotation::query()->findOrFail($quotationId);
+        $quotation = $this->quotationRepository->findByIdWithRelations($quotationId);
 
         if ($quotation->status !== 'aberta') {
             throw new RuntimeException('Somente cotacoes abertas podem ser editadas.');
@@ -196,7 +200,7 @@ class PurchaseQuotationService
                 throw new RuntimeException('Item informado nao pertence a cotacao.');
             }
 
-            $quotation = PurchaseQuotation::query()->findOrFail($quotationId);
+            $quotation = $this->quotationRepository->findByIdWithRelations($quotationId);
 
             if ($quotation->status !== 'aberta') {
                 throw new RuntimeException('Somente cotacoes abertas permitem selecao de vencedor.');
@@ -224,9 +228,7 @@ class PurchaseQuotationService
      */
     public function closeQuotation(int $quotationId): PurchaseQuotation
     {
-        $quotation = PurchaseQuotation::query()
-            ->with('requisition.items')
-            ->findOrFail($quotationId);
+        $quotation = $this->quotationRepository->findByIdWithRelations($quotationId, ['requisition.items']);
 
         if ($quotation->status !== 'aberta') {
             throw new RuntimeException('Somente cotacoes abertas podem ser encerradas.');
@@ -261,7 +263,7 @@ class PurchaseQuotationService
      */
     public function cancelQuotation(int $quotationId): PurchaseQuotation
     {
-        $quotation = PurchaseQuotation::query()->findOrFail($quotationId);
+        $quotation = $this->quotationRepository->findByIdWithRelations($quotationId);
 
         if ($quotation->status === 'encerrada') {
             throw new RuntimeException('Cotacoes encerradas nao podem ser canceladas.');

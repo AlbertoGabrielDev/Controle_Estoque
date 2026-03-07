@@ -18,11 +18,11 @@ class ContaContabilService
 
     public function update(ContaContabil $contaContabil, array $data): ContaContabil
     {
-        return $this->repo->update($contaContabil, $data);
+        return $this->repo->update($data, $contaContabil->id);
     }
 
     public function delete(ContaContabil $contaContabil): void
     {
-        $this->repo->delete($contaContabil);
+        $this->repo->delete($contaContabil->id);
     }
 }

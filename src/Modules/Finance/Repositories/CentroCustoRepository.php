@@ -2,27 +2,23 @@
 
 namespace Modules\Finance\Repositories;
 
-use Modules\Finance\Models\CentroCusto;
+use Prettus\Repository\Contracts\RepositoryInterface;
 
-class CentroCustoRepository
+interface CentroCustoRepository extends RepositoryInterface
 {
-    public function __construct(private CentroCusto $model)
-    {
-    }
+    /**
+     * Get the Datatable query and columns map.
+     *
+     * @param array $filters
+     * @return array{0: \Illuminate\Database\Eloquent\Builder, 1: array}
+     */
+    public function makeDatatableQuery(array $filters): array;
 
-    public function create(array $data): CentroCusto
-    {
-        return $this->model->create($data);
-    }
-
-    public function update(CentroCusto $centroCusto, array $data): CentroCusto
-    {
-        $centroCusto->update($data);
-        return $centroCusto;
-    }
-
-    public function delete(CentroCusto $centroCusto): void
-    {
-        $centroCusto->delete();
-    }
+    /**
+     * Get parent center options for select components.
+     *
+     * @param int|string|null $excludeId ID to exclude to avoid self-referencing.
+     * @return \Illuminate\Database\Eloquent\Collection
+     */
+    public function getParentOptions(int|string|null $excludeId = null);
 }

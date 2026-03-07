@@ -16,6 +16,14 @@ interface PurchaseOrderRepository
     public function findWithRelations(int $id): PurchaseOrder;
 
     /**
+     * Find an order with its items.
+     *
+     * @param int $id
+     * @return PurchaseOrder
+     */
+    public function findByIdWithItems(int $id): PurchaseOrder;
+
+    /**
      * Get approved requisitions for the order creation dropdown.
      *
      * @return Collection
@@ -28,4 +36,11 @@ interface PurchaseOrderRepository
      * @return Collection
      */
     public function suppliersOptions(): Collection;
+
+    /**
+     * Get orders available for receipt creation (emitido or parcialmente_recebido).
+     *
+     * @return Collection
+     */
+    public function getAvailableForReceipt(): Collection;
 }

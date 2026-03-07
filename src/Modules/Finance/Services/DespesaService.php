@@ -18,11 +18,11 @@ class DespesaService
 
     public function update(Despesa $despesa, array $data): Despesa
     {
-        return $this->repo->update($despesa, $data);
+        return $this->repo->update($data, $despesa->id);
     }
 
     public function delete(Despesa $despesa): void
     {
-        $this->repo->delete($despesa);
+        $this->repo->delete($despesa->id);
     }
 }

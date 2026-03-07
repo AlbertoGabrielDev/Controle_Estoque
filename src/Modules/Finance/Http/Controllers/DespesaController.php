@@ -13,12 +13,14 @@ use Modules\Finance\Models\CentroCusto;
 use Modules\Finance\Models\ContaContabil;
 use Modules\Finance\Models\Despesa;
 use Modules\Finance\Services\DespesaService;
+use Modules\Finance\Repositories\DespesaRepository;
 
 class DespesaController extends Controller
 {
     public function __construct(
         private DataTableService $dt,
-        private DespesaService $service
+        private DespesaService $service,
+        private DespesaRepository $repository
     ) {
     }
 
@@ -40,7 +42,7 @@ class DespesaController extends Controller
 
     public function data(Request $request)
     {
-        [$query, $columnsMap] = Despesa::makeDatatableQuery($request);
+        [$query, $columnsMap] = $this->repository->makeDatatableQuery($request->all());
 
         return $this->dt->make(
             $query,

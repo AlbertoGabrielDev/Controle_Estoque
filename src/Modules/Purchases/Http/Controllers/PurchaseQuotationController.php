@@ -16,15 +16,19 @@ use Modules\Purchases\Http\Requests\PurchaseQuotationPricesRequest;
 use Modules\Purchases\Http\Requests\PurchaseQuotationSelectItemRequest;
 use Modules\Purchases\Http\Requests\PurchaseQuotationStoreRequest;
 use Modules\Purchases\Http\Requests\PurchaseQuotationUpdateRequest;
-use Modules\Purchases\Models\PurchaseQuotation;
+use Modules\Purchases\Repositories\PurchaseOrderRepository;
+use Modules\Purchases\Repositories\PurchaseQuotationRepository;
+use Modules\Purchases\Repositories\PurchaseRequisitionRepository;
 use Modules\Purchases\Services\PurchaseQuotationService;
-use Modules\Suppliers\Models\Fornecedor;
 use RuntimeException;
 
 class PurchaseQuotationController extends Controller
 {
     public function __construct(
         private PurchaseQuotationService $service,
+        private PurchaseQuotationRepository $quotationRepository,
+        private PurchaseRequisitionRepository $requisitionRepository,
+        private PurchaseOrderRepository $orderRepository,
         private DataTableService $dt
     ) {
     }
@@ -58,7 +62,7 @@ class PurchaseQuotationController extends Controller
      */
     public function data(Request $request): JsonResponse
     {
-        [$query, $columnsMap] = PurchaseQuotation::makeDatatableQuery($request);
+        [$query, $columnsMap] = $this->quotationRepository->getDatatableQuery($request->all());
 
         $supplierId = (string) $request->query('supplier_id', '');
         if ($supplierId !== '') {
@@ -100,14 +104,8 @@ class PurchaseQuotationController extends Controller
     public function create(): InertiaResponse
     {
         return Inertia::render('Purchases/Quotations/Create', [
-            'requisitions_options' => \Modules\Purchases\Models\PurchaseRequisition::query()
-                ->select('id', 'numero', 'data_requisicao', 'observacoes', 'status')
-                ->where('status', 'LIKE', '%aprovado%')
-                ->get(),
-            'suppliers_options' => Fornecedor::query()
-                ->select('id_fornecedor as id', 'razao_social', 'nome_fornecedor', 'cnpj')
-                ->where('ativo', true)
-                ->get(),
+            'requisitions_options' => $this->requisitionRepository->approvedOptions(),
+            'suppliers_options' => $this->orderRepository->suppliersOptions(),
         ]);
     }
 
@@ -139,9 +137,12 @@ class PurchaseQuotationController extends Controller
      */
     public function show(int $quotationId): InertiaResponse
     {
-        $quotation = PurchaseQuotation::query()
-            ->with(['requisition.items', 'suppliers.items', 'suppliers.supplier', 'orders'])
-            ->findOrFail($quotationId);
+        $quotation = $this->quotationRepository->findByIdWithRelations($quotationId, [
+            'requisition.items',
+            'suppliers.items',
+            'suppliers.supplier',
+            'orders',
+        ]);
 
         return Inertia::render('Purchases/Quotations/Show', [
             'quotation' => $quotation,
@@ -156,21 +157,17 @@ class PurchaseQuotationController extends Controller
      */
     public function edit(int $quotationId): InertiaResponse
     {
-        $quotation = PurchaseQuotation::query()
-            ->with(['requisition.items', 'suppliers.items', 'suppliers.supplier', 'orders'])
-            ->findOrFail($quotationId);
+        $quotation = $this->quotationRepository->findByIdWithRelations($quotationId, [
+            'requisition.items',
+            'suppliers.items',
+            'suppliers.supplier',
+            'orders',
+        ]);
 
         return Inertia::render('Purchases/Quotations/Edit', [
             'quotation' => $quotation,
-            'requisitions_options' => \Modules\Purchases\Models\PurchaseRequisition::query()
-                ->select('id', 'numero', 'data_requisicao', 'observacoes', 'status')
-                ->where('status', 'LIKE', '%aprovado%')
-                ->orWhere('id', $quotation->requisition_id)
-                ->get(),
-            'suppliers_options' => Fornecedor::query()
-                ->select('id_fornecedor as id', 'razao_social', 'nome_fornecedor', 'cnpj')
-                ->where('ativo', true)
-                ->get(),
+            'requisitions_options' => $this->requisitionRepository->approvedOptions(),
+            'suppliers_options' => $this->orderRepository->suppliersOptions(),
         ]);
     }
 

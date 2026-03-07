@@ -5,44 +5,33 @@ namespace Modules\Categories\Services;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\UploadedFile;
 use Modules\Categories\Models\Categoria;
+use Modules\Categories\Repositories\CategoriaRepository;
 use RuntimeException;
 
 class CategoriaService
 {
+    public function __construct(private CategoriaRepository $repository)
+    {
+    }
+
     public function listForHome(bool $canViewInactive): Collection
     {
-        $query = Categoria::query()->withCount('produtos');
-
-        if (!$canViewInactive) {
-            $query->where('ativo', 1);
-        }
-
-        return $query
-            ->orderBy('nome_categoria')
-            ->get(['id_categoria', 'nome_categoria', 'imagem']);
+        return $this->repository->listForHome($canViewInactive);
     }
 
     public function listParentOptions(?int $exceptCategoriaId = null): Collection
     {
-        $query = Categoria::query()
-            ->select('id_categoria', 'nome_categoria')
-            ->orderBy('nome_categoria');
-
-        if ($exceptCategoriaId) {
-            $query->where('id_categoria', '<>', $exceptCategoriaId);
-        }
-
-        return $query->get();
+        return $this->repository->listParentOptions($exceptCategoriaId);
     }
 
     public function findOrFail(int $categoriaId): Categoria
     {
-        return Categoria::query()->findOrFail($categoriaId);
+        return $this->repository->find($categoriaId);
     }
 
     public function create(array $validated, ?UploadedFile $imagem, ?int $userId): Categoria
     {
-        return Categoria::query()->create([
+        return $this->repository->create([
             'codigo' => $validated['codigo'],
             'nome_categoria' => $validated['nome_categoria'],
             'tipo' => $validated['tipo'],
@@ -70,22 +59,20 @@ class CategoriaService
             $data['imagem'] = $imageName;
         }
 
-        $categoria->update($data);
+        $this->repository->update($data, $categoriaId);
 
         return $categoria->refresh();
     }
 
     public function delete(int $categoriaId): void
     {
-        $categoria = Categoria::query()
-            ->withCount(['produtos', 'filhas'])
-            ->findOrFail($categoriaId);
+        $categoria = $this->repository->findOrFailWithCount($categoriaId, ['produtos', 'filhas']);
 
         if ($categoria->produtos_count > 0 || $categoria->filhas_count > 0) {
             throw new RuntimeException('Nao e possivel remover: ha produtos ou subcategorias vinculadas.');
         }
 
-        $categoria->delete();
+        $this->repository->delete($categoriaId);
     }
 
     private function storeImage(?UploadedFile $imagem): ?string

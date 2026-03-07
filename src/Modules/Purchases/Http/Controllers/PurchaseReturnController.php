@@ -8,11 +8,10 @@ use App\Support\DataTableActions;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use App\Models\Item;
 use Inertia\Inertia;
 use Inertia\Response as InertiaResponse;
 use Modules\Purchases\Http\Requests\PurchaseReturnStoreRequest;
-use Modules\Purchases\Models\PurchaseReturn;
+use Modules\Purchases\Repositories\PurchaseReturnRepository;
 use Modules\Purchases\Services\PurchaseReturnService;
 use RuntimeException;
 
@@ -20,6 +19,7 @@ class PurchaseReturnController extends Controller
 {
     public function __construct(
         private PurchaseReturnService $service,
+        private PurchaseReturnRepository $returnRepository,
         private DataTableService $dt
     ) {
     }
@@ -52,7 +52,7 @@ class PurchaseReturnController extends Controller
      */
     public function data(Request $request): JsonResponse
     {
-        [$query, $columnsMap] = PurchaseReturn::makeDatatableQuery($request);
+        [$query, $columnsMap] = $this->returnRepository->getDatatableQuery($request->all());
 
         return $this->dt->make(
             $query,
@@ -80,7 +80,7 @@ class PurchaseReturnController extends Controller
     public function create(): InertiaResponse
     {
         return Inertia::render('Purchases/Returns/Create', [
-            'items_options' => Item::query()->select('id', 'sku', 'nome', 'descricao')->where('ativo', true)->get(),
+            'items_options' => \App\Models\Item::query()->select('id', 'sku', 'nome', 'descricao')->where('ativo', true)->get(),
         ]);
     }
 
@@ -110,9 +110,11 @@ class PurchaseReturnController extends Controller
      */
     public function show(int $returnId): InertiaResponse
     {
-        $return = PurchaseReturn::query()
-            ->with(['items', 'order', 'receipt'])
-            ->findOrFail($returnId);
+        $return = $this->returnRepository->findByIdWithRelations($returnId, [
+            'items',
+            'order',
+            'receipt',
+        ]);
 
         return Inertia::render('Purchases/Returns/Show', [
             'purchaseReturn' => $return,

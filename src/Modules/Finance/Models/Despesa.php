@@ -96,7 +96,8 @@ class Despesa extends Model
                     'cc.nome',
                     'ctb.codigo',
                     'ctb.nome',
-                    "COALESCE(f.nome_fornecedor, f.razao_social, '')",
+                    'f.nome_fornecedor',
+                    'f.razao_social',
                 ],
             ],
             'centro_custo_id' => [

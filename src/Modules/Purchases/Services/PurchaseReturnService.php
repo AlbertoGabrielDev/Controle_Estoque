@@ -6,14 +6,16 @@ use Illuminate\Support\Facades\DB;
 use Modules\Purchases\Models\PurchaseOrder;
 use Modules\Purchases\Models\PurchaseOrderItem;
 use Modules\Purchases\Models\PurchaseReceiptItem;
-use Modules\Purchases\Models\PurchaseReturn;
 use Modules\Purchases\Models\PurchaseReturnItem;
+use Modules\Purchases\Repositories\PurchaseReturnRepository;
 use RuntimeException;
 
 class PurchaseReturnService
 {
-    public function __construct(private DocumentNumberService $numberService)
-    {
+    public function __construct(
+        private DocumentNumberService $numberService,
+        private PurchaseReturnRepository $returnRepository
+    ) {
     }
 
     /**
@@ -24,10 +26,10 @@ class PurchaseReturnService
      * @throws \RuntimeException
      * @throws \Throwable
      */
-    public function createReturn(array $payload): PurchaseReturn
+    public function createReturn(array $payload): \Modules\Purchases\Models\PurchaseReturn
     {
-        return DB::transaction(function () use ($payload): PurchaseReturn {
-            $return = PurchaseReturn::query()->create([
+        return DB::transaction(function () use ($payload): \Modules\Purchases\Models\PurchaseReturn {
+            $return = $this->returnRepository->createReturn([
                 'numero' => $this->numberService->generate('DEV'),
                 'status' => 'aberta',
                 'receipt_id' => $payload['receipt_id'] ?? null,
@@ -59,10 +61,10 @@ class PurchaseReturnService
      * @throws \RuntimeException
      * @throws \Throwable
      */
-    public function confirmReturn(int $returnId): PurchaseReturn
+    public function confirmReturn(int $returnId): \Modules\Purchases\Models\PurchaseReturn
     {
-        return DB::transaction(function () use ($returnId): PurchaseReturn {
-            $return = PurchaseReturn::query()->with(['items', 'order.items'])->findOrFail($returnId);
+        return DB::transaction(function () use ($returnId): \Modules\Purchases\Models\PurchaseReturn {
+            $return = $this->returnRepository->findByIdWithRelations($returnId, ['items', 'order.items']);
 
             if ($return->status !== 'aberta') {
                 throw new RuntimeException('Somente devolucoes abertas podem ser confirmadas.');
@@ -131,9 +133,9 @@ class PurchaseReturnService
      * @return \Modules\Purchases\Models\PurchaseReturn
      * @throws \RuntimeException
      */
-    public function cancelReturn(int $returnId): PurchaseReturn
+    public function cancelReturn(int $returnId): \Modules\Purchases\Models\PurchaseReturn
     {
-        $return = PurchaseReturn::query()->findOrFail($returnId);
+        $return = $this->returnRepository->findByIdWithRelations($returnId);
 
         if ($return->status === 'confirmada') {
             throw new RuntimeException('Devolucoes confirmadas nao podem ser canceladas.');

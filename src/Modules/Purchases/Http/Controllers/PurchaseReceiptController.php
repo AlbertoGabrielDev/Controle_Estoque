@@ -8,11 +8,11 @@ use App\Support\DataTableActions;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use App\Models\Item;
 use Inertia\Inertia;
 use Inertia\Response as InertiaResponse;
 use Modules\Purchases\Http\Requests\PurchaseReceiptStoreRequest;
-use Modules\Purchases\Models\PurchaseReceipt;
+use Modules\Purchases\Repositories\PurchaseOrderRepository;
+use Modules\Purchases\Repositories\PurchaseReceiptRepository;
 use Modules\Purchases\Services\PurchaseReceiptService;
 use RuntimeException;
 
@@ -20,6 +20,8 @@ class PurchaseReceiptController extends Controller
 {
     public function __construct(
         private PurchaseReceiptService $service,
+        private PurchaseReceiptRepository $receiptRepository,
+        private PurchaseOrderRepository $orderRepository,
         private DataTableService $dt
     ) {
     }
@@ -53,7 +55,7 @@ class PurchaseReceiptController extends Controller
      */
     public function data(Request $request): JsonResponse
     {
-        [$query, $columnsMap] = PurchaseReceipt::makeDatatableQuery($request);
+        [$query, $columnsMap] = $this->receiptRepository->getDatatableQuery($request->all());
 
         return $this->dt->make(
             $query,
@@ -81,15 +83,7 @@ class PurchaseReceiptController extends Controller
     public function create(): InertiaResponse
     {
         return Inertia::render('Purchases/Receipts/Create', [
-            'orders_options' => \Modules\Purchases\Models\PurchaseOrder::query()
-                ->select('id', 'numero', 'status', 'data_emissao')
-                ->with([
-                    'items' => function ($q) {
-                        $q->select('id', 'order_id', 'item_id', 'descricao_snapshot', 'quantidade_pedida', 'preco_unit', 'quantidade_recebida');
-                    }
-                ])
-                ->whereIn('status', ['emitido', 'parcialmente_recebido'])
-                ->get(),
+            'orders_options' => $this->orderRepository->getAvailableForReceipt(),
         ]);
     }
 
@@ -119,9 +113,13 @@ class PurchaseReceiptController extends Controller
      */
     public function show(int $receiptId): InertiaResponse
     {
-        $receipt = PurchaseReceipt::query()
-            ->with(['items', 'order', 'supplier', 'returns', 'payables'])
-            ->findOrFail($receiptId);
+        $receipt = $this->receiptRepository->findByIdWithRelations($receiptId, [
+            'items',
+            'order',
+            'supplier',
+            'returns',
+            'payables',
+        ]);
 
         return Inertia::render('Purchases/Receipts/Show', [
             'receipt' => $receipt,
@@ -182,3 +180,4 @@ class PurchaseReceiptController extends Controller
             ->with('success', 'Recebimento estornado com sucesso.');
     }
 }
+

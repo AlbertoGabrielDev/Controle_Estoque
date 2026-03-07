@@ -2,27 +2,23 @@
 
 namespace Modules\Finance\Repositories;
 
-use Modules\Finance\Models\ContaContabil;
+use Prettus\Repository\Contracts\RepositoryInterface;
 
-class ContaContabilRepository
+interface ContaContabilRepository extends RepositoryInterface
 {
-    public function __construct(private ContaContabil $model)
-    {
-    }
+    /**
+     * Get the Datatable query and columns map.
+     *
+     * @param array $filters
+     * @return array{0: \Illuminate\Database\Eloquent\Builder, 1: array}
+     */
+    public function makeDatatableQuery(array $filters): array;
 
-    public function create(array $data): ContaContabil
-    {
-        return $this->model->create($data);
-    }
-
-    public function update(ContaContabil $contaContabil, array $data): ContaContabil
-    {
-        $contaContabil->update($data);
-        return $contaContabil;
-    }
-
-    public function delete(ContaContabil $contaContabil): void
-    {
-        $contaContabil->delete();
-    }
+    /**
+     * Get parent account options for select components.
+     *
+     * @param int|string|null $excludeId ID to exclude to avoid self-referencing.
+     * @return \Illuminate\Database\Eloquent\Collection
+     */
+    public function getParentOptions(int|string|null $excludeId = null);
 }

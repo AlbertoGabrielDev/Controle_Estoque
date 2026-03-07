@@ -7,10 +7,15 @@ use App\Models\Telefone;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\DB;
 use Modules\Suppliers\Models\Fornecedor;
+use Modules\Suppliers\Repositories\FornecedorRepository;
 use RuntimeException;
 
 class FornecedorService
 {
+    public function __construct(private FornecedorRepository $repo)
+    {
+    }
+
     public function listCitiesByUf(string $estado): array
     {
         $uf = strtoupper(trim($estado));
@@ -23,7 +28,7 @@ class FornecedorService
             ->whereRaw('UPPER(uf) = ?', [$uf])
             ->orderBy('nome')
             ->get(['id', 'nome', 'uf'])
-            ->map(fn (Cidade $cidade) => [
+            ->map(fn(Cidade $cidade) => [
                 'id' => $cidade->id,
                 'nome' => $cidade->nome,
                 'uf' => $cidade->uf,
@@ -35,7 +40,7 @@ class FornecedorService
     public function create(array $validated, ?int $userId): Fornecedor
     {
         return DB::transaction(function () use ($validated, $userId) {
-            $fornecedor = Fornecedor::query()->create([
+            $fornecedor = $this->repo->create([
                 'codigo' => $validated['codigo'],
                 'razao_social' => $validated['razao_social'] ?? null,
                 'nome_fornecedor' => $validated['nome_fornecedor'],
@@ -70,7 +75,7 @@ class FornecedorService
 
     public function findOrFail(int $fornecedorId): Fornecedor
     {
-        return Fornecedor::query()->findOrFail($fornecedorId);
+        return $this->repo->find($fornecedorId);
     }
 
     public function findPrimaryPhone(int $fornecedorId): ?Telefone
@@ -86,7 +91,7 @@ class FornecedorService
         return DB::transaction(function () use ($fornecedorId, $validated) {
             $fornecedor = $this->findOrFail($fornecedorId);
 
-            $fornecedor->update([
+            $this->repo->update([
                 'codigo' => $validated['codigo'],
                 'razao_social' => $validated['razao_social'] ?? null,
                 'nome_fornecedor' => $validated['nome_fornecedor'],
@@ -103,7 +108,7 @@ class FornecedorService
                 'prazo_entrega_dias' => $validated['prazo_entrega_dias'] ?? 0,
                 'condicao_pagamento' => $validated['condicao_pagamento'] ?? null,
                 'ativo' => (bool) $validated['ativo'],
-            ]);
+            ], $fornecedorId);
 
             Telefone::query()->updateOrCreate(
                 ['id_fornecedor_fk' => $fornecedorId],
@@ -128,6 +133,6 @@ class FornecedorService
             throw new RuntimeException('Nao e possivel remover: ha produtos vinculados a este fornecedor.');
         }
 
-        $fornecedor->delete();
+        $this->repo->delete($fornecedorId);
     }
 }

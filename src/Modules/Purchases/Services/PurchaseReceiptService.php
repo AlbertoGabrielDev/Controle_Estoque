@@ -5,16 +5,19 @@ namespace Modules\Purchases\Services;
 use Illuminate\Support\Facades\DB;
 use Modules\Purchases\Models\PurchaseOrder;
 use Modules\Purchases\Models\PurchaseOrderItem;
-use Modules\Purchases\Models\PurchasePayable;
 use Modules\Purchases\Models\PurchaseReceipt;
 use Modules\Purchases\Models\PurchaseReceiptItem;
+use Modules\Purchases\Repositories\PurchaseOrderRepository;
+use Modules\Purchases\Repositories\PurchaseReceiptRepository;
 use RuntimeException;
 
 class PurchaseReceiptService
 {
     public function __construct(
         private DocumentNumberService $numberService,
-        private AccountsPayableIntegrationService $payableService
+        private AccountsPayableIntegrationService $payableService,
+        private PurchaseOrderRepository $orderRepository,
+        private PurchaseReceiptRepository $receiptRepository
     ) {
     }
 
@@ -29,13 +32,13 @@ class PurchaseReceiptService
     public function registerReceipt(array $payload): PurchaseReceipt
     {
         return DB::transaction(function () use ($payload): PurchaseReceipt {
-            $order = PurchaseOrder::query()->with('items')->findOrFail($payload['order_id']);
+            $order = $this->orderRepository->findByIdWithItems($payload['order_id']);
 
             if ($order->status === 'cancelado') {
                 throw new RuntimeException('Pedidos cancelados nao podem receber recebimentos.');
             }
 
-            $receipt = PurchaseReceipt::query()->create([
+            $receipt = $this->receiptRepository->createReceipt([
                 'numero' => $this->numberService->generate('REC'),
                 'status' => 'registrado',
                 'order_id' => $order->id,
@@ -86,7 +89,7 @@ class PurchaseReceiptService
     public function checkReceipt(int $receiptId): PurchaseReceipt
     {
         return DB::transaction(function () use ($receiptId): PurchaseReceipt {
-            $receipt = PurchaseReceipt::query()->with(['items', 'order.items'])->findOrFail($receiptId);
+            $receipt = $this->receiptRepository->findByIdWithRelations($receiptId, ['items', 'order.items']);
 
             if ($receipt->status === 'estornado') {
                 throw new RuntimeException('Recebimentos estornados nao podem ser conferidos.');
@@ -144,7 +147,7 @@ class PurchaseReceiptService
      */
     public function acceptDivergence(int $receiptId): PurchaseReceipt
     {
-        $receipt = PurchaseReceipt::query()->findOrFail($receiptId);
+        $receipt = $this->receiptRepository->findByIdWithRelations($receiptId);
 
         if ($receipt->status !== 'com_divergencia') {
             throw new RuntimeException('Recebimento nao possui divergencias pendentes.');
@@ -169,7 +172,7 @@ class PurchaseReceiptService
     public function reverseReceipt(int $receiptId): PurchaseReceipt
     {
         return DB::transaction(function () use ($receiptId): PurchaseReceipt {
-            $receipt = PurchaseReceipt::query()->with(['items', 'order.items'])->findOrFail($receiptId);
+            $receipt = $this->receiptRepository->findByIdWithRelations($receiptId, ['items', 'order.items']);
 
             if ($receipt->status === 'estornado') {
                 throw new RuntimeException('Recebimento ja estornado.');
@@ -184,10 +187,7 @@ class PurchaseReceiptService
                 $orderItem->save();
             }
 
-            PurchasePayable::query()
-                ->where('receipt_id', $receipt->id)
-                ->where('status', '!=', 'pago')
-                ->update(['status' => 'cancelado']);
+            $this->receiptRepository->cancelUnpaidPayables($receipt->id);
 
             $receipt->status = 'estornado';
             $receipt->save();
@@ -247,3 +247,4 @@ class PurchaseReceiptService
         return round((float) $left, $scale) === round((float) $right, $scale);
     }
 }
+

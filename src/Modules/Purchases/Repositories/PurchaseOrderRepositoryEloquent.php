@@ -35,6 +35,16 @@ class PurchaseOrderRepositoryEloquent extends BaseRepository implements Purchase
     /**
      * {@inheritdoc}
      */
+    public function findByIdWithItems(int $id): PurchaseOrder
+    {
+        return PurchaseOrder::query()
+            ->with('items')
+            ->findOrFail($id);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function requisitionsOptions(): Collection
     {
         return PurchaseRequisition::query()
@@ -51,6 +61,22 @@ class PurchaseOrderRepositoryEloquent extends BaseRepository implements Purchase
         return Fornecedor::query()
             ->select('id_fornecedor as id', 'razao_social', 'nome_fornecedor', 'cnpj')
             ->where('ativo', true)
+            ->get();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getAvailableForReceipt(): Collection
+    {
+        return PurchaseOrder::query()
+            ->select('id', 'numero', 'status', 'data_emissao')
+            ->with([
+                'items' => function ($q) {
+                    $q->select('id', 'order_id', 'item_id', 'descricao_snapshot', 'quantidade_pedida', 'preco_unit', 'quantidade_recebida');
+                }
+            ])
+            ->whereIn('status', ['emitido', 'parcialmente_recebido'])
             ->get();
     }
 }

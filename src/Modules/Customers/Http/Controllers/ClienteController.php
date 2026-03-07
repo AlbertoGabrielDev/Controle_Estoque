@@ -10,6 +10,7 @@ use Inertia\Inertia;
 use Modules\Customers\Http\Requests\ClienteStoreRequest;
 use Modules\Customers\Http\Requests\ClienteUpdateRequest;
 use Modules\Customers\Models\Cliente;
+use Modules\Customers\Repositories\ClienteRepository;
 use Modules\Customers\Services\ClienteService;
 
 class ClienteController extends Controller
@@ -17,6 +18,7 @@ class ClienteController extends Controller
     public function __construct(
         private DataTableService $dt,
         private ClienteService $service,
+        private ClienteRepository $repository
     ) {
     }
 
@@ -36,7 +38,7 @@ class ClienteController extends Controller
 
     public function data(Request $request)
     {
-        [$query, $columnsMap] = Cliente::makeDatatableQuery($request);
+        [$query, $columnsMap] = $this->repository->makeDatatableQuery($request->all());
 
         return $this->dt->make(
             $query,

@@ -9,13 +9,15 @@ use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Modules\Finance\Http\Requests\CentroCustoRequest;
 use Modules\Finance\Models\CentroCusto;
+use Modules\Finance\Repositories\CentroCustoRepository;
 use Modules\Finance\Services\CentroCustoService;
 
 class CentroCustoController extends Controller
 {
     public function __construct(
         private DataTableService $dt,
-        private CentroCustoService $service
+        private CentroCustoService $service,
+        private CentroCustoRepository $repository
     ) {
     }
 
@@ -31,7 +33,7 @@ class CentroCustoController extends Controller
 
     public function data(Request $request)
     {
-        [$query, $columnsMap] = CentroCusto::makeDatatableQuery($request);
+        [$query, $columnsMap] = $this->repository->makeDatatableQuery($request->all());
 
         return $this->dt->make(
             $query,
@@ -52,10 +54,7 @@ class CentroCustoController extends Controller
     public function create()
     {
         return Inertia::render('CostCenters/Create', [
-            'centrosPai' => CentroCusto::query()
-                ->select('id', 'codigo', 'nome')
-                ->orderBy('nome')
-                ->get(),
+            'centrosPai' => $this->repository->getParentOptions(),
         ]);
     }
 
@@ -70,11 +69,7 @@ class CentroCustoController extends Controller
     {
         return Inertia::render('CostCenters/Edit', [
             'centro' => $centro_custo,
-            'centrosPai' => CentroCusto::query()
-                ->where('id', '<>', $centro_custo->id)
-                ->select('id', 'codigo', 'nome')
-                ->orderBy('nome')
-                ->get(),
+            'centrosPai' => $this->repository->getParentOptions($centro_custo->id),
         ]);
     }
 
