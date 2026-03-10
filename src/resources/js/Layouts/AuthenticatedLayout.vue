@@ -6,7 +6,7 @@ import DropdownLink from '@/Components/DropdownLink.vue';
 import NavLink from '@/Components/NavLink.vue';
 import ResponsiveNavLink from '@/Components/ResponsiveNavLink.vue';
 import { Link } from '@inertiajs/vue3';
-import ThemeToggle from '@/components/ThemeToggle.vue';
+import ThemeToggle from '@/Components/ThemeToggle.vue';
 import useTheme from '@/composables/useTheme';
 
 const showingNavigationDropdown = ref(false);

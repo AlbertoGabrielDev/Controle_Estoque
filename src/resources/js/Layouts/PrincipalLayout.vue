@@ -1,7 +1,7 @@
 <script setup>
 import { computed, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue'
 import { Link, usePage } from '@inertiajs/vue3'
-import ThemeToggle from '@/components/ThemeToggle.vue'
+import ThemeToggle from '@/Components/ThemeToggle.vue'
 
 const page = usePage()
 
