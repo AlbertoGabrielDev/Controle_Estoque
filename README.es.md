@@ -4,7 +4,7 @@
 
 <p align="center">
   <em>Leer en otros idiomas:</em><br>
-  🇧🇷 <a href="./README.md">Português</a> &nbsp;&middot;&nbsp; 🇺🇸 <a href="./README.en.md">English</a> &nbsp;&middot;&nbsp; 🇪🇸 <strong>Español</strong>
+  🇧🇷 <a href="README.md">Português</a> &nbsp;&middot;&nbsp; 🇺🇸 <a href="README.en.md">English</a> &nbsp;&middot;&nbsp; 🇪🇸 <strong>Español</strong>
 </p>
 
 <p align="center">
