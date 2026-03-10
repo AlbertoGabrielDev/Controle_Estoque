@@ -58,6 +58,7 @@ jobs:
 
     - name: Directory Permissions
       run: chmod -R 777 src/storage src/bootstrap/cache
+      working-directory: .
 
     - name: Create Database
       run: |
@@ -72,13 +73,14 @@ jobs:
       working-directory: src
 
     - name: Setup Node.js
-      uses: actions/setup-node@v3
+      uses: actions/setup-node@v4
       with:
-        node-version: '18'
+        node-version: '20'
 
     - name: Install NPM dependencies and build
       run: |
         npm install
+        chmod +x node_modules/.bin/vite
         npm run build
       working-directory: src
 
