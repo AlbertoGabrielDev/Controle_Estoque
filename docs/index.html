@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Controle de Estoque ERP</title>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- Nav -->
+    <nav class="navbar">
+        <div class="container nav-content">
+            <div class="logo">
+                <i class="fa-solid fa-boxes-stacked"></i>
+                <span>Controle<b>Estoque</b></span>
+            </div>
+            <div class="nav-links">
+                <a href="#features">Funcionalidades</a>
+                <a href="#stack">Tecnologias</a>
+                <a href="#modules">Módulos</a>
+                <a href="https://github.com/SEU_USUARIO/Controle_Estoque" target="_blank" class="btn-github">
+                    <i class="fa-brands fa-github"></i> Ver no GitHub
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="hero">
+        <div class="container hero-content">
+            <div class="hero-text">
+                <div class="badge-version">v1.0 (Laravel 10 + Vue 3)</div>
+                <h1>Gestão inteligente de estoque e compras.</h1>
+                <p>Sistema modular escalável com alertas visuais inteligentes, controle financeiro integrado e fluxo de compras completo.</p>
+                <div class="hero-buttons">
+                    <a href="https://github.com/SEU_USUARIO/Controle_Estoque" target="_blank" class="btn-primary">
+                        <i class="fa-solid fa-code"></i> Explorar Código
+                    </a>
+                    <a href="#features" class="btn-secondary">
+                        <i class="fa-solid fa-arrow-down"></i> Ver Projeto
+                    </a>
+                </div>
+            </div>
+            <div class="hero-image">
+                <!-- Placeholder para a imagem real do sistema. O recrutador prefere ver o sistema de verdade -->
+                <div class="mockup-window">
+                    <div class="mockup-header">
+                        <span class="dot red"></span>
+                        <span class="dot yellow"></span>
+                        <span class="dot green"></span>
+                    </div>
+                    <div class="mockup-body mockup-placeholder">
+                        <i class="fa-solid fa-chart-pie placeholder-icon"></i>
+                        <p>Adicione um print do dashboard aqui (`docs/assets/dashboard.png`)</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="wave-divider">
+            <svg data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120" preserveAspectRatio="none">
+                <path d="M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V0H0V27.35A600.21,600.21,0,0,0,321.39,56.44Z" class="shape-fill"></path>
+            </svg>
+        </div>
+    </header>
+
+    <!-- Features -->
+    <section id="features" class="features">
+        <div class="container">
+            <div class="section-title">
+                <h2>Por que este sistema?</h2>
+                <p>Criado para resolver problemas reais de gestão de suprimentos e finanças.</p>
+            </div>
+            
+            <div class="grid-3">
+                <div class="card feature-card">
+                    <div class="icon-box pulse-purple"><i class="fa-solid fa-triangle-exclamation"></i></div>
+                    <h3>Alertas Inteligentes</h3>
+                    <p>Itens abaixo da quantidade mínima ficam em roxo. Itens próximos do vencimento ficam amarelos, e vencidos, vermelhos.</p>
+                </div>
+                <div class="card feature-card">
+                    <div class="icon-box pulse-blue"><i class="fa-solid fa-truck-fast"></i></div>
+                    <h3>Fluxo de Compras P2P</h3>
+                    <p>Requisição > Cotação > Pedido > Recebimento corporativo alimentando estoque e contas a pagar.</p>
+                </div>
+                <div class="card feature-card">
+                    <div class="icon-box pulse-green"><i class="fa-solid fa-money-bill-transfer"></i></div>
+                    <h3>Financeiro Integrado</h3>
+                    <p>Hierarquia de Centros de Custo (pai/filho) e Contas Contábeis para categorização de despesas.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Architecture & Stack -->
+    <section id="stack" class="architecture bg-light">
+        <div class="container architecture-content">
+            <div class="arch-text">
+                <h2>Arquitetura Limpa e Modular</h2>
+                <p>O projeto foi construído usando <strong>Feature Modules</strong> em vez de uma estrutura MVC monolítica comum. Isso significa que o código relacionado a Finanças não se mistura com o código de Estoque.</p>
+                
+                <ul class="tech-list">
+                    <li><i class="fa-solid fa-check text-primary"></i> <b>Repository Pattern:</b> Mocks fáceis e lógica DB abstraída.</li>
+                    <li><i class="fa-solid fa-check text-primary"></i> <b>Service Layer:</b> Controllers limpos, regras no Service.</li>
+                    <li><i class="fa-solid fa-check text-primary"></i> <b>Inertia.js:</b> SPA moderno sem precisar escrever uma API REST em endpoints separados.</li>
+                </ul>
+            </div>
+            <div class="arch-stack">
+                <div class="stack-grid">
+                    <div class="stack-item"><i class="fa-brands fa-laravel" style="color:#FF2D20"></i><span>Laravel 10</span></div>
+                    <div class="stack-item"><i class="fa-brands fa-vuejs" style="color:#4FC08D"></i><span>Vue.js 3</span></div>
+                    <div class="stack-item"><i class="fa-brands fa-php" style="color:#777BB4"></i><span>PHP 8.1</span></div>
+                    <div class="stack-item"><i class="fa-brands fa-docker" style="color:#2496ED"></i><span>Docker</span></div>
+                    <div class="stack-item"><i class="fa-solid fa-database" style="color:#4479A1"></i><span>MySQL 8</span></div>
+                    <div class="stack-item"><i class="fa-solid fa-vial-circle-check" style="color:#6C9CCD"></i><span>PHPUnit</span></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Modules -->
+    <section id="modules" class="modules">
+        <div class="container">
+            <div class="section-title">
+                <h2>Módulos do Sistema</h2>
+            </div>
+            
+            <div class="modules-grid">
+                <div class="module-item">
+                    <div class="mod-icon"><i class="fa-solid fa-boxes-stacked"></i></div>
+                    <h4>Estoque</h4>
+                </div>
+                <div class="module-item">
+                    <div class="mod-icon"><i class="fa-solid fa-cart-shopping"></i></div>
+                    <h4>Compras</h4>
+                </div>
+                <div class="module-item">
+                    <div class="mod-icon"><i class="fa-solid fa-wallet"></i></div>
+                    <h4>Finanças</h4>
+                </div>
+                <div class="module-item">
+                    <div class="mod-icon"><i class="fa-solid fa-tags"></i></div>
+                    <h4>Produtos</h4>
+                </div>
+                <div class="module-item">
+                    <div class="mod-icon"><i class="fa-solid fa-users"></i></div>
+                    <h4>Clientes</h4>
+                </div>
+                <div class="module-item">
+                    <div class="mod-icon"><i class="fa-solid fa-store"></i></div>
+                    <h4>Vendas</h4>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta">
+        <div class="container cta-content">
+            <h2>Pronto para analisar o código?</h2>
+            <p>Verifique o repositório, clone locamente e rode os testes PHPUnit pelo Docker.</p>
+            <a href="https://github.com/SEU_USUARIO/Controle_Estoque" target="_blank" class="btn-primary btn-lg">
+                Ir para o Repositório GitHub
+            </a>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container footer-content">
+            <div class="developer-info">
+                <h3>Desenvolvido por <strong>Alberto Gabriel</strong></h3>
+                <p>Criado para demonstrar arquitetura no ecossistema Laravel.</p>
+            </div>
+            <div class="social-links">
+                <a href="#"><i class="fa-brands fa-linkedin"></i></a>
+                <a href="https://github.com/SEU_USUARIO"><i class="fa-brands fa-github"></i></a>
+            </div>
+        </div>
+    </footer>
+
+</body>
+</html>
