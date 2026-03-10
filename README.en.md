@@ -221,10 +221,10 @@ The tests cover:
 
 | Document | Description |
 |-----------|-----------|
-| [Architecture](docs/ARCHITECTURE.md) | Architectural overview (Feature Modules) |
-| [Modules](docs/MODULES.md) | Detailed description of each module |
-| [Patterns](docs/PATTERNS.md) | Repository Pattern, Service Layer, FormRequests |
-| [Contributing](CONTRIBUTING.md) | Guidelines for contributing |
+| [Architecture](docs/ARCHITECTURE.en.md) | Architectural overview (Feature Modules) |
+| [Modules](docs/MODULES.en.md) | Detailed description of each module |
+| [Patterns](docs/PATTERNS.en.md) | Repository Pattern, Service Layer, FormRequests |
+| [Contributing](CONTRIBUTING.en.md) | Guidelines for contributing |
 
 ---
 

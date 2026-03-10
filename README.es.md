@@ -221,10 +221,10 @@ Las pruebas cubren:
 
 | Documento | Descripción |
 |-----------|-----------|
-| [Arquitectura](docs/ARCHITECTURE.md) | Visión general de la arquitectura (Facture Modules) |
-| [Módulos](docs/MODULES.md) | Descripción detallada de cada módulo |
-| [Patrones](docs/PATTERNS.md) | Padrón Repositorio, Capa de Servicio, FormRequests |
-| [Contribución](CONTRIBUTING.md) | Guía para contribuyentes |
+| [Arquitectura](docs/ARCHITECTURE.es.md) | Visión general de la arquitectura (Facture Modules) |
+| [Módulos](docs/MODULES.es.md) | Descripción detallada de cada módulo |
+| [Patrones](docs/PATTERNS.es.md) | Padrón Repositorio, Capa de Servicio, FormRequests |
+| [Contribución](CONTRIBUTING.es.md) | Guía para contribuyentes |
 
 ---
 
