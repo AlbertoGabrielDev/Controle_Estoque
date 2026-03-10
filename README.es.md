@@ -2,12 +2,10 @@
   🏭 Software de Inventario (Controle de Estoque)
 </h1>
 
-<div align="center">
-
-<em>Leer en otros idiomas:</em><br>
-🇧🇷 [Português](README.md) &nbsp;&middot;&nbsp; 🇺🇸 [English](README.en.md) &nbsp;&middot;&nbsp; 🇪🇸 **Español**
-
-</div>
+<p align="center">
+  <em>Leer en otros idiomas:</em><br>
+  🇧🇷 <a href="./README.md">Português</a> &nbsp;&middot;&nbsp; 🇺🇸 <a href="./README.en.md">English</a> &nbsp;&middot;&nbsp; 🇪🇸 <strong>Español</strong>
+</p>
 
 <p align="center">
   Sistema modular para la gestión de inventario, compras, finanzas y ventas,<br>

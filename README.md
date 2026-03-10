@@ -2,12 +2,10 @@
   🏭 Controle de Estoque
 </h1>
 
-<div align="center">
-
-<em>Ler em outros idiomas:</em><br>
-🇧🇷 **Português** &nbsp;&middot;&nbsp; 🇺🇸 [English](README.en.md) &nbsp;&middot;&nbsp; 🇪🇸 [Español](README.es.md)
-
-</div>
+<p align="center">
+  <em>Ler em outros idiomas:</em><br>
+  🇧🇷 <strong>Português</strong> &nbsp;&middot;&nbsp; 🇺🇸 <a href="./README.en.md">English</a> &nbsp;&middot;&nbsp; 🇪🇸 <a href="./README.es.md">Español</a>
+</p>
 
 <p align="center">
   Sistema modular de gestão de estoque, compras, finanças e vendas,<br>

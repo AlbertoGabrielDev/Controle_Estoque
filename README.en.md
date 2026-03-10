@@ -2,12 +2,10 @@
   🏭 Inventory Management System (Controle de Estoque)
 </h1>
 
-<div align="center">
-
-<em>Read in other languages:</em><br>
-🇧🇷 [Português](README.md) &nbsp;&middot;&nbsp; 🇺🇸 **English** &nbsp;&middot;&nbsp; 🇪🇸 [Español](README.es.md)
-
-</div>
+<p align="center">
+  <em>Read in other languages:</em><br>
+  🇧🇷 <a href="./README.md">Português</a> &nbsp;&middot;&nbsp; 🇺🇸 <strong>English</strong> &nbsp;&middot;&nbsp; 🇪🇸 <a href="./README.es.md">Español</a>
+</p>
 
 <p align="center">
   Modular system for inventory, purchasing, finance, and sales management,<br>
