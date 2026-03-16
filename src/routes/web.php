@@ -4,6 +4,21 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\SpreadsheetController;
 use Illuminate\Foundation\Application;
 use Inertia\Inertia;
+use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\Cookie;
+use Illuminate\Http\Request;
+
+Route::post('/locale', function (Request $request) {
+    $request->validate(['locale' => 'required|string|max:5']);
+    $locale = explode('_', str_replace('-', '_', $request->input('locale')))[0];
+    $locale = strtolower($locale);
+    
+    if (in_array($locale, ['pt', 'en', 'es'])) {
+        Session::put('locale', $locale);
+        Cookie::queue('locale', $locale, 525600); // 1 year
+    }
+    return redirect()->back();
+})->name('locale.update');
 
 Route::get('/welcome', function () {
     return Inertia::render('Welcome', [

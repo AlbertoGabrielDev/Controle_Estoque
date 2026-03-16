@@ -1,5 +1,8 @@
 <script setup>
 import { onBeforeUnmount, onMounted, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 
 const props = defineProps({
   disabled: {
@@ -33,7 +36,7 @@ async function start() {
   }
 
   if (!navigator?.mediaDevices?.getUserMedia) {
-    notify('Camera nao disponivel neste navegador.', 'warning')
+    notify(t('Camera not available in this browser.'), 'warning')
     return
   }
 
@@ -49,7 +52,7 @@ async function start() {
     running.value = true
 
     if (!detectorSupported.value) {
-      notify('Leitura automatica nao suportada. Use o codigo manual.', 'warning')
+      notify(t('Automatic reading not supported. Use manual code.'), 'warning')
       return
     }
 
@@ -61,7 +64,7 @@ async function start() {
 
     intervalId = window.setInterval(scanFrame, 350)
   } catch (_) {
-    notify('Nao foi possivel iniciar a camera.', 'error')
+    notify(t('Could not start camera.'), 'error')
     await stop()
   }
 }
@@ -108,7 +111,7 @@ async function scanFrame() {
     }
 
     emit('decoded', code)
-    notify('QR code lido com sucesso.', 'success')
+    notify(t('QR code read successfully.'), 'success')
     await stop()
   } catch (_) {
     // Ignora falhas pontuais de frame.
@@ -133,7 +136,7 @@ function notify(message, type = 'success') {
         :disabled="disabled || running"
         @click="start"
       >
-        Iniciar camera
+        {{ $t('Start Camera') }}
       </button>
 
       <button
@@ -142,11 +145,11 @@ function notify(message, type = 'success') {
         class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg"
         @click="stop"
       >
-        Parar camera
+        {{ $t('Stop Camera') }}
       </button>
 
       <span class="text-sm text-gray-500">
-        Aponte a camera para o QR code do produto.
+        {{ $t("Point the camera at the product's QR code.") }}
       </span>
     </div>
 

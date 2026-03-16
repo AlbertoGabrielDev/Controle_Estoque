@@ -11,6 +11,7 @@ import { ZiggyVue } from 'ziggy-js'
 // Toasts (Vue 3)
 import Toast from 'vue-toastification'
 import 'vue-toastification/dist/index.css'
+import { createI18nInstance } from './i18n'
 
 import PrincipalLayout from './Layouts/PrincipalLayout.vue'
 
@@ -170,6 +171,7 @@ createInertiaApp({
         icon: true,
         rtl: false,
       })
+      .use(createI18nInstance(props.initialPage.props.locale))
 
     window.showToast = (message, type = 'success') => {
       const t = app.config.globalProperties.$toast

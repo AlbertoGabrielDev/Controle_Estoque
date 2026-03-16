@@ -7,7 +7,7 @@
           ‹
         </button>
         <div class="text-lg font-semibold min-w-[12ch] text-center">
-          {{ monthLabel }} de {{ currentYear }}
+          {{ monthLabel }} {{ $t('of') }} {{ currentYear }}
         </div>
         <button class="px-3 py-2 rounded-lg border hover:bg-gray-50"
                 @click="goNextMonth" aria-label="Próximo mês">
@@ -18,7 +18,7 @@
       <div class="flex items-center gap-2">
         <button class="px-3 py-2 rounded-lg border hover:bg-gray-50"
                 @click="goToday">
-          Hoje
+          {{ $t('Today') }}
         </button>
       </div>
     </div>
@@ -43,7 +43,7 @@
           </div>
           <div v-if="cell.stats.totalQty > 0"
                class="text-[10px] sm:text-xs px-2 py-0.5 rounded-full border">
-            {{ cell.stats.totalQty }} unid.
+            {{ cell.stats.totalQty }} {{ $t('units') }}
           </div>
         </div>
 
@@ -52,13 +52,13 @@
             • {{ p.name }} ({{ p.qty }})
           </li>
           <li v-if="cell.stats.products.length > 2" class="text-gray-500">
-            + {{ cell.stats.products.length - 2 }} mais
+            + {{ cell.stats.products.length - 2 }} {{ $t('more') }}
           </li>
         </ul>
 
         <div v-if="cell.stats.totalQty > 0"
              class="absolute bottom-1 right-2 text-[10px] sm:text-xs text-blue-600">
-          Detalhes ⇢
+          {{ $t('Details') }} ⇢
         </div>
       </div>
     </div>
@@ -71,20 +71,20 @@
             {{ modal.title }}
           </h3>
           <button class="px-3 py-2 rounded-lg border hover:bg-gray-50" @click="modal.open = false">
-            Fechar
+            {{ $t('Close') }}
           </button>
         </div>
 
         <div class="mt-2 text-sm text-gray-600 flex flex-wrap items-center gap-2">
-          <span>Total de unidades:</span>
+          <span>{{ $t('Total units:') }}</span>
           <span class="font-semibold text-gray-800">{{ modal.stats.totalQty }}</span>
           <span class="mx-2 hidden sm:inline">•</span>
-          <span>Registros:</span>
+          <span>{{ $t('Records:') }}</span>
           <span class="font-semibold text-gray-800">{{ modal.details.length }}</span>
         </div>
 
         <div class="mt-3">
-          <input v-model="productFilter" type="text" placeholder="Filtrar por produto..."
+          <input v-model="productFilter" type="text" :placeholder="$t('Filter by product...')"
                  class="w-full border rounded-lg px-3 py-2 text-sm"
                  @keydown.esc="productFilter = ''">
         </div>
@@ -93,10 +93,10 @@
           <table class="w-full text-sm">
             <thead class="sticky top-0 bg-white">
               <tr class="text-left border-b">
-                <th class="py-2 pr-2">Hora</th>
-                <th class="py-2 pr-2">Produto</th>
-                <th class="py-2 px-2 text-right">Qtd</th>
-                <th class="py-2 pl-2 text-right">Unidade</th>
+                <th class="py-2 pr-2">{{ $t('Time') }}</th>
+                <th class="py-2 pr-2">{{ $t('Product') }}</th>
+                <th class="py-2 px-2 text-right">{{ $t('Qty') }}</th>
+                <th class="py-2 pl-2 text-right">{{ $t('Unit') }}</th>
               </tr>
             </thead>
             <tbody>
@@ -107,7 +107,7 @@
                 <td class="py-2 pl-2 text-right">{{ r.unit }}</td>
               </tr>
               <tr v-if="filteredRows.length === 0">
-                <td class="py-8 text-center text-gray-500" colspan="4">Nada encontrado…</td>
+                <td class="py-8 text-center text-gray-500" colspan="4">{{ $t('Nothing found...') }}</td>
               </tr>
             </tbody>
           </table>
@@ -116,14 +116,14 @@
         <div class="mt-4 flex items-center justify-end gap-2">
           <button class="px-3 py-2 rounded-lg border hover:bg-gray-50"
                   @click="exportCsvDia">
-            Exportar CSV
+            {{ $t('Export CSV') }}
           </button>
         </div>
       </div>
     </div>
 
     <div v-if="loading" class="fixed bottom-3 right-3 bg-white border rounded-lg shadow px-3 py-2 text-sm z-30">
-      Carregando dados…
+      {{ $t('Loading data...') }}
     </div>
   </div>
 </template>
@@ -135,8 +135,9 @@ const props = defineProps({
   initialYear: { type: Number, default: null },
   initialMonth: { type: Number, default: null }, // 1-12
   fetchEndpoint: { type: String, default: '' },
-  locale: { type: String, default: 'pt-BR' },
 })
+
+const { t, locale: currentLocaleCode } = useI18n()
 
 /** ESTADO DE DATA */
 const today = new Date()
@@ -156,11 +157,13 @@ watch(() => props.salesByDate, (nv) => {
 /** Nome do mês e dias da semana */
 const monthLabel = computed(() => {
   const date = new Date(currentYear.value, currentMonth.value - 1, 1)
-  return new Intl.DateTimeFormat(props.locale, { month: 'long' }).format(date)
+  return new Intl.DateTimeFormat(currentLocaleCode.value, { month: 'long' }).format(date)
     .replace(/^./, c => c.toUpperCase())
 })
 
-const weekDays = computed(() => ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom'])
+const weekDays = computed(() => [
+  t('Mon'), t('Tue'), t('Wed'), t('Thu'), t('Fri'), t('Sat'), t('Sun')
+])
 
 /** CÁLCULO DA GRADE */
 const calendarCells = computed(() => {
@@ -248,7 +251,7 @@ function openDay(cell) {
   const k = toKey(cell.date)
   const rows = (data.salesByDate[k] || []).slice().sort((a, b) => (a.time || '').localeCompare(b.time || ''))
   modal.open = true
-  modal.title = formatDateHuman(cell.date, props.locale)
+  modal.title = formatDateHuman(cell.date, currentLocaleCode.value)
   modal.dateKey = k
   modal.details = rows
   modal.stats = aggregate(rows)
@@ -310,8 +313,8 @@ function normalizeMap(obj) {
   return out
 }
 
-function formatDateHuman(date, locale) {
-  const df = new Intl.DateTimeFormat(locale || 'pt-BR', {
+function formatDateHuman(date, localeCode) {
+  const df = new Intl.DateTimeFormat(localeCode || 'pt', {
     weekday: 'long', day: '2-digit', month: 'long', year: 'numeric'
   })
   const s = df.format(date)

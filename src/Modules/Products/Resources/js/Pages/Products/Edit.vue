@@ -36,11 +36,11 @@ function submit() {
 </script>
 
 <template>
-  <Head title="Editar Produto" />
+  <Head :title="$t('Edit Product')" />
 
   <div class="flex items-center justify-between mb-4">
-    <h1 class="text-2xl font-semibold">Editar Produto</h1>
-    <Link :href="route('produtos.index')" class="text-blue-600">Voltar</Link>
+    <h1 class="text-2xl font-semibold">{{ $t('Edit Product') }}</h1>
+    <Link :href="route('produtos.index')" class="text-blue-600">{{ $t('Back') }}</Link>
   </div>
 
   <ProductForm
@@ -48,7 +48,7 @@ function submit() {
     :categorias="props.categorias"
     :unidades="props.unidades"
     :itens="props.itens"
-    submit-label="Salvar Alterações"
+    :submit-label="$t('Save Changes')"
     @submit="submit"
   />
 </template>

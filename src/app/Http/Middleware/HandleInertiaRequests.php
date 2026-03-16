@@ -37,6 +37,8 @@ class HandleInertiaRequests extends Middleware
             'auth' => [
                 'user' => $request->user(),
             ],
+            'locale' => app()->getLocale(),
+            'available_locales' => ['pt', 'en', 'es'],
             'menus' => fn () => $this->resolveInertiaMenus($request->user()),
         ];
     }

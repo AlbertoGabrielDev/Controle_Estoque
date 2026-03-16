@@ -90,12 +90,12 @@ function goToSalesPage(page) {
 </script>
 
 <template>
-  <Head title="Registrar Venda" />
+  <Head :title="$t('Register Sale')" />
 
   <div class="bg-white p-4 md:p-6 rounded-md shadow-md w-full max-w-7xl mx-auto">
     <header class="mb-6">
       <h1 class="text-2xl md:text-3xl font-bold text-center md:text-left">
-        Registrar Venda
+        {{ $t('Register Sale') }}
       </h1>
     </header>
 

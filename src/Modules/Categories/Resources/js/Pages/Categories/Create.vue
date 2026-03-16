@@ -23,18 +23,18 @@ function submit() {
 </script>
 
 <template>
-  <Head title="Cadastro de Categoria" />
+  <Head :title="$t('Category Registration')" />
 
   <div class="flex items-center justify-between mb-4">
-    <h1 class="text-2xl font-semibold">Cadastro de Categoria</h1>
-    <Link :href="route('categoria.index')" class="text-blue-600">Voltar</Link>
+    <h1 class="text-2xl font-semibold">{{ $t('Category Registration') }}</h1>
+    <Link :href="route('categoria.index')" class="text-blue-600">{{ $t('Back') }}</Link>
   </div>
 
   <CategoryForm
     :form="form"
     :categorias-pai="props.categoriasPai"
     :show-image="true"
-    submit-label="Criar Categoria"
+    :submit-label="$t('Create Category')"
     @submit="submit"
   />
 </template>

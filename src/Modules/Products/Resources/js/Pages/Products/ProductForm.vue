@@ -4,7 +4,7 @@ const props = defineProps({
   categorias: { type: Array, default: () => [] },
   unidades: { type: Array, default: () => [] },
   itens: { type: Array, default: () => [] },
-  submitLabel: { type: String, default: 'Salvar' },
+  submitLabel: { type: String, default: '' },
 })
 
 defineEmits(['submit'])
@@ -14,13 +14,13 @@ defineEmits(['submit'])
   <form @submit.prevent="$emit('submit')" class="bg-white p-4 rounded shadow space-y-4">
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
       <div>
-        <label class="block text-sm font-medium">Código do Produto</label>
+        <label class="block text-sm font-medium">{{ $t('Product Code') }}</label>
         <input v-model="props.form.cod_produto" class="mt-1 border rounded px-3 py-2 w-full">
         <div v-if="props.form.errors.cod_produto" class="text-red-600 text-sm mt-1">{{ props.form.errors.cod_produto }}</div>
       </div>
 
       <div>
-        <label class="block text-sm font-medium">Nome do Produto</label>
+        <label class="block text-sm font-medium">{{ $t('Product Name') }}</label>
         <input v-model="props.form.nome_produto" class="mt-1 border rounded px-3 py-2 w-full">
         <div v-if="props.form.errors.nome_produto" class="text-red-600 text-sm mt-1">{{ props.form.errors.nome_produto }}</div>
       </div>
@@ -28,15 +28,15 @@ defineEmits(['submit'])
 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
       <div>
-        <label class="block text-sm font-medium">Descrição</label>
+        <label class="block text-sm font-medium">{{ $t('Description') }}</label>
         <input v-model="props.form.descricao" class="mt-1 border rounded px-3 py-2 w-full">
         <div v-if="props.form.errors.descricao" class="text-red-600 text-sm mt-1">{{ props.form.errors.descricao }}</div>
       </div>
 
       <div>
-        <label class="block text-sm font-medium">Unidade de Medida</label>
+        <label class="block text-sm font-medium">{{ $t('Measurement Unit') }}</label>
         <select v-model="props.form.unidade_medida_id" class="mt-1 border rounded px-3 py-2 w-full">
-          <option value="">Selecione uma unidade</option>
+          <option value="">{{ $t('Select a unit') }}</option>
           <option v-for="u in props.unidades" :key="u.id" :value="u.id">
             {{ u.codigo }} - {{ u.descricao }}
           </option>
@@ -47,9 +47,9 @@ defineEmits(['submit'])
 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
       <div>
-        <label class="block text-sm font-medium">Categoria</label>
+        <label class="block text-sm font-medium">{{ $t('Category') }}</label>
         <select v-model="props.form.id_categoria_fk" class="mt-1 border rounded px-3 py-2 w-full">
-          <option value="">Selecione uma categoria</option>
+          <option value="">{{ $t('Select a category') }}</option>
           <option v-for="cat in props.categorias" :key="cat.id_categoria" :value="cat.id_categoria">
             {{ cat.nome_categoria }}
           </option>
@@ -58,7 +58,7 @@ defineEmits(['submit'])
       </div>
 
       <div>
-        <label class="block text-sm font-medium">Item (Tabela de Preço)</label>
+        <label class="block text-sm font-medium">{{ $t('Item (Price Table)') }}</label>
         <select v-model="props.form.item_id" class="mt-1 border rounded px-3 py-2 w-full">
           <option value="">—</option>
           <option v-for="item in props.itens" :key="item.id" :value="item.id">
@@ -70,18 +70,20 @@ defineEmits(['submit'])
     </div>
 
     <div>
-      <label class="block text-sm font-medium">Informações Nutricionais (JSON - lista de itens)</label>
+      <label class="block text-sm font-medium">{{ $t('Nutritional Information (JSON - list of items)') }}</label>
       <textarea
         v-model="props.form.inf_nutriente"
         rows="5"
         class="mt-1 border rounded px-3 py-2 w-full"
-        placeholder='Exemplo JSON: [{"label":"Calorias","valor":120,"unidade":"kcal"},{"label":"Proteina","valor":5,"unidade":"g"}]'
+        :placeholder="$t('JSON Example: ') + '[{&quot;label&quot;:&quot;Calorias&quot;,&quot;valor&quot;:120,&quot;unidade&quot;:&quot;kcal&quot;},{&quot;label&quot;:&quot;Proteina&quot;,&quot;valor&quot;:5,&quot;unidade&quot;:&quot;g&quot;}]'"
       />
       <div v-if="props.form.errors.inf_nutriente" class="text-red-600 text-sm mt-1">{{ props.form.errors.inf_nutriente }}</div>
     </div>
 
     <div class="flex justify-end gap-2">
-      <button :disabled="props.form.processing" class="px-3 py-2 rounded bg-blue-600 text-white">{{ submitLabel }}</button>
+      <button :disabled="props.form.processing" class="px-3 py-2 rounded bg-blue-600 text-white">
+        {{ submitLabel || $t('Save') }}
+      </button>
     </div>
   </form>
 </template>

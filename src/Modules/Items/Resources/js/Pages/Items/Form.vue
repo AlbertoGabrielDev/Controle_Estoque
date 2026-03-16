@@ -5,7 +5,7 @@ const props = defineProps({
   form: { type: Object, required: true },
   categorias: { type: Array, default: () => [] },
   unidades: { type: Array, default: () => [] },
-  submitLabel: { type: String, default: 'Salvar' },
+  submitLabel: { type: String, default: '' },
 })
 
 defineEmits(['submit'])
@@ -27,13 +27,13 @@ watch(
   <form @submit.prevent="$emit('submit')" class="bg-white p-4 rounded shadow space-y-4">
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
       <div>
-        <label class="block text-sm font-medium">SKU</label>
+        <label class="block text-sm font-medium">{{ $t('SKU') }}</label>
         <input v-model="props.form.sku" class="mt-1 border rounded px-3 py-2 w-full">
         <div v-if="props.form.errors.sku" class="text-red-600 text-sm mt-1">{{ props.form.errors.sku }}</div>
       </div>
 
       <div>
-        <label class="block text-sm font-medium">Nome</label>
+        <label class="block text-sm font-medium">{{ $t('Name') }}</label>
         <input v-model="props.form.nome" class="mt-1 border rounded px-3 py-2 w-full">
         <div v-if="props.form.errors.nome" class="text-red-600 text-sm mt-1">{{ props.form.errors.nome }}</div>
       </div>
@@ -41,16 +41,16 @@ watch(
 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
       <div>
-        <label class="block text-sm font-medium">Tipo</label>
+        <label class="block text-sm font-medium">{{ $t('Type') }}</label>
         <select v-model="props.form.tipo" class="mt-1 border rounded px-3 py-2 w-full">
-          <option value="produto">Produto</option>
-          <option value="servico">Serviço</option>
+          <option value="produto">{{ $t('Products') }}</option>
+          <option value="servico">{{ $t('Service') }}</option>
         </select>
         <div v-if="props.form.errors.tipo" class="text-red-600 text-sm mt-1">{{ props.form.errors.tipo }}</div>
       </div>
 
       <div>
-        <label class="block text-sm font-medium">Categoria</label>
+        <label class="block text-sm font-medium">{{ $t('Category') }}</label>
         <select v-model="props.form.categoria_id" class="mt-1 border rounded px-3 py-2 w-full">
           <option value="">—</option>
           <option v-for="c in props.categorias" :key="c.id_categoria" :value="c.id_categoria">
@@ -63,7 +63,7 @@ watch(
 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
       <div>
-        <label class="block text-sm font-medium">Unidade de Medida</label>
+        <label class="block text-sm font-medium">{{ $t('Measurement Unit') }}</label>
         <select v-model="props.form.unidade_medida_id" class="mt-1 border rounded px-3 py-2 w-full">
           <option value="">—</option>
           <option v-for="u in props.unidades" :key="u.id" :value="u.id">
@@ -74,7 +74,7 @@ watch(
       </div>
 
       <div>
-        <label class="block text-sm font-medium">Descrição</label>
+        <label class="block text-sm font-medium">{{ $t('Description') }}</label>
         <input v-model="props.form.descricao" class="mt-1 border rounded px-3 py-2 w-full">
         <div v-if="props.form.errors.descricao" class="text-red-600 text-sm mt-1">{{ props.form.errors.descricao }}</div>
       </div>
@@ -82,25 +82,25 @@ watch(
 
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
       <div>
-        <label class="block text-sm font-medium">Custo</label>
+        <label class="block text-sm font-medium">{{ $t('Cost') }}</label>
         <input v-model="props.form.custo" type="number" step="0.01" min="0" class="mt-1 border rounded px-3 py-2 w-full">
         <div v-if="props.form.errors.custo" class="text-red-600 text-sm mt-1">{{ props.form.errors.custo }}</div>
       </div>
 
       <div>
-        <label class="block text-sm font-medium">Preço Base</label>
+        <label class="block text-sm font-medium">{{ $t('Base Price') }}</label>
         <input v-model="props.form.preco_base" type="number" step="0.01" min="0" class="mt-1 border rounded px-3 py-2 w-full">
         <div v-if="props.form.errors.preco_base" class="text-red-600 text-sm mt-1">{{ props.form.errors.preco_base }}</div>
       </div>
 
       <div>
-        <label class="block text-sm font-medium">Peso (kg)</label>
+        <label class="block text-sm font-medium">{{ $t('Weight (kg)') }}</label>
         <input v-model="props.form.peso_kg" type="number" step="0.001" min="0" class="mt-1 border rounded px-3 py-2 w-full">
         <div v-if="props.form.errors.peso_kg" class="text-red-600 text-sm mt-1">{{ props.form.errors.peso_kg }}</div>
       </div>
 
       <div>
-        <label class="block text-sm font-medium">Volume (m³)</label>
+        <label class="block text-sm font-medium">{{ $t('Volume (m³)') }}</label>
         <input v-model="props.form.volume_m3" type="number" step="0.000001" min="0" class="mt-1 border rounded px-3 py-2 w-full">
         <div v-if="props.form.errors.volume_m3" class="text-red-600 text-sm mt-1">{{ props.form.errors.volume_m3 }}</div>
       </div>
@@ -109,21 +109,23 @@ watch(
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
       <label class="flex items-center gap-2 border rounded px-3 py-2">
         <input v-model="props.form.controla_estoque" type="checkbox">
-        <span>Controla Estoque</span>
+        <span>{{ $t('Manage Stock') }}</span>
       </label>
 
       <div>
-        <label class="block text-sm font-medium">Ativo</label>
+        <label class="block text-sm font-medium">{{ $t('Active') }}</label>
         <select v-model="props.form.ativo" class="mt-1 border rounded px-3 py-2 w-full">
-          <option :value="true">Ativo</option>
-          <option :value="false">Inativo</option>
+          <option :value="true">{{ $t('Active') }}</option>
+          <option :value="false">{{ $t('Inactive') }}</option>
         </select>
-        <div v-if="props.form.errors.ativo" class="text-red-600 text-sm mt-1">{{ props.form.errors.ativo }}</div>
+        <div v-if="props.form.errors.ativo" class="text-red-600 text-sm mt-1">{{ $t(props.form.errors.ativo) }}</div>
       </div>
     </div>
 
     <div class="flex justify-end gap-2">
-      <button :disabled="props.form.processing" class="px-3 py-2 rounded bg-blue-600 text-white">{{ submitLabel }}</button>
+      <button :disabled="props.form.processing" class="px-3 py-2 rounded bg-blue-600 text-white">
+        {{ submitLabel || $t('Save') }}
+      </button>
     </div>
   </form>
 </template>

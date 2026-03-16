@@ -27,7 +27,8 @@ export function linkify(
 }
 </script>
 <script setup>
-import { onMounted, onBeforeUnmount, ref, watch, nextTick } from 'vue'
+import { onMounted, onBeforeUnmount, ref, watch, nextTick, computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import 'datatables.net-dt'
 import 'datatables.net-responsive-dt'
 import 'datatables.net-dt/css/dataTables.dataTables.css'
@@ -44,7 +45,7 @@ const props = defineProps({
   lengthMenu: { type: Array, default: () => [[10, 25, 50, 100], [10, 25, 50, 100]] },
   responsive: { type: Boolean, default: false },
   dom: { type: String, default: '<"erp-dt-toolbar flex flex-col gap-3 md:flex-row md:items-center md:justify-between mb-4"lfr>t<"erp-dt-footer flex flex-col gap-3 md:flex-row md:items-center md:justify-between mt-4"ip>' },
-  languageUrl: { type: String, default: 'https://cdn.datatables.net/plug-ins/1.13.6/i18n/pt-BR.json' },
+  languageUrl: { type: String, default: '' },
   reinitKey: { type: [String, Number], default: 0 },
   actionsColIndex: { type: Number, default: -1 },
 
@@ -55,18 +56,37 @@ const props = defineProps({
   ordering: { type: Boolean, default: true },       // ordenação
 })
 
+const { locale } = useI18n()
 const tableRef = ref(null)
 let dt = null
+
+const resolvedLanguageUrl = computed(() => {
+  if (props.languageUrl) return props.languageUrl
+
+  const mapping = {
+    pt: 'https://cdn.datatables.net/plug-ins/1.13.6/i18n/pt-BR.json',
+    es: 'https://cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json',
+    en: 'https://cdn.datatables.net/plug-ins/1.13.6/i18n/en-GB.json',
+  }
+
+  return mapping[locale.value] || mapping.pt
+})
 
 function init() {
   const $table = window.jQuery(tableRef.value)
   if (!$table || !$table.DataTable) return
 
+  // Defensive check: if it's already a DataTable according to the library, destroy it first
+  if (window.jQuery.fn.dataTable.isDataTable(tableRef.value)) {
+    $table.DataTable().destroy()
+  }
+
   const common = {
     processing: true,
     autoWidth: false,
+    destroy: true, // Fallback safety
     responsive: props.responsive ? { details: false } : false,
-    language: { url: props.languageUrl },
+    language: { url: resolvedLanguageUrl.value },
     dom: props.dom,
     order: props.order,
     pageLength: props.pageLength,
@@ -147,6 +167,21 @@ watch(
   },
   { deep: true }
 )
+
+watch(() => props.reinitKey, async () => {
+  destroy()
+  await nextTick()
+  init()
+})
+
+// Consolidate watchers to prevent race conditions during locale change
+watch([locale, () => props.columns], async ([newLocale, newCols], [oldLocale, oldCols]) => {
+  // If only locale changed, but columns didn't (static columns), we still need to re-init for translation
+  // If columns changed, we definitely need to re-init
+  destroy()
+  await nextTick()
+  init()
+}, { deep: false })
 
 watch(() => props.reinitKey, async () => {
   destroy()

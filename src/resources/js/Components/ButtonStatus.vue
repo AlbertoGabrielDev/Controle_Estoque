@@ -1,6 +1,7 @@
 <script setup>
 import axios from 'axios'
 import { computed, ref, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 
 const props = defineProps({
   modelId: { type: [String, Number], required: true },
@@ -11,6 +12,7 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['toggled'])
+const { t } = useI18n()
 
 const processing = ref(false)
 const localStatus = ref(Number(props.status) === 1 || props.status === true)
@@ -66,18 +68,18 @@ async function toggle() {
       emit('toggled', localStatus.value)
 
       const message = data?.message || (localStatus.value
-        ? 'Status ativado com sucesso!'
-        : 'Status desativado com sucesso!')
+        ? t('Status activated successfully!')
+        : t('Status deactivated successfully!'))
       const type = data?.type || (localStatus.value ? 'success' : 'warning')
 
       showToast(message, type)
       return
     }
 
-    showToast(data?.message || 'Erro ao atualizar status.', 'error')
+    showToast(data?.message || t('Error updating status.'), 'error')
   } catch (error) {
     console.error('toggle-status failed', error)
-    showToast('Erro ao atualizar status.', 'error')
+    showToast(t('Error updating status.'), 'error')
   } finally {
     processing.value = false
   }
@@ -145,7 +147,7 @@ function showToast(message, type = 'success') {
   <button
     v-if="canToggle"
     :class="cls(localStatus)"
-    :title="localStatus ? 'Desativar' : 'Ativar'"
+    :title="localStatus ? $t('Deactivate') : $t('Activate')"
     :disabled="processing"
     @click="toggle"
   >

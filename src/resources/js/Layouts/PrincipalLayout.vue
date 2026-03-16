@@ -2,6 +2,7 @@
 import { computed, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue'
 import { Link, usePage } from '@inertiajs/vue3'
 import ThemeToggle from '@/Components/ThemeToggle.vue'
+import LanguageSwitcher from '@/Components/LanguageSwitcher.vue'
 
 const page = usePage()
 
@@ -204,7 +205,7 @@ watch(
                         class="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-700 shadow-sm transition-colors hover:bg-slate-50 md:hidden dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700"
                         @click="sidebarOpen = !sidebarOpen"
                     >
-                        <span class="sr-only">Abrir menu</span>
+                        <span class="sr-only">{{ $t('Open menu') }}</span>
                         <svg v-if="!sidebarOpen" class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
                         </svg>
@@ -219,8 +220,8 @@ watch(
                         </div>
 
                         <div class="min-w-0">
-                            <p class="truncate text-lg font-semibold tracking-tight text-slate-900 dark:text-slate-100">Controle Estoque</p>
-                            <p class="truncate text-xs text-slate-500 dark:text-slate-400">ERP de operacoes e inventario</p>
+                            <p class="truncate text-lg font-semibold tracking-tight text-slate-900 dark:text-slate-100">{{ $t('Stock Control') }}</p>
+                            <p class="truncate text-xs text-slate-500 dark:text-slate-400">{{ $t('Operations and Inventory ERP') }}</p>
                         </div>
                     </div>
 
@@ -239,6 +240,7 @@ watch(
                             <span class="max-w-[140px] truncate">{{ firstName }}</span>
                         </div>
 
+                        <LanguageSwitcher />
                         <ThemeToggle />
                         <slot name="top-right" />
                     </div>
@@ -264,14 +266,14 @@ watch(
                                 </div>
 
                                 <div v-else>
-                                    <p class="text-[11px] uppercase tracking-[0.14em] text-slate-500 dark:text-slate-400">Menu principal</p>
-                                    <p v-if="user" class="mt-1 text-sm font-medium text-slate-700 dark:text-slate-200">Ola, {{ displayName }}</p>
+                                    <p class="text-[11px] uppercase tracking-[0.14em] text-slate-500 dark:text-slate-400">{{ $t('Main Menu') }}</p>
+                                    <p v-if="user" class="mt-1 text-sm font-medium text-slate-700 dark:text-slate-200">{{ $t('Hello') }}, {{ displayName }}</p>
                                 </div>
 
                                 <button
                                     type="button"
                                     class="hidden h-8 w-8 items-center justify-center rounded-lg border border-slate-200 text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-700 md:inline-flex dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800"
-                                    :title="compactSidebar ? 'Expandir menu lateral' : 'Colapsar menu lateral'"
+                                    :title="compactSidebar ? $t('Expand sidebar') : $t('Collapse sidebar')"
                                     @click="toggleSidebarCollapse"
                                 >
                                     <i :class="compactSidebar ? 'fas fa-angle-right text-sm' : 'fas fa-angle-left text-sm'"></i>
@@ -286,11 +288,11 @@ watch(
                                         <button
                                             type="button"
                                             :class="[menuItemClass(menu), compactSidebar ? 'justify-center px-2' : '']"
-                                            :title="compactSidebar ? menu.name : undefined"
+                                            :title="compactSidebar ? $t(menu.name) : undefined"
                                             @click="toggleGroup(menu.id)"
                                         >
                                             <i :class="iconClass(menu)"></i>
-                                            <span v-if="!compactSidebar" class="truncate">{{ menu.name }}</span>
+                                            <span v-if="!compactSidebar" class="truncate">{{ $t(menu.name) }}</span>
                                             <i
                                                 v-if="!compactSidebar"
                                                 class="fas fa-chevron-down ml-auto text-[11px] text-slate-400 transition-transform duration-200"
@@ -308,7 +310,7 @@ watch(
                                                         @click="closeMobileSidebar"
                                                     >
                                                         <i :class="iconClass(child)"></i>
-                                                        <span class="truncate">{{ child.name }}</span>
+                                                        <span class="truncate">{{ $t(child.name) }}</span>
                                                     </Link>
                                                 </template>
                                             </div>
@@ -319,17 +321,17 @@ watch(
                                         v-else-if="hasRoute(menu)"
                                         :href="resolveHref(menu)"
                                         :class="[menuItemClass(menu), compactSidebar ? 'justify-center px-2' : '']"
-                                        :title="compactSidebar ? menu.name : undefined"
+                                        :title="compactSidebar ? $t(menu.name) : undefined"
                                         @click="closeMobileSidebar"
                                     >
                                         <i :class="iconClass(menu)"></i>
-                                        <span v-if="!compactSidebar" class="truncate">{{ menu.name }}</span>
+                                        <span v-if="!compactSidebar" class="truncate">{{ $t(menu.name) }}</span>
                                     </Link>
                                 </template>
                             </template>
 
                             <div v-else class="rounded-xl border border-dashed border-slate-300 px-3 py-4 text-xs text-slate-500 dark:border-slate-700 dark:text-slate-400">
-                                Nenhum menu disponivel para este usuario.
+                                {{ $t('No menu available for this user.') }}
                             </div>
                         </nav>
 
@@ -338,10 +340,10 @@ watch(
                                 type="submit"
                                 class="flex w-full items-center rounded-xl py-2.5 text-sm font-medium text-slate-700 transition-colors hover:bg-rose-50 hover:text-rose-700 dark:text-slate-200 dark:hover:bg-rose-500/10 dark:hover:text-rose-200"
                                 :class="compactSidebar ? 'justify-center px-2' : 'gap-2 px-3'"
-                                :title="compactSidebar ? 'Sair da sessao' : undefined"
+                                :title="compactSidebar ? $t('Logout session') : undefined"
                             >
                                 <i class="fas fa-sign-out-alt shrink-0 w-4 text-center text-sm"></i>
-                                <span v-if="!compactSidebar" class="truncate">Sair da sessao</span>
+                                <span v-if="!compactSidebar" class="truncate">{{ $t('Logout session') }}</span>
                             </button>
                         </form>
                     </div>

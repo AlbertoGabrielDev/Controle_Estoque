@@ -21,12 +21,12 @@ function submit() {
 </script>
 
 <template>
-  <Head title="Editar Unidade de Medida" />
+  <Head :title="$t('Edit Measurement Unit')" />
 
   <div class="flex items-center justify-between mb-4">
-    <h1 class="text-2xl font-semibold">Editar Unidade de Medida</h1>
-    <Link :href="route('unidades_medida.index')" class="text-blue-600">Voltar</Link>
+    <h1 class="text-2xl font-semibold">{{ $t('Edit Measurement Unit') }}</h1>
+    <Link :href="route('unidades_medida.index')" class="text-blue-600">{{ $t('Back') }}</Link>
   </div>
 
-  <UnitForm :form="form" :unidades-base="props.unidadesBase" submit-label="Salvar Alterações" @submit="submit" />
+  <UnitForm :form="form" :unidades-base="props.unidadesBase" :submit-label="$t('Save Changes')" @submit="submit" />
 </template>

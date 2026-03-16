@@ -12,12 +12,12 @@ function submit() {
 </script>
 
 <template>
-  <Head title="Cadastro de Marca" />
+  <Head :title="$t('Brand Registration')" />
 
   <div class="flex items-center justify-between mb-4">
-    <h1 class="text-2xl font-semibold">Cadastro de Marca</h1>
-    <Link :href="route('marca.index')" class="text-blue-600">Voltar</Link>
+    <h1 class="text-2xl font-semibold">{{ $t('Brand Registration') }}</h1>
+    <Link :href="route('marca.index')" class="text-blue-600">{{ $t('Back') }}</Link>
   </div>
 
-  <BrandForm :form="form" submit-label="Criar Marca" @submit="submit" />
+  <BrandForm :form="form" :submit-label="$t('Create Brand')" @submit="submit" />
 </template>
