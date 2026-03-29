@@ -20,12 +20,12 @@ function submit() {
 </script>
 
 <template>
-  <Head title="Nova Unidade de Medida" />
+  <Head :title="$t('New Measurement Unit')" />
 
   <div class="flex items-center justify-between mb-4">
-    <h1 class="text-2xl font-semibold">Nova Unidade de Medida</h1>
-    <Link :href="route('unidades_medida.index')" class="text-blue-600">Voltar</Link>
+    <h1 class="text-2xl font-semibold">{{ $t('New Measurement Unit') }}</h1>
+    <Link :href="route('unidades_medida.index')" class="text-blue-600">{{ $t('Back') }}</Link>
   </div>
 
-  <UnitForm :form="form" :unidades-base="props.unidadesBase" submit-label="Criar Unidade" @submit="submit" />
+  <UnitForm :form="form" :unidades-base="props.unidadesBase" :submit-label="$t('Create Unit')" @submit="submit" />
 </template>

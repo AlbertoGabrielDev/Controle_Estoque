@@ -1,4 +1,8 @@
 <script setup>
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
+
 import { computed } from 'vue'
 
 const props = defineProps({
@@ -87,14 +91,14 @@ function onUnidadeSelected(selectedObj, index) {
   <form @submit.prevent="$emit('submit')" class="bg-white p-4 rounded shadow dark:bg-slate-900 dark:border dark:border-slate-700 space-y-4">
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
       <div>
-        <label class="block text-sm font-medium">Data da Requisicao</label>
+        <label class="block text-sm font-medium">{{ $t('Data da Requisicao') }}</label>
         <input v-model="props.form.data_requisicao" type="date" class="mt-1 border rounded px-3 py-2 w-full">
         <div v-if="props.form.errors.data_requisicao" class="text-red-600 text-sm mt-1">
           {{ props.form.errors.data_requisicao }}
         </div>
       </div>
       <div>
-        <label class="block text-sm font-medium">Observacoes</label>
+        <label class="block text-sm font-medium">{{ $t('Observacoes') }}</label>
         <textarea v-model="props.form.observacoes" rows="2" class="mt-1 border rounded px-3 py-2 w-full"></textarea>
         <div v-if="props.form.errors.observacoes" class="text-red-600 text-sm mt-1">
           {{ props.form.errors.observacoes }}
@@ -104,7 +108,7 @@ function onUnidadeSelected(selectedObj, index) {
 
     <div class="flex items-center justify-between">
       <h3 class="font-semibold">Itens da Requisicao</h3>
-      <button type="button" class="px-3 py-2 rounded bg-gray-100 hover:bg-gray-200 dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-slate-100" @click="addItem">Adicionar Item</button>
+      <button type="button" class="px-3 py-2 rounded bg-gray-100 hover:bg-gray-200 dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-slate-100" @click="addItem">{{ $t('Adicionar Item') }}</button>
     </div>
 
     <div class="overflow-x-auto">
@@ -129,7 +133,7 @@ function onUnidadeSelected(selectedObj, index) {
                 :options="props.itemsOptions"
                 :custom-label="customItemLabel"
                 track-by="id"
-                placeholder="Buscar Item"
+                :placeholder="$t('Buscar Item')"
                 select-label="Enter para esc."
                 deselect-label="Enter p/ remover"
                 :use-teleport="true"
@@ -141,7 +145,7 @@ function onUnidadeSelected(selectedObj, index) {
               </div>
             </td>
             <td class="px-3 py-2">
-              <input v-model="item.descricao_snapshot" class="border rounded px-2 py-1 w-full" placeholder="Descricao na cotacao">
+              <input v-model="item.descricao_snapshot" class="border rounded px-2 py-1 w-full" :placeholder="$t('Descricao na cotacao')">
               <div v-if="props.form.errors[`items.${index}.descricao_snapshot`]" class="text-red-600 text-xs mt-1">
                 {{ props.form.errors[`items.${index}.descricao_snapshot`] }}
               </div>
@@ -152,7 +156,7 @@ function onUnidadeSelected(selectedObj, index) {
                 :options="props.unidadesOptions"
                 label="codigo"
                 track-by="id"
-                placeholder="Unid."
+                :placeholder="$t('Unid.')"
                 select-label="Enter para esc."
                 deselect-label=""
                 :use-teleport="true"
@@ -176,7 +180,7 @@ function onUnidadeSelected(selectedObj, index) {
               <input v-model="item.observacoes" class="border rounded px-2 py-1 w-full">
             </td>
             <td class="px-3 py-2">
-              <button type="button" class="px-2 py-1 rounded bg-red-50 text-red-600 hover:bg-red-100 dark:bg-red-900/40 dark:text-red-300 dark:hover:bg-red-900/60 transition-colors" @click="removeItem(index)">Remover</button>
+              <button type="button" class="px-2 py-1 rounded bg-red-50 text-red-600 hover:bg-red-100 dark:bg-red-900/40 dark:text-red-300 dark:hover:bg-red-900/60 transition-colors" @click="removeItem(index)">{{ $t('Remove') }}</button>
             </td>
           </tr>
           <tr v-if="!props.form.items.length">

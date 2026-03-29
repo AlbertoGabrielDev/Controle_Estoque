@@ -1,4 +1,8 @@
 <script setup>
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
+
 import { Head, Link, useForm } from '@inertiajs/vue3'
 import { reactive } from 'vue'
 
@@ -58,8 +62,8 @@ function submitPrices(supplierId) {
       <div class="text-sm text-slate-600 dark:text-slate-300">Status: {{ props.quotation.status }}</div>
     </div>
     <div class="flex flex-wrap gap-2">
-      <Link :href="route('purchases.quotations.index')" class="text-blue-600 dark:text-cyan-400">Voltar</Link>
-      <Link v-if="props.quotation.status === 'aberta'" :href="route('purchases.quotations.edit', props.quotation.id)" class="text-blue-600 dark:text-cyan-400">Editar</Link>
+      <Link :href="route('purchases.quotations.index')" class="text-blue-600 dark:text-cyan-400">{{ $t('Back') }}</Link>
+      <Link v-if="props.quotation.status === 'aberta'" :href="route('purchases.quotations.edit', props.quotation.id)" class="text-blue-600 dark:text-cyan-400">{{ $t('Edit') }}</Link>
       <Link
         v-if="props.quotation.status === 'aberta'"
         method="patch"

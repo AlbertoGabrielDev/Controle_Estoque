@@ -1,4 +1,8 @@
 ﻿<script setup>
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
+
 import { computed } from 'vue'
 import { Head, Link, router } from '@inertiajs/vue3'
 import ButtonStatus from '@/components/ButtonStatus.vue'
@@ -212,7 +216,7 @@ function nutritionTitle(value) {
             <th class="px-4 py-3 text-left font-medium text-gray-600">Descricao</th>
             <th class="px-4 py-3 text-left font-medium text-gray-600">Unidade</th>
             <th class="px-4 py-3 text-left font-medium text-gray-600">Info. Nutricional</th>
-            <th class="px-4 py-3 text-left font-medium text-gray-600">Editar</th>
+            <th class="px-4 py-3 text-left font-medium text-gray-600">{{ $t('Edit') }}</th>
             <th class="px-4 py-3 text-left font-medium text-gray-600">Status</th>
           </tr>
         </thead>

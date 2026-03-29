@@ -70,13 +70,13 @@ const totalValor = computed(() => props.form.items.reduce((total, item) => {
   <form @submit.prevent="$emit('submit')" class="bg-white p-4 rounded shadow dark:bg-slate-900 dark:border dark:border-slate-700 space-y-4">
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
       <div>
-        <label class="block text-sm font-medium">Pedido</label>
+        <label class="block text-sm font-medium">{{ $t('Pedido') }}</label>
         <Multiselect
           v-model="selectedOrder"
           :options="props.ordersOptions"
           :custom-label="customOrderLabel"
           track-by="id"
-          placeholder="Buscar Pedido"
+          :placeholder="$t('Buscar Pedido')"
           select-label="Enter para selecionar"
           deselect-label=""
           :use-teleport="true"
@@ -90,7 +90,7 @@ const totalValor = computed(() => props.form.items.reduce((total, item) => {
         <div v-if="props.form.errors.data_recebimento" class="text-red-600 text-sm mt-1">{{ props.form.errors.data_recebimento }}</div>
       </div>
       <div>
-        <label class="block text-sm font-medium">Observacoes</label>
+        <label class="block text-sm font-medium">{{ $t('Observacoes') }}</label>
         <input v-model="props.form.observacoes" class="mt-1 border rounded px-3 py-2 w-full">
       </div>
     </div>

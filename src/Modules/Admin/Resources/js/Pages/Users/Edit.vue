@@ -1,4 +1,8 @@
 <script setup>
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
+
 import { Head, Link, useForm } from '@inertiajs/vue3'
 import UserForm from './UserForm.vue'
 
@@ -43,7 +47,7 @@ function submit() {
 
   <div class="flex items-center justify-between mb-4">
     <h1 class="text-2xl font-semibold">Editar Usuario</h1>
-    <Link :href="route('usuario.index')" class="text-blue-600">Voltar</Link>
+    <Link :href="route('usuario.index')" class="text-blue-600">{{ $t('Back') }}</Link>
   </div>
 
   <UserForm

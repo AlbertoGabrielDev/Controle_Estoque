@@ -24,18 +24,18 @@ function submit() {
 </script>
 
 <template>
-  <Head title="Editar Categoria" />
+  <Head :title="$t('Edit Category')" />
 
   <div class="flex items-center justify-between mb-4">
-    <h1 class="text-2xl font-semibold">Editar Categoria</h1>
-    <Link :href="route('categoria.index')" class="text-blue-600">Voltar</Link>
+    <h1 class="text-2xl font-semibold">{{ $t('Edit Category') }}</h1>
+    <Link :href="route('categoria.index')" class="text-blue-600">{{ $t('Back') }}</Link>
   </div>
 
   <CategoryForm
     :form="form"
     :categorias-pai="props.categoriasPai"
     :show-image="true"
-    submit-label="Salvar Alterações"
+    :submit-label="$t('Save Changes')"
     @submit="submit"
   />
 </template>

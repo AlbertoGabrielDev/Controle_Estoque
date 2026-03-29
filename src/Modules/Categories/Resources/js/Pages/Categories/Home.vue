@@ -13,15 +13,15 @@ function imageUrl(categoria) {
 </script>
 
 <template>
-  <Head title="Categorias" />
+  <Head :title="$t('Categories')" />
 
   <div class="min-h-screen bg-gray-50 p-4 md:p-8">
     <div class="max-w-7xl mx-auto">
       <div class="mb-8 flex items-center justify-between">
-        <h1 class="text-3xl font-bold text-gray-800">Categorias</h1>
+        <h1 class="text-3xl font-bold text-gray-800">{{ $t('Categories') }}</h1>
         <Link :href="route('categoria.index')" class="flex items-center space-x-2 rounded-lg bg-white px-4 py-2 text-cyan-600 shadow-md transition-all hover:bg-cyan-50">
           <i class="fas fa-table-list"></i>
-          <span>Index</span>
+          <span>{{ $t('Index') }}</span>
         </Link>
       </div>
 
@@ -49,10 +49,10 @@ function imageUrl(categoria) {
                 :href="route('categorias.produto', categoria.id_categoria)"
                 class="block w-full rounded-lg bg-cyan-500 px-4 py-2 text-center text-white transition-all hover:bg-cyan-600"
               >
-                Ver Produtos ({{ categoria.produtos_count }})
+                {{ $t('See Products') }} ({{ categoria.produtos_count }})
               </Link>
               <div v-else class="rounded-lg bg-gray-100 px-4 py-2 text-center text-gray-500">
-                Nenhum produto disponível
+                {{ $t('No products available') }}
               </div>
             </div>
           </div>

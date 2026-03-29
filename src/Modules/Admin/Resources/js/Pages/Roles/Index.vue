@@ -1,6 +1,10 @@
 <script setup>
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
+
 import { Head, Link } from '@inertiajs/vue3'
-import { onBeforeUnmount, reactive } from 'vue'
+import { computed, onBeforeUnmount, reactive } from 'vue'
 import DataTable, { esc } from '@/components/DataTable.vue'
 import { useQueryFilters } from '@/composables/useQueryFilters'
 
@@ -12,10 +16,10 @@ const form = reactive({
   q: props.filters?.q ?? '',
 })
 
-const dtColumns = [
+const dtColumns = computed(() => [
   {
     data: 'c1',
-    title: 'Perfil',
+    title: t('Role'),
     render: (data, type, row) => {
       if (type !== 'display') {
         return data
@@ -26,24 +30,24 @@ const dtColumns = [
       return `<a href="${url}" class="text-blue-600 hover:underline">${label}</a>`
     },
   },
-  { data: 'acoes', title: 'Acoes', orderable: false, searchable: false },
-]
+  { data: 'acoes', title: t('Actions'), orderable: false, searchable: false },
+])
 
 const stopSyncFilters = useQueryFilters(form, 'roles.index')
 onBeforeUnmount(() => stopSyncFilters())
 </script>
 
 <template>
-  <Head title="Roles" />
+  <Head :title="$t('Roles')" />
 
   <div class="flex justify-between items-center mb-6">
-    <h2 class="text-2xl font-semibold text-slate-700">Roles</h2>
+    <h2 class="text-2xl font-semibold text-slate-700">{{ $t('Roles') }}</h2>
     <div class="flex gap-4">
       <Link :href="route('categoria.inicio')" class="flex items-center px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-md text-gray-800 transition-colors">
-        <i class="fas fa-angle-left mr-2"></i>Voltar
+        <i class="fas fa-angle-left mr-2"></i>{{ $t('Back') }}
       </Link>
       <Link :href="route('roles.cadastro')" class="flex items-center px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-md text-gray-800 transition-colors">
-        <i class="fas fa-plus mr-2"></i>Cadastrar
+        <i class="fas fa-plus mr-2"></i>{{ $t('Create') }}
       </Link>
     </div>
   </div>
@@ -53,7 +57,7 @@ onBeforeUnmount(() => stopSyncFilters())
       v-model="form.q"
       type="text"
       class="px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500 w-full md:max-w-md"
-      placeholder="Buscar por nome do perfil"
+      :placeholder="$t('Search by role name')"
     >
   </div>
 

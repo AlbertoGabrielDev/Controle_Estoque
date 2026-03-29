@@ -21,12 +21,17 @@ function submit() {
 </script>
 
 <template>
-  <Head title="Nova Conta Contábil" />
+  <Head :title="$t('New Accounting Account')" />
 
   <div class="flex items-center justify-between mb-4">
-    <h1 class="text-2xl font-semibold">Nova Conta Contábil</h1>
-    <Link :href="route('contas_contabeis.index')" class="text-blue-600">Voltar</Link>
+    <h1 class="text-2xl font-semibold">{{ $t('New Accounting Account') }}</h1>
+    <Link :href="route('contas_contabeis.index')" class="text-blue-600">{{ $t('Back') }}</Link>
   </div>
 
-  <ContaForm :form="form" :contas-pai="props.contasPai" submit-label="Criar Conta" @submit="submit" />
+  <ContaForm
+    :form="form"
+    :contas-pai="props.contasPai"
+    :submit-label="$t('Create')"
+    @submit="submit"
+  />
 </template>

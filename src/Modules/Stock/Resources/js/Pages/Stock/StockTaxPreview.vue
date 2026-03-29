@@ -1,21 +1,41 @@
 <script setup>
+import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
+
+const { t, locale } = useI18n()
+
 const props = defineProps({
   vm: { type: Object, default: null },
 })
 
+const currentLocale = computed(() => {
+  if (locale.value === 'en') return 'en-US'
+  if (locale.value === 'es') return 'es-ES'
+  return 'pt-BR'
+})
+
+const currencySymbol = computed(() => {
+  if (locale.value === 'en') return 'USD'
+  if (locale.value === 'es') return 'EUR'
+  return 'BRL'
+})
+
 const money = (value) =>
-  Number(value || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
+  Number(value || 0).toLocaleString(currentLocale.value, { 
+    style: 'currency', 
+    currency: currencySymbol.value 
+  })
 </script>
 
 <template>
   <div v-if="!props.vm" class="text-slate-500 dark:text-slate-400">
-    Selecione o produto e informe o preço de venda.
+    {{ $t('Select product and enter sale price.') }}
   </div>
 
   <div v-else class="stock-tax-preview text-slate-700 dark:text-slate-200">
-    <div class="mb-2">Preço base: <strong>{{ money(props.vm.__totais?.preco_base) }}</strong></div>
-    <div class="mb-2">Somente impostos: <strong>{{ money(props.vm.__totais?.total_impostos) }}</strong></div>
-    <div class="mb-3">Preço com impostos: <strong>{{ money(props.vm.__totais?.total_com_impostos) }}</strong></div>
+    <div class="mb-2">{{ $t('Base Price') }}: <strong>{{ money(props.vm.__totais?.preco_base) }}</strong></div>
+    <div class="mb-2">{{ $t('Taxes Only') }}: <strong>{{ money(props.vm.__totais?.total_impostos) }}</strong></div>
+    <div class="mb-3">{{ $t('Price with Taxes') }}: <strong>{{ money(props.vm.__totais?.total_com_impostos) }}</strong></div>
 
     <div
       v-for="(imp, idx) in props.vm.impostos || []"
@@ -27,17 +47,17 @@ const money = (value) =>
           {{ imp.imposto || imp.codigo || '—' }}
           <span v-if="imp.tax_nome"> - {{ imp.tax_nome }}</span>
         </div>
-        <div class="text-right text-slate-700 dark:text-slate-200">Total: <strong>{{ money(imp.total) }}</strong></div>
+        <div class="text-right text-slate-700 dark:text-slate-200">{{ $t('Total') }}: <strong>{{ money(imp.total) }}</strong></div>
       </div>
 
       <div v-if="Array.isArray(imp.linhas) && imp.linhas.length" class="mt-2 overflow-x-auto">
         <table class="stock-tax-preview-table min-w-full text-sm">
           <thead class="bg-slate-50 dark:bg-slate-800/70 text-slate-500 dark:text-slate-300">
             <tr>
-              <th class="text-left pr-4 py-1">Método</th>
-              <th class="text-left pr-4 py-1">Base</th>
-              <th class="text-left pr-4 py-1">Alíquota/Valor</th>
-              <th class="text-right py-1">Imposto</th>
+              <th class="text-left pr-4 py-1">{{ $t('Method') }}</th>
+              <th class="text-left pr-4 py-1">{{ $t('Base') }}</th>
+              <th class="text-left pr-4 py-1">{{ $t('Rate/Value') }}</th>
+              <th class="text-right py-1">{{ $t('Taxes') }}</th>
             </tr>
           </thead>
           <tbody>

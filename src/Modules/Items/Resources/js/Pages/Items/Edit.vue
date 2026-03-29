@@ -29,12 +29,12 @@ function submit() {
 </script>
 
 <template>
-  <Head title="Editar Item" />
+  <Head :title="$t('Edit Item')" />
 
   <div class="flex items-center justify-between mb-4">
-    <h1 class="text-2xl font-semibold">Editar Item</h1>
-    <Link :href="route('itens.index')" class="text-blue-600">Voltar</Link>
+    <h1 class="text-2xl font-semibold">{{ $t('Edit Item') }}</h1>
+    <Link :href="route('itens.index')" class="text-blue-600">{{ $t('Back') }}</Link>
   </div>
 
-  <ItemForm :form="form" :categorias="props.categorias" :unidades="props.unidades" submit-label="Salvar Alterações" @submit="submit" />
+  <ItemForm :form="form" :categorias="props.categorias" :unidades="props.unidades" :submit-label="$t('Save Changes')" @submit="submit" />
 </template>

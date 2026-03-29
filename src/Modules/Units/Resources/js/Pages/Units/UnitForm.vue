@@ -9,7 +9,7 @@ defineEmits(['submit'])
 
 <template>
   <form @submit.prevent="$emit('submit')" class="bg-white p-4 rounded shadow max-w-xl">
-    <label class="block text-sm font-medium">Nome da Unidade</label>
+    <label class="block text-sm font-medium">{{ $t('Nome da Unidade') }}</label>
     <input v-model="props.form.nome" class="mt-1 border rounded px-3 py-2 w-full">
     <div v-if="props.form.errors.nome" class="text-red-600 text-sm mt-1">{{ props.form.errors.nome }}</div>
 

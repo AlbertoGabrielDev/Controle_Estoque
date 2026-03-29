@@ -27,7 +27,8 @@ export function linkify(
 }
 </script>
 <script setup>
-import { onMounted, onBeforeUnmount, ref, watch, nextTick } from 'vue'
+import { onMounted, onBeforeUnmount, ref, watch, nextTick, computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import 'datatables.net-dt'
 import 'datatables.net-responsive-dt'
 import 'datatables.net-dt/css/dataTables.dataTables.css'
@@ -44,7 +45,7 @@ const props = defineProps({
   lengthMenu: { type: Array, default: () => [[10, 25, 50, 100], [10, 25, 50, 100]] },
   responsive: { type: Boolean, default: false },
   dom: { type: String, default: '<"erp-dt-toolbar flex flex-col gap-3 md:flex-row md:items-center md:justify-between mb-4"lfr>t<"erp-dt-footer flex flex-col gap-3 md:flex-row md:items-center md:justify-between mt-4"ip>' },
-  languageUrl: { type: String, default: 'https://cdn.datatables.net/plug-ins/1.13.6/i18n/pt-BR.json' },
+  languageUrl: { type: String, default: '' },
   reinitKey: { type: [String, Number], default: 0 },
   actionsColIndex: { type: Number, default: -1 },
 
@@ -55,18 +56,46 @@ const props = defineProps({
   ordering: { type: Boolean, default: true },       // ordenação
 })
 
+const { locale } = useI18n()
 const tableRef = ref(null)
+const renderTable = ref(true)
 let dt = null
+let skipNextAjaxLoad = false
+let lastAjaxResponse = null
+
+const resolvedLanguageUrl = computed(() => {
+  if (props.languageUrl) return props.languageUrl
+
+  const mapping = {
+    pt: 'https://cdn.datatables.net/plug-ins/1.13.6/i18n/pt-BR.json',
+    es: 'https://cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json',
+    en: 'https://cdn.datatables.net/plug-ins/1.13.6/i18n/en-GB.json',
+  }
+
+  return mapping[locale.value] || mapping.pt
+})
 
 function init() {
+  if (!tableRef.value || !tableRef.value.parentNode) return
+
   const $table = window.jQuery(tableRef.value)
   if (!$table || !$table.DataTable) return
+
+  // Defensive check: if it's already a DataTable according to the library, destroy it first
+  try {
+    if (window.jQuery.fn.dataTable.isDataTable(tableRef.value)) {
+      $table.DataTable().destroy()
+    }
+  } catch (e) {
+    console.warn('Silent fallback: Datatable destroy missed.', e)
+  }
 
   const common = {
     processing: true,
     autoWidth: false,
+    destroy: true, // Fallback safety
     responsive: props.responsive ? { details: false } : false,
-    language: { url: props.languageUrl },
+    language: { url: resolvedLanguageUrl.value },
     dom: props.dom,
     order: props.order,
     pageLength: props.pageLength,
@@ -96,11 +125,26 @@ function init() {
     dt = $table.DataTable({
       ...common,
       serverSide: true,
-      ajax: {
-        url: props.ajaxUrl,
-        type: 'GET',
-        data: (d) => Object.assign(d, props.ajaxParams || {}),
-        error: (xhr) => console.error('DT Ajax error:', xhr.status, xhr.responseText),
+      ajax: function(data, callback, settings) {
+          if (skipNextAjaxLoad && lastAjaxResponse) {
+              skipNextAjaxLoad = false
+              Promise.resolve().then(() => callback(lastAjaxResponse))
+              return
+          }
+
+          const mergedData = Object.assign({}, data, props.ajaxParams || {})
+          window.jQuery.ajax({
+              url: props.ajaxUrl,
+              type: 'GET',
+              data: mergedData,
+              success: function(json) {
+                  lastAjaxResponse = json
+                  callback(json)
+              },
+              error: function(xhr) {
+                  console.error('DT Ajax error:', xhr.status, xhr.responseText)
+              }
+          })
       },
       columns: props.columns,
     })
@@ -148,6 +192,32 @@ watch(
   { deep: true }
 )
 
+// Consolidate watchers to prevent race conditions during locale change
+watch([locale, () => props.columns], async ([newLocale, newCols], [oldLocale, oldCols]) => {
+  if (!dt) return;
+  
+  if (newLocale !== oldLocale) {
+     skipNextAjaxLoad = true;
+  }
+  
+  try {
+     if (window.jQuery.fn.dataTable.isDataTable(tableRef.value)) {
+        dt.destroy();
+     }
+  } catch(e) {}
+  dt = null;
+
+  // Force Vue to drop the polluted DOM element
+  renderTable.value = false;
+  await nextTick();
+  
+  // Force Vue to mount a fresh DOM element
+  renderTable.value = true;
+  await nextTick();
+  
+  init();
+}, { deep: true });
+
 watch(() => props.reinitKey, async () => {
   destroy()
   await nextTick()
@@ -157,7 +227,7 @@ watch(() => props.reinitKey, async () => {
 
 <template>
   <div class="dt-tailwind overflow-x-auto rounded-2xl border border-slate-200/80 bg-white/85 p-3 md:p-4 shadow-sm dark:border-slate-700 dark:bg-slate-900/70">
-    <table :id="tableId" ref="tableRef" class="w-full text-sm">
+    <table v-if="renderTable" :id="tableId" ref="tableRef" class="w-full text-sm">
       <thead class="bg-slate-50/90 dark:bg-slate-800/70">
         <tr>
           <slot name="thead" />

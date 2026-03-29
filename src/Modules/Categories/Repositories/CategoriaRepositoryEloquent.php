@@ -34,21 +34,10 @@ class CategoriaRepositoryEloquent extends BaseRepository implements CategoriaRep
      */
     public function makeDatatableQuery(array $filters): array
     {
-        $q = trim((string) ($filters['q'] ?? ''));
-        $status = isset($filters['status']) && $filters['status'] !== '' ? (int) $filters['status'] : null;
+        $request = \Illuminate\Http\Request::create('/', 'GET', $filters);
+        [$query, $columnsMap] = $this->model::makeDatatableQuery($request);
 
-        $t = $this->model->getTable();
-
-        $query = $this->model->newQuery()
-            ->when($q !== '', function ($query) use ($q, $t) {
-                $query->where("{$t}.nome_categoria", 'like', "%{$q}%");
-            })
-            ->when(!is_null($status), function ($query) use ($status, $t) {
-                $query->where("{$t}.status", $status);
-            })
-            ->with('categoriaPai');
-
-        $columnsMap = $this->model::dtColumns();
+        $query->with('categoriaPai');
 
         return [$query, $columnsMap];
     }

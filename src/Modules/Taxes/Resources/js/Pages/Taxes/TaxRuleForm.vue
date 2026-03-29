@@ -1,4 +1,8 @@
 <script setup>
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
+
 import { Link } from '@inertiajs/vue3'
 import Multiselect from 'vue-multiselect'
 import 'vue-multiselect/dist/vue-multiselect.css'
@@ -120,7 +124,7 @@ const productOptions = computed(() =>
         maxlength="2"
         list="tax-origin-codes"
         class="w-full border rounded px-3 py-2 uppercase"
-        placeholder="Ex.: GO ou US"
+        :placeholder="$t('Ex.: GO ou US')"
       >
     </div>
 
@@ -134,7 +138,7 @@ const productOptions = computed(() =>
         maxlength="2"
         list="tax-dest-codes"
         class="w-full border rounded px-3 py-2 uppercase"
-        placeholder="Ex.: SP ou FR"
+        :placeholder="$t('Ex.: SP ou FR')"
       >
     </div>
 
@@ -144,7 +148,7 @@ const productOptions = computed(() =>
         <span class="ml-1 text-gray-400 cursor-help" :title="hints.customer_segment_id">ⓘ</span>
       </label>
       <select v-model="form.customer_segment_id" class="w-full border rounded px-3 py-2">
-        <option value="">—</option>
+        <option value="">{{ $t('—') }}</option>
         <option v-for="s in customerSegments" :key="s.id" :value="s.id">{{ s.nome }}</option>
       </select>
     </div>
@@ -158,7 +162,7 @@ const productOptions = computed(() =>
 
       <Multiselect v-model="form.product_segment_ids" :options="productOptions" :multiple="true"
         :close-on-select="false" :clear-on-select="false" :preserve-search="true" :searchable="true"
-        :show-no-results="true" placeholder="Selecione categorias…" label="label" track-by="value" />
+        :show-no-results="true" :placeholder="$t('Selecione categorias…')" label="label" track-by="value" />
 
       <p class="text-xs text-gray-500 mt-1">Dica: pesquise e selecione várias categorias.</p>
 
@@ -216,7 +220,7 @@ const productOptions = computed(() =>
         Fórmula <span class="ml-1 text-gray-400 cursor-help" :title="hints.formula">ⓘ</span>
       </label>
       <input v-model="form.formula" type="text" class="w-full border rounded px-3 py-2 font-mono"
-        placeholder="ex.: base * (rate/100)" />
+        :placeholder="$t('ex.: base * (rate/100)')" />
       <div v-if="form.errors?.formula" class="text-sm text-red-600 mt-1">{{ form.errors.formula }}</div>
     </div>
 
@@ -226,7 +230,7 @@ const productOptions = computed(() =>
         Canal <span class="ml-1 text-gray-400 cursor-help" :title="hints.canal">ⓘ</span>
       </label>
       <select v-model="form.canal" class="w-full border rounded px-3 py-2">
-        <option value="">—</option>
+        <option value="">{{ $t('—') }}</option>
         <option v-for="c in channels" :key="c.value" :value="c.value">{{ c.label }}</option>
       </select>
       <div v-if="form.errors?.canal" class="text-sm text-red-600 mt-1">{{ form.errors.canal }}</div>
@@ -237,7 +241,7 @@ const productOptions = computed(() =>
         Tipo de Operação <span class="ml-1 text-gray-400 cursor-help" :title="hints.tipo_operacao">ⓘ</span>
       </label>
       <select v-model="form.tipo_operacao" class="w-full border rounded px-3 py-2">
-        <option value="">—</option>
+        <option value="">{{ $t('—') }}</option>
         <option v-for="op in operationTypes" :key="op.value" :value="op.value">{{ op.label }}</option>
       </select>
       <div v-if="form.errors?.tipo_operacao" class="text-sm text-red-600 mt-1">{{ form.errors.tipo_operacao }}</div>
@@ -256,7 +260,7 @@ const productOptions = computed(() =>
 
     <!-- Ações -->
     <div class="md:col-span-2 flex justify-end gap-2 mt-4">
-      <Link :href="route('taxes.index')" class="px-3 py-2 rounded bg-gray-100">Cancelar</Link>
+      <Link :href="route('taxes.index')" class="px-3 py-2 rounded bg-gray-100">{{ $t('Cancel') }}</Link>
       <button type="submit" class="px-4 py-2 rounded bg-blue-600 text-white" :disabled="form.processing">
         {{ form.processing ? 'Salvando...' : 'Salvar' }}
       </button>

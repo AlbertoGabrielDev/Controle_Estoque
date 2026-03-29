@@ -1,6 +1,9 @@
 <script setup>
 import { computed } from 'vue'
 import { Head, Link, router } from '@inertiajs/vue3'
+import { useI18n } from 'vue-i18n'
+
+const { t, locale } = useI18n()
 
 const props = defineProps({
   historicos: {
@@ -13,8 +16,23 @@ const rows = computed(() => props.historicos?.data ?? [])
 const currentPage = computed(() => Number(props.historicos?.current_page ?? 1))
 const lastPage = computed(() => Number(props.historicos?.last_page ?? 1))
 
+const currentLocale = computed(() => {
+  if (locale.value === 'en') return 'en-US'
+  if (locale.value === 'es') return 'es-ES'
+  return 'pt-BR'
+})
+
+const currencySymbol = computed(() => {
+  if (locale.value === 'en') return 'USD'
+  if (locale.value === 'es') return 'EUR'
+  return 'BRL'
+})
+
 function money(value) {
-  return Number(value || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
+  return Number(value || 0).toLocaleString(currentLocale.value, { 
+    style: 'currency', 
+    currency: currencySymbol.value 
+  })
 }
 
 function goToPage(page) {
@@ -36,16 +54,16 @@ function goToPage(page) {
 </script>
 
 <template>
-  <Head title="Historico de Estoque" />
+  <Head :title="$t('Stock History')" />
 
   <div class="bg-white p-4 rounded-md w-full">
     <div class="mb-6 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-      <h1 class="text-2xl font-semibold text-slate-700">Historico de Estoque</h1>
+      <h1 class="text-2xl font-semibold text-slate-700">{{ $t('Stock History') }}</h1>
       <Link
         :href="route('estoque.index')"
         class="rounded bg-gray-100 px-4 py-2 text-gray-700 hover:bg-gray-200 w-fit"
       >
-        Voltar
+        {{ $t('Back') }}
       </Link>
     </div>
 
@@ -53,13 +71,13 @@ function goToPage(page) {
       <table class="min-w-full text-sm">
         <thead class="bg-gray-100">
           <tr>
-            <th class="px-4 py-3 text-left font-medium text-gray-600">Produto</th>
-            <th class="px-4 py-3 text-left font-medium text-gray-600">Marca</th>
-            <th class="px-4 py-3 text-left font-medium text-gray-600">Fornecedor</th>
-            <th class="px-4 py-3 text-left font-medium text-gray-600">Qtde. Retirada</th>
-            <th class="px-4 py-3 text-left font-medium text-gray-600">Qtde. Estoque</th>
-            <th class="px-4 py-3 text-left font-medium text-gray-600">Venda</th>
-            <th class="px-4 py-3 text-left font-medium text-gray-600">Data de Alteracao</th>
+            <th class="px-4 py-3 text-left font-medium text-gray-600">{{ $t('Product') }}</th>
+            <th class="px-4 py-3 text-left font-medium text-gray-600">{{ $t('Brand') }}</th>
+            <th class="px-4 py-3 text-left font-medium text-gray-600">{{ $t('Supplier') }}</th>
+            <th class="px-4 py-3 text-left font-medium text-gray-600">{{ $t('Quantity Withdrawn') }}</th>
+            <th class="px-4 py-3 text-left font-medium text-gray-600">{{ $t('Stock Quantity') }}</th>
+            <th class="px-4 py-3 text-left font-medium text-gray-600">{{ $t('Sale') }}</th>
+            <th class="px-4 py-3 text-left font-medium text-gray-600">{{ $t('Date of Change') }}</th>
           </tr>
         </thead>
         <tbody>
@@ -79,7 +97,7 @@ function goToPage(page) {
 
           <tr v-if="rows.length === 0">
             <td colspan="7" class="px-4 py-8 text-center text-gray-500">
-              Nenhum historico encontrado.
+              {{ $t('No history found.') }}
             </td>
           </tr>
         </tbody>
@@ -93,10 +111,10 @@ function goToPage(page) {
         :disabled="currentPage <= 1"
         @click="goToPage(currentPage - 1)"
       >
-        Anterior
+        {{ $t('Previous') }}
       </button>
       <span class="rounded bg-gray-100 px-3 py-2 text-sm text-gray-600">
-        Pagina {{ currentPage }} de {{ lastPage }}
+        {{ $t('Page {page} of {total}', { page: currentPage, total: lastPage }) }}
       </span>
       <button
         type="button"
@@ -104,7 +122,7 @@ function goToPage(page) {
         :disabled="currentPage >= lastPage"
         @click="goToPage(currentPage + 1)"
       >
-        Proxima
+        {{ $t('Next') }}
       </button>
     </div>
   </div>

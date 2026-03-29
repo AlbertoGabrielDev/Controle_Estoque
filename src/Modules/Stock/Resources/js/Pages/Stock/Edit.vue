@@ -35,11 +35,11 @@ function submit() {
 </script>
 
 <template>
-  <Head title="Editar Estoque" />
+  <Head :title="$t('Edit Stock')" />
 
   <div class="flex items-center justify-between mb-4">
-    <h1 class="text-2xl font-semibold">Editar Estoque</h1>
-    <Link :href="route('estoque.index')" class="text-blue-600">Voltar</Link>
+    <h1 class="text-2xl font-semibold">{{ $t('Edit Stock') }}</h1>
+    <Link :href="route('estoque.index')" class="text-blue-600">{{ $t('Back') }}</Link>
   </div>
 
   <StockForm
@@ -50,7 +50,7 @@ function submit() {
     :lock-product="true"
     :product-label="props.estoque?.produtos?.nome_produto || ''"
     :initial-vm="props.previewVm"
-    submit-label="Salvar Alterações"
+    :submit-label="$t('Save Changes')"
     @submit="submit"
   />
 </template>

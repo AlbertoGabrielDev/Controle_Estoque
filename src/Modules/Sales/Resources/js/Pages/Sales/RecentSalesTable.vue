@@ -1,5 +1,8 @@
 <script setup>
 import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
+
+const { locale } = useI18n()
 
 const props = defineProps({
   sales: {
@@ -15,7 +18,13 @@ const currentPage = computed(() => Number(props.sales?.current_page ?? 1))
 const lastPage = computed(() => Number(props.sales?.last_page ?? 1))
 
 function money(value) {
-  return Number(value || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
+  const currencyLocale = locale.value === 'en' ? 'en-US' : (locale.value === 'es' ? 'es-ES' : 'pt-BR')
+  const currencySymbol = locale.value === 'en' ? 'USD' : (locale.value === 'es' ? 'EUR' : 'BRL')
+  
+  return Number(value || 0).toLocaleString(currencyLocale, { 
+    style: 'currency', 
+    currency: currencySymbol 
+  })
 }
 
 function goPrev() {
@@ -38,20 +47,20 @@ function goNext() {
 <template>
   <section class="mt-8 recent-sales-table">
     <h2 class="text-xl md:text-2xl font-bold mb-4 text-center md:text-left text-slate-900 dark:text-slate-100">
-      Ultimos Produtos Vendidos
+      {{ $t('Last Products Sold') }}
     </h2>
 
     <div class="overflow-x-auto rounded-lg border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900/80">
       <table class="table-auto w-full border-collapse">
         <thead class="bg-slate-50 dark:bg-slate-800/70">
           <tr class="text-sm md:text-base text-slate-600 dark:text-slate-300">
-            <th class="py-3 px-4 md:px-6 text-left font-medium">Nome</th>
-            <th class="py-3 px-4 md:px-6 text-left font-medium">Preço Venda</th>
-            <th class="py-3 px-4 md:px-6 text-left font-medium">Preço Total</th>
-            <th class="py-3 px-4 md:px-6 text-left font-medium">Cod. Produto</th>
-            <th class="py-3 px-4 md:px-6 text-left font-medium">Quantidade</th>
-            <th class="py-3 px-4 md:px-6 text-left font-medium">Vendedor</th>
-            <th class="py-3 px-4 md:px-6 text-left font-medium">Data</th>
+            <th class="py-3 px-4 md:px-6 text-left font-medium">{{ $t('Name') }}</th>
+            <th class="py-3 px-4 md:px-6 text-left font-medium">{{ $t('Sale Price') }}</th>
+            <th class="py-3 px-4 md:px-6 text-left font-medium">{{ $t('Total Price') }}</th>
+            <th class="py-3 px-4 md:px-6 text-left font-medium">{{ $t('Product Code') }}</th>
+            <th class="py-3 px-4 md:px-6 text-left font-medium">{{ $t('Quantity') }}</th>
+            <th class="py-3 px-4 md:px-6 text-left font-medium">{{ $t('Seller') }}</th>
+            <th class="py-3 px-4 md:px-6 text-left font-medium">{{ $t('Date') }}</th>
           </tr>
         </thead>
         <tbody>
@@ -77,7 +86,7 @@ function goNext() {
 
           <tr v-if="rows.length === 0">
             <td colspan="7" class="py-8 px-4 text-center text-slate-500 dark:text-slate-400">
-              Nenhuma venda registrada ate o momento.
+              {{ $t('No sales registered yet.') }}
             </td>
           </tr>
         </tbody>
@@ -91,10 +100,10 @@ function goNext() {
         :disabled="currentPage <= 1"
         @click="goPrev"
       >
-        Anterior
+        {{ $t('Previous') }}
       </button>
       <span class="py-2 px-3 rounded-lg bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-200">
-        Pagina {{ currentPage }} de {{ lastPage }}
+        {{ $t('Page') }} {{ currentPage }} {{ $t('of') }} {{ lastPage }}
       </span>
       <button
         type="button"
@@ -102,7 +111,7 @@ function goNext() {
         :disabled="currentPage >= lastPage"
         @click="goNext"
       >
-        Proxima
+        {{ $t('Next') }}
       </button>
     </div>
   </section>

@@ -1,4 +1,8 @@
 <script setup>
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
+
 import { Head, Link, useForm } from '@inertiajs/vue3'
 
 const props = defineProps({
@@ -42,7 +46,7 @@ function submit() {
   <div class="w-full max-w-none rounded border border-slate-200 bg-white p-4 shadow dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100">
     <div class="flex items-center justify-between mb-4">
       <h1 class="text-2xl font-semibold">Editar Permissoes: {{ role.name }}</h1>
-      <Link :href="route('roles.index')" class="text-blue-600 dark:text-cyan-400">Voltar</Link>
+      <Link :href="route('roles.index')" class="text-blue-600 dark:text-cyan-400">{{ $t('Back') }}</Link>
     </div>
 
     <form @submit.prevent="submit" class="space-y-4">

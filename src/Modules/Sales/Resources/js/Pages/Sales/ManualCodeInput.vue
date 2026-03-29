@@ -1,5 +1,8 @@
 <script setup>
 import { ref } from 'vue'
+import { useI18n } from 'vue-i18n'
+
+const { locale, t } = useI18n()
 
 const props = defineProps({
   disabled: {
@@ -45,7 +48,13 @@ function selectOption(option) {
 }
 
 function money(value) {
-  return Number(value || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
+  const currencyLocale = locale.value === 'en' ? 'en-US' : (locale.value === 'es' ? 'es-ES' : 'pt-BR')
+  const currencySymbol = locale.value === 'en' ? 'USD' : (locale.value === 'es' ? 'EUR' : 'BRL')
+  
+  return Number(value || 0).toLocaleString(currencyLocale, { 
+    style: 'currency', 
+    currency: currencySymbol 
+  })
 }
 
 function onKeydown(event) {
@@ -67,14 +76,14 @@ function onKeydown(event) {
       :disabled="disabled"
       @click="toggle"
     >
-      {{ open ? 'Ocultar codigo manual' : 'Inserir codigo manual' }}
+      {{ open ? $t('Hide manual code') : $t('Insert manual code') }}
     </button>
 
     <div v-if="open" class="bg-gray-50 border rounded-lg p-3 md:p-4 mt-3">
       <div class="flex flex-col md:flex-row items-end gap-3">
         <div class="w-full md:w-80">
           <label for="manual-code" class="block text-sm font-medium text-gray-700">
-            Codigo do produto
+            {{ $t('Product Code') }}
           </label>
           <input
             id="manual-code"
@@ -93,32 +102,32 @@ function onKeydown(event) {
             :disabled="disabled"
             @click="submit"
           >
-            Adicionar
+            {{ $t('Add') }}
           </button>
           <button
             type="button"
             class="flex-1 md:flex-none bg-white border hover:bg-gray-50 text-gray-700 px-4 py-2 rounded-lg"
             @click="close"
           >
-            Fechar
+            {{ $t('Close') }}
           </button>
         </div>
       </div>
 
       <div v-if="options.length" class="mt-4">
         <div class="text-sm text-gray-600 mb-2">
-          Encontramos mais de um cadastro para este codigo. Selecione o estoque desejado.
+          {{ $t('Encontramos mais de um cadastro para este codigo. Selecione o estoque desejado.') }}
         </div>
         <div class="overflow-auto border rounded-lg bg-white">
           <table class="min-w-full divide-y divide-gray-200 text-sm">
             <thead class="bg-gray-50">
               <tr>
-                <th class="px-3 py-2 text-left font-medium text-gray-500 uppercase tracking-wider">ID Estoque</th>
-                <th class="px-3 py-2 text-left font-medium text-gray-500 uppercase tracking-wider">Produto</th>
-                <th class="px-3 py-2 text-left font-medium text-gray-500 uppercase tracking-wider">Fornecedor</th>
-                <th class="px-3 py-2 text-left font-medium text-gray-500 uppercase tracking-wider">Marca</th>
-                <th class="px-3 py-2 text-left font-medium text-gray-500 uppercase tracking-wider">Preco</th>
-                <th class="px-3 py-2 text-left font-medium text-gray-500 uppercase tracking-wider">Acoes</th>
+                <th class="px-3 py-2 text-left font-medium text-gray-500 uppercase tracking-wider">{{ $t('Stock ID') }}</th>
+                <th class="px-3 py-2 text-left font-medium text-gray-500 uppercase tracking-wider">{{ $t('Product') }}</th>
+                <th class="px-3 py-2 text-left font-medium text-gray-500 uppercase tracking-wider">{{ $t('Supplier') }}</th>
+                <th class="px-3 py-2 text-left font-medium text-gray-500 uppercase tracking-wider">{{ $t('Brand') }}</th>
+                <th class="px-3 py-2 text-left font-medium text-gray-500 uppercase tracking-wider">{{ $t('Price') }}</th>
+                <th class="px-3 py-2 text-left font-medium text-gray-500 uppercase tracking-wider">{{ $t('Actions') }}</th>
               </tr>
             </thead>
             <tbody class="bg-white divide-y divide-gray-200">
@@ -135,7 +144,7 @@ function onKeydown(event) {
                     :disabled="disabled"
                     @click="selectOption(option)"
                   >
-                    Selecionar
+                    {{ $t('Select') }}
                   </button>
                 </td>
               </tr>

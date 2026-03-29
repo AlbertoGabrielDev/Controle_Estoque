@@ -1,6 +1,7 @@
 <script setup>
 import { Head, Link } from '@inertiajs/vue3'
-import { onBeforeUnmount, reactive } from 'vue'
+import { computed, onBeforeUnmount, reactive } from 'vue'
+import { useI18n } from 'vue-i18n'
 import DataTable from '@/components/DataTable.vue'
 import { useQueryFilters } from '@/composables/useQueryFilters'
 
@@ -13,33 +14,35 @@ const form = reactive({
   ativo: props.filters?.ativo ?? '',
 })
 
-const dtColumns = [
-  { data: 'c1', title: 'Código' },
-  { data: 'c2', title: 'Descrição' },
-  { data: 'c3', title: 'Fator Base' },
-  { data: 'c4', title: 'Unidade Base' },
-  {
-    data: 'st',
-    title: 'Ativo',
-    render: (data) => data
-      ? '<span class="text-green-700">Ativo</span>'
-      : '<span class="text-gray-500">Inativo</span>',
-  },
-  { data: 'acoes', title: 'Ações', orderable: false, searchable: false },
-]
-
 const stopSyncFilters = useQueryFilters(form, 'unidades_medida.index')
 onBeforeUnmount(() => stopSyncFilters())
+
+const { t } = useI18n()
+
+const dtColumns = computed(() => [
+  { data: 'c1', title: t('Code') },
+  { data: 'c2', title: t('Description') },
+  { data: 'c3', title: t('Base Factor') },
+  { data: 'c4', title: t('Base Unit') },
+  {
+    data: 'st',
+    title: t('Active'),
+    render: (data) => data
+      ? `<span class="text-green-700">${t('Active')}</span>`
+      : `<span class="text-gray-500">${t('Inactive')}</span>`,
+  },
+  { data: 'acoes', title: t('Actions'), orderable: false, searchable: false },
+])
 </script>
 
 <template>
-  <Head title="Unidades de Medida" />
+  <Head :title="$t('Measurement Units')" />
 
   <div class="flex justify-between items-center mb-6">
-    <h2 class="text-2xl font-semibold text-slate-700">Unidades de Medida</h2>
+    <h2 class="text-2xl font-semibold text-slate-700">{{ $t('Measurement Units') }}</h2>
     <div class="flex gap-4">
       <Link :href="route('unidades_medida.create')" class="flex items-center px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-md text-gray-800 transition-colors">
-        <i class="fas fa-plus mr-2"></i>Nova Unidade
+        <i class="fas fa-plus mr-2"></i>{{ $t('New Unit') }}
       </Link>
     </div>
   </div>
@@ -49,12 +52,12 @@ onBeforeUnmount(() => stopSyncFilters())
       v-model="form.q"
       type="text"
       class="px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500"
-      placeholder="Buscar por código ou descrição"
+      :placeholder="$t('Search by code or description')"
     >
     <select v-model="form.ativo" class="px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500">
-      <option value="">Ativo</option>
-      <option :value="1">Ativo</option>
-      <option :value="0">Inativo</option>
+      <option value="">{{ $t('Active') }}</option>
+      <option :value="1">{{ $t('Active') }}</option>
+      <option :value="0">{{ $t('Inactive') }}</option>
     </select>
   </div>
 

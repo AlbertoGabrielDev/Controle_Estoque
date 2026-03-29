@@ -13,3 +13,8 @@
 - UI simples e consistente (tabela + filtros + paginação + formulário)
 - Usar PHPUnit no docker, com sqlLite
 - Caso haja button de editar ou de status usar os componentes criados de Edit e Status
+- Sempre que for criar uma tabela usar o componente DataTable
+- Respeitar a estrutura de pastas e arquivos do projeto
+- Respeitar a modulação do projeto
+- Respeitar a arquitetura do projeto
+- Lembrar de usar caso necessário os componentes de UI criados  

@@ -34,21 +34,7 @@ class MarcaRepositoryEloquent extends BaseRepository implements MarcaRepository
      */
     public function makeDatatableQuery(array $filters): array
     {
-        $q = trim((string) ($filters['q'] ?? ''));
-        $status = isset($filters['status']) && $filters['status'] !== '' ? (int) $filters['status'] : null;
-
-        $t = $this->model->getTable();
-
-        $query = $this->model->newQuery()
-            ->when($q !== '', function ($query) use ($q, $t) {
-                $query->where("{$t}.nome_marca", 'like', "%{$q}%");
-            })
-            ->when(!is_null($status), function ($query) use ($status, $t) {
-                $query->where("{$t}.status", $status);
-            });
-
-        $columnsMap = $this->model::dtColumns();
-
-        return [$query, $columnsMap];
+        $request = \Illuminate\Http\Request::create('/', 'GET', $filters);
+        return $this->model::makeDatatableQuery($request);
     }
 }
