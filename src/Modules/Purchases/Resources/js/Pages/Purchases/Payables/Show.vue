@@ -1,4 +1,8 @@
 ﻿<script setup>
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
+
 import { Head, Link } from '@inertiajs/vue3'
 
 const props = defineProps({
@@ -14,7 +18,7 @@ const props = defineProps({
       <h2 class="text-2xl font-semibold">Documento {{ props.payable.numero_documento }}</h2>
       <div class="text-sm text-slate-600">Status: {{ props.payable.status }}</div>
     </div>
-    <Link :href="route('purchases.payables.index')" class="text-blue-600">Voltar</Link>
+    <Link :href="route('purchases.payables.index')" class="text-blue-600">{{ $t('Back') }}</Link>
   </div>
 
   <div class="bg-white rounded shadow p-4 space-y-4">

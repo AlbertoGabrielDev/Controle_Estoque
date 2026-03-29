@@ -1,4 +1,8 @@
 <script setup>
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
+
 import { Head, Link, useForm } from '@inertiajs/vue3'
 import TaxRuleForm from './TaxRuleForm.vue'
 import { useToast } from 'vue-toastification'
@@ -62,7 +66,7 @@ function submit() {
 
   <div class="flex items-center justify-between mb-6">
     <h2 class="text-2xl font-semibold text-slate-700">Nova Regra</h2>
-    <Link :href="route('taxes.index')" class="px-3 py-2 rounded bg-gray-100">Voltar</Link>
+    <Link :href="route('taxes.index')" class="px-3 py-2 rounded bg-gray-100">{{ $t('Back') }}</Link>
   </div>
 
   <div class="bg-white rounded shadow p-4">

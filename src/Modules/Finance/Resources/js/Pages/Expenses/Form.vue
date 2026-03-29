@@ -64,7 +64,7 @@ defineEmits(['submit'])
       <div>
         <label class="block text-sm font-medium">{{ $t('Supplier') }}</label>
         <select v-model="props.form.fornecedor_id" class="mt-1 border rounded px-3 py-2 w-full">
-          <option value="">—</option>
+          <option value="">{{ $t('—') }}</option>
           <option v-for="f in props.fornecedores" :key="f.id_fornecedor" :value="f.id_fornecedor">
             {{ f.nome_fornecedor || f.razao_social }}
           </option>

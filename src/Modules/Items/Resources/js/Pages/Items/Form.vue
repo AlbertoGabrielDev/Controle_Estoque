@@ -52,7 +52,7 @@ watch(
       <div>
         <label class="block text-sm font-medium">{{ $t('Category') }}</label>
         <select v-model="props.form.categoria_id" class="mt-1 border rounded px-3 py-2 w-full">
-          <option value="">—</option>
+          <option value="">{{ $t('—') }}</option>
           <option v-for="c in props.categorias" :key="c.id_categoria" :value="c.id_categoria">
             {{ c.nome_categoria }}
           </option>
@@ -65,7 +65,7 @@ watch(
       <div>
         <label class="block text-sm font-medium">{{ $t('Measurement Unit') }}</label>
         <select v-model="props.form.unidade_medida_id" class="mt-1 border rounded px-3 py-2 w-full">
-          <option value="">—</option>
+          <option value="">{{ $t('—') }}</option>
           <option v-for="u in props.unidades" :key="u.id" :value="u.id">
             {{ u.codigo }} - {{ u.descricao }}
           </option>

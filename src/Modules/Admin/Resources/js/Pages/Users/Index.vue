@@ -1,6 +1,10 @@
 <script setup>
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
+
 import { Head, Link } from '@inertiajs/vue3'
-import { onBeforeUnmount, reactive } from 'vue'
+import { computed, onBeforeUnmount, reactive } from 'vue'
 import DataTable, { esc } from '@/components/DataTable.vue'
 import { useQueryFilters } from '@/composables/useQueryFilters'
 
@@ -13,10 +17,10 @@ const form = reactive({
   status: props.filters?.status ?? '',
 })
 
-const dtColumns = [
+const dtColumns = computed(() => [
   {
     data: 'c1',
-    title: 'Usuario',
+    title: t('User'),
     render: (data, type, row) => {
       if (type !== 'display') {
         return data
@@ -37,33 +41,33 @@ const dtColumns = [
       `
     },
   },
-  { data: 'roles', title: 'Perfis' },
+  { data: 'roles', title: t('Roles') },
   {
     data: 'st',
-    title: 'Status',
+    title: t('Status'),
     render: (data) => data
-      ? '<span class="text-green-700">Online</span>'
-      : '<span class="text-gray-500">Offline</span>',
+      ? `<span class="text-green-700">${t('Online')}</span>`
+      : `<span class="text-gray-500">${t('Offline')}</span>`,
   },
-  { data: 'created_at_fmt', title: 'Ativo desde' },
-  { data: 'acoes', title: 'Acoes', orderable: false, searchable: false },
-]
+  { data: 'created_at_fmt', title: t('Active since') },
+  { data: 'acoes', title: t('Actions'), orderable: false, searchable: false },
+])
 
 const stopSyncFilters = useQueryFilters(form, 'usuario.index')
 onBeforeUnmount(() => stopSyncFilters())
 </script>
 
 <template>
-  <Head title="Usuarios" />
+  <Head :title="$t('Users')" />
 
   <div class="flex justify-between items-center mb-6">
-    <h2 class="text-2xl font-semibold text-slate-700">Usuarios</h2>
+    <h2 class="text-2xl font-semibold text-slate-700">{{ $t('Users') }}</h2>
     <div class="flex gap-4">
       <Link :href="route('categoria.inicio')" class="flex items-center px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-md text-gray-800 transition-colors">
-        <i class="fas fa-angle-left mr-2"></i>Voltar
+        <i class="fas fa-angle-left mr-2"></i>{{ $t('Back') }}
       </Link>
       <Link :href="route('usuario.cadastro')" class="flex items-center px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-md text-gray-800 transition-colors">
-        <i class="fas fa-plus mr-2"></i>Cadastrar
+        <i class="fas fa-plus mr-2"></i>{{ $t('Create') }}
       </Link>
     </div>
   </div>
@@ -73,12 +77,12 @@ onBeforeUnmount(() => stopSyncFilters())
       v-model="form.q"
       type="text"
       class="px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500"
-      placeholder="Buscar por nome ou email"
+      :placeholder="$t('Search by name or email')"
     >
     <select v-model="form.status" class="px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500">
-      <option value="">Status</option>
-      <option :value="1">Online</option>
-      <option :value="0">Offline</option>
+      <option value="">{{ t('Status') }}</option>
+      <option :value="1">{{ t('Online') }}</option>
+      <option :value="0">{{ t('Offline') }}</option>
     </select>
   </div>
 

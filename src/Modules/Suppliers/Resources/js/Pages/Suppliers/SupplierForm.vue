@@ -1,4 +1,8 @@
 <script setup>
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
+
 const props = defineProps({
   form: { type: Object, required: true },
   submitLabel: { type: String, default: 'Salvar' },
@@ -11,19 +15,19 @@ defineEmits(['submit'])
   <form @submit.prevent="$emit('submit')" class="bg-white p-4 rounded shadow max-w-5xl">
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
       <div>
-        <label class="block text-sm font-medium">Código</label>
+        <label class="block text-sm font-medium">{{ $t('Código') }}</label>
         <input v-model="props.form.codigo" class="mt-1 border rounded px-3 py-2 w-full">
         <div v-if="props.form.errors.codigo" class="text-red-600 text-sm mt-1">{{ props.form.errors.codigo }}</div>
       </div>
 
       <div>
-        <label class="block text-sm font-medium">Razão Social</label>
+        <label class="block text-sm font-medium">{{ $t('Razão Social') }}</label>
         <input v-model="props.form.razao_social" class="mt-1 border rounded px-3 py-2 w-full">
         <div v-if="props.form.errors.razao_social" class="text-red-600 text-sm mt-1">{{ props.form.errors.razao_social }}</div>
       </div>
 
       <div>
-        <label class="block text-sm font-medium">Nome do Fornecedor</label>
+        <label class="block text-sm font-medium">{{ $t('Nome do Fornecedor') }}</label>
         <input
           v-model="props.form.nome_fornecedor"
           class="mt-1 border rounded px-3 py-2 w-full"
@@ -32,7 +36,7 @@ defineEmits(['submit'])
       </div>
 
       <div>
-        <label class="block text-sm font-medium">CNPJ</label>
+        <label class="block text-sm font-medium">{{ $t('CNPJ') }}</label>
         <input
           v-model="props.form.cnpj"
           class="mt-1 border rounded px-3 py-2 w-full"
@@ -41,7 +45,7 @@ defineEmits(['submit'])
       </div>
 
       <div>
-        <label class="block text-sm font-medium">NIF/CIF</label>
+        <label class="block text-sm font-medium">{{ $t('NIF/CIF') }}</label>
         <input
           v-model="props.form.nif_cif"
           class="mt-1 border rounded px-3 py-2 w-full"
@@ -50,7 +54,7 @@ defineEmits(['submit'])
       </div>
 
       <div>
-        <label class="block text-sm font-medium">CEP</label>
+        <label class="block text-sm font-medium">{{ $t('CEP') }}</label>
         <input
           v-model="props.form.cep"
           class="mt-1 border rounded px-3 py-2 w-full"
@@ -59,7 +63,7 @@ defineEmits(['submit'])
       </div>
 
       <div>
-        <label class="block text-sm font-medium">Logradouro</label>
+        <label class="block text-sm font-medium">{{ $t('Logradouro') }}</label>
         <input
           v-model="props.form.logradouro"
           class="mt-1 border rounded px-3 py-2 w-full"
@@ -68,7 +72,7 @@ defineEmits(['submit'])
       </div>
 
       <div>
-        <label class="block text-sm font-medium">Bairro</label>
+        <label class="block text-sm font-medium">{{ $t('Bairro') }}</label>
         <input
           v-model="props.form.bairro"
           class="mt-1 border rounded px-3 py-2 w-full"
@@ -77,7 +81,7 @@ defineEmits(['submit'])
       </div>
 
       <div>
-        <label class="block text-sm font-medium">Numero</label>
+        <label class="block text-sm font-medium">{{ $t('Numero') }}</label>
         <input
           v-model="props.form.numero_casa"
           class="mt-1 border rounded px-3 py-2 w-full"
@@ -86,7 +90,7 @@ defineEmits(['submit'])
       </div>
 
       <div>
-        <label class="block text-sm font-medium">Email</label>
+        <label class="block text-sm font-medium">{{ $t('Email') }}</label>
         <input
           v-model="props.form.email"
           type="email"
@@ -96,7 +100,7 @@ defineEmits(['submit'])
       </div>
 
       <div>
-        <label class="block text-sm font-medium">DDD</label>
+        <label class="block text-sm font-medium">{{ $t('DDD') }}</label>
         <input
           v-model="props.form.ddd"
           class="mt-1 border rounded px-3 py-2 w-full"
@@ -105,7 +109,7 @@ defineEmits(['submit'])
       </div>
 
       <div>
-        <label class="block text-sm font-medium">Cidade</label>
+        <label class="block text-sm font-medium">{{ $t('Cidade') }}</label>
         <input
           v-model="props.form.cidade"
           class="mt-1 border rounded px-3 py-2 w-full"
@@ -114,7 +118,7 @@ defineEmits(['submit'])
       </div>
 
       <div>
-        <label class="block text-sm font-medium">UF</label>
+        <label class="block text-sm font-medium">{{ $t('UF') }}</label>
         <input
           v-model="props.form.uf"
           class="mt-1 border rounded px-3 py-2 w-full uppercase"
@@ -123,25 +127,25 @@ defineEmits(['submit'])
       </div>
 
       <div class="md:col-span-2">
-        <label class="block text-sm font-medium">Endereço (Texto)</label>
+        <label class="block text-sm font-medium">{{ $t('Endereço (Texto)') }}</label>
         <textarea v-model="props.form.endereco" rows="2" class="mt-1 border rounded px-3 py-2 w-full" />
         <div v-if="props.form.errors.endereco" class="text-red-600 text-sm mt-1">{{ props.form.errors.endereco }}</div>
       </div>
 
       <div>
-        <label class="block text-sm font-medium">Prazo de Entrega (dias)</label>
+        <label class="block text-sm font-medium">{{ $t('Prazo de Entrega (dias)') }}</label>
         <input v-model="props.form.prazo_entrega_dias" type="number" min="0" class="mt-1 border rounded px-3 py-2 w-full">
         <div v-if="props.form.errors.prazo_entrega_dias" class="text-red-600 text-sm mt-1">{{ props.form.errors.prazo_entrega_dias }}</div>
       </div>
 
       <div>
-        <label class="block text-sm font-medium">Condição de Pagamento</label>
+        <label class="block text-sm font-medium">{{ $t('Condição de Pagamento') }}</label>
         <input v-model="props.form.condicao_pagamento" class="mt-1 border rounded px-3 py-2 w-full">
         <div v-if="props.form.errors.condicao_pagamento" class="text-red-600 text-sm mt-1">{{ props.form.errors.condicao_pagamento }}</div>
       </div>
 
       <div>
-        <label class="block text-sm font-medium">Telefone</label>
+        <label class="block text-sm font-medium">{{ $t('Telefone') }}</label>
         <input
           v-model="props.form.telefone"
           class="mt-1 border rounded px-3 py-2 w-full"
@@ -150,10 +154,10 @@ defineEmits(['submit'])
       </div>
 
       <div>
-        <label class="block text-sm font-medium">Ativo</label>
+        <label class="block text-sm font-medium">{{ $t('Active') }}</label>
         <select v-model="props.form.ativo" class="mt-1 border rounded px-3 py-2 w-full">
-          <option :value="true">Ativo</option>
-          <option :value="false">Inativo</option>
+          <option :value="true">{{ $t('Active') }}</option>
+          <option :value="false">{{ $t('Inactive') }}</option>
         </select>
         <div v-if="props.form.errors.ativo" class="text-red-600 text-sm mt-1">{{ props.form.errors.ativo }}</div>
       </div>

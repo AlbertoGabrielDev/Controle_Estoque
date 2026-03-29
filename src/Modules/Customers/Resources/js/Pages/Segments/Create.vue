@@ -1,4 +1,8 @@
 <script setup>
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
+
 import { Head, Link, useForm } from '@inertiajs/vue3'
 const form = useForm({ nome: '' })
 const submit = () => form.post(route('segmentos.store'))
@@ -8,7 +12,7 @@ const submit = () => form.post(route('segmentos.store'))
   <Head title="Novo Segmento" />
   <div class="flex items-center justify-between mb-4">
     <h1 class="text-2xl font-semibold">Novo Segmento</h1>
-    <Link :href="route('segmentos.index')" class="text-blue-600">Voltar</Link>
+    <Link :href="route('segmentos.index')" class="text-blue-600">{{ $t('Back') }}</Link>
   </div>
 
   <form @submit.prevent="submit" class="bg-white p-4 rounded shadow max-w-xl">
@@ -17,8 +21,8 @@ const submit = () => form.post(route('segmentos.store'))
     <div v-if="form.errors.nome" class="text-red-600 text-sm mt-1">{{ form.errors.nome }}</div>
 
     <div class="mt-4 flex justify-end gap-2">
-      <Link :href="route('segmentos.index')" class="px-3 py-2 rounded border">Cancelar</Link>
-      <button :disabled="form.processing" class="px-3 py-2 rounded bg-blue-600 text-white">Salvar</button>
+      <Link :href="route('segmentos.index')" class="px-3 py-2 rounded border">{{ $t('Cancel') }}</Link>
+      <button :disabled="form.processing" class="px-3 py-2 rounded bg-blue-600 text-white">{{ $t('Save') }}</button>
     </div>
   </form>
 </template>

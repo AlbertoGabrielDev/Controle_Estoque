@@ -1,13 +1,13 @@
 <script setup>
 import { computed } from 'vue';
-import { usePage, router } from '@inertiajs/vue3';
+import { usePage } from '@inertiajs/vue3';
 import { useI18n } from 'vue-i18n';
 import { changeLocale } from '../i18n';
 
-const page = usePage();
 const { locale: i18nLocale } = useI18n();
+const page = usePage();
 
-const currentLocale = computed(() => page.props.locale || 'pt');
+// We still use availableLocales from backend if shared, or fallback
 const availableLocales = computed(() => page.props.available_locales || ['pt', 'en', 'es']);
 
 const languages = [
@@ -21,19 +21,13 @@ const currentLanguage = computed(() =>
 );
 
 const handleLocaleChange = (code) => {
-    // 1. Update Frontend state (instant for $t calls)
+    // Purely frontend change
     i18nLocale.value = code;
     localStorage.setItem('locale', code);
     document.documentElement.lang = code;
-
-    // 2. Persist to Backend and Refresh all server-side props (menus, etc.)
-    router.post(route('locale.update'), { locale: code }, {
-        preserveState: false, // Force a fresh state from the server
-        preserveScroll: true,
-        onSuccess: () => {
-             // Backend update success
-        }
-    });
+    
+    // We don't call router.post anymore to keep it frontend-only
+    console.log(`Locale changed to: ${code} (Frontend Only)`);
 };
 </script>
 

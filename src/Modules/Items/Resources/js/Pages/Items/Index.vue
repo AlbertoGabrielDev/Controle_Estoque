@@ -1,6 +1,6 @@
 <script setup>
 import { Head, Link } from '@inertiajs/vue3'
-import { onBeforeUnmount, reactive } from 'vue'
+import { computed, onBeforeUnmount, reactive } from 'vue'
 import { useI18n } from 'vue-i18n'
 import DataTable from '@/components/DataTable.vue'
 import { useQueryFilters } from '@/composables/useQueryFilters'
@@ -20,7 +20,7 @@ onBeforeUnmount(() => stopSyncFilters())
 
 const { t } = useI18n()
 
-const dtColumns = [
+const dtColumns = computed(() => [
   { data: 'c1', title: t('SKU') },
   { data: 'c2', title: t('Name') },
   { data: 'c3', title: t('Type') },
@@ -35,7 +35,7 @@ const dtColumns = [
       : `<span class="text-gray-500">${t('Inactive')}</span>`,
   },
   { data: 'acoes', title: t('Actions'), orderable: false, searchable: false },
-]
+])
 </script>
 
 <template>

@@ -27,7 +27,7 @@ defineEmits(['submit'])
     <div>
       <label class="block text-sm font-medium">{{ $t('Parent Center') }}</label>
       <select v-model="props.form.centro_pai_id" class="mt-1 border rounded px-3 py-2 w-full">
-        <option value="">—</option>
+        <option value="">{{ $t('—') }}</option>
         <option v-for="c in props.centrosPai" :key="c.id" :value="c.id">
           {{ c.codigo }} - {{ c.nome }}
         </option>

@@ -4,7 +4,10 @@ import { Link, usePage } from '@inertiajs/vue3'
 import ThemeToggle from '@/Components/ThemeToggle.vue'
 import LanguageSwitcher from '@/Components/LanguageSwitcher.vue'
 
+import { useI18n } from 'vue-i18n'
+
 const page = usePage()
+const { t } = useI18n()
 
 const user = computed(() => page.props.auth?.user ?? null)
 const menus = computed(() => page.props.menus ?? [])
@@ -180,6 +183,19 @@ watch(
         syncOpenGroupsWithRoute()
         closeMobileSidebar()
     }
+)
+
+watch(
+    () => page.props.flash,
+    (flash) => {
+        if (!flash) return
+        if (flash.success) window.showToast(t(flash.success), 'success')
+        if (flash.error) window.showToast(t(flash.error), 'error')
+        if (flash.warning) window.showToast(t(flash.warning), 'warning')
+        if (flash.info) window.showToast(t(flash.info), 'info')
+        if (flash.status) window.showToast(t(flash.status), 'info')
+    },
+    { immediate: true, deep: true }
 )
 
 watch(

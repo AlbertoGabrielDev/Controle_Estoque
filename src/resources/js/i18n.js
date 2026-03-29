@@ -7,16 +7,12 @@ const messages = { pt, en, es };
 
 /**
  * Detect locale based on priority:
- * 1. preferredLocale (passed from prop)
- * 2. localStorage
- * 3. navigator.language
+ * 1. localStorage (User's explicit choice)
+ * 2. navigator.language (Browser preference)
+ * 3. preferredLocale (Inertia prop as fallback)
  * 4. default 'pt'
  */
 function detectLocale(preferredLocale) {
-    if (preferredLocale && ['pt', 'en', 'es'].includes(preferredLocale)) {
-        return preferredLocale;
-    }
-
     const stored = localStorage.getItem('locale');
     if (stored && ['pt', 'en', 'es'].includes(stored)) {
         return stored;
@@ -25,6 +21,10 @@ function detectLocale(preferredLocale) {
     const browser = navigator.language.split('-')[0];
     if (['pt', 'en', 'es'].includes(browser)) {
         return browser;
+    }
+
+    if (preferredLocale && ['pt', 'en', 'es'].includes(preferredLocale)) {
+        return preferredLocale;
     }
 
     return 'pt';
@@ -49,10 +49,19 @@ export function createI18nInstance(preferredLocale) {
     });
 }
 
+/**
+ * Change locale purely in frontend
+ */
 export function changeLocale(i18n, target) {
     if (!['pt', 'en', 'es'].includes(target)) return;
 
-    i18n.global.locale.value = target;
+    if (i18n.global.locale.value) {
+        i18n.global.locale.value = target;
+    } else {
+        // Compatibility for different i18n versions if needed
+        i18n.global.locale = target;
+    }
+    
     localStorage.setItem('locale', target);
     document.documentElement.lang = target;
 }

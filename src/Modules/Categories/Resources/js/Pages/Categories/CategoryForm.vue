@@ -43,7 +43,7 @@ function onImageChange(event) {
     <div class="mt-4">
       <label class="block text-sm font-medium">{{ $t('Parent Category') }}</label>
       <select v-model="props.form.categoria_pai_id" class="mt-1 border rounded px-3 py-2 w-full">
-        <option value="">—</option>
+        <option value="">{{ $t('—') }}</option>
         <option v-for="c in props.categoriasPai" :key="c.id_categoria" :value="c.id_categoria">
           {{ c.nome_categoria }}
         </option>

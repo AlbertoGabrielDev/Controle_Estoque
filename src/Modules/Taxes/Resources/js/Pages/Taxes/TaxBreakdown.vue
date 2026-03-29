@@ -1,29 +1,24 @@
 <script setup>
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
+
 const props = defineProps({
   breakdown: { type: Object, required: true },
-  // formato esperado:
-  // {
-  //   total: 12.34,
-  //   lines: [
-  //     { code:'ICMS', scope:'item', item_id:123, base:100, value:18, label:'ICMS 18%'},
-  //     ...
-  //   ],
-  //   by_code: { ICMS: 18, PIS: 3.5, ... }
-  // }
 })
 </script>
 
 <template>
   <div class="bg-white rounded shadow p-4">
-    <h3 class="text-lg font-semibold mb-3 text-slate-700">Impostos</h3>
+    <h3 class="text-lg font-semibold mb-3 text-slate-700">{{ $t('Taxes') }}</h3>
 
     <table class="w-full">
       <thead class="bg-gray-50">
         <tr>
-          <th class="px-4 py-2 text-left text-sm font-medium text-gray-700">Imposto</th>
-          <th class="px-4 py-2 text-left text-sm font-medium text-gray-700 hidden md:table-cell">Escopo</th>
-          <th class="px-4 py-2 text-left text-sm font-medium text-gray-700 hidden lg:table-cell">Base</th>
-          <th class="px-4 py-2 text-left text-sm font-medium text-gray-700">Valor</th>
+          <th class="px-4 py-2 text-left text-sm font-medium text-gray-700">{{ $t('Tax') }}</th>
+          <th class="px-4 py-2 text-left text-sm font-medium text-gray-700 hidden md:table-cell">{{ $t('Scope') }}</th>
+          <th class="px-4 py-2 text-left text-sm font-medium text-gray-700 hidden lg:table-cell">{{ $t('Base') }}</th>
+          <th class="px-4 py-2 text-left text-sm font-medium text-gray-700">{{ $t('Value') }}</th>
         </tr>
       </thead>
       <tbody class="divide-y divide-gray-200">
@@ -42,12 +37,12 @@ const props = defineProps({
           </td>
         </tr>
         <tr v-if="(breakdown.lines?.length || 0) === 0">
-          <td colspan="4" class="px-4 py-4 text-center text-gray-500">Sem impostos aplicáveis.</td>
+          <td colspan="4" class="px-4 py-4 text-center text-gray-500">{{ $t('No applicable taxes.') }}</td>
         </tr>
       </tbody>
       <tfoot>
         <tr class="border-t">
-          <td class="px-4 py-3 text-sm font-medium text-gray-700" colspan="3">Total de Impostos</td>
+          <td class="px-4 py-3 text-sm font-medium text-gray-700" colspan="3">{{ $t('Total Taxes') }}</td>
           <td class="px-4 py-3 text-sm font-semibold">
             {{ (breakdown.total ?? 0).toLocaleString('pt-BR', { style:'currency', currency:'BRL' }) }}
           </td>

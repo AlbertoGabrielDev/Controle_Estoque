@@ -1,4 +1,8 @@
 <script setup>
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
+
 import { Head, Link, useForm } from '@inertiajs/vue3'
 const props = defineProps({ segmento: Object })
 const form = useForm({ nome: props.segmento.nome })
@@ -9,7 +13,7 @@ const submit = () => form.put(route('segmentos.update', props.segmento.id))
   <Head title="Editar Segmento" />
   <div class="flex items-center justify-between mb-4">
     <h1 class="text-2xl font-semibold">Editar Segmento</h1>
-    <Link :href="route('segmentos.index')" class="text-blue-600">Voltar</Link>
+    <Link :href="route('segmentos.index')" class="text-blue-600">{{ $t('Back') }}</Link>
   </div>
 
   <form @submit.prevent="submit" class="bg-white p-4 rounded shadow max-w-xl">
@@ -28,8 +32,8 @@ const submit = () => form.put(route('segmentos.update', props.segmento.id))
       </Link>
 
       <div class="flex gap-2">
-        <Link :href="route('segmentos.index')" class="px-3 py-2 rounded border">Cancelar</Link>
-        <button :disabled="form.processing" class="px-3 py-2 rounded bg-blue-600 text-white">Salvar</button>
+        <Link :href="route('segmentos.index')" class="px-3 py-2 rounded border">{{ $t('Cancel') }}</Link>
+        <button :disabled="form.processing" class="px-3 py-2 rounded bg-blue-600 text-white">{{ $t('Save') }}</button>
       </div>
     </div>
   </form>

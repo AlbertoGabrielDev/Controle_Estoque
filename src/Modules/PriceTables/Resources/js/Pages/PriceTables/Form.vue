@@ -1,4 +1,8 @@
 ﻿<script setup>
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
+
 import { computed, ref, watch } from 'vue'
 
 const props = defineProps({
@@ -152,13 +156,13 @@ watch([totalItems, perPage], () => {
   <form @submit.prevent="$emit('submit')" class="bg-white p-4 rounded shadow space-y-4">
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
       <div>
-        <label class="block text-sm font-medium">Código</label>
+        <label class="block text-sm font-medium">{{ $t('Código') }}</label>
         <input v-model="props.form.codigo" class="mt-1 border rounded px-3 py-2 w-full">
         <div v-if="props.form.errors.codigo" class="text-red-600 text-sm mt-1">{{ props.form.errors.codigo }}</div>
       </div>
 
       <div>
-        <label class="block text-sm font-medium">Nome</label>
+        <label class="block text-sm font-medium">{{ $t('Nome') }}</label>
         <input v-model="props.form.nome" class="mt-1 border rounded px-3 py-2 w-full">
         <div v-if="props.form.errors.nome" class="text-red-600 text-sm mt-1">{{ props.form.errors.nome }}</div>
       </div>
@@ -166,19 +170,19 @@ watch([totalItems, perPage], () => {
 
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
       <div>
-        <label class="block text-sm font-medium">Moeda</label>
+        <label class="block text-sm font-medium">{{ $t('Moeda') }}</label>
         <input v-model="props.form.moeda" class="mt-1 border rounded px-3 py-2 w-full">
         <div v-if="props.form.errors.moeda" class="text-red-600 text-sm mt-1">{{ props.form.errors.moeda }}</div>
       </div>
 
       <div>
-        <label class="block text-sm font-medium">Início Vigência</label>
+        <label class="block text-sm font-medium">{{ $t('Início Vigência') }}</label>
         <input v-model="props.form.inicio_vigencia" type="date" class="mt-1 border rounded px-3 py-2 w-full">
         <div v-if="props.form.errors.inicio_vigencia" class="text-red-600 text-sm mt-1">{{ props.form.errors.inicio_vigencia }}</div>
       </div>
 
       <div>
-        <label class="block text-sm font-medium">Fim Vigência</label>
+        <label class="block text-sm font-medium">{{ $t('Fim Vigência') }}</label>
         <input v-model="props.form.fim_vigencia" type="date" class="mt-1 border rounded px-3 py-2 w-full">
         <div v-if="props.form.errors.fim_vigencia" class="text-red-600 text-sm mt-1">{{ props.form.errors.fim_vigencia }}</div>
       </div>
@@ -186,7 +190,7 @@ watch([totalItems, perPage], () => {
 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
       <div>
-        <label class="block text-sm font-medium">Tipo da Tabela</label>
+        <label class="block text-sm font-medium">{{ $t('Tipo da Tabela') }}</label>
         <select v-model="props.form.tipo_alvo" class="mt-1 border rounded px-3 py-2 w-full">
           <option value="item">Itens</option>
           <option value="produto">Produtos</option>
@@ -195,10 +199,10 @@ watch([totalItems, perPage], () => {
       </div>
 
       <div>
-        <label class="block text-sm font-medium">Ativo</label>
+        <label class="block text-sm font-medium">{{ $t('Active') }}</label>
         <select v-model="props.form.ativo" class="mt-1 border rounded px-3 py-2 w-full">
-          <option :value="true">Ativo</option>
-          <option :value="false">Inativo</option>
+          <option :value="true">{{ $t('Active') }}</option>
+          <option :value="false">{{ $t('Inactive') }}</option>
         </select>
         <div v-if="props.form.errors.ativo" class="text-red-600 text-sm mt-1">{{ props.form.errors.ativo }}</div>
       </div>
@@ -242,7 +246,7 @@ watch([totalItems, perPage], () => {
             <tr v-for="(row, index) in pagedItens" :key="pageStart + index" class="border-t">
               <td class="px-3 py-2">
                 <select v-model="row.item_id" class="border rounded px-2 py-1 w-full" @change="onProdutoChange(row)">
-                  <option value="">Selecione</option>
+                  <option value="">{{ $t('Selecione') }}</option>
                   <option v-for="opt in filteredOptions()" :key="opt.id" :value="opt.id">{{ opt.label }}</option>
                 </select>
                 <div v-if="props.form.errors[`itens.${pageStart + index}.${props.form.tipo_alvo === 'produto' ? 'produto_id' : 'item_id'}`]" class="text-red-600 text-xs mt-1">
@@ -251,7 +255,7 @@ watch([totalItems, perPage], () => {
               </td>
               <td v-if="props.form.tipo_alvo === 'produto'" class="px-3 py-2">
                 <select v-model="row.marca_id" class="border rounded px-2 py-1 w-full">
-                  <option value="">—</option>
+                  <option value="">{{ $t('—') }}</option>
                   <option v-for="m in marcasForRow(row)" :key="m.id_marca" :value="m.id_marca">
                     {{ m.nome_marca }}
                   </option>
@@ -262,7 +266,7 @@ watch([totalItems, perPage], () => {
               </td>
               <td v-if="props.form.tipo_alvo === 'produto'" class="px-3 py-2">
                 <select v-model="row.fornecedor_id" class="border rounded px-2 py-1 w-full">
-                  <option value="">—</option>
+                  <option value="">{{ $t('—') }}</option>
                   <option v-for="f in fornecedoresForRow(row)" :key="f.id_fornecedor" :value="f.id_fornecedor">
                     {{ f.nome_fornecedor }}
                   </option>
@@ -281,7 +285,7 @@ watch([totalItems, perPage], () => {
                 <input v-model="row.quantidade_minima" type="number" step="1" min="1" class="border rounded px-2 py-1 w-full">
               </td>
               <td class="px-3 py-2">
-                <button type="button" class="px-2 py-1 rounded bg-red-50 text-red-600" @click="removeItem(pageStart + index)">Remover</button>
+                <button type="button" class="px-2 py-1 rounded bg-red-50 text-red-600" @click="removeItem(pageStart + index)">{{ $t('Remove') }}</button>
               </td>
             </tr>
             <tr v-if="!props.form.itens.length">
@@ -302,18 +306,14 @@ watch([totalItems, perPage], () => {
             class="px-2 py-1 rounded border disabled:opacity-50"
             :disabled="currentPage === 1"
             @click="previousPage"
-          >
-            Anterior
-          </button>
+          >{{ $t('Anterior') }}</button>
           <span class="text-slate-600">Página {{ currentPage }} de {{ totalPages }}</span>
           <button
             type="button"
             class="px-2 py-1 rounded border disabled:opacity-50"
             :disabled="currentPage === totalPages"
             @click="nextPage"
-          >
-            Próxima
-          </button>
+          >{{ $t('Próxima') }}</button>
         </div>
       </div>
     </div>

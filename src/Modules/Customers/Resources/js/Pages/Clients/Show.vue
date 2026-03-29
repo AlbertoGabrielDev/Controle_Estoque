@@ -1,4 +1,8 @@
 <script setup>
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
+
 import { Head, Link } from '@inertiajs/vue3'
 
 const props = defineProps({
@@ -21,8 +25,8 @@ const props = defineProps({
       </div>
     </div>
     <div class="flex gap-2">
-      <Link :href="route('clientes.edit', cliente.id_cliente)" class="px-3 py-2 rounded bg-gray-100">Editar</Link>
-      <Link :href="route('clientes.index')" class="px-3 py-2 rounded border">Voltar</Link>
+      <Link :href="route('clientes.edit', cliente.id_cliente)" class="px-3 py-2 rounded bg-gray-100">{{ $t('Edit') }}</Link>
+      <Link :href="route('clientes.index')" class="px-3 py-2 rounded border">{{ $t('Back') }}</Link>
     </div>
   </div>
 

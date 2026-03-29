@@ -1,4 +1,8 @@
 <script setup>
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
+
 import { Head, Link } from '@inertiajs/vue3'
 import DataTable, { esc } from '@/components/DataTable.vue'
 
@@ -14,17 +18,19 @@ function money(v) {
 
 function methodLabel(value) {
   switch (Number(value)) {
-    case 1: return 'Percentual'
-    case 2: return 'Valor fixo'
-    case 3: return 'Fórmula'
+    case 1: return t('Percentage')
+    case 2: return t('Fixed value')
+    case 3: return t('Formula')
     default: return '—'
   }
 }
 
-const dtColumns = [
+import { computed } from 'vue'
+
+const dtColumns = computed(() => [
   // usa data:null e combina c2 + c1 do row
   {
-    data: null, title: 'Taxa',
+    data: null, title: t('Tax'),
     render: (d, type, row) => {
       const label = [row?.c2, row?.c1].filter(Boolean).join(' - ') || '—'
       if (type !== 'display') return label
@@ -32,50 +38,50 @@ const dtColumns = [
       return `<a href="${url}" class="text-blue-600 hover:underline">${esc(label)}</a>`
     }
   },
-  { data: 'seg',  title: 'Segmento',   className: 'hidden lg:table-cell' },
-  { data: 'ufo',  title: 'UF Origem' },
-  { data: 'ufd',  title: 'UF Destino' },
-  { data: 'can',  title: 'Canal',      className: 'hidden xl:table-cell' },
-  { data: 'op',   title: 'Operação',   className: 'hidden xl:table-cell' },
+  { data: 'seg',  title: t('Segment'),   className: 'hidden lg:table-cell' },
+  { data: 'ufo',  title: t('Origin UF') },
+  { data: 'ufd',  title: t('Dest UF') },
+  { data: 'can',  title: t('Channel'),      className: 'hidden xl:table-cell' },
+  { data: 'op',   title: t('Operation'),   className: 'hidden xl:table-cell' },
   {
-    data: 'met', title: 'Método',
-    render: (v, t) => t === 'display' ? methodLabel(v) : v
+    data: 'met', title: t('Method'),
+    render: (v, type) => type === 'display' ? methodLabel(v) : v
   },
   {
-    data: null, title: 'Valor Regra', orderable: false, searchable: false,
-    render: (d, t, row)=> {
-      if (t !== 'display') return row?.aliq ?? row?.vfx ?? ''
+    data: null, title: t('Rule Value'), orderable: false, searchable: false,
+    render: (d, type, row)=> {
+      if (type !== 'display') return row?.aliq ?? row?.vfx ?? ''
       const metodo = Number(row?.met)
       if (metodo === 2) {
         if (row?.vfx === null || row?.vfx === undefined || row?.vfx === '') return '—'
         return money(row.vfx)
       }
       if (metodo === 3) {
-        return '<span class="text-indigo-600">Fórmula</span>'
+        return `<span class="text-indigo-600">${t('Formula')}</span>`
       }
       if (row?.aliq === null || row?.aliq === undefined || row?.aliq === '') return '—'
       return `${Number(row.aliq).toFixed(2)}%`
     }
   },
-  { data: 'prio', title: 'Prioridade' },
+  { data: 'prio', title: t('Priority') },
   {
-    data: 'cum',  title: 'Cumulativo',
-    render: (v,t)=> t==='display' ? (v ? '<span class="text-green-700">Sim</span>' : '<span class="text-gray-500">Não</span>') : v
+    data: 'cum',  title: t('Cumulative'),
+    render: (v, type)=> type==='display' ? (v ? `<span class="text-green-700">${t('Yes')}</span>` : `<span class="text-gray-500">${t('No')}</span>`) : v
   },
   {
-    data: null, title: 'Vigência', defaultContent: '',
-    render: (d,t,row)=> t==='display' ? `${fmtDate(row?.vi)} — ${fmtDate(row?.vf)}` : `${row?.vi}|${row?.vf}`
+    data: null, title: t('Validity'), defaultContent: '',
+    render: (d, type, row)=> type==='display' ? `${fmtDate(row?.vi)} — ${fmtDate(row?.vf)}` : `${row?.vi}|${row?.vf}`
   },
-  { data: 'acoes', title: 'Ações', orderable:false, searchable:false },
-]
+  { data: 'acoes', title: t('Actions'), orderable:false, searchable:false },
+])
 </script>
 
 
 <template>
-  <Head title="Regras de Taxa" />
+  <Head :title="$t('Tax Rules')" />
   <div class="flex items-center justify-between mb-6">
-    <h2 class="text-2xl font-semibold text-slate-700">Regras de Taxa</h2>
-    <Link :href="route('taxes.create')" class="px-3 py-2 rounded bg-blue-600 text-white">Nova Regra</Link>
+    <h2 class="text-2xl font-semibold text-slate-700">{{ $t('Tax Rules') }}</h2>
+    <Link :href="route('taxes.create')" class="px-3 py-2 rounded bg-blue-600 text-white">{{ $t('New Rule') }}</Link>
   </div>
 
   <DataTable

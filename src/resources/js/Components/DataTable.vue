@@ -58,7 +58,10 @@ const props = defineProps({
 
 const { locale } = useI18n()
 const tableRef = ref(null)
+const renderTable = ref(true)
 let dt = null
+let skipNextAjaxLoad = false
+let lastAjaxResponse = null
 
 const resolvedLanguageUrl = computed(() => {
   if (props.languageUrl) return props.languageUrl
@@ -73,12 +76,18 @@ const resolvedLanguageUrl = computed(() => {
 })
 
 function init() {
+  if (!tableRef.value || !tableRef.value.parentNode) return
+
   const $table = window.jQuery(tableRef.value)
   if (!$table || !$table.DataTable) return
 
   // Defensive check: if it's already a DataTable according to the library, destroy it first
-  if (window.jQuery.fn.dataTable.isDataTable(tableRef.value)) {
-    $table.DataTable().destroy()
+  try {
+    if (window.jQuery.fn.dataTable.isDataTable(tableRef.value)) {
+      $table.DataTable().destroy()
+    }
+  } catch (e) {
+    console.warn('Silent fallback: Datatable destroy missed.', e)
   }
 
   const common = {
@@ -116,11 +125,26 @@ function init() {
     dt = $table.DataTable({
       ...common,
       serverSide: true,
-      ajax: {
-        url: props.ajaxUrl,
-        type: 'GET',
-        data: (d) => Object.assign(d, props.ajaxParams || {}),
-        error: (xhr) => console.error('DT Ajax error:', xhr.status, xhr.responseText),
+      ajax: function(data, callback, settings) {
+          if (skipNextAjaxLoad && lastAjaxResponse) {
+              skipNextAjaxLoad = false
+              Promise.resolve().then(() => callback(lastAjaxResponse))
+              return
+          }
+
+          const mergedData = Object.assign({}, data, props.ajaxParams || {})
+          window.jQuery.ajax({
+              url: props.ajaxUrl,
+              type: 'GET',
+              data: mergedData,
+              success: function(json) {
+                  lastAjaxResponse = json
+                  callback(json)
+              },
+              error: function(xhr) {
+                  console.error('DT Ajax error:', xhr.status, xhr.responseText)
+              }
+          })
       },
       columns: props.columns,
     })
@@ -168,20 +192,31 @@ watch(
   { deep: true }
 )
 
-watch(() => props.reinitKey, async () => {
-  destroy()
-  await nextTick()
-  init()
-})
-
 // Consolidate watchers to prevent race conditions during locale change
 watch([locale, () => props.columns], async ([newLocale, newCols], [oldLocale, oldCols]) => {
-  // If only locale changed, but columns didn't (static columns), we still need to re-init for translation
-  // If columns changed, we definitely need to re-init
-  destroy()
-  await nextTick()
-  init()
-}, { deep: false })
+  if (!dt) return;
+  
+  if (newLocale !== oldLocale) {
+     skipNextAjaxLoad = true;
+  }
+  
+  try {
+     if (window.jQuery.fn.dataTable.isDataTable(tableRef.value)) {
+        dt.destroy();
+     }
+  } catch(e) {}
+  dt = null;
+
+  // Force Vue to drop the polluted DOM element
+  renderTable.value = false;
+  await nextTick();
+  
+  // Force Vue to mount a fresh DOM element
+  renderTable.value = true;
+  await nextTick();
+  
+  init();
+}, { deep: true });
 
 watch(() => props.reinitKey, async () => {
   destroy()
@@ -192,7 +227,7 @@ watch(() => props.reinitKey, async () => {
 
 <template>
   <div class="dt-tailwind overflow-x-auto rounded-2xl border border-slate-200/80 bg-white/85 p-3 md:p-4 shadow-sm dark:border-slate-700 dark:bg-slate-900/70">
-    <table :id="tableId" ref="tableRef" class="w-full text-sm">
+    <table v-if="renderTable" :id="tableId" ref="tableRef" class="w-full text-sm">
       <thead class="bg-slate-50/90 dark:bg-slate-800/70">
         <tr>
           <slot name="thead" />

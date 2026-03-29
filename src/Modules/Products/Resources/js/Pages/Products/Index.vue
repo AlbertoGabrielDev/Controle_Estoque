@@ -16,6 +16,11 @@ const form = reactive({
   status: props.filters?.status ?? '',
 })
 
+/**
+ * Filtro automático na URL
+ */
+const stopSyncFilters = useQueryFilters(form, 'produtos.index')
+
 function decodeHtmlEntities(value) {
   if (typeof value !== 'string' || !value.includes('&')) return value
   if (typeof document === 'undefined') return value
@@ -221,4 +226,3 @@ onBeforeUnmount(() => stopSyncFilters())
     :actions-col-index="6"
   />
 </template>
-

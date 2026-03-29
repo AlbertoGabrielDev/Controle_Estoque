@@ -4,7 +4,7 @@ import '@fortawesome/fontawesome-free/css/fontawesome.min.css'
 import '@fortawesome/fontawesome-free/css/solid.min.css'
 
 import { createApp, h } from 'vue'
-import { createInertiaApp } from '@inertiajs/vue3'
+import { createInertiaApp, router } from '@inertiajs/vue3'
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers'
 import { ZiggyVue } from 'ziggy-js'
 
@@ -112,6 +112,11 @@ if (typeof window !== 'undefined' && typeof window.showToast !== 'function') {
   window.showToast = fallbackToast
 }
 
+router.on('before', (event) => {
+  const locale = localStorage.getItem('locale') || 'pt';
+  event.detail.visit.headers['Accept-Language'] = locale;
+});
+
 // Regras de layout
 const USE_PRINCIPAL = [
   /^Dashboard\//, /^Calendar\//, /^Vendas\//, /^Sales\//, /^Spreadsheets\//, /^Estoque\//, /^Categoria\//,
@@ -196,6 +201,7 @@ createInertiaApp({
       }
     }
 
+    window.VueApp = app
     app.mount(el)
     return app
   },
@@ -245,15 +251,17 @@ document.addEventListener('click', async (ev) => {
     btn.classList.toggle('bg-red-400', !active)
     btn.classList.toggle('hover:bg-red-500', !active)
 
+    const t = window.VueApp?.config.globalProperties.$t || ((s) => s)
     const message = data?.message || (active
-      ? 'Status ativado com sucesso!'
-      : 'Status desativado com sucesso!')
+      ? t('Status successfully enabled!')
+      : t('Status successfully disabled!'))
 
     const type = data?.type || (active ? 'success' : 'warning')
     safeShowToast(message, type)
   } catch (err) {
     console.error('toggle-status failed', err)
-    safeShowToast(err?.message || 'Erro ao atualizar status.', 'error')
+    const t = window.VueApp?.config.globalProperties.$t || ((s) => s)
+    safeShowToast(err?.message || t('Error updating status.'), 'error')
   } finally {
     btn.dataset.processing = '0'
   }
