@@ -48,13 +48,13 @@ function customSupplierLabel(option) {
   <form @submit.prevent="$emit('submit')" class="bg-white p-4 rounded shadow space-y-4">
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
       <div>
-        <label class="block text-sm font-medium">Requisicao ID</label>
+        <label class="block text-sm font-medium">{{ $t('Requisicao ID') }}</label>
         <Multiselect
           v-model="selectedRequisition"
           :options="props.requisitionsOptions"
           :custom-label="customRequisitionLabel"
           track-by="id"
-          placeholder="Buscar Requisição"
+          :placeholder="$t('Buscar Requisição')"
           select-label="Enter para esc."
           deselect-label=""
           :use-teleport="true"
@@ -66,14 +66,14 @@ function customSupplierLabel(option) {
         </div>
       </div>
       <div>
-        <label class="block text-sm font-medium">Data Limite</label>
+        <label class="block text-sm font-medium">{{ $t('Data Limite') }}</label>
         <input v-model="props.form.data_limite" type="date" class="mt-1 border rounded px-3 py-2 w-full">
         <div v-if="props.form.errors.data_limite" class="text-red-600 text-sm mt-1">
           {{ props.form.errors.data_limite }}
         </div>
       </div>
       <div>
-        <label class="block text-sm font-medium">Observacoes</label>
+        <label class="block text-sm font-medium">{{ $t('Observacoes') }}</label>
         <input v-model="props.form.observacoes" class="mt-1 border rounded px-3 py-2 w-full">
         <div v-if="props.form.errors.observacoes" class="text-red-600 text-sm mt-1">
           {{ props.form.errors.observacoes }}
@@ -94,7 +94,7 @@ function customSupplierLabel(option) {
           :close-on-select="false"
           :clear-on-select="false"
           track-by="id"
-          placeholder="Pesquisar e adicionar Fornecedores"
+          :placeholder="$t('Pesquisar e adicionar Fornecedores')"
           select-label="Enter p/ adic."
           deselect-label="Enter p/ remv."
           :use-teleport="true"

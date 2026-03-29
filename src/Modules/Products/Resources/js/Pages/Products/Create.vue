@@ -24,11 +24,11 @@ function submit() {
 </script>
 
 <template>
-  <Head title="Cadastro de Produto" />
+  <Head :title="$t('Product Registration')" />
 
   <div class="flex items-center justify-between mb-4">
-    <h1 class="text-2xl font-semibold">Cadastro de Produto</h1>
-    <Link :href="route('produtos.index')" class="text-blue-600">Voltar</Link>
+    <h1 class="text-2xl font-semibold">{{ $t('Product Registration') }}</h1>
+    <Link :href="route('produtos.index')" class="text-blue-600">{{ $t('Back') }}</Link>
   </div>
 
   <ProductForm
@@ -36,7 +36,7 @@ function submit() {
     :categorias="props.categorias"
     :unidades="props.unidades"
     :itens="props.itens"
-    submit-label="Criar Produto"
+    :submit-label="$t('Create Product')"
     @submit="submit"
   />
 </template>

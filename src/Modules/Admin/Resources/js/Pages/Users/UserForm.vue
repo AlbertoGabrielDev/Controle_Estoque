@@ -35,19 +35,19 @@ function onPhotoChange(event) {
   <form @submit.prevent="$emit('submit')" class="bg-white p-4 rounded shadow max-w-4xl">
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
       <div class="md:col-span-2">
-        <label class="block text-sm font-medium">Nome</label>
+        <label class="block text-sm font-medium">{{ $t('Nome') }}</label>
         <input v-model="props.form.name" class="mt-1 border rounded px-3 py-2 w-full">
         <div v-if="props.form.errors.name" class="text-red-600 text-sm mt-1">{{ props.form.errors.name }}</div>
       </div>
 
       <div>
-        <label class="block text-sm font-medium">Email</label>
+        <label class="block text-sm font-medium">{{ $t('Email') }}</label>
         <input v-model="props.form.email" type="email" class="mt-1 border rounded px-3 py-2 w-full">
         <div v-if="props.form.errors.email" class="text-red-600 text-sm mt-1">{{ props.form.errors.email }}</div>
       </div>
 
       <div>
-        <label class="block text-sm font-medium">Senha</label>
+        <label class="block text-sm font-medium">{{ $t('Senha') }}</label>
         <input
           v-model="props.form.password"
           type="password"
@@ -58,16 +58,16 @@ function onPhotoChange(event) {
       </div>
 
       <div>
-        <label class="block text-sm font-medium">Unidade</label>
+        <label class="block text-sm font-medium">{{ $t('Unidade') }}</label>
         <select v-model="props.form.id_unidade" class="mt-1 border rounded px-3 py-2 w-full">
-          <option value="">Selecione</option>
+          <option value="">{{ $t('Selecione') }}</option>
           <option v-for="unit in units" :key="unit.id_unidade" :value="unit.id_unidade">{{ unit.nome }}</option>
         </select>
         <div v-if="props.form.errors.id_unidade" class="text-red-600 text-sm mt-1">{{ props.form.errors.id_unidade }}</div>
       </div>
 
       <div>
-        <label class="block text-sm font-medium">Perfis</label>
+        <label class="block text-sm font-medium">{{ $t('Perfis') }}</label>
         <select v-model="props.form.roles" multiple class="mt-1 border rounded px-3 py-2 w-full min-h-28">
           <option v-for="role in roles" :key="role.id" :value="role.id">{{ role.name }}</option>
         </select>
@@ -75,14 +75,12 @@ function onPhotoChange(event) {
       </div>
 
       <div class="md:col-span-2">
-        <label class="block text-sm font-medium">Foto</label>
+        <label class="block text-sm font-medium">{{ $t('Foto') }}</label>
         <div class="mt-2 flex items-center gap-3">
           <img v-if="imagePreview" :src="imagePreview" alt="preview" class="w-16 h-16 rounded-full object-cover">
           <div v-else class="w-16 h-16 rounded-full bg-gray-100 border"></div>
 
-          <button type="button" class="rounded-md bg-white px-3 py-2 text-sm border hover:bg-gray-50" @click="pickFile">
-            Selecionar arquivo
-          </button>
+          <button type="button" class="rounded-md bg-white px-3 py-2 text-sm border hover:bg-gray-50" @click="pickFile">{{ $t('Selecionar arquivo') }}</button>
           <input ref="fileInput" type="file" class="hidden" accept="image/*" @change="onPhotoChange">
         </div>
         <div v-if="props.form.errors.photo" class="text-red-600 text-sm mt-1">{{ props.form.errors.photo }}</div>

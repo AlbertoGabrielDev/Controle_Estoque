@@ -1,4 +1,8 @@
 <script setup>
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
+
 import { Head, Link, useForm } from '@inertiajs/vue3'
 import RoleForm from './RoleForm.vue'
 
@@ -16,7 +20,7 @@ function submit() {
 
   <div class="flex items-center justify-between mb-4">
     <h1 class="text-2xl font-semibold">Cadastro de Role</h1>
-    <Link :href="route('roles.index')" class="text-blue-600">Voltar</Link>
+    <Link :href="route('roles.index')" class="text-blue-600">{{ $t('Back') }}</Link>
   </div>
 
   <RoleForm :form="form" submit-label="Cadastrar Role" @submit="submit" />

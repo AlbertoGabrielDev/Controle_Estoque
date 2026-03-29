@@ -1,4 +1,8 @@
 <script setup>
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
+
 import { Head, Link } from '@inertiajs/vue3'
 
 const props = defineProps({
@@ -15,8 +19,8 @@ const props = defineProps({
       <div class="text-sm text-slate-600 dark:text-slate-300">Status: {{ props.requisition.status }}</div>
     </div>
     <div class="flex flex-wrap gap-2">
-      <Link :href="route('purchases.requisitions.index')" class="text-blue-600 dark:text-cyan-400">Voltar</Link>
-      <Link v-if="props.requisition.status === 'draft'" :href="route('purchases.requisitions.edit', props.requisition.id)" class="text-blue-600 dark:text-cyan-400">Editar</Link>
+      <Link :href="route('purchases.requisitions.index')" class="text-blue-600 dark:text-cyan-400">{{ $t('Back') }}</Link>
+      <Link v-if="props.requisition.status === 'draft'" :href="route('purchases.requisitions.edit', props.requisition.id)" class="text-blue-600 dark:text-cyan-400">{{ $t('Edit') }}</Link>
       <Link
         v-if="props.requisition.status === 'draft'"
         method="patch"

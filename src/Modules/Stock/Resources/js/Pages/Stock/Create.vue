@@ -32,11 +32,11 @@ function submit() {
 </script>
 
 <template>
-  <Head title="Cadastro de Estoque" />
+  <Head :title="$t('Register Stock')" />
 
   <div class="flex items-center justify-between mb-4">
-    <h1 class="text-2xl font-semibold">Cadastro de Estoque</h1>
-    <Link :href="route('estoque.index')" class="text-blue-600">Voltar</Link>
+    <h1 class="text-2xl font-semibold">{{ $t('Register Stock') }}</h1>
+    <Link :href="route('estoque.index')" class="text-blue-600">{{ $t('Back') }}</Link>
   </div>
 
   <StockForm
@@ -44,7 +44,7 @@ function submit() {
     :fornecedores="props.fornecedores"
     :marcas="props.marcas"
     :produtos="props.produtos"
-    submit-label="Criar Estoque"
+    :submit-label="$t('Create')"
     @submit="submit"
   />
 </template>

@@ -1,5 +1,6 @@
 <script setup>
 import { computed, ref, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { Head, router } from '@inertiajs/vue3'
 import {
   Chart as ChartJS,
@@ -14,6 +15,8 @@ ChartJS.register(
   LineElement, BarElement, PointElement, ArcElement,
   CategoryScale, LinearScale
 )
+
+const { t } = useI18n()
 
 const props = defineProps({
   daily: Object,
@@ -89,7 +92,7 @@ const lineData = computed(() => ({
   labels: props.daily.labels,
   datasets: [
     {
-      label: 'Faturamento (R$)',
+      label: t('Revenue (R$)'),
       data: props.daily.totais,
       borderWidth: 2,
       borderColor: 'rgba(59,130,246,0.8)',
@@ -98,7 +101,7 @@ const lineData = computed(() => ({
       yAxisID: 'y'
     },
     {
-      label: 'Quantidade',
+      label: t('Quantity'),
       data: props.daily.qtds,
       borderWidth: 2,
       borderColor: 'rgba(16,185,129,0.8)',
@@ -166,7 +169,7 @@ const doughnutOptions = {
 const byUnitData = computed(() => ({
   labels: props.byUnit.labels,
   datasets: [{
-    label: 'Faturamento por Unidade (R$)',
+    label: t('Revenue by Unit (R$)'),
     data: props.byUnit.totais,
     backgroundColor: 'rgba(14,165,233,0.75)',
   }]
@@ -185,7 +188,7 @@ const byUnitOptions = {
 const monthlyData = computed(() => ({
   labels: props.monthly.labels,
   datasets: [{
-    label: `Faturamento ${props.monthly.year ?? ''} (R$)`,
+    label: `\${t('Revenue')} ${props.monthly.year ?? ''} (R$)`,
     data: props.monthly.totais,
     backgroundColor: 'rgba(99,102,241,0.7)'
   }]
@@ -195,15 +198,15 @@ const monthlyOptions = { responsive: true, maintainAspectRatio: false, plugins: 
 
 <template>
 
-  <Head title="Dashboard de Vendas" />
+  <Head :title="$t('Sales Dashboard')" />
 
   <div class="space-y-6 dashboard-view">
     <!-- Filtros -->
     <div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
       <div class="flex items-center gap-2">
-        <label for="att" class="text-sm text-gray-600">Usuario:</label>
+        <label for="att" class="text-sm text-gray-600">{{ $t('User') }}:</label>
         <select id="att" v-model="selectedAtt" class="border rounded-lg px-3 py-2 text-sm">
-          <option :value="''">Todos</option>
+          <option :value="''">{{ $t('All') }}</option>
           <option v-for="a in attendants" :key="a.id" :value="a.id">
             {{ a.name }}
           </option>
@@ -212,74 +215,71 @@ const monthlyOptions = { responsive: true, maintainAspectRatio: false, plugins: 
 
       <div class="flex items-end gap-3 flex-wrap">
         <div class="flex flex-col">
-          <label class="text-sm text-gray-600">De</label>
+          <label class="text-sm text-gray-600">{{ $t('From') }}</label>
           <input type="date" v-model="fromDate" class="border rounded-lg px-3 py-2 text-sm" />
         </div>
         <div class="flex flex-col">
-          <label class="text-sm text-gray-600">Até</label>
+          <label class="text-sm text-gray-600">{{ $t('To') }}</label>
           <input type="date" v-model="toDate" class="border rounded-lg px-3 py-2 text-sm" />
         </div>
 
         <button class="bg-blue-600 hover:bg-blue-700 text-white text-sm rounded-lg px-4 py-2" @click="applyFilters()">
-          Aplicar
+          {{ $t('Apply') }}
         </button>
 
         <button class="bg-gray-200 hover:bg-gray-300 text-gray-700 text-sm rounded-lg px-3 py-2" @click="clearDates">
-          Limpar
+          {{ $t('Clear') }}
         </button>
       </div>
     </div>
 
     <!-- Presets -->
     <div class="flex flex-wrap gap-2">
-      <span class="text-sm text-gray-500">Atalhos:</span>
-      <button class="px-3 py-1.5 text-sm rounded bg-gray-100 hover:bg-gray-200" @click="setPreset(7)">Últimos 7
-        dias</button>
-      <button class="px-3 py-1.5 text-sm rounded bg-gray-100 hover:bg-gray-200" @click="setPreset(30)">Últimos 30
-        dias</button>
-      <button class="px-3 py-1.5 text-sm rounded bg-gray-100 hover:bg-gray-200" @click="setThisMonth()">Este
-        mês</button>
-      <button class="px-3 py-1.5 text-sm rounded bg-gray-100 hover:bg-gray-200" @click="setPreset(1)">Hoje</button>
+      <span class="text-sm text-gray-500">{{ $t('Shortcuts') }}:</span>
+      <button class="px-3 py-1.5 text-sm rounded bg-gray-100 hover:bg-gray-200" @click="setPreset(7)">{{ $t('Last 7 days') }}</button>
+      <button class="px-3 py-1.5 text-sm rounded bg-gray-100 hover:bg-gray-200" @click="setPreset(30)">{{ $t('Last 30 days') }}</button>
+      <button class="px-3 py-1.5 text-sm rounded bg-gray-100 hover:bg-gray-200" @click="setThisMonth()">{{ $t('This month') }}</button>
+      <button class="px-3 py-1.5 text-sm rounded bg-gray-100 hover:bg-gray-200" @click="setPreset(1)">{{ $t('Today') }}</button>
     </div>
 
     <!-- Cabeçalho -->
     <div class="flex items-center justify-between">
-      <h1 class="text-2xl md:text-3xl font-bold">Dashboard de Vendas</h1>
+      <h1 class="text-2xl md:text-3xl font-bold">{{ $t('Sales Dashboard') }}</h1>
       <div v-if="unidade" class="text-sm text-gray-500">
-        Unidade: <span class="font-medium">{{ unidade }}</span>
+        {{ $t('Unit') }}: <span class="font-medium">{{ unidade }}</span>
       </div>
     </div>
 
     <!-- KPIs -->
     <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
       <div class="bg-white rounded-xl shadow p-4">
-        <div class="text-sm text-gray-500">Vendas (intervalo)</div>
-        <div class="text-xs text-gray-400">Contagem de vendas no intervalo</div>
+        <div class="text-sm text-gray-500">{{ $t('Sales (interval)') }}</div>
+        <div class="text-xs text-gray-400">{{ $t('Sales count in interval') }}</div>
         <div class="mt-1 text-2xl font-bold">{{ props.kpis?.salesCount ?? 0 }}</div>
       </div>
 
       <div class="bg-white rounded-xl shadow p-4">
-        <div class="text-sm text-gray-500">Faturamento <strong>bruto</strong></div>
-        <div class="text-xs text-gray-400">Soma(preco_venda * quantidade)</div>
+        <div class="text-sm text-gray-500" v-html="$t('Gross Revenue html')"></div>
+        <div class="text-xs text-gray-400">{{ $t('Sum(sale_price * quantity)') }}</div>
         <div class="mt-1 text-2xl font-bold">
           {{ brl.format(props.kpis?.grossRevenue ?? 0) }}
         </div>
       </div>
 
       <div class="bg-white rounded-xl shadow p-4">
-        <div class="text-sm text-gray-500">Faturamento <strong>líquido</strong></div>
-        <div class="text-xs text-gray-400">Bruto - devolucoes - descontos - impostos</div>
+        <div class="text-sm text-gray-500" v-html="$t('Net Revenue html')"></div>
+        <div class="text-xs text-gray-400">{{ $t('Gross - returns - discounts - taxes') }}</div>
         <div class="mt-1 text-2xl font-bold">
           {{ brl.format(props.kpis?.netRevenue ?? 0) }}
         </div>
         <div class="text-xs text-gray-500 mt-1">
-          Impostos: {{ brl.format(props.kpis?.taxes ?? 0) }}
+          {{ $t('Taxes') }}: {{ brl.format(props.kpis?.taxes ?? 0) }}
         </div>
       </div>
 
       <div class="bg-white rounded-xl shadow p-4">
-        <div class="text-sm text-gray-500">Lucro (intervalo)</div>
-        <div class="text-xs text-gray-400">(preco_venda - custo_unit) * qtd</div>
+        <div class="text-sm text-gray-500">{{ $t('Profit (interval)') }}</div>
+        <div class="text-xs text-gray-400">{{ $t('(sale_price - unit_cost) * qty') }}</div>
         <div class="mt-1 text-2xl font-bold">
           {{ brl.format(props.kpis?.profit ?? 0) }}
         </div>
@@ -290,19 +290,19 @@ const monthlyOptions = { responsive: true, maintainAspectRatio: false, plugins: 
     <div class="grid grid-cols-1 lg:grid-cols-6 gap-6">
       <!-- Vendas diárias -->
       <div class="lg:col-span-2 bg-white rounded-xl shadow p-4 pb-6 h-52">
-        <div class="font-semibold mb-2">Vendas diárias</div>
+        <div class="font-semibold mb-2">{{ $t('Daily sales') }}</div>
         <Line :data="lineData" :options="lineOptions" />
       </div>
 
       <!-- Pedidos por status -->
       <div class="lg:col-span-2 bg-white rounded-xl shadow p-4 h-64">
-        <div class="font-semibold mb-2">Pedidos por status</div>
+        <div class="font-semibold mb-2">{{ $t('Orders by status') }}</div>
         <Doughnut :data="doughnutData" :options="doughnutOptions" />
       </div>
 
       <!-- Vendas por unidade -->
       <div class="lg:col-span-2 bg-white rounded-xl shadow p-4 h-64">
-        <div class="font-semibold mb-2">Vendas por unidade</div>
+        <div class="font-semibold mb-2">{{ $t('Sales by unit') }}</div>
         <Bar :data="byUnitData" :options="byUnitOptions" />
       </div>
     </div>
@@ -310,12 +310,12 @@ const monthlyOptions = { responsive: true, maintainAspectRatio: false, plugins: 
     <!-- Linha 2 -->
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
       <div class="bg-white rounded-xl shadow p-4 h-80">
-        <div class="font-semibold mb-2">Top 5 produtos (faturamento)</div>
+        <div class="font-semibold mb-2">{{ $t('Top 5 products (revenue)') }}</div>
         <Bar :data="barTopData" :options="barOptions" />
       </div>
 
       <div class="bg-white rounded-xl shadow p-4 h-80">
-        <div class="font-semibold mb-2">Faturamento mensal</div>
+        <div class="font-semibold mb-2">{{ $t('Monthly revenue') }}</div>
         <Bar :data="monthlyData" :options="monthlyOptions" />
       </div>
     </div>

@@ -1,6 +1,10 @@
 <script setup>
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
+
 import { Head, Link } from '@inertiajs/vue3'
-import { onBeforeUnmount, reactive } from 'vue'
+import { computed, onBeforeUnmount, reactive } from 'vue'
 import DataTable from '@/components/DataTable.vue'
 import { useQueryFilters } from '@/composables/useQueryFilters'
 
@@ -15,10 +19,10 @@ const form = reactive({
 const stopSyncFilters = useQueryFilters(form, 'segmentos.index')
 onBeforeUnmount(() => stopSyncFilters())
 
-const dtColumns = [
-  { data: 'c1',  title: 'Nome', className: 'hidden md:table-cell' },
-  { data: 'acoes', title: 'Ações', orderable: false, searchable: false }
-]
+const dtColumns = computed(() => [
+  { data: 'c1',  title: t('Name'), className: 'hidden md:table-cell' },
+  { data: 'acoes', title: t('Actions'), orderable: false, searchable: false }
+])
 </script>
 
 <template>

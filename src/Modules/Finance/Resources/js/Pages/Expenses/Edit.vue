@@ -27,11 +27,11 @@ function submit() {
 </script>
 
 <template>
-  <Head title="Editar Despesa" />
+  <Head :title="$t('Edit Expense')" />
 
   <div class="flex items-center justify-between mb-4">
-    <h1 class="text-2xl font-semibold">Editar Despesa</h1>
-    <Link :href="route('despesas.index')" class="text-blue-600">Voltar</Link>
+    <h1 class="text-2xl font-semibold">{{ $t('Edit Expense') }}</h1>
+    <Link :href="route('despesas.index')" class="text-blue-600">{{ $t('Back') }}</Link>
   </div>
 
   <ExpenseForm
@@ -39,7 +39,7 @@ function submit() {
     :centros-custo="props.centrosCusto"
     :contas-contabeis="props.contasContabeis"
     :fornecedores="props.fornecedores"
-    submit-label="Salvar Alterações"
+    :submit-label="$t('Save Changes')"
     @submit="submit"
   />
 </template>

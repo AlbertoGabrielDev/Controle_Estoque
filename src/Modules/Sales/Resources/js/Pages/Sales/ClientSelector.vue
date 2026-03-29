@@ -42,8 +42,8 @@ function sanitizeClient() {
   <section class="grid grid-cols-1 md:grid-cols-3 gap-3 items-end">
     <div class="md:col-span-2">
       <label for="sales-client" class="block text-sm font-medium text-gray-700">
-        Cliente (WhatsApp)
-        <span v-if="!required" class="ml-1 text-xs text-gray-500">(Opcional)</span>
+        {{ $t('Customer (WhatsApp)') }}
+        <span v-if="!required" class="ml-1 text-xs text-gray-500">({{ $t('Optional') }})</span>
       </label>
       <input
         id="sales-client"
@@ -63,7 +63,7 @@ function sanitizeClient() {
       :disabled="loading"
       @click="$emit('load-cart')"
     >
-      {{ loading ? 'Carregando...' : 'Carregar Carrinho' }}
+      {{ loading ? $t('Loading data...') : $t('Load Cart') }}
     </button>
   </section>
 </template>

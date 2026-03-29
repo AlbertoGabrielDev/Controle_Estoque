@@ -31,10 +31,10 @@ class CustomerSegmentRepositoryTest extends TestCase
         $repository = app(CustomerSegmentRepository::class);
 
         [$query, $columns] = $repository->makeDatatableQuery(['q' => 'Ativo']);
-        $this->assertGreaterThanOrEqual(1, $query->get()->where('nome', 'Segmento Ativo')->count());
+        $this->assertGreaterThanOrEqual(1, $query->where('nome', 'Segmento Ativo')->count());
 
         [$query, $columns] = $repository->makeDatatableQuery(['q' => 'Inativo']);
-        $this->assertGreaterThanOrEqual(1, $query->get()->where('nome', 'Segmento Inativo')->count());
+        $this->assertGreaterThanOrEqual(1, $query->where('nome', 'Segmento Inativo')->count());
 
         $this->assertIsArray($columns);
         $this->assertArrayHasKey('id', $columns);

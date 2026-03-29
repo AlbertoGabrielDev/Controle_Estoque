@@ -89,7 +89,7 @@ trait HasDatatableConfig
         // 4) Filtros conforme configuração
         foreach ($fltCfg as $param => $cfg) {
             $type = $cfg['type'] ?? 'text';
-            $val  = $request->query($param);
+            $val  = $request->input($param);
 
             $startParam = $cfg['start_param'] ?? ($param.'_from');
             $endParam   = $cfg['end_param']   ?? ($param.'_to');
@@ -137,8 +137,8 @@ trait HasDatatableConfig
                     break;
 
                 case 'daterange':
-                    $from = $request->query($startParam);
-                    $to   = $request->query($endParam);
+                    $from = $request->input($startParam);
+                    $to   = $request->input($endParam);
                     if ($from) $query->whereDate($cfg['column'], '>=', $from);
                     if ($to)   $query->whereDate($cfg['column'], '<=', $to);
                     break;
@@ -148,7 +148,6 @@ trait HasDatatableConfig
         // 5) columnsMap (alias -> db / order / search)
         $columnsMap = [];
         foreach ($colsCfg as $alias => $cfg) {
-            if (!empty($cfg['computed'])) continue;
             $columnsMap[$alias] = [
                 'db'     => $cfg['db']     ?? null,
                 'order'  => (bool) ($cfg['order']  ?? false),

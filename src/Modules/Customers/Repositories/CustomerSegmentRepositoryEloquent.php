@@ -34,17 +34,7 @@ class CustomerSegmentRepositoryEloquent extends BaseRepository implements Custom
      */
     public function makeDatatableQuery(array $filters): array
     {
-        $q = trim((string) ($filters['q'] ?? ''));
-
-        $t = $this->model->getTable();
-
-        $query = $this->model->newQuery()
-            ->when($q !== '', function ($query) use ($q, $t) {
-                $query->where("{$t}.nome", 'like', "%{$q}%");
-            });
-
-        $columnsMap = $this->model::dtColumns();
-
-        return [$query, $columnsMap];
+        $request = \Illuminate\Http\Request::create('/', 'GET', $filters);
+        return $this->model::makeDatatableQuery($request);
     }
 }

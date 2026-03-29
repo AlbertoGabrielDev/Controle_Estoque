@@ -48,13 +48,13 @@ function customSupplierLabel(option) {
   <form @submit.prevent="$emit('submit')" class="bg-white p-4 rounded shadow space-y-4 dark:bg-slate-900 dark:border dark:border-slate-700">
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
       <div>
-        <label class="block text-sm font-medium dark:text-slate-200">Requisição</label>
+        <label class="block text-sm font-medium dark:text-slate-200">{{ $t('Requisição') }}</label>
         <Multiselect
           v-model="selectedRequisition"
           :options="props.requisitionsOptions"
           :custom-label="customRequisitionLabel"
           track-by="id"
-          placeholder="Buscar Requisição"
+          :placeholder="$t('Buscar Requisição')"
           select-label="Enter para selecionar"
           deselect-label=""
           :use-teleport="true"
@@ -65,13 +65,13 @@ function customSupplierLabel(option) {
         </div>
       </div>
       <div>
-        <label class="block text-sm font-medium dark:text-slate-200">Fornecedor</label>
+        <label class="block text-sm font-medium dark:text-slate-200">{{ $t('Fornecedor') }}</label>
         <Multiselect
           v-model="selectedSupplier"
           :options="props.suppliersOptions"
           :custom-label="customSupplierLabel"
           track-by="id"
-          placeholder="Buscar Fornecedor"
+          :placeholder="$t('Buscar Fornecedor')"
           select-label="Enter para selecionar"
           deselect-label=""
           :use-teleport="true"
@@ -85,14 +85,14 @@ function customSupplierLabel(option) {
 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
       <div>
-        <label class="block text-sm font-medium dark:text-slate-200">Data Prevista de Entrega</label>
+        <label class="block text-sm font-medium dark:text-slate-200">{{ $t('Data Prevista de Entrega') }}</label>
         <input v-model="props.form.data_prevista" type="date" class="mt-1 border rounded px-3 py-2 w-full dark:bg-slate-800 dark:border-slate-600 dark:text-slate-200">
         <div v-if="props.form.errors.data_prevista" class="text-red-600 text-sm mt-1">
           {{ props.form.errors.data_prevista }}
         </div>
       </div>
       <div>
-        <label class="block text-sm font-medium dark:text-slate-200">Observações</label>
+        <label class="block text-sm font-medium dark:text-slate-200">{{ $t('Observações') }}</label>
         <input v-model="props.form.observacoes" class="mt-1 border rounded px-3 py-2 w-full dark:bg-slate-800 dark:border-slate-600 dark:text-slate-200">
         <div v-if="props.form.errors.observacoes" class="text-red-600 text-sm mt-1">
           {{ props.form.errors.observacoes }}

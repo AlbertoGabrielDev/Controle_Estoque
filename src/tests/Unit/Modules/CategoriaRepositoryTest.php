@@ -39,10 +39,10 @@ class CategoriaRepositoryTest extends TestCase
         $repository = app(CategoriaRepository::class);
 
         [$query, $columns] = $repository->makeDatatableQuery(['status' => 1]);
-        $this->assertGreaterThanOrEqual(1, $query->get()->where('nome_categoria', 'Categoria Ativa')->count());
+        $this->assertGreaterThanOrEqual(1, $query->where('nome_categoria', 'Categoria Ativa')->count());
 
         [$query, $columns] = $repository->makeDatatableQuery(['q' => 'Inativa']);
-        $this->assertGreaterThanOrEqual(1, $query->get()->where('nome_categoria', 'Categoria Inativa')->count());
+        $this->assertGreaterThanOrEqual(1, $query->where('nome_categoria', 'Categoria Inativa')->count());
 
         $this->assertIsArray($columns);
         $this->assertArrayHasKey('id', $columns);

@@ -20,12 +20,17 @@ function submit() {
 </script>
 
 <template>
-  <Head title="Editar Centro de Custo" />
+  <Head :title="$t('Edit Cost Center')" />
 
   <div class="flex items-center justify-between mb-4">
-    <h1 class="text-2xl font-semibold">Editar Centro de Custo</h1>
-    <Link :href="route('centros_custo.index')" class="text-blue-600">Voltar</Link>
+    <h1 class="text-2xl font-semibold">{{ $t('Edit Cost Center') }}</h1>
+    <Link :href="route('centros_custo.index')" class="text-blue-600">{{ $t('Back') }}</Link>
   </div>
 
-  <CentroForm :form="form" :centros-pai="props.centrosPai" submit-label="Salvar Alterações" @submit="submit" />
+  <CentroForm
+    :form="form"
+    :centros-pai="props.centrosPai"
+    :submit-label="$t('Save Changes')"
+    @submit="submit"
+  />
 </template>

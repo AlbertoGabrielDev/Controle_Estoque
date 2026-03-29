@@ -21,27 +21,27 @@ function submit() {
 </script>
 
 <template>
-  <Head title="Configuracoes de Vendas" />
+  <Head :title="$t('Sales Configuration')" />
 
   <div class="max-w-3xl mx-auto">
     <div class="bg-white rounded-lg shadow-md p-6">
-      <h1 class="text-2xl font-semibold text-slate-700">Configuracoes de Vendas</h1>
+      <h1 class="text-2xl font-semibold text-slate-700">{{ $t('Sales Configuration') }}</h1>
       <p class="text-sm text-slate-500 mt-1">
-        Controle se o numero do cliente (WhatsApp) sera obrigatorio ao registrar vendas.
+        {{ $t('Control whether the customer number (WhatsApp) will be mandatory when recording sales.') }}
       </p>
 
       <div class="mt-6 border rounded-lg bg-slate-50 p-4 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
-          <h2 class="text-sm font-semibold text-slate-700">Obrigar numero do cliente</h2>
+          <h2 class="text-sm font-semibold text-slate-700">{{ $t('Require customer number') }}</h2>
           <p class="text-xs text-slate-500 mt-1">
-            Quando ativo, o sistema exige o numero do cliente para finalizar a venda.
+            {{ $t('When active, the system requires the customer number to finalize the sale.') }}
           </p>
         </div>
 
         <label class="flex items-center gap-3">
           <Checkbox v-model:checked="form.require_client" />
           <span class="text-sm text-slate-600">
-            {{ form.require_client ? 'Ativo' : 'Inativo' }}
+            {{ form.require_client ? $t('Active') : $t('Inactive') }}
           </span>
         </label>
       </div>
@@ -53,10 +53,10 @@ function submit() {
           :disabled="form.processing"
           @click="submit"
         >
-          {{ form.processing ? 'Salvando...' : 'Salvar' }}
+          {{ form.processing ? $t('Saving...') : $t('Save') }}
         </button>
         <span v-if="form.recentlySuccessful" class="text-sm text-emerald-600">
-          Configuracao atualizada.
+          {{ $t('Configuration updated.') }}
         </span>
       </div>
     </div>

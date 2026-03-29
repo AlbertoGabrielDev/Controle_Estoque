@@ -11,10 +11,12 @@ class DataTableActions
         }
 
         $url = route($routeName, $id);
+        $title = __('Edit');
 
         return sprintf(
-            '<a href="%s" class="p-2 text-cyan-600 hover:bg-cyan-50 rounded-md inline-flex items-center" title="Editar"><i class="fas fa-edit"></i></a>',
-            e($url)
+            '<a href="%s" class="p-2 text-cyan-600 hover:bg-cyan-50 rounded-md inline-flex items-center" title="%s"><i class="fas fa-edit"></i></a>',
+            e($url),
+            e($title)
         );
     }
 
@@ -35,22 +37,26 @@ class DataTableActions
             ? 'bg-green-500 hover:bg-green-600'
             : 'bg-red-400 hover:bg-red-500';
 
+        $title = $isActive ? __('Disable') : __('Enable');
+
         return sprintf(
             '<button type="button" class="toggle-status inline-flex items-center justify-center w-10 h-10 rounded-full transition %s" data-url="%s" data-active="%d" aria-pressed="%s" title="%s"><i class="fa-solid fa-power-off text-white"></i></button>',
             $classes,
             e($url),
             $isActive ? 1 : 0,
             $isActive ? 'true' : 'false',
-            $isActive ? 'Desativar' : 'Ativar'
+            e($title)
         );
     }
 
     public static function delete(
         string $routeName,
         string|int $id,
-        string $label = 'Excluir',
-        string $confirmMessage = 'Excluir este registro?'
+        ?string $label = null,
+        ?string $confirmMessage = null
     ): string {
+        $label = $label ?? __('Delete');
+        $confirmMessage = $confirmMessage ?? __('Delete this record?');
         $url = route($routeName, $id);
         $token = csrf_token();
 

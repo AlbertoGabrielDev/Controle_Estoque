@@ -1,6 +1,7 @@
-﻿<script setup>
+<script setup>
 import { Head, Link } from '@inertiajs/vue3'
-import { onBeforeUnmount, reactive } from 'vue'
+import { onBeforeUnmount, reactive, computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import DataTable, { esc, linkify } from '@/components/DataTable.vue'
 import { useQueryFilters } from '@/composables/useQueryFilters'
 
@@ -8,10 +9,17 @@ const props = defineProps({
   filters: Object,
 })
 
+const { t } = useI18n()
+
 const form = reactive({
   q: props.filters?.q ?? '',
   status: props.filters?.status ?? '',
 })
+
+/**
+ * Filtro automático na URL
+ */
+const stopSyncFilters = useQueryFilters(form, 'produtos.index')
 
 function decodeHtmlEntities(value) {
   if (typeof value !== 'string' || !value.includes('&')) return value
@@ -151,14 +159,14 @@ function nutritionTitle(data) {
   return formatNutrition(data)
 }
 
-const dtColumns = [
-  { data: 'c1', title: 'Código' },
-  linkify({ data: 'c2', title: 'Nome' }, { routeName: 'produtos.editar', idField: 'id' }),
-  { data: 'c3', title: 'Descrição', className: 'hidden lg:table-cell' },
-  { data: 'c4', title: 'Unidade' },
+const dtColumns = computed(() => [
+  { data: 'c1', title: t('Code') },
+  linkify({ data: 'c2', title: t('Name') }, { routeName: 'produtos.editar', idField: 'id' }),
+  { data: 'c3', title: t('Description'), className: 'hidden lg:table-cell' },
+  { data: 'c4', title: t('Unit') },
   {
     data: 'c5',
-    title: 'Nutrição',
+    title: t('Nutrition'),
     orderable: false,
     searchable: false,
     render: (data, type) => {
@@ -168,29 +176,28 @@ const dtColumns = [
   },
   {
     data: 'st',
-    title: 'Status',
+    title: t('Status'),
     render: (data) => data
-      ? '<span class="text-green-700">Ativo</span>'
-      : '<span class="text-gray-500">Inativo</span>',
+      ? `<span class="text-green-700">${t('Active')}</span>`
+      : `<span class="text-gray-500">${t('Inactive')}</span>`,
   },
-  { data: 'acoes', title: 'Ações', orderable: false, searchable: false },
-]
+  { data: 'acoes', title: t('Actions'), orderable: false, searchable: false },
+])
 
-const stopSyncFilters = useQueryFilters(form, 'produtos.index')
 onBeforeUnmount(() => stopSyncFilters())
 </script>
 
 <template>
-  <Head title="Produtos" />
+  <Head :title="$t('Products')" />
 
   <div class="flex justify-between items-center mb-6">
-    <h2 class="text-2xl font-semibold text-slate-700">Produtos</h2>
+    <h2 class="text-2xl font-semibold text-slate-700">{{ $t('Products') }}</h2>
     <div class="flex gap-4">
       <Link :href="route('categoria.inicio')" class="flex items-center px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-md text-gray-800 transition-colors">
-        <i class="fas fa-angle-left mr-2"></i>Voltar
+        <i class="fas fa-angle-left mr-2"></i>{{ $t('Back') }}
       </Link>
       <Link :href="route('produtos.cadastro')" class="flex items-center px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-md text-gray-800 transition-colors">
-        <i class="fas fa-plus mr-2"></i>Cadastrar
+        <i class="fas fa-plus mr-2"></i>{{ $t('Create') }}
       </Link>
     </div>
   </div>
@@ -200,12 +207,12 @@ onBeforeUnmount(() => stopSyncFilters())
       v-model="form.q"
       type="text"
       class="px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500"
-      placeholder="Buscar por código, nome, descrição ou unidade"
+      :placeholder="$t('Search by code, name, description or unit')"
     >
     <select v-model="form.status" class="px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500">
-      <option value="">Status</option>
-      <option :value="1">Ativo</option>
-      <option :value="0">Inativo</option>
+      <option value="">{{ $t('Status') }}</option>
+      <option :value="1">{{ $t('Active') }}</option>
+      <option :value="0">{{ $t('Inactive') }}</option>
     </select>
   </div>
 
@@ -219,4 +226,3 @@ onBeforeUnmount(() => stopSyncFilters())
     :actions-col-index="6"
   />
 </template>
-
