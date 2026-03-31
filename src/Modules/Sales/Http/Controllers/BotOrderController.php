@@ -2,54 +2,63 @@
 
 namespace Modules\Sales\Http\Controllers;
 
+use App\Http\Controllers\Bot\BaseBotController;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Modules\Customers\Models\Cliente;
 use Modules\Sales\Models\Order;
 use Modules\Sales\Models\Venda;
 
-class BotOrderController
+class BotOrderController extends BaseBotController
 {
     /**
-     * Pedidos recentes de um cliente por documento (CPF/CNPJ).
+     * Busca pedidos/vendas recentes de um cliente.
      *
      * GET /api/bot/orders?customer_cpf=12345678900
      */
-    public function byCustomerDocument(Request $request): JsonResponse
+    public function search(Request $request): JsonResponse
     {
         $request->validate([
-            'customer_cpf' => 'required|string|min:8|max:20',
+            'customer_cpf' => 'nullable|string|min:8|max:20',
+            'customer_id'  => 'nullable|integer',
+            'limit'        => 'nullable|integer|min:1|max:50',
         ]);
 
-        $doc = preg_replace('/\D/', '', $request->input('customer_cpf'));
+        $query = Venda::query();
+        $limit = $request->input('limit', 20);
 
-        $customer = Cliente::query()
-            ->where('ativo', true)
-            ->where('documento', $doc)
-            ->first();
+        $customer = null;
 
-        if (! $customer) {
-            return response()->json([
-                'found'  => false,
-                'orders' => [],
-            ]);
+        if ($request->filled('customer_id')) {
+            $customer = Cliente::find($request->input('customer_id'));
+        } elseif ($request->filled('customer_cpf')) {
+            $doc = preg_replace('/\D/', '', $request->input('customer_cpf'));
+            $customer = Cliente::query()
+                ->where('ativo', true)
+                ->where('documento', $doc)
+                ->first();
         }
 
-        // Busca vendas recentes do cliente
-        $vendas = Venda::query()
-            ->where('id_usuario_fk', $customer->id_users_fk)
-            ->orderByDesc('created_at')
-            ->limit(10)
-            ->get();
+        if ($customer) {
+            $query->where('id_usuario_fk', $customer->id_users_fk);
+        } else {
+            // Se tentou buscar por cliente não existente
+            if ($request->filled('customer_id') || $request->filled('customer_cpf')) {
+                return $this->responseSuccess(['orders' => [], 'count' => 0, 'found' => false]);
+            }
+        }
 
-        return response()->json([
-            'found'         => true,
-            'customer_name' => $customer->nome ?: $customer->nome_fantasia,
+        $vendas = $query->orderByDesc('created_at')->limit($limit)->get();
+
+        return $this->responseSuccess([
+            'found'         => $customer ? true : false,
+            'customer_name' => $customer ? ($customer->nome ?: $customer->nome_fantasia) : null,
             'orders'        => $vendas->map(fn (Venda $v) => [
+                'id'           => $v->id_venda,
                 'product'      => $v->nome_produto,
                 'product_code' => $v->cod_produto,
                 'quantity'     => (float) $v->quantidade,
-                'unit_price'   => (float) $v->preco_venda,
+                'unit_price'   => $this->formatCurrency($v->preco_venda),
                 'unit'         => $v->unidade_medida,
                 'date'         => $v->created_at?->format('Y-m-d H:i'),
             ]),
@@ -67,19 +76,19 @@ class BotOrderController
         $order = Order::with('items')->find($id);
 
         if (! $order) {
-            return response()->json(['error' => 'Pedido não encontrado'], 404);
+            return $this->responseError('Pedido não encontrado', 404);
         }
 
-        return response()->json([
+        return $this->responseSuccess([
             'order' => [
                 'id'     => $order->id,
                 'client' => $order->client,
                 'status' => $order->status,
-                'total'  => (float) $order->total_valor,
-                'items'  => $order->items->map(fn ($item) => [
+                'total'  => $this->formatCurrency($order->total_valor),
+                'items'  => collect($order->items)->map(fn ($item) => [
                     'product_id' => $item->product_id,
                     'quantity'   => (float) $item->quantity,
-                    'price'      => (float) $item->price,
+                    'price'      => $this->formatCurrency($item->price),
                 ]),
             ],
         ]);

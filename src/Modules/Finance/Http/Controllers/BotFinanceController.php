@@ -2,37 +2,40 @@
 
 namespace Modules\Finance\Http\Controllers;
 
+use App\Http\Controllers\Bot\BaseBotController;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Modules\Customers\Models\Cliente;
 use Modules\Finance\Models\Despesa;
 
-class BotFinanceController
+class BotFinanceController extends BaseBotController
 {
     /**
-     * Saldo / pendências financeiras de um cliente por documento.
+     * Saldo / pendências financeiras de um cliente.
      *
-     * GET /api/bot/finance/customer-balance?cpf=12345678900
-     *
-     * Nota: no momento este endpoint retorna despesas associadas ao fornecedor
-     * que corresponde ao documento do cliente (cenário B2B). Para B2C puro,
-     * o modelo financeiro pode precisar de evolução futura.
+     * GET /api/bot/finance?customer_cpf=12345678900
      */
-    public function customerBalance(Request $request): JsonResponse
+    public function search(Request $request): JsonResponse
     {
         $request->validate([
-            'cpf' => 'required|string|min:8|max:20',
+            'customer_cpf' => 'nullable|string|min:8|max:20',
+            'customer_id'  => 'nullable|integer',
         ]);
 
-        $doc = preg_replace('/\D/', '', $request->input('cpf'));
+        $customer = null;
 
-        $customer = Cliente::query()
-            ->where('ativo', true)
-            ->where('documento', $doc)
-            ->first();
+        if ($request->filled('customer_id')) {
+            $customer = Cliente::find($request->input('customer_id'));
+        } elseif ($request->filled('customer_cpf')) {
+            $doc = preg_replace('/\D/', '', $request->input('customer_cpf'));
+            $customer = Cliente::query()
+                ->where('ativo', true)
+                ->where('documento', $doc)
+                ->first();
+        }
 
         if (! $customer) {
-            return response()->json([
+            return $this->responseSuccess([
                 'found'   => false,
                 'balance' => null,
             ]);
@@ -46,12 +49,12 @@ class BotFinanceController
 
         $totalPurchases = $recentSales->sum(fn ($v) => $v->quantidade * $v->preco_venda);
 
-        return response()->json([
+        return $this->responseSuccess([
             'found'         => true,
             'customer_name' => $customer->nome ?: $customer->nome_fantasia,
-            'credit_limit'  => (float) $customer->limite_credito,
+            'credit_limit'  => $this->formatCurrency($customer->limite_credito),
             'blocked'       => (bool) $customer->bloqueado,
-            'recent_total'  => round($totalPurchases, 2),
+            'recent_total'  => $this->formatCurrency($totalPurchases),
             'recent_count'  => $recentSales->count(),
         ]);
     }

@@ -2,18 +2,19 @@
 
 namespace Modules\PriceTables\Http\Controllers;
 
+use App\Http\Controllers\Bot\BaseBotController;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Modules\PriceTables\Models\TabelaPreco;
 
-class BotPriceTableController
+class BotPriceTableController extends BaseBotController
 {
     /**
      * Tabela de preço ativa com seus produtos.
      *
-     * GET /api/bot/price-tables/active
+     * GET /api/bot/price-tables
      */
-    public function active(): JsonResponse
+    public function search(): JsonResponse
     {
         $table = TabelaPreco::query()
             ->where('ativo', true)
@@ -31,13 +32,13 @@ class BotPriceTableController
             ->first();
 
         if (! $table) {
-            return response()->json([
+            return $this->responseSuccess([
                 'found'       => false,
                 'price_table' => null,
             ]);
         }
 
-        return response()->json([
+        return $this->responseSuccess([
             'found'       => true,
             'price_table' => [
                 'name'     => $table->nome,
@@ -48,9 +49,9 @@ class BotPriceTableController
                 'products' => $table->produtos->map(fn ($p) => [
                     'name'             => $p->nome_produto,
                     'code'             => $p->cod_produto,
-                    'price'            => (float) $p->pivot->preco,
-                    'discount_percent' => (float) ($p->pivot->desconto_percent ?? 0),
-                    'min_quantity'     => (float) ($p->pivot->quantidade_minima ?? 0),
+                    'price'            => $this->formatCurrency($p->pivot->preco),
+                    'discount_percent' => $this->formatCurrency($p->pivot->desconto_percent ?? 0),
+                    'min_quantity'     => $this->formatCurrency($p->pivot->quantidade_minima ?? 0),
                 ]),
             ],
         ]);
@@ -70,7 +71,7 @@ class BotPriceTableController
         $items = json_decode($request->input('items'), true);
 
         if (! is_array($items) || count($items) === 0) {
-            return response()->json(['error' => 'Lista de itens inválida'], 422);
+            return $this->responseError('Lista de itens inválida', 422);
         }
 
         $table = TabelaPreco::query()
@@ -82,7 +83,7 @@ class BotPriceTableController
             ->first();
 
         if (! $table) {
-            return response()->json(['error' => 'Nenhuma tabela de preço ativa'], 404);
+            return $this->responseError('Nenhuma tabela de preço ativa', 404);
         }
 
         $productIds = collect($items)->pluck('product_id')->toArray();
@@ -122,16 +123,16 @@ class BotPriceTableController
                 'product_name' => $product->nome_produto,
                 'found'        => true,
                 'quantity'     => $qty,
-                'unit_price'   => round($finalPrice, 2),
-                'subtotal'     => $subtotal,
+                'unit_price'   => $this->formatCurrency($finalPrice),
+                'subtotal'     => $this->formatCurrency($subtotal),
             ];
         }
 
-        return response()->json([
+        return $this->responseSuccess([
             'price_table' => $table->nome,
             'currency'    => $table->moeda,
             'items'       => $quotedItems,
-            'total'       => round($total, 2),
+            'total'       => $this->formatCurrency($total),
         ]);
     }
 }

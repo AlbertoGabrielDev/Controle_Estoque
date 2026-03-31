@@ -2,37 +2,91 @@
 
 namespace Modules\Products\Http\Controllers;
 
+use App\Helpers\BotSearchHelper;
+use App\Http\Controllers\Bot\BaseBotController;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Modules\Products\Models\Produto;
 
-class BotProductController
+class BotProductController extends BaseBotController
 {
     /**
-     * Busca produtos ativos por nome/código.
+     * Busca produtos ativos.
      *
-     * GET /api/bot/products?search=tomate
+     * GET /api/bot/products?search=tomate&category_id=1&brand_id=2&code=123
      */
     public function search(Request $request): JsonResponse
     {
         $request->validate([
-            'search' => 'required|string|min:2|max:100',
+            'search'      => 'nullable|string|min:2|max:100',
+            'category_id' => 'nullable|integer',
+            'brand_id'    => 'nullable|integer',
+            'code'        => 'nullable|string',
+            'limit'       => 'nullable|integer|min:1|max:50',
         ]);
 
-        $term = $request->input('search');
+        $term = trim((string) $request->input('search'));
+        $categoryId = $request->input('category_id');
+        $brandId = $request->input('brand_id');
+        $code = $request->input('code');
+        $limit = $request->input('limit', 20); // Default pagination to 20
 
-        $products = Produto::query()
-            ->where('status', 1)
-            ->where(function ($q) use ($term) {
+        $query = Produto::query()->where('status', 1);
+
+        if ($term !== '') {
+            $categoryHints = BotSearchHelper::resolveCategoryHints($term);
+            $semanticProductHints = BotSearchHelper::resolveSemanticProductHints($term);
+
+            $query->where(function ($q) use ($term, $categoryHints, $semanticProductHints) {
                 $q->where('nome_produto', 'like', "%{$term}%")
                   ->orWhere('cod_produto', 'like', "%{$term}%")
                   ->orWhere('descricao', 'like', "%{$term}%");
-            })
+
+                if ($categoryHints !== []) {
+                    $q->orWhereHas('categorias', function ($categoryQuery) use ($categoryHints) {
+                        $categoryQuery->where(function ($categoryFilter) use ($categoryHints) {
+                            foreach ($categoryHints as $hint) {
+                                $categoryFilter->orWhere('nome_categoria', 'like', "%{$hint}%");
+                            }
+                        });
+                    });
+                }
+
+                if ($semanticProductHints !== []) {
+                    $q->orWhere(function ($semanticFilter) use ($semanticProductHints) {
+                        foreach ($semanticProductHints as $hint) {
+                            $pattern = BotSearchHelper::toWholeWordRegexPattern($hint);
+                            $semanticFilter
+                                ->orWhereRaw('LOWER(nome_produto) REGEXP ?', [$pattern])
+                                ->orWhereRaw('LOWER(descricao) REGEXP ?', [$pattern]);
+                        }
+                    });
+                }
+            });
+        }
+
+        if ($categoryId) {
+            $query->whereHas('categorias', function ($q) use ($categoryId) {
+                $q->where('categorias.id_categoria', $categoryId);
+            });
+        }
+
+        if ($brandId) {
+            $query->whereHas('marcas', function ($q) use ($brandId) {
+                $q->where('marcas.id_marca', $brandId);
+            });
+        }
+
+        if ($code) {
+            $query->where('cod_produto', $code);
+        }
+
+        $products = $query
             ->with(['categorias:id_categoria,nome_categoria', 'marcas:id_marca,nome_marca', 'unidadeMedida:id,codigo,descricao'])
-            ->limit(20)
+            ->limit($limit)
             ->get();
 
-        return response()->json([
+        return $this->responseSuccess([
             'products' => $products->map(fn (Produto $p) => [
                 'id'          => $p->id_produto,
                 'code'        => $p->cod_produto,
@@ -59,10 +113,10 @@ class BotProductController
             ->find($id);
 
         if (! $product) {
-            return response()->json(['error' => 'Produto não encontrado'], 404);
+            return $this->responseError('Produto não encontrado', 404);
         }
 
-        return response()->json([
+        return $this->responseSuccess([
             'product' => [
                 'id'          => $product->id_produto,
                 'code'        => $product->cod_produto,

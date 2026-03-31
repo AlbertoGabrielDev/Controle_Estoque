@@ -21,16 +21,16 @@ Cliente WhatsApp
 
 ---
 
-## Estratégia: API REST Interna
+## Estratégia: API REST Interna Modular
 
-Os dois projetos se comunicam via **API REST protegida por API Key**. O bot-zap nunca acessa o banco de dados do Controle_Estoque diretamente.
+Os endpoints foram estruturados seguindo uma padronização modular a fim de unificar as responses e fornecer mais flexibilidade via filtros.
+A classe `BaseBotController` padroniza os formatos de moeda e respostas HTTP, e o `BotSearchHelper` fornece a inteligência semântica compartilhada p/ pesquisas.
 
 Vantagens:
 - Projetos 100% desacoplados
-- Cada um escala independentemente
-- Segurança por API Key sem acesso direto ao banco
-- Deploys independentes
-- Respeita as regras do `Agents.md` (sem SQL livre para o modelo)
+- Busca Semântica Centralizada (Categorias e Pistas Semânticas como "fruta" -> "maçã", "uva")
+- Segurança por API Key (Preparada para Multi-Tenant futuro)
+- Respeita as regras de Agents (sem SQL livre para o modelo da IA)
 
 ---
 
@@ -38,112 +38,49 @@ Vantagens:
 
 Todos os endpoints usam o prefixo `/api/bot/` e requerem o header `X-Bot-Api-Key`.
 
-### Products
+### Produtos (`Products`)
 
-| Método | Rota | Descrição |
-|--------|------|-----------|
-| GET | `/api/bot/products?search={termo}` | Busca produtos ativos por nome/código |
-| GET | `/api/bot/products/{id}` | Detalhes de um produto |
+| Método | Rota | Filtros Aceitos | Descrição |
+|--------|------|-----------------|-----------|
+| GET | `/api/bot/products` | `search`, `category_id`, `brand_id`, `code`, `limit` | Busca produtos ativos |
+| GET | `/api/bot/products/{id}` | - | Detalhes de um produto |
 
-**Resposta de busca:**
-```json
-{
-  "products": [
-    {
-      "id": 1,
-      "code": "TOM001",
-      "name": "Tomate Italiano",
-      "description": "Tomate italiano orgânico",
-      "unit": "KG",
-      "categories": ["Hortifruti"],
-      "brands": ["Orgânicos do Vale"]
-    }
-  ],
-  "count": 1
-}
-```
+### Estoque (`Stock`)
 
-### Stock
-
-| Método | Rota | Descrição |
-|--------|------|-----------|
-| GET | `/api/bot/stock?product_id={id}` | Estoque de um produto específico |
-| GET | `/api/bot/stock/availability?search={termo}` | Produtos disponíveis por termo |
-
-**Resposta de estoque:**
-```json
-{
-  "stock": [
-    {
-      "product_name": "Tomate Italiano",
-      "product_code": "TOM001",
-      "quantity": 150.0,
-      "sell_price": 12.50,
-      "brand": "Orgânicos do Vale",
-      "batch": "L2026-03",
-      "location": "Câmara Fria A",
-      "expiry_date": "2026-04-15"
-    }
-  ],
-  "total_quantity": 150.0
-}
-```
+| Método | Rota | Filtros Aceitos | Descrição |
+|--------|------|-----------------|-----------|
+| GET | `/api/bot/stock` | `search`, `product_id`, `batch`, `min_quantity`, `limit` | Busca estoque disponível |
+| GET | `/api/bot/stock/{id}` | - | Detalhes de um item de estoque |
 
 **Nota:** O `preco_custo` (preço de custo) NÃO é exposto na API — apenas `sell_price`.
 
-### Customers
+### Clientes (`Customers`)
 
-| Método | Rota | Descrição |
-|--------|------|-----------|
-| GET | `/api/bot/customers?phone={telefone}` | Busca cliente por telefone/WhatsApp |
-| GET | `/api/bot/customers/{id}/summary` | Resumo do cliente (compras, saldo) |
+| Método | Rota | Filtros Aceitos | Descrição |
+|--------|------|-----------------|-----------|
+| GET | `/api/bot/customers` | `phone`, `document`, `name`, `email`, `limit` | Busca cliente |
+| GET | `/api/bot/customers/{id}` | - | Detalhes do cliente |
+| GET | `/api/bot/customers/{id}/summary` | - | Resumo do cliente (compras, saldo) |
 
-**Resposta de busca por telefone:**
-```json
-{
-  "found": true,
-  "customer": {
-    "id": 1,
-    "name": "João Silva",
-    "document": "12345678900",
-    "whatsapp": "5511999999999",
-    "email": "joao@email.com",
-    "city": "São Paulo",
-    "state": "SP",
-    "segment": "Varejo",
-    "credit_limit": 5000.00,
-    "blocked": false
-  }
-}
-```
+### Vendas e Pedidos (`Sales`)
 
-### Orders (Vendas/Pedidos)
+| Método | Rota | Filtros Aceitos | Descrição |
+|--------|------|-----------------|-----------|
+| GET | `/api/bot/orders` | `customer_cpf`, `customer_id`, `limit` | Vendas recentes por cliente |
+| GET | `/api/bot/orders/{id}` | - | Detalhes e itens de um pedido |
 
-| Método | Rota | Descrição |
-|--------|------|-----------|
-| GET | `/api/bot/orders?customer_cpf={cpf}` | Vendas recentes por CPF/CNPJ |
-| GET | `/api/bot/orders/{id}` | Detalhes de um pedido (order) |
+### Financeiro (`Finance`)
 
-### Finance (Financeiro)
+| Método | Rota | Filtros Aceitos | Descrição |
+|--------|------|-----------------|-----------|
+| GET | `/api/bot/finance` | `customer_cpf`, `customer_id` | Saldo financeiro e totais recentes do cliente |
 
-| Método | Rota | Descrição |
-|--------|------|-----------|
-| GET | `/api/bot/finance/customer-balance?cpf={cpf}` | Saldo financeiro do cliente |
+### Tabelas de Preço (`PriceTables`)
 
-### PriceTables (Tabelas de Preço)
-
-| Método | Rota | Descrição |
-|--------|------|-----------|
-| GET | `/api/bot/price-tables/active` | Tabela de preço ativa |
-| GET | `/api/bot/price-tables/quote?items=[...]` | Cotação para lista de itens |
-
-**Formato do parâmetro `items` para cotação:**
-```json
-[
-  {"product_id": 1, "quantity": 10},
-  {"product_id": 5, "quantity": 5}
-]
-```
+| Método | Rota | Filtros Aceitos | Descrição |
+|--------|------|-----------------|-----------|
+| GET | `/api/bot/price-tables` | - | Retorna a tabela ativa e os produtos no escopo |
+| GET | `/api/bot/price-tables/quote` | `items=[{"product_id": 1, "quantity": 10}]` | Cotação para lista de itens baseada na tabela ativa |
 
 ---
 
@@ -172,81 +109,27 @@ CONTROLE_ESTOQUE_TIMEOUT_MS=3000
 
 ---
 
-## Arquitetura de Arquivos
+## Estrutura Arquitetural da API
 
-### Controle_Estoque (este projeto)
+A estrutura modular da API Bot segue uma arquitetura baseada no `BaseBotController` e nos `api_bot.php` de cada módulo:
 
-Arquivos criados/modificados:
-
-```
+```text
+app/Http/Controllers/Bot/BaseBotController.php     # Controller base com response formatter
+app/Helpers/BotSearchHelper.php                    # Auxiliar centralizado de "Inteligência Semântica"
 app/Http/Middleware/ValidateBotApiKey.php          # Middleware de autenticação API
 app/Http/Kernel.php                                # Registro do alias bot.api.key
-app/Providers/ModuleServiceProvider.php            # Carregamento de api_bot.php
+app/Providers/ModuleServiceProvider.php            # Carregamento automático de api_bot.php
 config/services.php                                # Config bot_api.key
 
-Modules/Products/Http/Controllers/BotProductController.php
-Modules/Products/Routes/api_bot.php
-
-Modules/Stock/Http/Controllers/BotStockController.php
-Modules/Stock/Routes/api_bot.php
-
-Modules/Customers/Http/Controllers/BotCustomerController.php
-Modules/Customers/Routes/api_bot.php
-
-Modules/Sales/Http/Controllers/BotOrderController.php
-Modules/Sales/Routes/api_bot.php
-
-Modules/Finance/Http/Controllers/BotFinanceController.php
-Modules/Finance/Routes/api_bot.php
-
-Modules/PriceTables/Http/Controllers/BotPriceTableController.php
-Modules/PriceTables/Routes/api_bot.php
+Modules/[Nome_Modulo]/Http/Controllers/Bot[Nome_Modulo]Controller.php
+Modules/[Nome_Modulo]/Routes/api_bot.php
 ```
-
-### bot-zap (projeto parceiro — implementação futura)
-
-Arquivos a criar no bot-zap:
-
-```
-modules/whatsapp/backend/src/Application/Services/Ai/EstoqueApiClient.php
-modules/whatsapp/backend/src/Application/Services/Ai/Tools/SearchProductsTool.php
-modules/whatsapp/backend/src/Application/Services/Ai/Tools/GetProductStockTool.php
-modules/whatsapp/backend/src/Application/Services/Ai/Tools/GetProductPriceTool.php
-modules/whatsapp/backend/src/Application/Services/Ai/Tools/GetCustomerOrdersTool.php
-modules/whatsapp/backend/src/Application/Services/Ai/Tools/GetCustomerBalanceTool.php
-modules/whatsapp/backend/src/Application/Services/Ai/Tools/GetStockAvailabilityTool.php
-modules/whatsapp/backend/src/Application/Services/Ai/Agents/StockAgent.php
-```
-
----
-
-## Configuração Docker (Rede Compartilhada)
-
-Para que o bot-zap acesse a API do Controle_Estoque:
-
-**Controle_Estoque `docker-compose.yml` — dar nome fixo à rede:**
-```yaml
-networks:
-  laravel-network:
-    driver: bridge
-    name: shared-network
-```
-
-**bot-zap `docker-compose.dev.yml` — usar rede externa:**
-```yaml
-networks:
-  laravel-net:
-    external: true
-    name: shared-network
-```
-
-Com isso, o container do bot-zap acessa `http://nginx_server/api/bot/...` pela rede Docker.
 
 ---
 
 ## Dados Sensíveis NÃO Expostos
 
-Os seguintes dados **nunca** são retornados pela API:
+Para garantir a segurança dos dados da loja, os seguintes dados **nunca** são retornados pela API:
 - `preco_custo` (preço de custo / margem)
 - `imposto_total` / `impostos_json` (dados fiscais internos)
 - `id_users_fk` (IDs de usuários internos)
@@ -258,26 +141,20 @@ Os seguintes dados **nunca** são retornados pela API:
 
 1. **API Key:** Toda requisição exige header `X-Bot-Api-Key` válido
 2. **Comparação timing-safe:** Usa `hash_equals()` para evitar timing attacks
-3. **Rate limiting:** Middleware `ThrottleRequests` do grupo `api` já está ativo
-4. **Somente leitura:** A API bot é 100% GET — não permite criar, editar ou deletar dados
-5. **Dados mínimos:** Cada endpoint retorna apenas o necessário para o agente IA
+3. **Somente leitura:** A API bot é 100% GET — não permite criar, editar ou deletar dados
+4. **Respostas padronizadas:** Baseadas no `BaseBotController` ocultando detalhes indesejados
 
 ---
 
 ## Fluxo de Exemplo
 
-1. Cliente envia no WhatsApp: *"Tem tomate disponível?"*
-2. bot-zap processa e aciona o agente IA
-3. Gemini identifica a intenção e chama a tool `search_products("tomate")`
-4. A tool faz `GET http://nginx_server/api/bot/stock/availability?search=tomate`
-5. Controle_Estoque responde: `{"available": [{"product_name": "Tomate Italiano", "quantity": 150, ...}]}`
-6. Gemini formula a resposta: *"Sim! Temos Tomate Italiano disponível (150 KG) por R$ 12,50/kg"*
-7. bot-zap envia a resposta pelo WhatsApp
+1. Cliente envia no WhatsApp: *"Tem maçã?"*
+2. bot-zap processa e aciona o agente IA StockAgent.
+3. Gemini identifica a intenção e chama a tool `search_stock("maçã")`.
+4. A tool faz chamada GET para: `http://nginx_server/api/bot/stock?search=maçã`.
+5. O `BotSearchHelper` traduz "maçã" em uma possível query mais ampla (se for categoria 'fruta', ele pega todas as frutas, senão pega apenas maçã por RegExp).
+6. Controle_Estoque responde: `{"stock": [{"product_name": "Maçã Gala", "quantity": 10.5, "sell_price": 5.00}]}`
+7. Gemini formula a resposta: *"Sim! Temos Maçã Gala disponível por R$ 5,00/kg."*
+8. bot-zap envia a resposta pelo WhatsApp.
 
----
-
-## Manutenção
-
-- Para adicionar novos endpoints: crie o controller em `Modules/<Modulo>/Http/Controllers/Bot<Modulo>Controller.php` e registre a rota em `Modules/<Modulo>/Routes/api_bot.php`
-- O `ModuleServiceProvider` carrega automaticamente arquivos `api_bot.php` de todos os módulos
-- Sempre seguir o padrão: sem dados sensíveis, retorno mínimo, somente leitura
+Fim do documento.

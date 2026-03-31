@@ -1,0 +1,67 @@
+# Testes da API do Bot (Integração bot-zap)
+# Requere a extensão "REST Client" ou similar no VS Code.
+
+@baseUrl = http://localhost:8000/api/bot
+# Substitua a chave abaixo pelo valor de BOT_API_KEY do seu .env
+@apiKey = e49a954a9634dd25ca308f045abe16cf94c4cbe080e0de71826c6a43da3d8d6d
+
+### 1. Produtos - Busca Simples
+GET {{baseUrl}}/products?search=tomate
+X-Bot-Api-Key: {{apiKey}}
+Accept: application/json
+
+### 2. Produtos - Busca Semântica (Ex: Frutas)
+GET {{baseUrl}}/products?search=fruta
+X-Bot-Api-Key: {{apiKey}}
+Accept: application/json
+
+### 3. Produtos - Detalhes
+# Substitua {id} pelo ID válido de um produto.
+GET {{baseUrl}}/products/1
+X-Bot-Api-Key: {{apiKey}}
+Accept: application/json
+
+### 4. Estoque - Busca por Produto e Disponibilidade Diária
+GET {{baseUrl}}/stock?product_id=1&min_quantity=1
+X-Bot-Api-Key: {{apiKey}}
+Accept: application/json
+
+### 5. Clientes - Busca por WhatsApp
+# Modifique o telefone para um que exista no seu banco (exemplo apenas com números)
+GET {{baseUrl}}/customers?phone=5511999999999
+X-Bot-Api-Key: {{apiKey}}
+Accept: application/json
+
+### 6. Clientes - Resumo
+# Substitua {id} pelo ID válido de um cliente.
+GET {{baseUrl}}/customers/1/summary
+X-Bot-Api-Key: {{apiKey}}
+Accept: application/json
+
+### 7. Vendas/Pedidos - Recentes por CPF
+# Modifique o CPF para um que exista no banco
+GET {{baseUrl}}/orders?customer_cpf=12345678900
+X-Bot-Api-Key: {{apiKey}}
+Accept: application/json
+
+### 8. Vendas/Pedidos - Detalhes do Pedido
+# Substitua {id} pelo ID válido de uma Venda/Order.
+GET {{baseUrl}}/orders/1
+X-Bot-Api-Key: {{apiKey}}
+Accept: application/json
+
+### 9. Financeiro - Saldo do Cliente
+# Modifique o CPF
+GET {{baseUrl}}/finance?customer_cpf=12345678900
+X-Bot-Api-Key: {{apiKey}}
+Accept: application/json
+
+### 10. Tabela de Preço - Tabela Ativa
+GET {{baseUrl}}/price-tables
+X-Bot-Api-Key: {{apiKey}}
+Accept: application/json
+
+### 11. Tabela de Preço - Cotação Múltipla
+GET {{baseUrl}}/price-tables/quote?items=[{"product_id":1,"quantity":10},{"product_id":2,"quantity":5}]
+X-Bot-Api-Key: {{apiKey}}
+Accept: application/json
