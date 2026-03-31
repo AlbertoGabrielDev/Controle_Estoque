@@ -38,6 +38,7 @@ return [
 
     'bot_api' => [
         'key' => env('BOT_API_KEY'),
+        'api_key' => env('BOT_API_KEY'),
     ],
 
 ];

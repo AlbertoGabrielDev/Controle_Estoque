@@ -80,5 +80,7 @@ class Kernel extends HttpKernel
         'check.permission.auto' => \App\Http\Middleware\CheckPermissionAuto::class,
         'n8n.apikey' => \App\Http\Middleware\ApiKeyMiddleware::class,
         'bot.api.key' => \App\Http\Middleware\ValidateBotApiKey::class,
+        'n8n.apikey' => \App\Http\Middleware\ApiKeyMiddleware::class, // <- apenas aqui
+        'bot.apikey' => \App\Http\Middleware\BotApiKeyMiddleware::class,
     ];
 }
