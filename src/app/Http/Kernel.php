@@ -78,6 +78,7 @@ class Kernel extends HttpKernel
     protected $routeMiddleware = [
         'check.permission' => \App\Http\Middleware\CheckPermission::class,
         'check.permission.auto' => \App\Http\Middleware\CheckPermissionAuto::class,
-        'n8n.apikey' => \App\Http\Middleware\ApiKeyMiddleware::class, // <- apenas aqui
+        'n8n.apikey' => \App\Http\Middleware\ApiKeyMiddleware::class,
+        'bot.api.key' => \App\Http\Middleware\ValidateBotApiKey::class,
     ];
 }

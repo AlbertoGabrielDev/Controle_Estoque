@@ -36,4 +36,8 @@ return [
         'api_key' => env('N8N_API_KEY'),
     ],
 
+    'bot_api' => [
+        'key' => env('BOT_API_KEY'),
+    ],
+
 ];

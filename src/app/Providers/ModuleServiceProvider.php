@@ -52,7 +52,7 @@ class ModuleServiceProvider extends ServiceProvider
                     continue;
                 }
 
-                foreach (['web.php', 'api.php'] as $file) {
+                foreach (['web.php', 'api.php', 'api_bot.php'] as $file) {
                     $fullPath = $routesPath . DIRECTORY_SEPARATOR . $file;
                     if (is_file($fullPath)) {
                         if ($file === 'web.php') {
