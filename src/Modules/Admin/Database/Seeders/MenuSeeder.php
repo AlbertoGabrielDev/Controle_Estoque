@@ -441,5 +441,106 @@ class MenuSeeder extends Seeder
                 'order' => 6,
             ]
         );
+
+        /**
+         * =========================
+         * NOVO: Comercial (CRM leve)
+         * =========================
+         */
+        $commercial = Menu::updateOrCreate(
+            ['slug' => 'commercial'],
+            [
+                'name' => 'Commercial',
+                'slug' => 'commercial',
+                'icon' => 'fas fa-briefcase mr-2',
+                'route' => null,
+                'parent_id' => null,
+                'order' => 14,
+            ]
+        );
+
+        Menu::updateOrCreate(
+            ['slug' => 'commercial_opportunities'],
+            [
+                'name' => 'Opportunities',
+                'slug' => 'commercial_opportunities',
+                'icon' => 'fas fa-bullseye mr-2',
+                'route' => 'commercial.opportunities.index',
+                'parent_id' => $commercial->id,
+                'order' => 1,
+            ]
+        );
+
+        Menu::updateOrCreate(
+            ['slug' => 'commercial_proposals'],
+            [
+                'name' => 'Commercial Proposals',
+                'slug' => 'commercial_proposals',
+                'icon' => 'fas fa-file-signature mr-2',
+                'route' => 'commercial.proposals.index',
+                'parent_id' => $commercial->id,
+                'order' => 2,
+            ]
+        );
+
+        Menu::updateOrCreate(
+            ['slug' => 'commercial_orders'],
+            [
+                'name' => 'Sales Orders',
+                'slug' => 'commercial_orders',
+                'icon' => 'fas fa-file-invoice-dollar mr-2',
+                'route' => 'commercial.orders.index',
+                'parent_id' => $commercial->id,
+                'order' => 3,
+            ]
+        );
+
+        Menu::updateOrCreate(
+            ['slug' => 'commercial_invoices'],
+            [
+                'name' => 'Invoices',
+                'slug' => 'commercial_invoices',
+                'icon' => 'fas fa-receipt mr-2',
+                'route' => 'commercial.invoices.index',
+                'parent_id' => $commercial->id,
+                'order' => 4,
+            ]
+        );
+
+        Menu::updateOrCreate(
+            ['slug' => 'commercial_returns'],
+            [
+                'name' => 'Sales Returns',
+                'slug' => 'commercial_returns',
+                'icon' => 'fas fa-undo mr-2',
+                'route' => 'commercial.returns.index',
+                'parent_id' => $commercial->id,
+                'order' => 5,
+            ]
+        );
+
+        Menu::updateOrCreate(
+            ['slug' => 'commercial_receivables'],
+            [
+                'name' => 'Accounts Receivable',
+                'slug' => 'commercial_receivables',
+                'icon' => 'fas fa-money-check-alt mr-2',
+                'route' => 'commercial.receivables.index',
+                'parent_id' => $commercial->id,
+                'order' => 6,
+            ]
+        );
+
+        Menu::updateOrCreate(
+            ['slug' => 'commercial_discount_policies'],
+            [
+                'name' => 'Discount Policies',
+                'slug' => 'commercial_discount_policies',
+                'icon' => 'fas fa-percent mr-2',
+                'route' => 'commercial.discount-policies.index',
+                'parent_id' => $commercial->id,
+                'order' => 7,
+            ]
+        );
     }
 }

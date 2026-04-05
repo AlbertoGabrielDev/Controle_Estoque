@@ -69,6 +69,22 @@ use Modules\Suppliers\Repositories\FornecedorRepository;
 use Modules\Suppliers\Repositories\FornecedorRepositoryEloquent;
 use Modules\Units\Repositories\UnidadesRepository as ModuleUnidadesRepository;
 use Modules\Units\Repositories\UnidadesRepositoryEloquent as ModuleUnidadesRepositoryEloquent;
+use Modules\Commercial\Repositories\CommercialOpportunityRepository;
+use Modules\Commercial\Repositories\CommercialOpportunityRepositoryEloquent;
+use Modules\Commercial\Repositories\CommercialProposalRepository;
+use Modules\Commercial\Repositories\CommercialProposalRepositoryEloquent;
+use Modules\Commercial\Repositories\CommercialDiscountPolicyRepository;
+use Modules\Commercial\Repositories\CommercialDiscountPolicyRepositoryEloquent;
+use Modules\Commercial\Repositories\CommercialSalesOrderRepository;
+use Modules\Commercial\Repositories\CommercialSalesOrderRepositoryEloquent;
+use Modules\Commercial\Repositories\CommercialSalesInvoiceRepository;
+use Modules\Commercial\Repositories\CommercialSalesInvoiceRepositoryEloquent;
+use Modules\Commercial\Repositories\CommercialSalesReturnRepository;
+use Modules\Commercial\Repositories\CommercialSalesReturnRepositoryEloquent;
+use Modules\Commercial\Repositories\CommercialSalesReceivableRepository;
+use Modules\Commercial\Repositories\CommercialSalesReceivableRepositoryEloquent;
+use Modules\Commercial\Repositories\CommercialDocumentSequenceRepository;
+use Modules\Commercial\Repositories\CommercialDocumentSequenceRepositoryEloquent;
 
 use Illuminate\Pagination\Paginator;
 class AppServiceProvider extends ServiceProvider
@@ -112,6 +128,14 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(UnidadeMedidaRepository::class, UnidadeMedidaRepositoryEloquent::class);
         $this->app->bind(FornecedorRepository::class, FornecedorRepositoryEloquent::class);
         $this->app->bind(ModuleUnidadesRepository::class, ModuleUnidadesRepositoryEloquent::class);
+        $this->app->bind(CommercialOpportunityRepository::class, CommercialOpportunityRepositoryEloquent::class);
+        $this->app->bind(CommercialProposalRepository::class, CommercialProposalRepositoryEloquent::class);
+        $this->app->bind(CommercialDiscountPolicyRepository::class, CommercialDiscountPolicyRepositoryEloquent::class);
+        $this->app->bind(CommercialSalesOrderRepository::class, CommercialSalesOrderRepositoryEloquent::class);
+        $this->app->bind(CommercialSalesInvoiceRepository::class, CommercialSalesInvoiceRepositoryEloquent::class);
+        $this->app->bind(CommercialSalesReturnRepository::class, CommercialSalesReturnRepositoryEloquent::class);
+        $this->app->bind(CommercialSalesReceivableRepository::class, CommercialSalesReceivableRepositoryEloquent::class);
+        $this->app->bind(CommercialDocumentSequenceRepository::class, CommercialDocumentSequenceRepositoryEloquent::class);
     }
 
     /**

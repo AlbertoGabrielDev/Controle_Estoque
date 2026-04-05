@@ -36,6 +36,7 @@ class DatabaseSeeder extends Seeder
             EstoqueSeeder::class,
             PurchasesSeeder::class,
             VendaSeeder::class,
+            CommercialSeeder::class,
         ]);
 
     }

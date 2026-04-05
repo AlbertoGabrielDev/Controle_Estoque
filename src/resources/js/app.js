@@ -125,6 +125,7 @@ const USE_PRINCIPAL = [
   /^Products\//, /^Stock\//,
   /^Clients\//, /^Segments\//, /^Taxes\//,
   /^Settings\//,
+  /^Commercial\//,
   // Cadastro Mestre (MDM)
   /^MeasureUnits\//, /^Items\//, /^PriceTables\//, /^CostCenters\//, /^AccountingAccounts\//,/^Expenses\//,
   /^Purchases\//,

@@ -1,0 +1,6 @@
+{
+  "name": "Commercial",
+  "slug": "commercial",
+  "enabled": true,
+  "description": "Modulo comercial/CRM: oportunidades, propostas, pedidos, faturamento, devolucoes e contas a receber."
+}
