@@ -23,10 +23,14 @@ class ProdutoService
         [$query, $columnsMap] = Produto::makeDatatableQuery($request);
 
         return $this->dataTableService->make(
-            $query,
+            $query->with('categorias'),
             $columnsMap,
-            rawColumns: ['acoes'],
+            rawColumns: ['acoes', 'categorias'],
             decorate: function ($dt) {
+                $dt->addColumn('categorias', function ($row) {
+                    return $row->categorias->pluck('nome_categoria')->implode(', ');
+                });
+
                 $dt->addColumn('acoes', function ($row) {
                     return DataTableActions::wrap([
                         DataTableActions::edit('produtos.editar', $row->id),

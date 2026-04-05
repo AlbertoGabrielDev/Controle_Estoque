@@ -17,6 +17,7 @@ Route::middleware([
         Route::get('/cadastro', [CategoriaController::class, 'cadastro'])->name('categoria.cadastro');
         Route::post('/cadastro', [CategoriaController::class, 'inserirCategoria'])->name('categoria.inserirCategoria');
         Route::get('/produto/{categoria}', [CategoriaController::class, 'produto'])->name('categorias.produto');
+        Route::get('/produto/{categoria}/data', [CategoriaController::class, 'produtoData'])->name('categorias.produto.data');
         Route::get('/editar/{categoriaId}', [CategoriaController::class, 'editar'])->name('categorias.editar');
         Route::post('/editar/{categoriaId}', [CategoriaController::class, 'salvarEditar'])->name('categorias.salvarEditar');
         Route::delete('/{categoriaId}', [CategoriaController::class, 'destroy'])->name('categorias.destroy');

@@ -28,6 +28,7 @@ class BotApiIntegrationTest extends TestCase
             '/api/bot/orders',
             '/api/bot/finance',
             '/api/bot/price-tables',
+            '/api/bot/categories',
         ];
 
         foreach ($endpoints as $endpoint) {
@@ -53,6 +54,7 @@ class BotApiIntegrationTest extends TestCase
             '/api/bot/orders',
             '/api/bot/finance',
             '/api/bot/price-tables',
+            '/api/bot/categories',
         ];
 
         foreach ($endpoints as $endpoint) {

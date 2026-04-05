@@ -128,6 +128,7 @@ class Produto extends Model implements Transformable
             ],
             'c5' => ['db' => "{$t}.inf_nutriente", 'label' => 'Nutricao', 'order' => false, 'search' => false],
             'st' => ['db' => "{$t}.status", 'label' => 'Status', 'order' => true, 'search' => false],
+            'categorias' => ['computed' => true, 'label' => 'Categoria'],
             'acoes' => ['computed' => true],
         ];
     }

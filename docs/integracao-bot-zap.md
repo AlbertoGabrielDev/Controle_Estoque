@@ -24,7 +24,8 @@ Cliente WhatsApp
 ## Estratégia: API REST Interna Modular
 
 Os endpoints foram estruturados seguindo uma padronização modular a fim de unificar as responses e fornecer mais flexibilidade via filtros.
-A classe `BaseBotController` padroniza os formatos de moeda e respostas HTTP, e o `BotSearchHelper` fornece a inteligência semântica compartilhada p/ pesquisas.
+A classe `BaseBotController` padroniza os formatos de moeda e respostas HTTP, garantindo que as respostas sejam consistentes em todos os módulos.
+Buscas por texto (`search`) são dinâmicas e cruzam dados de nomes, códigos e categorias.
 
 Vantagens:
 - Projetos 100% desacoplados
@@ -82,6 +83,13 @@ Todos os endpoints usam o prefixo `/api/bot/` e requerem o header `X-Bot-Api-Key
 | GET | `/api/bot/price-tables` | - | Retorna a tabela ativa e os produtos no escopo |
 | GET | `/api/bot/price-tables/quote` | `items=[{"product_id": 1, "quantity": 10}]` | Cotação para lista de itens baseada na tabela ativa |
 
+### Categorias (`Categories`)
+
+| Método | Rota | Filtros Aceitos | Descrição |
+|--------|------|-----------------|-----------|
+| GET | `/api/bot/categories` | `search`, `limit` | Lista categorias de produtos ativas |
+| GET | `/api/bot/categories/{id}` | - | Detalhes de uma categoria |
+
 ---
 
 ## Autenticação
@@ -115,7 +123,6 @@ A estrutura modular da API Bot segue uma arquitetura baseada no `BaseBotControll
 
 ```text
 app/Http/Controllers/Bot/BaseBotController.php     # Controller base com response formatter
-app/Helpers/BotSearchHelper.php                    # Auxiliar centralizado de "Inteligência Semântica"
 app/Http/Middleware/ValidateBotApiKey.php          # Middleware de autenticação API
 app/Http/Kernel.php                                # Registro do alias bot.api.key
 app/Providers/ModuleServiceProvider.php            # Carregamento automático de api_bot.php
@@ -146,15 +153,18 @@ Para garantir a segurança dos dados da loja, os seguintes dados **nunca** são 
 
 ---
 
-## Fluxo de Exemplo
+---
 
-1. Cliente envia no WhatsApp: *"Tem maçã?"*
-2. bot-zap processa e aciona o agente IA StockAgent.
-3. Gemini identifica a intenção e chama a tool `search_stock("maçã")`.
-4. A tool faz chamada GET para: `http://nginx_server/api/bot/stock?search=maçã`.
-5. O `BotSearchHelper` traduz "maçã" em uma possível query mais ampla (se for categoria 'fruta', ele pega todas as frutas, senão pega apenas maçã por RegExp).
-6. Controle_Estoque responde: `{"stock": [{"product_name": "Maçã Gala", "quantity": 10.5, "sell_price": 5.00}]}`
-7. Gemini formula a resposta: *"Sim! Temos Maçã Gala disponível por R$ 5,00/kg."*
-8. bot-zap envia a resposta pelo WhatsApp.
+## Swagger / OpenAPI
+
+Para uma visualização interativa de todos os endpoints, parâmetros e schemas de resposta, utilize o arquivo de especificação técnica:
+
+- **Arquivo:** [bot_api_swagger.yaml](file:///c:/Users/Alberto%20Gabriel/Documents/Projetos/Controle_Estoque/docs/bot_api_swagger.yaml)
+
+### Como visualizar:
+1. Acesse o [Swagger Editor](https://editor.swagger.io/).
+2. Vá em `File` -> `Import File`.
+3. Selecione o arquivo `docs/bot_api_swagger.yaml`.
+4. Você terá uma interface interativa para testar e entender a estrutura da API.
 
 Fim do documento.

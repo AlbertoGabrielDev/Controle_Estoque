@@ -2,7 +2,7 @@
 
 namespace Modules\Stock\Http\Controllers;
 
-use App\Helpers\BotSearchHelper;
+
 use App\Http\Controllers\Bot\BaseBotController;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -45,35 +45,15 @@ class BotStockController extends BaseBotController
         }
 
         if ($term !== '') {
-            $categoryHints = BotSearchHelper::resolveCategoryHints($term);
-            $semanticProductHints = BotSearchHelper::resolveSemanticProductHints($term);
-
-            $query->whereHas('produtos', function ($q) use ($term, $categoryHints, $semanticProductHints) {
+            $query->whereHas('produtos', function ($q) use ($term) {
                 $q->where('status', 1)
-                  ->where(function ($sub) use ($term, $categoryHints, $semanticProductHints) {
+                  ->where(function ($sub) use ($term) {
                       $sub->where('nome_produto', 'like', "%{$term}%")
                           ->orWhere('cod_produto', 'like', "%{$term}%")
-                          ->orWhere('descricao', 'like', "%{$term}%");
-
-                      if ($categoryHints !== []) {
-                          $sub->orWhereHas('categorias', function ($categoryQuery) use ($categoryHints) {
-                              $categoryQuery->where(function ($categoryFilter) use ($categoryHints) {
-                                  foreach ($categoryHints as $hint) {
-                                      $categoryFilter->orWhere('nome_categoria', 'like', "%{$hint}%");
-                                  }
-                              });
+                          ->orWhere('descricao', 'like', "%{$term}%")
+                          ->orWhereHas('categorias', function ($categoryQuery) use ($term) {
+                              $categoryQuery->where('nome_categoria', 'like', "%{$term}%");
                           });
-                      }
-
-                      if ($semanticProductHints === []) {
-                          return;
-                      }
-
-                      foreach ($semanticProductHints as $hint) {
-                          $pattern = BotSearchHelper::toWholeWordRegexPattern($hint);
-                          $sub->orWhereRaw('LOWER(nome_produto) REGEXP ?', [$pattern])
-                              ->orWhereRaw('LOWER(descricao) REGEXP ?', [$pattern]);
-                      }
                   });
             });
         }

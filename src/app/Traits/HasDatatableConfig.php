@@ -72,6 +72,9 @@ trait HasDatatableConfig
 
         // 3) SELECT com aliases (ignorando computed)
         $selects = [];
+        $pkName  = $instance->getKeyName();
+        $selects[] = DB::raw("{$table}.{$pkName}");
+
         foreach ($colsCfg as $alias => $cfg) {
             if (!empty($cfg['computed'])) continue;
             if (!empty($cfg['db'])) {

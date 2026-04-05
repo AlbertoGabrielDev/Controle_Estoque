@@ -18,3 +18,5 @@
 - Respeitar a modulação do projeto
 - Respeitar a arquitetura do projeto
 - Lembrar de usar caso necessário os componentes de UI criados  
+- Usar o sistema de datatable tanto no front end como no back end (DataTable.vue e DataTableService.php)
+

@@ -164,6 +164,7 @@ const dtColumns = computed(() => [
   linkify({ data: 'c2', title: t('Name') }, { routeName: 'produtos.editar', idField: 'id' }),
   { data: 'c3', title: t('Description'), className: 'hidden lg:table-cell' },
   { data: 'c4', title: t('Unit') },
+  { data: 'categorias', title: t('Category') },
   {
     data: 'c5',
     title: t('Nutrition'),

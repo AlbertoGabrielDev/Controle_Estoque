@@ -2,7 +2,7 @@
 
 namespace Modules\Products\Http\Controllers;
 
-use App\Helpers\BotSearchHelper;
+
 use App\Http\Controllers\Bot\BaseBotController;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -34,34 +34,13 @@ class BotProductController extends BaseBotController
         $query = Produto::query()->where('status', 1);
 
         if ($term !== '') {
-            $categoryHints = BotSearchHelper::resolveCategoryHints($term);
-            $semanticProductHints = BotSearchHelper::resolveSemanticProductHints($term);
-
-            $query->where(function ($q) use ($term, $categoryHints, $semanticProductHints) {
+            $query->where(function ($q) use ($term) {
                 $q->where('nome_produto', 'like', "%{$term}%")
                   ->orWhere('cod_produto', 'like', "%{$term}%")
-                  ->orWhere('descricao', 'like', "%{$term}%");
-
-                if ($categoryHints !== []) {
-                    $q->orWhereHas('categorias', function ($categoryQuery) use ($categoryHints) {
-                        $categoryQuery->where(function ($categoryFilter) use ($categoryHints) {
-                            foreach ($categoryHints as $hint) {
-                                $categoryFilter->orWhere('nome_categoria', 'like', "%{$hint}%");
-                            }
-                        });
-                    });
-                }
-
-                if ($semanticProductHints !== []) {
-                    $q->orWhere(function ($semanticFilter) use ($semanticProductHints) {
-                        foreach ($semanticProductHints as $hint) {
-                            $pattern = BotSearchHelper::toWholeWordRegexPattern($hint);
-                            $semanticFilter
-                                ->orWhereRaw('LOWER(nome_produto) REGEXP ?', [$pattern])
-                                ->orWhereRaw('LOWER(descricao) REGEXP ?', [$pattern]);
-                        }
-                    });
-                }
+                  ->orWhere('descricao', 'like', "%{$term}%")
+                  ->orWhereHas('categorias', function ($categoryQuery) use ($term) {
+                      $categoryQuery->where('nome_categoria', 'like', "%{$term}%");
+                  });
             });
         }
 
@@ -93,6 +72,7 @@ class BotProductController extends BaseBotController
                 'name'        => $p->nome_produto,
                 'description' => $p->descricao,
                 'unit'        => $p->unidadeMedida?->codigo ?? $p->unidade_medida,
+                'category'    => $p->categorias->pluck('nome_categoria')->implode(', '),
                 'categories'  => $p->categorias->pluck('nome_categoria')->toArray(),
                 'brands'      => $p->marcas->pluck('nome_marca')->toArray(),
             ]),

@@ -87,8 +87,14 @@ class CategoriaController extends Controller
 
     public function produto(int|string $categoriaId): InertiaResponse
     {
+        $request = request();
+
         return Inertia::render('Categories/Products', [
             'categoriaId' => (int) $categoriaId,
+            'filters' => [
+                'q' => (string) $request->query('q', ''),
+                'status' => (string) $request->query('status', ''),
+            ],
             'categoria' => fn() => (string) $this->service->findOrFail((int) $categoriaId)->nome_categoria,
             'produtos' => function () use ($categoriaId) {
                 $categoria = $this->service->findOrFail((int) $categoriaId);
@@ -122,6 +128,33 @@ class CategoriaController extends Controller
                 });
             },
         ]);
+    }
+
+    public function produtoData(Request $request, int|string $categoriaId)
+    {
+        [$query, $columnsMap] = Produto::makeDatatableQuery($request);
+
+        $query->whereHas('categorias', function ($categorias) use ($categoriaId) {
+            $categorias->where('categorias.id_categoria', (int) $categoriaId);
+        });
+
+        if (!Gate::allows('permissao')) {
+            $query->where('produtos.status', 1);
+        }
+
+        return $this->dt->make(
+            $query,
+            $columnsMap,
+            rawColumns: ['acoes'],
+            decorate: function ($dt) {
+                $dt->addColumn('acoes', function ($row) {
+                    return DataTableActions::wrap([
+                        DataTableActions::edit('produtos.editar', $row->id),
+                        DataTableActions::status('produto.status', 'produto', $row->id, (bool) $row->st),
+                    ], 'end');
+                });
+            }
+        );
     }
 
     public function editar($categoriaId)

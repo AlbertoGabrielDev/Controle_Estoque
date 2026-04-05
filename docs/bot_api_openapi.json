@@ -1,0 +1,539 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Controle_Estoque - Bot API",
+    "version": "1.0.0",
+    "description": "API para integração entre o ERP Controle_Estoque e agentes de IA (bot-zap).\nEsta API é exclusivamente de leitura (GET) e protegida por chave de API no header."
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8000/api/bot",
+      "description": "Servidor Local (Exemplo)"
+    }
+  ],
+  "security": [
+    {
+      "botApiKey": []
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "botApiKey": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-Bot-Api-Key",
+        "description": "Chave de API configurada no .env (BOT_API_KEY)"
+      }
+    },
+    "schemas": {
+      "SuccessResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": true
+          },
+          "data": {
+            "type": "object"
+          }
+        }
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": false
+          },
+          "error": {
+            "type": "string",
+            "example": "Mensagem descritiva do erro"
+          }
+        }
+      },
+      "Product": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "code": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "unit": {
+            "type": "string"
+          },
+          "category": {
+            "type": "string",
+            "description": "Nomes das categorias concatenados (ex: 'Frutas, Hortifruti')"
+          },
+          "categories": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "brands": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "StockItem": {
+        "type": "object",
+        "properties": {
+          "product_name": {
+            "type": "string"
+          },
+          "product_code": {
+            "type": "string"
+          },
+          "quantity": {
+            "type": "number"
+          },
+          "sell_price": {
+            "type": "string",
+            "example": "R$ 10,00"
+          },
+          "brand": {
+            "type": "string"
+          },
+          "batch": {
+            "type": "string"
+          },
+          "location": {
+            "type": "string"
+          },
+          "expiry_date": {
+            "type": "string",
+            "format": "date"
+          }
+        }
+      },
+      "Customer": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          },
+          "document": {
+            "type": "string"
+          },
+          "phone": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "address": {
+            "type": "string"
+          }
+        }
+      },
+      "Order": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "product": {
+            "type": "string"
+          },
+          "product_code": {
+            "type": "string"
+          },
+          "quantity": {
+            "type": "number"
+          },
+          "unit_price": {
+            "type": "string"
+          },
+          "unit": {
+            "type": "string"
+          },
+          "date": {
+            "type": "string",
+            "example": "2024-03-20 14:30"
+          }
+        }
+      }
+    }
+  },
+  "tags": [
+    {
+      "name": "Products",
+      "description": "Consulta ao catálogo de produtos"
+    },
+    {
+      "name": "Stock",
+      "description": "Verificação de estoque e disponibilidade"
+    },
+    {
+      "name": "Customers",
+      "description": "Identificação e resumo de clientes"
+    },
+    {
+      "name": "Sales",
+      "description": "Histórico de pedidos e detalhes"
+    },
+    {
+      "name": "Finance",
+      "description": "Balanço financeiro"
+    },
+    {
+      "name": "Categories",
+      "description": "Navegação por categorias do sistema"
+    },
+    {
+      "name": "PriceTables",
+      "description": "Tabelas de preço e cotações"
+    }
+  ],
+  "paths": {
+    "/products": {
+      "get": {
+        "tags": [
+          "Products"
+        ],
+        "summary": "Busca produtos ativos",
+        "parameters": [
+          {
+            "name": "search",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Termo de busca (nome, código ou categoria)"
+          },
+          {
+            "name": "category_id",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "brand_id",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 20
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/SuccessResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "properties": {
+                            "products": {
+                              "type": "array",
+                              "items": {
+                                "$ref": "#/components/schemas/Product"
+                              }
+                            },
+                            "count": {
+                              "type": "integer"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/products/{id}": {
+      "get": {
+        "tags": [
+          "Products"
+        ],
+        "summary": "Detalhes de um produto",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Sucesso"
+          },
+          "404": {
+            "description": "Não encontrado"
+          }
+        }
+      }
+    },
+    "/stock": {
+      "get": {
+        "tags": [
+          "Stock"
+        ],
+        "summary": "Busca estoque disponível",
+        "parameters": [
+          {
+            "name": "search",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "product_id",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "min_quantity",
+            "in": "query",
+            "schema": {
+              "type": "number",
+              "default": 0.01
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/SuccessResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "properties": {
+                            "stock": {
+                              "type": "array",
+                              "items": {
+                                "$ref": "#/components/schemas/StockItem"
+                              }
+                            },
+                            "total_quantity": {
+                              "type": "number"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/customers": {
+      "get": {
+        "tags": [
+          "Customers"
+        ],
+        "summary": "Busca cliente por telefone, documento ou nome",
+        "parameters": [
+          {
+            "name": "phone",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "document",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "name",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Sucesso"
+          }
+        }
+      }
+    },
+    "/customers/{id}/summary": {
+      "get": {
+        "tags": [
+          "Customers"
+        ],
+        "summary": "Resumo financeiro do cliente",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Sucesso"
+          }
+        }
+      }
+    },
+    "/orders": {
+      "get": {
+        "tags": [
+          "Sales"
+        ],
+        "summary": "Busca vendas recentes do cliente",
+        "parameters": [
+          {
+            "name": "customer_cpf",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "customer_id",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Sucesso"
+          }
+        }
+      }
+    },
+    "/finance": {
+      "get": {
+        "tags": [
+          "Finance"
+        ],
+        "summary": "Saldo e pendências do cliente",
+        "parameters": [
+          {
+            "name": "customer_cpf",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Sucesso"
+          }
+        }
+      }
+    },
+    "/categories": {
+      "get": {
+        "tags": [
+          "Categories"
+        ],
+        "summary": "Lista categorias ativas",
+        "parameters": [
+          {
+            "name": "search",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Sucesso"
+          }
+        }
+      }
+    },
+    "/price-tables": {
+      "get": {
+        "tags": [
+          "PriceTables"
+        ],
+        "summary": "Tabela de preço ativa",
+        "responses": {
+          "200": {
+            "description": "Sucesso"
+          }
+        }
+      }
+    },
+    "/price-tables/quote": {
+      "get": {
+        "tags": [
+          "PriceTables"
+        ],
+        "summary": "Cotação de itens na tabela ativa",
+        "parameters": [
+          {
+            "name": "items",
+            "in": "query",
+            "description": "JSON array string. Ex: [{\"product_id\":1,\"quantity\":5}]",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Sucesso"
+          }
+        }
+      }
+    }
+  }
+}
